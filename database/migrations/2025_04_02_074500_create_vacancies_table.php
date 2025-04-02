@@ -1,7 +1,9 @@
 <?php
 
 use App\Models\Hierarchy\Position;
+use App\Models\Recruitment\Vacancies\BaseQuestion;
 use App\Models\Recruitment\Vacancies\Vacancy;
+use App\Models\Users\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,7 +17,8 @@ return new class extends Migration
     {
         Schema::create('vacancies', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Position::class);
+            $table->foreignIdFor(User::class, 'assigned_to')->constrained('users');
+            $table->foreignIdFor(Position::class)->constrained('positions');
             $table->enum('type', ['full_time', 'part_time', 'temporary']);
             $table->enum('status', ['open', 'closed']);
             $table->date('closing_date')->nullable();
@@ -37,7 +40,7 @@ return new class extends Migration
             $table->id();
             $table->string('question');
             $table->string('arabic_question')->nullable();
-            $table->enum('type', ['text', 'number', 'email', 'date', 'select', 'checkbox', 'radio']);
+            $table->enum('type', BaseQuestion::TYPES);
             $table->boolean('required')->default(false);
             $table->json('options')->nullable();
             $table->timestamps();
@@ -45,10 +48,10 @@ return new class extends Migration
 
         Schema::create('vacancy_questions', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Vacancy::class);
+            $table->foreignIdFor(Vacancy::class)->constrained('vacancies');
             $table->string('question');
             $table->string('arabic_question')->nullable();
-            $table->enum('type', ['text', 'number', 'email', 'date', 'select', 'checkbox', 'radio']);
+            $table->enum('type', BaseQuestion::TYPES);
             $table->boolean('required')->default(false);
             $table->json('options')->nullable();
             $table->timestamps();
@@ -56,11 +59,11 @@ return new class extends Migration
         
         Schema::create('vacancy_slots', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Vacancy::class);
+            $table->foreignIdFor(Vacancy::class)->constrained('vacancies');
             $table->date('date');
             $table->time('start_time');
             $table->time('end_time');
-        });
+        });        
     }
 
     /**
@@ -68,8 +71,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('vacancy_form_questions');
-        Schema::dropIfExists('base_form_questions');
+        Schema::dropIfExists('vacancy_slots');
+        Schema::dropIfExists('vacancy_questions');
+        Schema::dropIfExists('base_questions');
         Schema::dropIfExists('vacancies');
     }
 };

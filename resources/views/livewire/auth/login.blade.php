@@ -32,7 +32,7 @@
                             </div>
                         </div>
                         <!-- BEGIN: Login Form -->
-                        <div class="space-y-4" >
+                        <form class="space-y-4" wire:submit="checkUser">
                             @csrf
                             <div class="formGroup">
                                 <!-- Typo corrected from "fromGroup" to "formGroup" -->
@@ -85,7 +85,7 @@
                            
                             </div>
                             <button class="btn btn-dark block w-full text-center" wire:click="checkUser">{{ __('auth.login') }}</button>
-                        </div>
+                        </form>
                         <!-- END: Login Form -->
                     </div>
                     <div class="auth-footer text-center">

@@ -16,7 +16,7 @@ return new class extends Migration
     {
         Schema::create('positions', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Department::class);
+            $table->foreignIdFor(Department::class)->constrained('departments');
             $table->string('name');
             $table->string('arabic_name');
 
@@ -32,7 +32,6 @@ return new class extends Migration
             $table->text('job_benefits')->nullable();
             $table->text('arabic_job_benefits')->nullable();
 
-            $table->foreignIdFor(Employee::class)->nullable()->constrained()->nullOnDelete();
             $table->foreignIdFor(Position::class, 'parent_id')->nullable()->constrained('positions')->nullOnDelete();
             $table->timestamps();
         });

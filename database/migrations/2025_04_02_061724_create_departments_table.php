@@ -15,9 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('prefix_code')->unique();
             $table->string('name');
-            $table->string('arabic_name');
             $table->text('desc')->nullable();
-            $table->text('arabic_desc')->nullable();
             $table->timestamps();
         });
     }

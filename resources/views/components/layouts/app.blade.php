@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
-    <title>@yield('title')</title>
+    <title>{{ $title ?? 'HiRe' }}</title>
     <link rel="icon" type="image/png" href="{{ asset('images/logo/tawasoa-favicon.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
@@ -83,13 +83,13 @@
                     <li class="">
                         <a href="javascript:void(0)" class="navItem">
                             <span class="flex items-center">
-                                <span>Main Database</span>
+                                <span>Settings</span>
                             </span>
                             <iconify-icon class="icon-arrow" icon="heroicons-outline:chevron-right"></iconify-icon>
                         </a>
                         <ul class="sidebar-submenu">
                             <li>
-                                <a href="{{ url('employees') }}">Employees</a>
+                                <a class="{{ $usersIndex ?? '' }}" href="{{ url('/settings/users') }}">Users</a>
                             </li>
 
                         </ul>
@@ -194,10 +194,14 @@
                                         type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         <div
                                             class="lg:h-8 lg:w-8 h-7 w-7 rounded-full flex-1 ltr:mr-[10px] rtl:ml-[10px]">
-                                            <span
-                                                class="block w-full h-full object-cover text-center text-lg leading-8 user-initial">
-                                                {{ strtoupper(substr(Auth::user()->username, 0, 1)) }}
+                                            @if(Auth::user()->image_url)
+                                                <img src="{{ Auth::user()->full_image_url }}" class="w-full h-full object-cover rounded-full" alt="user image">
+                                            @else
+                                                <span
+                                                    class="block w-full h-full object-cover text-center text-lg leading-8 user-initial">
+                                                    {{ strtoupper(substr(Auth::user()->username, 0, 1)) }}
                                             </span>
+                                            @endif
                                         </div>
                                         <span
                                             class="flex-none text-slate-600 dark:text-white text-sm font-normal items-center lg:flex hidden overflow-hidden text-ellipsis whitespace-nowrap">
@@ -215,12 +219,12 @@
                                         class="dropdown-menu z-10 hidden bg-white divide-y divide-slate-100 shadow w-44 dark:bg-slate-800 border dark:border-slate-700 !top-[23px] rounded-md    overflow-hidden">
                                         <ul class="py-1 text-sm text-slate-800 dark:text-slate-200">
                                             <li>
-                                                <a href="{{ url('/') }}" target="_blank"
+                                                <a href="{{ url('/profile') }}" target="_blank"
                                                     class="block px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-600 dark:hover:text-white font-inter text-sm text-slate-600 dark:text-white font-normal">
                                                     <iconify-icon icon="heroicons-outline:user"
                                                         class="relative top-[2px] text-lg ltr:mr-1 rtl:ml-1">
                                                     </iconify-icon>
-                                                    <span class="font-Inter">Main Website</span>
+                                                    <span class="font-Inter">Profile</span>
                                                 </a>
                                             </li>
 

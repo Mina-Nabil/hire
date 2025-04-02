@@ -16,25 +16,25 @@ return new class extends Migration
     {
         Schema::create('interviews', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Application::class);
-            $table->foreignIdFor(User::class);
+            $table->foreignIdFor(Application::class)->constrained('applications')->cascadeOnDelete();
+            $table->foreignIdFor(User::class)->constrained('users');
             $table->dateTime('date');
             $table->string('location');
             $table->string('zoom_link')->nullable();
-            $table->string('status')->default('pending');
+            $table->enum('status', Interview::INTERVIEW_STATUSES)->default(Interview::STATUS_PENDING);
             $table->timestamps();
         });
 
         Schema::create('interview_users', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Interview::class);
-            $table->foreignIdFor(User::class);
+            $table->foreignIdFor(Interview::class)->constrained('interviews')->cascadeOnDelete();
+            $table->foreignIdFor(User::class)->constrained('users');
         });
 
         Schema::create('interview_notes', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Interview::class);
-            $table->foreignIdFor(User::class);
+            $table->foreignIdFor(Interview::class)->constrained('interviews')->cascadeOnDelete();
+            $table->foreignIdFor(User::class)->constrained('users');
             $table->string('title');
             $table->text('note')->nullable();
             $table->timestamps();

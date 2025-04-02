@@ -18,6 +18,9 @@ class UsersSeeder extends Seeder
             'username' => 'dev',
             'password' => 'dev@smart',
             'name' => "Smart Dev",
+            'type' => 'admin',
+            'is_active' => true,
+            'default_language' => 'en',
         ]);
     }
 }

@@ -29,10 +29,15 @@ return new class extends Migration
         $locations = json_decode(file_get_contents(resource_path('json/cities.json'))); 
 
         foreach ($cities as $c) {
-            City::newCity($c->governorate_name_ar);
+            City::create([
+                'name' => $c->governorate_name_ar,
+            ]);
         }
         foreach ($locations as $loc) {
-            Area::newArea($loc->city_name_ar, $loc->governorate_id);
+            Area::create([
+                'name' => $loc->city_name_ar,
+                'city_id' => City::where('id', $loc->governorate_id)->first()->id,
+            ]);
         }
     }
 

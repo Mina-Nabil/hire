@@ -3,14 +3,19 @@
 namespace App\Models\Hierarchy;
 
 use App\Exceptions\AppException;
+use Database\Factories\DepartmentFactory;
 use Exception;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Auth;
 
 class Department extends Model
 {
-    const MORPH_NAME = 'department';
+    use HasFactory;
     
+    const MORPH_NAME = 'department';
+
     protected $fillable = [
         'prefix_code',
         'name',
@@ -35,6 +40,12 @@ class Department extends Model
      */
     public static function createDepartment(string $name, string $prefix_code, ?string $description = null): Department
     {
+        /** @var User $loggerInUser */
+        $loggerInUser = Auth::user();
+        if (!$loggerInUser->can('create', Department::class)) {
+            throw new AppException('You are not authorized to create a department');
+        }
+
         try {
             return self::create([
                 'name' => $name,
@@ -51,6 +62,12 @@ class Department extends Model
     ////model methods
     public function editInfo(string $name, string $prefix_code, ?string $description = null): bool
     {
+        /** @var User $loggerInUser */
+        $loggerInUser = Auth::user();
+        if (!$loggerInUser->can('update', $this)) {
+            throw new AppException('You are not authorized to edit this department');
+        }
+
         try {
             return $this->update([
                 'name' => $name,
@@ -61,5 +78,36 @@ class Department extends Model
             report($e);
             throw new AppException('Failed to edit department');
         }
+    }
+
+
+    public function deleteDepartment()
+    {
+        /** @var User $loggerInUser */
+        $loggerInUser = Auth::user();
+        if (!$loggerInUser->can('delete', $this)) {
+            throw new AppException('You are not authorized to delete this department');
+        }
+        // Check if there are any positions associated with this department
+        if ($this->positions()->count() > 0) {
+            throw new AppException('Cannot delete department with associated positions.');
+        } else {
+            $this->delete();
+        }
+    }
+
+
+
+    ///scope methods
+    public function scopeSearch($query, $search)
+    {
+        return $query->where('name', 'like', '%' . $search . '%')
+            ->orWhere('prefix_code', 'like', '%' . $search . '%');
+    }
+
+
+    public static function newFactory()
+    {
+        return DepartmentFactory::new();
     }
 }

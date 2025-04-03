@@ -5,17 +5,24 @@ namespace App\Models\Hierarchy;
 use App\Exceptions\AppException;
 use App\Models\Personel\Employee;
 use App\Models\Recruitment\Vacancies\Vacancy;
+use Database\Factories\PositionFactory;
 use Exception;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Auth;
 
 class Position extends Model
 {
-    const MORPH_NAME = 'position';
+    use HasFactory;
     
+    const MORPH_NAME = 'position';
+
     protected $fillable = [
         'department_id',
+        'code',
+        'sap_code',
         'name',
         'arabic_name',
         'job_description',
@@ -84,6 +91,7 @@ class Position extends Model
     public static function createPosition(
         int $departmentId,
         string $name,
+        ?int $parentId,
         string $arabicName,
         ?string $jobDescription,
         ?string $arabicJobDescription,
@@ -93,7 +101,15 @@ class Position extends Model
         ?string $arabicJobQualifications,
         ?string $jobBenefits,
         ?string $arabicJobBenefits,
+        ?string $code,
+        ?string $sapCode,
     ): Position {
+        /** @var User $loggerInUser */
+        $loggerInUser = Auth::user();
+        if (!$loggerInUser->can('create', Position::class)) {
+            throw new AppException('You are not authorized to create a position');
+        }
+
         try {
             $newPosition = self::create([
                 'department_id' => $departmentId,
@@ -107,6 +123,9 @@ class Position extends Model
                 'arabic_job_qualifications' => $arabicJobQualifications,
                 'job_benefits' => $jobBenefits,
                 'arabic_job_benefits' => $arabicJobBenefits,
+                'parent_id' => $parentId,
+                'code' => $code,
+                'sap_code' => $sapCode,
             ]);
             return $newPosition;
         } catch (Exception $e) {
@@ -121,6 +140,7 @@ class Position extends Model
     public function editInfo(
         int $departmentId,
         string $name,
+        ?int $parentId,
         string $arabicName,
         ?string $jobDescription,
         ?string $arabicJobDescription,
@@ -130,8 +150,17 @@ class Position extends Model
         ?string $arabicJobQualifications,
         ?string $jobBenefits,
         ?string $arabicJobBenefits,
+        ?string $code,
+        ?string $sapCode,
     ): bool {
         try {
+            /** @var User $loggerInUser */
+            $loggerInUser = Auth::user();
+            if (!$loggerInUser->can('update', $this)) {
+                throw new AppException('You are not authorized to edit this position');
+            }
+
+
             return $this->update([
                 'department_id' => $departmentId,
                 'name' => $name,
@@ -144,6 +173,9 @@ class Position extends Model
                 'arabic_job_qualifications' => $arabicJobQualifications,
                 'job_benefits' => $jobBenefits,
                 'arabic_job_benefits' => $arabicJobBenefits,
+                'parent_id' => $parentId,
+                'code' => $code,
+                'sap_code' => $sapCode,
             ]);
         } catch (Exception $e) {
             report($e);
@@ -151,6 +183,34 @@ class Position extends Model
         }
     }
 
+    public function deletePosition()
+    {
+        /** @var User $loggerInUser */
+        $loggerInUser = Auth::user();
+        if (!$loggerInUser->can('delete', $this)) {
+            throw new AppException('You are not authorized to delete this position');
+        }
+
+         // Check if there are child positions
+         if ($this->children()->count() > 0) {
+            throw new AppException('Cannot delete position with child positions. Please reassign or delete child positions first.');
+        } 
+        // Check if there is an employee assigned to this position
+        else if ($this->employee()->exists()) {
+            throw new AppException('Cannot delete position with an assigned employee.');
+        }
+        // Check if there are vacancies for this position
+        else if ($this->vacancies()->count() > 0) {
+            throw new AppException('Cannot delete position with active vacancies.');
+        }
+
+        try {
+            $this->delete();
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException('Failed to delete position');
+        }
+    }
     /**
      * Get position hierarchy level
      * 
@@ -178,5 +238,22 @@ class Position extends Model
     public function isManager(): bool
     {
         return $this->children()->exists();
+    }
+
+
+    ///scope methods
+    public function scopeSearch($query, $search)
+    {
+        return $query->where('name', 'like', '%' . $search . '%')
+            ->orWhere('arabic_name', 'like', '%' . $search . '%')
+            ->orWhereHas('department', function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%');
+            });
+    }
+
+
+    public static function newFactory()
+    {
+        return PositionFactory::new();
     }
 }

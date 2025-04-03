@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
-    <title>{{ $title ? 'HiRe • ' . $title : 'HiRe' }}</title>
+    <title>{{ isset($title) && is_string($title) ? 'HiRe • ' . $title : 'HiRe' }}</title>
     <link rel="icon" type="image/png" href="{{ asset('images/logo/tawasoa-favicon.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
@@ -33,7 +33,9 @@
     @endauth
 
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+
+    @yield('child_styles')
+    
 </head>
 
 <body class=" font-inter dashcode-app">
@@ -79,6 +81,28 @@
             <div class="sidebar-menus bg-white dark:bg-slate-800 py-2 px-4 h-[calc(100%-80px)] overflow-y-auto z-50"
                 id="sidebar_menus">
                 <ul class="sidebar-menu">
+
+                    <li class="">
+                        <a href="javascript:void(0)" class="navItem">
+                            <span class="flex items-center">
+                                <span>Heirarchy</span>
+                            </span>
+                            <iconify-icon class="icon-arrow" icon="heroicons-outline:chevron-right"></iconify-icon>
+                        </a>
+                        <ul class="sidebar-submenu">
+                            @can('viewAny', App\Models\Heirarchy\Position::class)
+                                <li>
+                                    <a class="{{ $positionsIndex ?? '' }}" href="{{ url('/hierarchy/positions') }}">Positions</a>
+                                </li>
+                            @endcan
+                            @can('viewAny', App\Models\Heirarchy\Position::class)
+                                <li>
+                                    <a class="{{ $organizationIndex ?? '' }}" href="{{ url('/hierarchy/tree') }}">Organization</a>
+                                </li>
+                            @endcan
+
+                        </ul>
+                    </li>
 
                     <li class="">
                         <a href="javascript:void(0)" class="navItem">
@@ -316,7 +340,8 @@
     <script src="{{ asset('js/app.js') }}"></script>
 
 
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+
     <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 

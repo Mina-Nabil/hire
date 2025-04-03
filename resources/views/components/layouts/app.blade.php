@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
-    <title>{{ $title ?? 'HiRe' }}</title>
+    <title>{{ $title ? 'HiRe • ' . $title : 'HiRe' }}</title>
     <link rel="icon" type="image/png" href="{{ asset('images/logo/tawasoa-favicon.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
@@ -88,9 +88,16 @@
                             <iconify-icon class="icon-arrow" icon="heroicons-outline:chevron-right"></iconify-icon>
                         </a>
                         <ul class="sidebar-submenu">
-                            <li>
-                                <a class="{{ $usersIndex ?? '' }}" href="{{ url('/settings/users') }}">Users</a>
-                            </li>
+                            @can('viewAny', App\Models\Users\User::class)
+                                <li>
+                                    <a class="{{ $usersIndex ?? '' }}" href="{{ url('/settings/users') }}">Users</a>
+                                </li>
+                            @endcan
+                            @can('viewAny', App\Models\Base\Area::class)
+                                <li>
+                                    <a class="{{ $areasIndex ?? '' }}" href="{{ url('/settings/areas') }}">Areas</a>
+                                </li>
+                            @endcan
 
                         </ul>
                     </li>
@@ -194,13 +201,14 @@
                                         type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         <div
                                             class="lg:h-8 lg:w-8 h-7 w-7 rounded-full flex-1 ltr:mr-[10px] rtl:ml-[10px]">
-                                            @if(Auth::user()->image_url)
-                                                <img src="{{ Auth::user()->full_image_url }}" class="w-full h-full object-cover rounded-full" alt="user image">
+                                            @if (Auth::user()->image_url)
+                                                <img src="{{ Auth::user()->full_image_url }}"
+                                                    class="w-full h-full object-cover rounded-full" alt="user image">
                                             @else
                                                 <span
                                                     class="block w-full h-full object-cover text-center text-lg leading-8 user-initial">
                                                     {{ strtoupper(substr(Auth::user()->username, 0, 1)) }}
-                                            </span>
+                                                </span>
                                             @endif
                                         </div>
                                         <span

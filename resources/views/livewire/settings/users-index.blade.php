@@ -2,7 +2,7 @@
     <div class="flex justify-between flex-wrap items-center">
         <div class="md:mb-6 mb-4 flex space-x-3 rtl:space-x-reverse">
             <h4 class="font-medium lg:text-2xl text-xl capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
-                Users Management
+                {{ __('users.users_management') }}
             </h4>
         </div>
         <div class="flex sm:space-x-4 space-x-2 sm:justify-end items-center md:mb-6 mb-4 rtl:space-x-reverse">
@@ -10,7 +10,7 @@
                 <button wire:click="openNewUserSec"
                     class="btn inline-flex justify-center btn-dark dark:bg-slate-700 dark:text-slate-300 m-1">
                     <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2" icon="ph:plus-bold"></iconify-icon>
-                    Create user
+                    {{ __('users.create_user') }}
                 </button>
             @endcan
 
@@ -20,7 +20,7 @@
         <header class="card-header cust-card-header noborder">
             <iconify-icon wire:loading wire:target="search" class="loading-icon text-lg"
                 icon="line-md:loading-twotone-loop"></iconify-icon>
-            <input type="text" class="form-control !pl-9 mr-1 basis-1/4" placeholder="Search"
+            <input type="text" class="form-control !pl-9 mr-1 basis-1/4" placeholder="{{ __('users.search') }}"
                 wire:model.live.debounce.500ms="search">
         </header>
 
@@ -34,23 +34,23 @@
                                 <tr>
 
                                     <th scope="col" class=" table-th ">
-                                        Name
+                                        {{ __('users.name') }}
                                     </th>
 
                                     <th scope="col" class=" table-th ">
-                                        Username
+                                        {{ __('users.username') }}
                                     </th>
 
                                     <th scope="col" class=" table-th ">
-                                        Type
+                                        {{ __('users.type') }}
                                     </th>
 
                                     <th scope="col" class=" table-th ">
-                                        Active?
+                                        {{ __('users.active') }}
                                     </th>
 
                                     <th scope="col" class=" table-th ">
-                                        Action
+                                        {{ __('users.action') }}
                                     </th>
 
 
@@ -89,10 +89,10 @@
                                         <td class="table-td">
                                             @if ($user->is_active)
                                                 <span
-                                                    class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Active</span>
+                                                    class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">{{ __('users.active_status') }}</span>
                                             @else
                                                 <span
-                                                    class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Deactivated</span>
+                                                    class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">{{ __('users.deactivated_status') }}</span>
                                             @endif
 
                                         </td>
@@ -111,14 +111,14 @@
                                                         <span
                                                             class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300  last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize  rtl:space-x-reverse">
                                                             <iconify-icon icon="lucide:edit"></iconify-icon>
-                                                            <span>Edit</span></span>
+                                                            <span>{{ __('users.edit') }}</span></span>
                                                     </li>
 
                                                     <li wire:click="openChangePasswordModal({{ $user->id }})">
                                                         <span
                                                             class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300  last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize  rtl:space-x-reverse">
                                                             <iconify-icon icon="lucide:key"></iconify-icon>
-                                                            <span>Change Password</span></span>
+                                                            <span>{{ __('users.change_password') }}</span></span>
                                                     </li>
 
                                                     @if ($user->is_active)
@@ -127,7 +127,7 @@
                                                                 class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300  last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize  rtl:space-x-reverse">
                                                                 <iconify-icon
                                                                     icon="ant-design:stop-twotone"></iconify-icon>
-                                                                <span>Set As Deactivated</span></span>
+                                                                <span>{{ __('users.set_as_deactivated') }}</span></span>
                                                         </li>
                                                     @else
                                                         <li wire:click="toggleUserStatus({{ $user->id }})">
@@ -135,7 +135,7 @@
                                                                 class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300  last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize  rtl:space-x-reverse">
                                                                 <iconify-icon
                                                                     icon="teenyicons:tick-circle-outline"></iconify-icon>
-                                                                <span>Set As Active</span></span>
+                                                                <span>{{ __('users.set_as_active') }}</span></span>
                                                         </li>
                                                     @endif
 
@@ -158,14 +158,11 @@
                                 <div class="card-body rounded-md bg-white dark:bg-slate-800">
                                     <div class="items-center text-center p-5">
                                         <h2><iconify-icon icon="icon-park-outline:search"></iconify-icon></h2>
-                                        <h2 class="card-title text-slate-900 dark:text-white mb-3">No users with the
-                                            applied
-                                            filters</h2>
-                                        <p class="card-text">Try changing the filters or search terms for this view.
+                                        <h2 class="card-title text-slate-900 dark:text-white mb-3">{{ __('users.no_users_with_filters') }}</h2>
+                                        <p class="card-text">{{ __('users.try_changing_filters') }}
                                         </p>
                                         <a href="{{ url('/users') }}"
-                                            class="btn inline-flex justify-center mx-2 mt-3 btn-primary active btn-sm">View
-                                            all users</a>
+                                            class="btn inline-flex justify-center mx-2 mt-3 btn-primary active btn-sm">{{ __('users.view_all_users') }}</a>
                                     </div>
                                 </div>
                             </div>
@@ -174,7 +171,9 @@
                     </div>
 
                 </div>
-
+                <div class="mt-6">
+                    {{ $users->links('vendor.livewire.simple-bootstrap') }}
+                </div>
             </div>
         </div>
     </div>
@@ -191,7 +190,7 @@
                             <div
                                 class="flex items-center justify-between p-5 border-b rounded-t dark:border-slate-600 bg-black-500">
                                 <h3 class="text-xl font-medium text-white dark:text-white capitalize">
-                                    Create new user
+                                    {{ __('users.create_new_user') }}
                                 </h3>
                                 <button wire:click="closeSetUserSec" type="button"
                                     class="text-slate-400 bg-transparent hover:text-slate-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-slate-600 dark:hover:text-white"
@@ -202,14 +201,14 @@
                                             d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
                                             clip-rule="evenodd"></path>
                                     </svg>
-                                    <span class="sr-only">Close modal</span>
+                                    <span class="sr-only">{{ __('users.close_modal') }}</span>
                                 </button>
                             </div>
                             <!-- Modal body -->
                             <div class="p-6 space-y-4">
                                 <div class="from-group">
                                     <div class="input-area">
-                                        <label for="username" class="form-label">Username</label>
+                                        <label for="username" class="form-label">{{ __('users.username') }}</label>
                                         <input id="username" type="text"
                                             class="form-control @error('username') !border-danger-500 @enderror"
                                             wire:model="username" autocomplete="off">
@@ -221,7 +220,7 @@
                                 </div>
                                 <div class="from-group">
                                     <div class="input-area">
-                                        <label for="name" class="form-label">Name</label>
+                                        <label for="name" class="form-label">{{ __('users.name') }}</label>
                                         <input type="text"
                                             class="form-control @error('name') !border-danger-500 @enderror"
                                             wire:model="name" autocomplete="off">
@@ -235,14 +234,14 @@
 
 
                                 <div class="from-group">
-                                    <label for="newType" class="form-label">Type</label>
+                                    <label for="newType" class="form-label">{{ __('users.type') }}</label>
                                     <select name="newType" id="newType"
                                         class="form-control w-full mt-2 @error('type') !border-danger-500 @enderror"
                                         wire:model="type" autocomplete="off">
-                                        <option>None</option>
+                                        <option>{{ __('users.none') }}</option>
                                         @foreach ($TYPES as $type)
                                             <option value="{{ $type }}">
-                                                {{ ucwords(str_replace('_', ' ', $type)) }}</option>
+                                                {{ __('users.' . $type) }}</option>
                                         @endforeach
                                     </select>
                                     @error('newType')
@@ -252,8 +251,8 @@
                                 </div>
 
                                 <div class="uppercase text-xs text-slate-500 dark:text-slate-300 mb-1 leading-[12px]">
-                                    Profile Image
-                                    <span class="float-right cursor-pointer" wire:click='clearUserImage'>clear</span>
+                                    {{ __('users.profile_image') }}
+                                    <span class="float-right cursor-pointer" wire:click='clearUserImage'>{{ __('users.clear') }}</span>
                                 </div>
 
                                 @if ($userImage)
@@ -268,8 +267,7 @@
                                                 style="font-size:20px">
                                                 <iconify-icon icon="svg-spinners:tadpole"></iconify-icon>
                                             </p>
-                                            <p class="dropzone-para" wire:loading.remove wire:target="userImage">Choose a
-                                                file or drop it here...</p>
+                                            <p class="dropzone-para" wire:loading.remove wire:target="userImage">{{ __('users.choose_file') }}</p>
                                             <input name="file" type="file" class="dropzone dropzone-input"
                                                 wire:model.live="userImage" />
                                         </div>
@@ -281,14 +279,13 @@
                                     <div class="from-group">
                                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
                                             <div class="input-area">
-                                                <label for="newPassword" class="form-label">Password</label>
+                                                <label for="newPassword" class="form-label">{{ __('users.password') }}</label>
                                                 <input id="newPassword" type="password"
                                                     class="form-control @error('password') !border-danger-500 @enderror"
                                                     wire:model="password" autocomplete="off">
                                             </div>
                                             <div class="input-area">
-                                                <label for="password_confirmation" class="form-label">Confirm
-                                                    Password</label>
+                                                <label for="password_confirmation" class="form-label">{{ __('users.confirm_password') }}</label>
                                                 <input type="password"
                                                     class="form-control @error('password_confirmation') !border-danger-500 @enderror"
                                                     autocomplete="off" wire:model="password_confirmation">
@@ -311,13 +308,13 @@
                                 class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
                                 <button wire:click="closeSetUserSec" data-bs-dismiss="modal"
                                     class="btn inline-flex justify-center text-white bg-black-500">
-                                    Close
+                                    {{ __('users.close') }}
                                 </button>
                                 <button
                                     @if ($setUserSec === true) wire:click="addNewUser" @elseif(is_numeric($setUserSec)) wire:click="EditUser()" @endif
                                     data-bs-dismiss="modal"
                                     class="btn inline-flex justify-center text-white bg-black-500">
-                                    <span wire:loading.remove wire:target="addNewUser">Submit</span>
+                                    <span wire:loading.remove wire:target="addNewUser">{{ __('users.submit') }}</span>
                                     <iconify-icon class="text-xl spin-slow ltr:mr-2 rtl:ml-2 relative top-[1px]"
                                         wire:loading wire:target="addNewUser"
                                         icon="line-md:loading-twotone-loop"></iconify-icon>
@@ -343,7 +340,7 @@
                         <div
                             class="flex items-center justify-between p-5 border-b rounded-t dark:border-slate-600 bg-black-500">
                             <h3 class="text-xl font-medium text-white dark:text-white capitalize">
-                                Change Password
+                                {{ __('users.change_password') }}
                             </h3>
                             <button wire:click="closeChangePasswordModal" type="button"
                                 class="text-slate-400 bg-transparent hover:text-slate-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-slate-600 dark:hover:text-white"
@@ -354,7 +351,7 @@
                                         d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
                                         clip-rule="evenodd"></path>
                                 </svg>
-                                <span class="sr-only">Close modal</span>
+                                <span class="sr-only">{{ __('users.close_modal') }}</span>
                             </button>
                         </div>
                         <!-- Modal body -->
@@ -362,14 +359,13 @@
                             <div class="from-group">
                                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
                                     <div class="input-area">
-                                        <label for="changePassword" class="form-label">New Password</label>
+                                        <label for="changePassword" class="form-label">{{ __('users.new_password') }}</label>
                                         <input id="changePassword" type="password"
                                             class="form-control @error('newPassword') !border-danger-500 @enderror"
                                             wire:model="newPassword" autocomplete="off">
                                     </div>
                                     <div class="input-area">
-                                        <label for="newPassword_confirmation" class="form-label">Confirm New
-                                            Password</label>
+                                        <label for="newPassword_confirmation" class="form-label">{{ __('users.confirm_new_password') }}</label>
                                         <input id="newPassword_confirmation" type="password"
                                             class="form-control @error('newPassword_confirmation') !border-danger-500 @enderror"
                                             autocomplete="off" wire:model="newPassword_confirmation">
@@ -386,7 +382,7 @@
                             class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
                             <button wire:click="changeUserPassword" data-bs-dismiss="modal"
                                 class="btn inline-flex justify-center text-white bg-black-500">
-                                <span wire:loading.remove wire:target="changeUserPassword">Change Password</span>
+                                <span wire:loading.remove wire:target="changeUserPassword">{{ __('users.change_password') }}</span>
                                 <iconify-icon class="text-xl spin-slow ltr:mr-2 rtl:ml-2 relative top-[1px]"
                                     wire:loading wire:target="changeUserPassword"
                                     icon="line-md:loading-twotone-loop"></iconify-icon>

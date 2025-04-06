@@ -35,7 +35,7 @@
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
 
     @yield('child_styles')
-    
+
 </head>
 
 <body class=" font-inter dashcode-app">
@@ -93,10 +93,24 @@
                         <ul class="sidebar-submenu">
                             @can('viewAny', App\Models\Heirarchy\Position::class)
                                 <li>
-                                    <a class="{{ $vacanciesIndex ?? '' }}" href="{{ url('/recruitment/vacancies') }}">Vacancies</a>
+                                    <a class="{{ $vacanciesIndex ?? '' }}"
+                                        href="{{ url('/recruitment/vacancies') }}">Vacancies</a>
                                 </li>
                             @endcan
-                    
+
+                            @can('viewAny', App\Models\Recruitment\BaseQuestion::class)
+                                <li>
+                                    <a class="{{ $baseQuestionsIndex ?? '' }}"
+                                        href="{{ url('/recruitment/base-questions') }}">Base Questions</a>
+                                </li>
+                            @endcan
+                            @can('viewAny', App\Models\Recruitment\Applicants\Channel::class)
+                                <li>
+                                    <a class="{{ $channelsIndex ?? '' }}"
+                                        href="{{ url('/settings/channels') }}">Channels</a>
+                                </li>
+                            @endcan
+
 
                         </ul>
                     </li>
@@ -111,12 +125,14 @@
                         <ul class="sidebar-submenu">
                             @can('viewAny', App\Models\Heirarchy\Position::class)
                                 <li>
-                                    <a class="{{ $positionsIndex ?? '' }}" href="{{ url('/hierarchy/positions') }}">Positions</a>
+                                    <a class="{{ $positionsIndex ?? '' }}"
+                                        href="{{ url('/hierarchy/positions') }}">Positions</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Heirarchy\Position::class)
                                 <li>
-                                    <a class="{{ $organizationIndex ?? '' }}" href="{{ url('/hierarchy/tree') }}">Organization</a>
+                                    <a class="{{ $organizationIndex ?? '' }}"
+                                        href="{{ url('/hierarchy/tree') }}">Organization</a>
                                 </li>
                             @endcan
 
@@ -139,11 +155,6 @@
                             @can('viewAny', App\Models\Base\Area::class)
                                 <li>
                                     <a class="{{ $areasIndex ?? '' }}" href="{{ url('/settings/areas') }}">Areas</a>
-                                </li>
-                            @endcan
-                            @can('viewAny', App\Models\Recruitment\Applicants\Channel::class)
-                                <li>
-                                    <a class="{{ $channelsIndex ?? '' }}" href="{{ url('/settings/channels') }}">Channels</a>
                                 </li>
                             @endcan
 
@@ -181,8 +192,8 @@
                             <div class="items-center space-x-4 rtl:space-x-reverse horizental-box">
                                 <a href="{{ url('/') }}">
                                     <span class="xl:inline-block hidden">
-                                        <img src="{{ asset('admin/assets/images/logo/logo.svg') }}" class="black_logo "
-                                            alt="logo">
+                                        <img src="{{ asset('admin/assets/images/logo/logo.svg') }}"
+                                            class="black_logo " alt="logo">
                                         <img src="{{ asset('admin/assets/images/logo/logo.svg') }}assets/images/logo/logo-white.svg"
                                             class="white_logo" alt="logo">
                                     </span>

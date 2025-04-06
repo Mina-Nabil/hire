@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
+
+    public const MORPH_NAME = 'user';
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
@@ -195,5 +197,42 @@ class User extends Authenticatable
     {
         return $query->where('name', 'like', '%' . $search . '%')
             ->orWhere('username', 'like', '%' . $search . '%');
+    }
+
+    public function scopeAdmin($query)
+    {
+        return $query->where('type', self::TYPE_ADMIN);
+    }
+
+    public function scopeHr($query)
+    {
+        return $query->where('type', self::TYPE_HR);
+    }
+
+    public function scopeHrOrAdmin($query)
+    {
+        return $query->where(function ($query) {
+            $query->where('type', self::TYPE_HR)->orWhere('type', self::TYPE_ADMIN);
+        });
+    }
+
+    public function scopeEmployee($query)
+    {
+        return $query->where('type', self::TYPE_EMPLOYEE);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    public function scopeInactive($query)
+    {
+        return $query->where('is_active', false);
+    }
+
+    public function scopeNotEmployee($query)
+    {
+        return $query->where('type', '!=', self::TYPE_EMPLOYEE);
     }
 }

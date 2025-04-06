@@ -3,12 +3,30 @@
 namespace App\Models\Recruitment\Vacancies;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class VacancyQuestion extends Model
 {
-    protected $fillable = ['question', 'type', 'options', 'created_at', 'updated_at'];
+    const MORPH_NAME = 'vacancy_question';
+    
+    protected $fillable = [
+        'vacancy_id',
+        'question',
+        'arabic_question',
+        'type',
+        'required',
+        'options'
+    ];
 
-    public function vacancy()
+    protected $casts = [
+        'required' => 'boolean',
+        'options' => 'array'
+    ];
+
+    /**
+     * Get the vacancy that owns this question.
+     */
+    public function vacancy(): BelongsTo
     {
         return $this->belongsTo(Vacancy::class);
     }

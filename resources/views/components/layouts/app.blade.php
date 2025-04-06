@@ -82,6 +82,25 @@
                 id="sidebar_menus">
                 <ul class="sidebar-menu">
 
+
+                    <li class="">
+                        <a href="javascript:void(0)" class="navItem">
+                            <span class="flex items-center">
+                                <span>Recruitment</span>
+                            </span>
+                            <iconify-icon class="icon-arrow" icon="heroicons-outline:chevron-right"></iconify-icon>
+                        </a>
+                        <ul class="sidebar-submenu">
+                            @can('viewAny', App\Models\Heirarchy\Position::class)
+                                <li>
+                                    <a class="{{ $vacanciesIndex ?? '' }}" href="{{ url('/recruitment/vacancies') }}">Vacancies</a>
+                                </li>
+                            @endcan
+                    
+
+                        </ul>
+                    </li>
+
                     <li class="">
                         <a href="javascript:void(0)" class="navItem">
                             <span class="flex items-center">
@@ -120,6 +139,11 @@
                             @can('viewAny', App\Models\Base\Area::class)
                                 <li>
                                     <a class="{{ $areasIndex ?? '' }}" href="{{ url('/settings/areas') }}">Areas</a>
+                                </li>
+                            @endcan
+                            @can('viewAny', App\Models\Recruitment\Applicants\Channel::class)
+                                <li>
+                                    <a class="{{ $channelsIndex ?? '' }}" href="{{ url('/settings/channels') }}">Channels</a>
                                 </li>
                             @endcan
 

@@ -251,6 +251,16 @@ class Position extends Model
             });
     }
 
+    public function scopeAvailableForRecruitment($query)
+    {
+        return $query->where(function ($query) {
+            $query->whereHas('vacancies', function ($q) {
+                    $q->where('status', Vacancy::STATUS_CLOSED);
+                })
+                ->orWhereDoesntHave('vacancies');
+        })->whereNull('employee_id');
+    }
+
 
     public static function newFactory()
     {

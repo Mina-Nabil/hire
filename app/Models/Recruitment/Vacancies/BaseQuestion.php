@@ -17,7 +17,6 @@ class BaseQuestion extends Model
 
     const TYPE_TEXT = 'text';
     const TYPE_NUMBER = 'number';
-    const TYPE_EMAIL = 'email';
     const TYPE_DATE = 'date';
     const TYPE_SELECT = 'select';
     const TYPE_CHECKBOX = 'checkbox';
@@ -27,7 +26,6 @@ class BaseQuestion extends Model
     const TYPES = [
         self::TYPE_TEXT,
         self::TYPE_NUMBER,
-        self::TYPE_EMAIL,
         self::TYPE_DATE,
         self::TYPE_SELECT,
         self::TYPE_CHECKBOX,

@@ -20,6 +20,7 @@ use App\Models\Recruitment\Applicants\Experience as ApplicantExperience;
 use App\Models\Recruitment\Applicants\Language as ApplicantLanguage;
 use App\Models\Recruitment\Applicants\Reference as ApplicantReference;
 use App\Models\Recruitment\Applicants\Training as ApplicantTraining;
+use App\Models\Users\User;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
 
@@ -39,6 +40,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Relation::enforceMorphMap([
+            User::MORPH_NAME => User::class,
             Department::MORPH_NAME => Department::class,
             Position::MORPH_NAME => Position::class,
             Employee::MORPH_NAME => Employee::class,

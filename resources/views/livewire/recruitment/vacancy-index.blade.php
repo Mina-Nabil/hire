@@ -170,6 +170,38 @@
                                                 class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
                                         @enderror
                                     </div>
+                                    <!-- Hiring Manager -->
+                                    <div class="from-group">
+                                        <label for="hiringManagerId" class="form-label">Hiring Manager</label>
+                                        <select id="hiringManagerId"
+                                            class="form-control @error('hiringManagerId') !border-danger-500 @enderror"
+                                            wire:model="hiringManagerId">
+                                            <option value="">Select a user</option>
+                                            @foreach ($users as $user)
+                                                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('hiringManagerId')
+                                            <span
+                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <!-- HR Manager -->
+                                    <div class="from-group">
+                                        <label for="hrManagerId" class="form-label">HR Manager</label>
+                                        <select id="hrManagerId"
+                                            class="form-control @error('hrManagerId') !border-danger-500 @enderror"
+                                            wire:model="hrManagerId">
+                                            <option value="">Select a user</option>
+                                            @foreach ($users as $user)
+                                                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('hrManagerId')
+                                            <span
+                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        @enderror
+                                    </div>
 
                                 </div>
 

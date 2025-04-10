@@ -16,6 +16,9 @@ class DatabaseSeeder extends Seeder
             UsersSeeder::class,
             OrganizationSeeder::class,
             ChannelSeeder::class,
+            VacancySeeder::class,
+            ApplicantSeeder::class,
+            InterviewSeeder::class,
         ]);
     }
 }

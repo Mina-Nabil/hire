@@ -4,6 +4,7 @@ namespace App\Models\Recruitment\Applicants;
 
 use App\Exceptions\AppException;
 use App\Models\Personel\Employee;
+use App\Models\Recruitment\Interviews\Interview;
 use App\Models\Recruitment\Vacancies\Vacancy;
 use App\Models\Recruitment\Vacancies\VacancySlot;
 use Exception;
@@ -41,6 +42,20 @@ class Application extends Model
         self::STATUS_REJECTED,
     ];
 
+    ////attributes
+    public function getStatusClassAttribute()
+    {
+        return match($this->status) {
+            self::STATUS_PENDING => 'bg-info-200',
+            self::STATUS_SHORTLISTED => 'bg-warning-200',
+            self::STATUS_INTERVIEW => 'bg-primary-200', 
+            self::STATUS_HIRED => 'bg-success-200',
+            self::STATUS_REJECTED => 'bg-danger-200'
+        };
+    }
+
+
+
     /**
      * Get the applicant that owns this application.
      */
@@ -63,6 +78,14 @@ class Application extends Model
     public function answers(): HasMany
     {
         return $this->hasMany(ApplicationAnswer::class);
+    }
+
+    /**
+     * Get the interviews for this application.
+     */
+    public function interviews(): HasMany
+    {
+        return $this->hasMany(Interview::class);
     }
 
     /**
@@ -97,7 +120,7 @@ class Application extends Model
                 'vacancy_id' => $vacancyId,
                 'cover_letter' => $coverLetter,
                 'status' => self::STATUS_PENDING,
-                // 'referred_by_id' => $refered_by_id,
+                'referred_by_id' => $refered_by_id,
             ]);
         } catch (Exception $e) {
             report($e);
@@ -148,6 +171,44 @@ class Application extends Model
         } catch (Exception $e) {
             report($e);
             throw new AppException('Failed to book slot: ' . $e->getMessage());
+        }
+    }
+
+       /**
+     * Create a new interview
+     * 
+     * @param int $applicationId
+     * @param int $userId
+     * @param \DateTime $date
+     * @param string $location
+     * @param string|null $zoomLink
+     * @return Interview
+     */
+    public function createInterview(
+        int $userId,
+        \DateTime $date,
+        string $type,
+        ?string $location = null,
+        ?string $zoomLink = null,
+    ): Interview {
+        try {
+            return DB::transaction(function () use ($userId, $date, $type, $location, $zoomLink) {
+                 $ret = $this->interviews()->create([
+                    'user_id' => $userId,
+                    'date' => $date,
+                    'type' => $type,
+                    'location' => $location,
+                    'zoom_link' => $zoomLink,
+                    'status' => self::STATUS_PENDING,
+                ]);
+
+                $this->moveToInterview();
+
+                return $ret;
+            });
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException('Failed to create interview: ' . $e->getMessage());
         }
     }
 

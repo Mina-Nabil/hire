@@ -15,8 +15,17 @@ return new class extends Migration
     {
         Schema::create('employees', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Applicant::class)->constrained('applicants')->restrictOnDelete();
+            $table->foreignIdFor(Applicant::class)->nullable()->constrained('applicants')->nullOnDelete();
+            $table->string('first_name');
+            $table->string('last_name');
+            $table->string('email');
+            $table->date('employment_date');
+            $table->date('termination_date')->nullable();
             $table->timestamps();
+        });
+
+        Schema::table('applications', function (Blueprint $table) {
+            $table->foreignIdFor(Employee::class, 'referred_by_id')->nullable()->constrained('employees');
         });
 
         Schema::table('users', function (Blueprint $table) {

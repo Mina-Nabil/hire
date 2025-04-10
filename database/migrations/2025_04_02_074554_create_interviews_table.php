@@ -19,7 +19,8 @@ return new class extends Migration
             $table->foreignIdFor(Application::class)->constrained('applications')->cascadeOnDelete();
             $table->foreignIdFor(User::class)->constrained('users');
             $table->dateTime('date');
-            $table->string('location');
+            $table->enum('type', Interview::INTERVIEW_TYPES)->default(Interview::TYPE_IN_PERSON);
+            $table->string('location')->nullable();
             $table->string('zoom_link')->nullable();
             $table->enum('status', Interview::INTERVIEW_STATUSES)->default(Interview::STATUS_PENDING);
             $table->timestamps();
@@ -37,6 +38,18 @@ return new class extends Migration
             $table->foreignIdFor(User::class)->constrained('users');
             $table->string('title');
             $table->text('note')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('interview_feedbacks', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(Interview::class)->constrained('interviews')->cascadeOnDelete();
+            $table->foreignIdFor(User::class)->constrained('users');
+            $table->string('result');
+            $table->integer('rating');
+            $table->text('strengths')->nullable();
+            $table->text('weaknesses')->nullable();
+            $table->text('feedback')->nullable();
             $table->timestamps();
         });
     }

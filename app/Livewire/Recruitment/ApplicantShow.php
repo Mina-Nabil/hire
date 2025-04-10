@@ -4,6 +4,7 @@ namespace App\Livewire\Recruitment;
 
 use App\Exceptions\AppException;
 use App\Models\Base\Area;
+use App\Models\Personel\Employee;
 use App\Models\Recruitment\Applicants\Applicant;
 use App\Models\Recruitment\Applicants\ApplicantSkill;
 use App\Models\Recruitment\Applicants\Application;
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use App\Models\Users\User;
 
 class ApplicantShow extends Component
 {
@@ -52,9 +54,12 @@ class ApplicantShow extends Component
     public $showNewApplicationModal = false;
     public $vacancyId;
     public $applicationNotes;
+    public $referedBy;
+    public $referedByOptions;
     public $availableVacancies = [];
 
     // New Interview Modal
+    public $interviewTypes = Interview::INTERVIEW_TYPES;
     public $showNewInterviewModal = false;
     public $selectedApplicationId;
     public $selectedApplication;
@@ -66,6 +71,7 @@ class ApplicantShow extends Component
 
     // Interview Feedback Modal
     public $showFeedbackModal = false;
+    public $showFeedbacksHistoryModal = false;
     public $selectedInterview;
     public $interviewResult;
     public $rating;
@@ -73,6 +79,34 @@ class ApplicantShow extends Component
     public $weaknesses;
     public $feedbackNotes;
     public $nextStep;
+    public $newApplicationStatus;
+
+
+    // Interview Management Modals
+    public $showSetInterviewersModal = false;
+    public $interviewers = [];
+    public $selectedInterviewers = [];
+    
+    public $showRescheduleModal = false;
+    public $newInterviewDate;
+    public $newInterviewTime;
+    public $newInterviewLocation;
+    public $newInterviewType;
+    public $newInterviewZoomLink;
+
+    public $showCancelModal = false;
+    public $cancelReason;
+    
+    public $showCompleteModal = false;
+    
+    public $showAddNoteModal = false;
+    public $noteTitle;
+    public $noteContent;
+    
+    public $showUpdateStatusModal = false;
+    public $newInterviewStatus;
+    public $interviewStatuses = Interview::INTERVIEW_STATUSES;
+    public $applicationStatuses = Application::APPLICATION_STATUSES;
 
     // Offer related properties
     public $showNewOfferModal = false;
@@ -85,7 +119,7 @@ class ApplicantShow extends Component
     public $specialTerms;
     public $offerNotes;
     public $selectedOffer;
-    public $eligibleApplications = [];
+    public $eligibleApplications;
     public $canCreateOffer = false;
 
     // Document upload
@@ -275,6 +309,7 @@ class ApplicantShow extends Component
     {
         // Get vacancies that are open and that the applicant hasn't applied to yet
         $appliedVacancyIds = $this->applicant->applications->pluck('vacancy_id')->toArray();
+        $this->referedByOptions = Employee::current()->get();
         $this->availableVacancies = Vacancy::where('status', 'open')
             ->whereNotIn('id', $appliedVacancyIds)
             ->with('position.department')
@@ -288,6 +323,7 @@ class ApplicantShow extends Component
         $this->showNewApplicationModal = false;
         $this->vacancyId = null;
         $this->applicationNotes = null;
+        $this->referedBy = null;
         $this->resetValidation();
     }
 
@@ -295,16 +331,16 @@ class ApplicantShow extends Component
     {
         $this->validate([
             'vacancyId' => 'required|exists:vacancies,id',
+            'referedBy' => 'nullable|exists:employees,id',
         ]);
 
         try {
-            $application = new Application([
-                'vacancy_id' => $this->vacancyId,
-                'notes' => $this->applicationNotes,
-                'status' => 'New',
-            ]);
-
-            $this->applicant->applications()->save($application);
+            // Use the applyForVacancy method from the Applicant model
+            $this->applicant->applyForVacancy(
+                $this->vacancyId,
+                $this->applicationNotes,
+                $this->referedBy
+            );
 
             $this->alert('success', 'Application submitted successfully');
             $this->closeNewApplicationModal();
@@ -326,8 +362,8 @@ class ApplicantShow extends Component
         // Set default values
         $this->interviewDate = now()->addDays(3)->format('Y-m-d');
         $this->interviewTime = now()->format('H:i');
-        $this->interviewType = 'In-Person';
-        $this->interviewLocation = 'Main Office';
+        $this->interviewType = Interview::TYPE_IN_PERSON;
+        $this->interviewLocation = null;
         $this->interviewNotes = null;
 
         $this->showNewInterviewModal = true;
@@ -352,28 +388,22 @@ class ApplicantShow extends Component
             'interviewDate' => 'required|date|after_or_equal:today',
             'interviewTime' => 'required',
             'interviewType' => 'required|string|max:255',
-            'interviewLocation' => 'required|string|max:255',
+            'interviewLocation' => 'nullable|string|max:255',
             'interviewNotes' => 'nullable|string|max:500',
         ]);
 
         try {
-            $interviewDateTime = $this->interviewDate . ' ' . $this->interviewTime;
-
-            $interview = new Interview([
-                'application_id' => $this->selectedApplicationId,
-                'interviewer_id' => Auth::id(),
-                'interview_date' => $interviewDateTime,
-                'type' => $this->interviewType,
-                'location' => $this->interviewLocation,
-                'notes' => $this->interviewNotes,
-                'status' => 'Scheduled',
-            ]);
-
-            $interview->save();
-
-            // Update application status to interview
-            $this->selectedApplication->status = 'Interview';
-            $this->selectedApplication->save();
+            // Create DateTime object from the date and time
+            $interviewDateTime = new \DateTime($this->interviewDate . ' ' . $this->interviewTime);
+            
+            // Use the application's createInterview method
+            $this->selectedApplication->createInterview(
+                Auth::id(),
+                $interviewDateTime,
+                $this->interviewType,
+                $this->interviewLocation,
+                $this->interviewNotes
+            );
 
             $this->alert('success', 'Interview scheduled successfully');
             $this->closeNewInterviewModal();
@@ -418,33 +448,29 @@ class ApplicantShow extends Component
     {
         $this->validate([
             'interviewResult' => 'required|string|max:255',
-            'rating' => 'required|integer|min:1|max:5',
-            'strengths' => 'required|string|max:500',
-            'weaknesses' => 'required|string|max:500',
+            'rating' => 'required|integer|min:1|max:10',
+            'strengths' => 'nullable|string|max:500',
+            'weaknesses' => 'nullable|string|max:500',
             'feedbackNotes' => 'nullable|string|max:1000',
-            'nextStep' => 'required|string|max:255',
+            'nextStep' => 'nullable|string|max:255',
+            'newApplicationStatus' => 'nullable|string|max:255',
         ]);
 
         try {
-            $this->selectedInterview->result = $this->interviewResult;
-            $this->selectedInterview->rating = $this->rating;
-            $this->selectedInterview->strengths = $this->strengths;
-            $this->selectedInterview->weaknesses = $this->weaknesses;
-            $this->selectedInterview->feedback = $this->feedbackNotes;
-            $this->selectedInterview->next_step = $this->nextStep;
-            $this->selectedInterview->status = 'Completed';
-            $this->selectedInterview->save();
+            $this->selectedInterview->addFeedback(
+                Auth::id(),
+                $this->interviewResult,
+                $this->rating,
+                $this->strengths,
+                $this->weaknesses,
+                $this->feedbackNotes
+            ); 
+            
+            $this->selectedInterview->complete();
 
-            // Update application status based on result
-            $application = $this->selectedInterview->application;
-            if ($this->interviewResult === 'Passed') {
-                $application->status = 'Interview Passed';
-            } elseif ($this->interviewResult === 'Failed') {
-                $application->status = 'Rejected';
-            } elseif ($this->interviewResult === 'On Hold') {
-                $application->status = 'On Hold';
+            if ($this->newApplicationStatus) {
+                $this->selectedInterview->application->updateStatus($this->newApplicationStatus);
             }
-            $application->save();
 
             $this->alert('success', 'Interview feedback saved successfully');
             $this->closeFeedbackModal();
@@ -453,8 +479,11 @@ class ApplicantShow extends Component
             $this->applicant->refresh();
             $this->interviews = Interview::whereIn('application_id', $this->applicant->applications->pluck('id')->toArray())->get();
             $this->checkEligibleApplications();
+        } catch (AppException $e) {
+            $this->alert('error', $e->getMessage());
         } catch (Exception $e) {
-            $this->alert('error', 'Failed to save interview feedback: ' . $e->getMessage());
+            report($e);
+            $this->alert('error', 'Internal server error');
         }
     }
 
@@ -1042,5 +1071,258 @@ class ApplicantShow extends Component
     public function render()
     {
         return view('livewire.recruitment.applicant-show');
+    }
+
+    // Interview Management - Set Interviewers
+    public function openSetInterviewersModal($interviewId)
+    {
+        $this->selectedInterview = Interview::find($interviewId);
+        $this->interviewers = User::hrOrAdmin()->get();
+        $this->selectedInterviewers = $this->selectedInterview->interviewers->pluck('id')->toArray();
+        $this->showSetInterviewersModal = true;
+    }
+
+    public function closeSetInterviewersModal()
+    {
+        $this->showSetInterviewersModal = false;
+        $this->selectedInterview = null;
+        $this->selectedInterviewers = [];
+        $this->resetValidation();
+    }
+
+    public function saveInterviewers()
+    {
+        $this->validate([
+            'selectedInterviewers' => 'required|array|min:1',
+        ]);
+
+        try {
+            $this->selectedInterview->setInterviewers($this->selectedInterviewers);
+            $this->alert('success', 'Interviewers assigned successfully');
+            $this->closeSetInterviewersModal();
+            
+            // Refresh interviews data
+            $this->interviews = Interview::whereIn('application_id', $this->applicant->applications->pluck('id')->toArray())->get();
+        } catch (Exception $e) {
+            $this->alert('error', 'Failed to assign interviewers: ' . $e->getMessage());
+        }
+    }
+
+    // Interview Management - Reschedule
+    public function openRescheduleModal($interviewId)
+    {
+        $this->selectedInterview = Interview::find($interviewId);
+        
+        // Pre-populate with current values
+        $this->newInterviewDate = $this->selectedInterview->date->format('Y-m-d');
+        $this->newInterviewTime = $this->selectedInterview->date->format('H:i');
+        $this->newInterviewType = $this->selectedInterview->type;
+        $this->newInterviewLocation = $this->selectedInterview->location;
+        $this->newInterviewZoomLink = $this->selectedInterview->zoom_link;
+        
+        $this->showRescheduleModal = true;
+    }
+
+    public function closeRescheduleModal()
+    {
+        $this->showRescheduleModal = false;
+        $this->selectedInterview = null;
+        $this->newInterviewDate = null;
+        $this->newInterviewTime = null;
+        $this->newInterviewType = null;
+        $this->newInterviewLocation = null;
+        $this->newInterviewZoomLink = null;
+        $this->resetValidation();
+    }
+
+    public function rescheduleInterview()
+    {
+        $this->validate([
+            'newInterviewDate' => 'required|date|after_or_equal:today',
+            'newInterviewTime' => 'required',
+            'newInterviewType' => 'required|in:' . implode(',', Interview::INTERVIEW_TYPES),
+            'newInterviewLocation' => 'nullable|string|max:255',
+            'newInterviewZoomLink' => 'nullable|url|max:255',
+        ]);
+
+        try {
+            // Create DateTime object from the date and time
+            $newDateTime = new \DateTime($this->newInterviewDate . ' ' . $this->newInterviewTime);
+            
+            $this->selectedInterview->reschedule(
+                $newDateTime,
+                $this->newInterviewType,
+                $this->newInterviewLocation,
+                $this->newInterviewZoomLink
+            );
+            
+            $this->alert('success', 'Interview rescheduled successfully');
+            $this->closeRescheduleModal();
+            
+            // Refresh interviews data
+            $this->interviews = Interview::whereIn('application_id', $this->applicant->applications->pluck('id')->toArray())->get();
+        } catch (Exception $e) {
+            $this->alert('error', 'Failed to reschedule interview: ' . $e->getMessage());
+        }
+    }
+
+    // Interview Management - Cancel
+    public function openCancelModal($interviewId)
+    {
+        $this->selectedInterview = Interview::find($interviewId);
+        $this->cancelReason = null;
+        $this->showCancelModal = true;
+    }
+
+    public function closeCancelModal()
+    {
+        $this->showCancelModal = false;
+        $this->selectedInterview = null;
+        $this->cancelReason = null;
+        $this->resetValidation();
+    }
+
+    public function cancelInterview()
+    {
+        $this->validate([
+            'cancelReason' => 'nullable|string|max:500',
+        ]);
+
+        try {
+            $this->selectedInterview->cancel();
+            
+            // Add a note with the cancellation reason if provided
+            if ($this->cancelReason) {
+                $this->selectedInterview->addNote('Cancellation Reason', $this->cancelReason);
+            }
+            
+            $this->alert('success', 'Interview cancelled successfully');
+            $this->closeCancelModal();
+            
+            // Refresh interviews data
+            $this->interviews = Interview::whereIn('application_id', $this->applicant->applications->pluck('id')->toArray())->get();
+        } catch (Exception $e) {
+            $this->alert('error', 'Failed to cancel interview: ' . $e->getMessage());
+        }
+    }
+
+    // Interview Management - Complete
+    public function openCompleteModal($interviewId)
+    {
+        $this->selectedInterview = Interview::find($interviewId);
+        $this->showCompleteModal = true;
+    }
+
+    public function closeCompleteModal()
+    {
+        $this->showCompleteModal = false;
+        $this->selectedInterview = null;
+        $this->resetValidation();
+    }
+
+    public function completeInterview()
+    {
+        try {
+            $this->selectedInterview->complete();
+            $this->alert('success', 'Interview marked as completed');
+            $this->closeCompleteModal();
+            
+            // Optionally redirect to feedback form
+            $this->openFeedbackModal($this->selectedInterview->id);
+            
+            // Refresh interviews data
+            $this->interviews = Interview::whereIn('application_id', $this->applicant->applications->pluck('id')->toArray())->get();
+        } catch (Exception $e) {
+            $this->alert('error', 'Failed to complete interview: ' . $e->getMessage());
+        }
+    }
+
+    // Interview Management - Add Note
+    public function openAddNoteModal($interviewId)
+    {
+        $this->selectedInterview = Interview::find($interviewId);
+        $this->noteTitle = null;
+        $this->noteContent = null;
+        $this->showAddNoteModal = true;
+    }
+
+    public function closeAddNoteModal()
+    {
+        $this->showAddNoteModal = false;
+        $this->selectedInterview = null;
+        $this->noteTitle = null;
+        $this->noteContent = null;
+        $this->resetValidation();
+    }
+
+    public function addInterviewNote()
+    {
+        $this->validate([
+            'noteTitle' => 'required|string|max:255',
+            'noteContent' => 'nullable|string|max:1000',
+        ]);
+
+        try {
+            $this->selectedInterview->addNote($this->noteTitle, $this->noteContent);
+            $this->alert('success', 'Note added successfully');
+            $this->closeAddNoteModal();
+            
+            // Refresh interviews data
+            $this->interviews = Interview::whereIn('application_id', $this->applicant->applications->pluck('id')->toArray())->get();
+        } catch (Exception $e) {
+            $this->alert('error', 'Failed to add note: ' . $e->getMessage());
+        }
+    }
+
+    // Interview Management - Update Status
+    public function openUpdateStatusModal($interviewId)
+    {
+        $this->selectedInterview = Interview::find($interviewId);
+        $this->newInterviewStatus = $this->selectedInterview->status;
+        $this->showUpdateStatusModal = true;
+    }
+
+    public function closeUpdateStatusModal()
+    {
+        $this->showUpdateStatusModal = false;
+        $this->selectedInterview = null;
+        $this->newInterviewStatus = null;
+        $this->resetValidation();
+    }
+
+    public function updateInterviewStatus()
+    {
+        $this->validate([
+            'newInterviewStatus' => 'required|string|in:' . implode(',', Interview::INTERVIEW_STATUSES),
+        ]);
+
+        try {
+            $this->selectedInterview->updateStatus($this->newInterviewStatus);
+            $this->alert('success', 'Interview status updated successfully');
+            $this->closeUpdateStatusModal();
+            
+            // Refresh interviews data
+            $this->interviews = Interview::whereIn('application_id', $this->applicant->applications->pluck('id')->toArray())->get();
+        } catch (Exception $e) {
+            $this->alert('error', 'Failed to update interview status: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Open the show feedbacks modal
+     */
+    public function openShowFeedbacksModal($interviewId)
+    {
+        $this->resetValidation();
+        $this->selectedInterview = Interview::with(['feedbacks.user'])->find($interviewId);
+        $this->showFeedbacksHistoryModal = true;
+    }
+
+    /**
+     * Close the show feedbacks modal
+     */
+    public function closeShowFeedbacksModal()
+    {
+        $this->showFeedbacksHistoryModal = false;
     }
 }

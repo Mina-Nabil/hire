@@ -140,6 +140,7 @@
                             <th scope="col" class="table-th">Marital Status</th>
                             <th scope="col" class="table-th">Military Status</th>
                             <th scope="col" class="table-th">Applications</th>
+                            <th scope="col" class="table-th">Interviews</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
@@ -174,6 +175,12 @@
                                         </span>
                                     </div>
                                 </td>
+                                <td class="table-td">
+                                    <div class="flex space-x-3 rtl:space-x-reverse">
+                                        <span class="text-success-500 text-xl leading-[0]">
+                                            {{ $applicant->interviews->count() }}
+                                        </span>
+                                    </div>
                             </tr>
                         @endforeach
                     </tbody>

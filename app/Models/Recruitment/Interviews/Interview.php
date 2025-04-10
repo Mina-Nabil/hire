@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -22,6 +23,7 @@ class Interview extends Model
     protected $fillable = [
         'application_id',
         'user_id',
+        'type',
         'date',
         'location',
         'zoom_link',
@@ -30,6 +32,16 @@ class Interview extends Model
 
     protected $casts = [
         'date' => 'datetime',
+    ];
+
+    // Interview types
+    const TYPE_IN_PERSON = 'in_person';
+    const TYPE_ONLINE = 'online';
+    const TYPE_PHONE = 'phone';
+    const INTERVIEW_TYPES = [
+        self::TYPE_IN_PERSON,
+        self::TYPE_ONLINE,
+        self::TYPE_PHONE,
     ];
 
     // Interview statuses
@@ -46,6 +58,18 @@ class Interview extends Model
         self::STATUS_CANCELLED,
         self::STATUS_RESCHEDULED,
     ];
+
+
+    public function getStatusClassAttribute()
+    {
+        return match($this->status) {
+            self::STATUS_PENDING => 'bg-info-200',
+            self::STATUS_SCHEDULED => 'bg-warning-200',
+            self::STATUS_COMPLETED => 'bg-success-200',
+            self::STATUS_CANCELLED => 'bg-danger-200',
+            self::STATUS_RESCHEDULED => 'bg-warning-200',
+        };
+    }
 
     /**
      * Get the application for this interview
@@ -80,37 +104,11 @@ class Interview extends Model
     }
 
     /**
-     * Create a new interview
-     * 
-     * @param int $applicationId
-     * @param int $userId
-     * @param \DateTime $date
-     * @param string $location
-     * @param string|null $zoomLink
-     * @return Interview
+     * Get the feedback for this interview
      */
-    public static function createInterview(
-        int $applicationId,
-        int $userId,
-        \DateTime $date,
-        string $location,
-        ?string $zoomLink = null
-    ): Interview {
-        try {
-            return DB::transaction(function () use ($applicationId, $userId, $date, $location, $zoomLink) {
-                return self::create([
-                    'application_id' => $applicationId,
-                    'user_id' => $userId,
-                    'date' => $date,
-                    'location' => $location,
-                    'zoom_link' => $zoomLink,
-                    'status' => self::STATUS_PENDING,
-                ]);
-            });
-        } catch (Exception $e) {
-            report($e);
-            throw new AppException('Failed to create interview: ' . $e->getMessage());
-        }
+    public function feedbacks(): HasMany
+    {
+        return $this->hasMany(InterviewFeedback::class);
     }
 
     /**
@@ -134,38 +132,6 @@ class Interview extends Model
     }
 
     /**
-     * Add an interviewer to this interview
-     * 
-     * @param int $userId
-     * @return void
-     */
-    public function addInterviewer(int $userId): void
-    {
-        try {
-            $this->interviewers()->attach($userId);
-        } catch (Exception $e) {
-            report($e);
-            throw new AppException('Failed to add interviewer: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Remove an interviewer from this interview
-     * 
-     * @param int $userId
-     * @return void
-     */
-    public function removeInterviewer(int $userId): void
-    {
-        try {
-            $this->interviewers()->detach($userId);
-        } catch (Exception $e) {
-            report($e);
-            throw new AppException('Failed to remove interviewer: ' . $e->getMessage());
-        }
-    }
-
-    /**
      * Add multiple interviewers to this interview
      * 
      * @param array $userIds
@@ -181,6 +147,36 @@ class Interview extends Model
         }
     }
 
+
+    /**
+     * Add feedback to this interview
+     * 
+     * @param string $result
+     * @param int $rating
+     * @param string $strengths
+     * @param string $weaknesses
+     * @param string $feedback
+     * @return InterviewFeedback
+     */
+    public function addFeedback(int $userId, string $result, int $rating, ?string $strengths, ?string $weaknesses, ?string $feedback): InterviewFeedback
+    {   
+        try {
+            return $this->feedbacks()->updateOrCreate([ 
+                'interview_id' => $this->id,
+                'user_id' => $userId,
+            ], [
+                'result' => $result,
+                'rating' => $rating,
+                'strengths' => $strengths,
+                'weaknesses' => $weaknesses,
+                'feedback' => $feedback,
+            ]);
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException('Failed to add feedback.');
+        }
+    }
+
     /**
      * Reschedule this interview
      * 
@@ -189,13 +185,19 @@ class Interview extends Model
      * @param string|null $newZoomLink
      * @return bool
      */
-    public function reschedule(\DateTime $newDate, ?string $newLocation = null, ?string $newZoomLink = null): bool
+    public function reschedule(\DateTime $newDate, 
+    ?string $newType = null, 
+    ?string $newLocation = null, ?string $newZoomLink = null): bool
     {
         try {
             $data = ['date' => $newDate, 'status' => self::STATUS_RESCHEDULED];
             
             if ($newLocation) {
                 $data['location'] = $newLocation;
+            }
+
+            if ($newType) {
+                $data['type'] = $newType;
             }
             
             if ($newZoomLink !== null) {
@@ -241,7 +243,7 @@ class Interview extends Model
     {
         try {
             return $this->notes()->create([
-                'user_id' => Auth::id(),
+                'user_id' => Auth::id() ?? 1,
                 'title' => $title,
                 'note' => $note,
             ]);

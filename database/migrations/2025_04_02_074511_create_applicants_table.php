@@ -21,6 +21,12 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::create('channels', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+
         Schema::create('applicants', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Area::class)->constrained('areas');
@@ -116,8 +122,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Applicant::class)->constrained('applicants')->cascadeOnDelete();
             $table->foreignIdFor(Vacancy::class)->constrained('vacancies')->cascadeOnDelete();
-            $table->foreignIdFor(Employee::class, 'referred_by_id')->nullable()->constrained('employees');
-            $table->string('cover_letter')->nullable();
+            $table->text('cover_letter')->nullable();
             $table->enum('status', Application::APPLICATION_STATUSES)->default(Application::STATUS_PENDING);
             $table->timestamps();
         });

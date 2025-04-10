@@ -33,6 +33,8 @@ class VacancyIndex extends Component
     public $vacancyId;
     public $positionId;
     public $assignedTo;
+    public $hiringManagerId;
+    public $hrManagerId;
     public $vacancyType;
     public $vacancyStatus;
     public $closingDate;
@@ -84,6 +86,8 @@ class VacancyIndex extends Component
         $this->validate([
             'positionId' => 'required|exists:positions,id',
             'assignedTo' => 'required|exists:users,id',
+            'hiringManagerId' => 'required|exists:users,id',
+            'hrManagerId' => 'required|exists:users,id',
             'vacancyType' => 'required|in:full_time,part_time,temporary',
             'jobResponsibilities' => 'nullable|string',
             'arabicJobResponsibilities' => 'nullable|string',
@@ -99,6 +103,8 @@ class VacancyIndex extends Component
             $data = [
                 'position_id' => $this->positionId,
                 'assigned_to' => $this->assignedTo,
+                'hiring_manager_id' => $this->hiringManagerId,
+                'hr_manager_id' => $this->hrManagerId,
                 'type' => $this->vacancyType,
                 'job_responsibilities' => $this->jobResponsibilities,
                 'arabic_job_responsibilities' => $this->arabicJobResponsibilities,
@@ -156,6 +162,8 @@ class VacancyIndex extends Component
         $this->vacancyId = $vacancy->id;
         $this->positionId = $vacancy->position_id;
         $this->assignedTo = $vacancy->assigned_to;
+        $this->hiringManagerId = $vacancy->hiring_manager_id;
+        $this->hrManagerId = $vacancy->hr_manager_id;
         $this->vacancyType = $vacancy->type;
         $this->vacancyStatus = $vacancy->status;
         $this->closingDate = $vacancy->closing_date ? $vacancy->closing_date->format('Y-m-d') : null;
@@ -206,10 +214,12 @@ class VacancyIndex extends Component
 
     public function viewVacancy($id)
     {
-        $vacancy = Vacancy::with(['vacancy_questions', 'vacancy_slots', 'position', 'assigned_to_user'])->find($id);
+        $vacancy = Vacancy::with(['vacancy_questions', 'vacancy_slots', 'position', 'assigned_to_user', 'hiring_manager', 'hr_manager'])->find($id);
         $this->vacancyId = $vacancy->id;
         $this->positionId = $vacancy->position_id;
         $this->assignedTo = $vacancy->assigned_to;
+        $this->hiringManagerId = $vacancy->hiring_manager_id;
+        $this->hrManagerId = $vacancy->hr_manager_id;
         $this->vacancyType = $vacancy->type;
         $this->vacancyStatus = $vacancy->status;
         $this->closingDate = $vacancy->closing_date ? $vacancy->closing_date->format('Y-m-d') : null;
@@ -263,6 +273,8 @@ class VacancyIndex extends Component
         $this->validate([
             'positionId' => 'required|exists:positions,id',
             'assignedTo' => 'required|exists:users,id',
+            'hiringManagerId' => 'required|exists:users,id',
+            'hrManagerId' => 'required|exists:users,id',
             'vacancyType' => 'required|in:full_time,part_time,temporary',
             'vacancyStatus' => 'required|in:open,closed',
             'jobResponsibilities' => 'nullable|string',
@@ -281,6 +293,8 @@ class VacancyIndex extends Component
             $data = [
                 'position_id' => $this->positionId,
                 'assigned_to' => $this->assignedTo,
+                'hiring_manager_id' => $this->hiringManagerId,
+                'hr_manager_id' => $this->hrManagerId,
                 'type' => $this->vacancyType,
                 'status' => $this->vacancyStatus,
                 'job_responsibilities' => $this->jobResponsibilities,
@@ -445,6 +459,8 @@ class VacancyIndex extends Component
         $this->vacancyId = null;
         $this->positionId = null;
         $this->assignedTo = null;
+        $this->hiringManagerId = null;
+        $this->hrManagerId = null;
         $this->vacancyType = 'full_time';
         $this->vacancyStatus = 'open';
         $this->closingDate = Carbon::now()->addDays(30)->format('Y-m-d');

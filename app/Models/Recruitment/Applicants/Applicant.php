@@ -4,11 +4,13 @@ namespace App\Models\Recruitment\Applicants;
 
 use App\Exceptions\AppException;
 use App\Models\Base\Area;
+use App\Models\Recruitment\Interviews\Interview;
 use App\Models\Users\Document;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\DB;
@@ -138,6 +140,14 @@ class Applicant extends Model
     public function languages(): HasMany
     {
         return $this->hasMany(Language::class);
+    }
+
+    /**
+     * Get all interviews for this applicant
+     */
+    public function interviews(): HasManyThrough
+    {
+        return $this->hasManyThrough(Interview::class, Application::class);
     }
 
     /**
@@ -473,14 +483,15 @@ class Applicant extends Model
      * @param string|null $coverLetter
      * @return Application
      */
-    public function applyForVacancy(int $vacancyId, ?string $coverLetter = null): Application
+    public function applyForVacancy(int $vacancyId, ?string $coverLetter = null, ?int $refered_by_id = null): Application
     {
         try {
-            return DB::transaction(function () use ($vacancyId, $coverLetter) {
+            return DB::transaction(function () use ($vacancyId, $coverLetter, $refered_by_id) {
                 return $this->applications()->create([
                     'vacancy_id' => $vacancyId,
                     'cover_letter' => $coverLetter,
                     'status' => Application::STATUS_PENDING,
+                    // 'referred_by_id' => $refered_by_id,
                 ]);
             });
         } catch (Exception $e) {

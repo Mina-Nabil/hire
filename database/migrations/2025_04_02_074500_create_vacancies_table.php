@@ -18,6 +18,8 @@ return new class extends Migration
         Schema::create('vacancies', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(User::class, 'assigned_to')->constrained('users');
+            $table->foreignIdFor(User::class, 'hiring_manager_id')->constrained('users');
+            $table->foreignIdFor(User::class, 'hr_manager_id')->constrained('users');
             $table->foreignIdFor(Position::class)->constrained('positions');
             $table->enum('type', ['full_time', 'part_time', 'temporary']);
             $table->enum('status', ['open', 'closed']);

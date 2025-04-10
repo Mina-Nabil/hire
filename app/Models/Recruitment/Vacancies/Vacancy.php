@@ -97,6 +97,22 @@ class Vacancy extends Model
     }
 
     /**
+     * The user assigned to manage this vacancy.
+     */
+    public function hiring_manager(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'hiring_manager_id');
+    }
+
+    /**
+     * The user assigned to manage this vacancy.
+     */
+    public function hr_manager(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'hr_manager_id');
+    }
+
+    /**
      * Scope a query to search vacancies.
      */
     public function scopeSearch($query, $search)

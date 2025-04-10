@@ -5,11 +5,15 @@ namespace App\Models\Recruitment\Vacancies;
 use App\Exceptions\AppException;
 use App\Models\Recruitment\Applicants\Application;
 use App\Models\Users\User;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
 class BaseQuestion extends Model
 {
+    use HasFactory;
+    const MORPH_NAME = 'base_question';
+    
     protected $fillable = [
         'question',
         'type',

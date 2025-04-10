@@ -1,9 +1,16 @@
 <div>
     <div class="flex justify-between flex-wrap items-center">
         <div class="md:mb-6 mb-4 flex space-x-3 rtl:space-x-reverse">
-            <h4 class="font-medium lg:text-2xl text-xl capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
-                Base Questions Management
-            </h4>
+            <div class="flex flex-col">
+                <h4 class="font-medium lg:text-2xl text-xl capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
+                    Base Questions Management
+                </h4>
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm text-slate-500">
+                        Questions common for all vacancies
+                    </span>
+                </div>
+            </div>
         </div>
         <div class="flex sm:space-x-4 space-x-2 sm:justify-end items-center md:mb-6 mb-4 rtl:space-x-reverse">
             @can('create', App\Models\Recruitment\Vacancies\BaseQuestion::class)
@@ -147,8 +154,7 @@
                                     <label for="options" class="form-label">Options (comma separated)</label>
                                     <input id="options" type="text"
                                         class="form-control @error('options') !border-danger-500 @enderror"
-                                        wire:model="options"
-                                        @disabled(!in_array($type, ['select', 'checkbox', 'radio']))>
+                                        wire:model="options" @disabled(!in_array($type, ['select', 'checkbox', 'radio']))>
                                     @error('options')
                                         <span
                                             class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
@@ -237,8 +243,7 @@
                                     <label for="edit-options" class="form-label">Options (comma separated)</label>
                                     <input id="edit-options" type="text"
                                         class="form-control @error('options') !border-danger-500 @enderror"
-                                        wire:model="options"
-                                        @disabled(!in_array($type, ['select', 'checkbox', 'radio']))>
+                                        wire:model="options" @disabled(!in_array($type, ['select', 'checkbox', 'radio']))>
                                     @error('options')
                                         <span
                                             class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
@@ -320,4 +325,4 @@
             </div>
         </div>
     @endif
-</div> 
+</div>

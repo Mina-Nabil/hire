@@ -47,6 +47,7 @@
                                     <th scope="col" class="table-th">Closing Date</th>
                                     <th scope="col" class="table-th">Questions</th>
                                     <th scope="col" class="table-th">Slots</th>
+                                    <th scope="col" class="table-th">Applications</th>
                                     <th scope="col" class="table-th">Actions</th>
                                 </tr>
                             </thead>
@@ -64,8 +65,9 @@
                                         <td class="table-td">
                                             {{ $vacancy->closing_date ? $vacancy->closing_date->format('Y-m-d') : 'N/A' }}
                                         </td>
-                                        <td class="table-td">{{ $vacancy->vacancy_questions->count() }}</td>
-                                        <td class="table-td">{{ $vacancy->vacancy_slots->count() }}</td>
+                                        <td class="table-td">{{ $vacancy->vacancy_questions_count }}</td>
+                                        <td class="table-td">{{ $vacancy->vacancy_slots_count }}</td>
+                                        <td class="table-td">{{ $vacancy->applications_count }}</td>
                                         <td class="table-td">
                                             <div class="flex space-x-3 rtl:space-x-reverse">
                                                 <button wire:click="viewVacancy({{ $vacancy->id }})"

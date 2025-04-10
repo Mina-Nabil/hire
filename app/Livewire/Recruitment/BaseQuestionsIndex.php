@@ -161,6 +161,6 @@ class BaseQuestionsIndex extends Component
 
         return view('livewire.recruitment.base-questions-index', [
             'baseQuestions' => $baseQuestions,
-        ]);
+        ])->layout('components.layouts.app', ['title' => 'Base Questions', 'baseQuestionsIndex' => 'active']);
     }
 } 

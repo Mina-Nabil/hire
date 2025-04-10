@@ -1080,8 +1080,10 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 window.addEventListener("openNewTab", function (event) {
-    window.open(event.detail[0]["url"], "_blank");
+    window.open(event.detail[0], "_blank");
 });
+
+
 
 // radio btn new
 

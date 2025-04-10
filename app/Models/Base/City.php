@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 
 class City extends Model
 {
+    const MORPH_NAME = 'city';
+    
     protected $fillable = ['name'];
     public $timestamps = false;
 

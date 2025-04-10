@@ -4,12 +4,15 @@ namespace App\Models\Recruitment\Applicants;
 
 use App\Exceptions\AppException;
 use App\Models\Base\Area;
+use App\Models\Users\Document;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class Applicant extends Model
 {
@@ -34,7 +37,7 @@ class Applicant extends Model
         'image_url',
         'cv_url',
         'signature_url',
-        'signature_date',
+        'signature_date'
     ];
 
     protected $casts = [
@@ -79,8 +82,13 @@ class Applicant extends Model
         return $this->first_name . ' ' . ($this->middle_name ? $this->middle_name . ' ' : '') . $this->last_name;
     }
 
+    public function getFullCvUrlAttribute(): string
+    {
+        return $this->cv_url ? Storage::disk('s3')->url($this->cv_url) : null;
+    }
+
     ////static methods
-   
+
 
 
     ///relations
@@ -119,7 +127,7 @@ class Applicant extends Model
     /**
      * Get all experience records for this applicant
      */
-    public function experiences(): HasMany   
+    public function experiences(): HasMany
     {
         return $this->hasMany(Experience::class);
     }
@@ -157,6 +165,14 @@ class Applicant extends Model
     }
     
     /**
+     * Get all documents for this applicant
+     */
+    public function documents(): MorphMany
+    {
+        return $this->morphMany(Document::class, 'doc_owner');
+    }
+
+    /**
      * Create a new applicant
      * 
      * @param int $areaId
@@ -169,9 +185,9 @@ class Applicant extends Model
      */
     public static function createApplicant(
         int $areaId,
-        string $firstName, 
-        string $lastName, 
-        string $email, 
+        string $firstName,
+        string $lastName,
+        string $email,
         string $phone,
         array $additionalData = []
     ): Applicant {
@@ -207,6 +223,26 @@ class Applicant extends Model
         }
     }
 
+
+    /**
+     * Update the applicant's CV
+     * 
+     * @param string $cvUrl
+     * @return Applicant
+     */
+    public function updateCv(string $cvUrl): bool
+    {
+        try {
+            if($this->cv_url){
+                Storage::disk('s3')->delete($this->cv_url);
+            }
+            $this->cv_url = $cvUrl;
+            return $this->save();
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException('Failed to update CV: ' . $e->getMessage());
+        }
+    }
     /**
      * Set education records for this applicant
      * This will remove existing education records and create new ones
@@ -220,12 +256,12 @@ class Applicant extends Model
             return DB::transaction(function () use ($educations) {
                 // Delete existing educations
                 $this->educations()->delete();
-                
+
                 // Create new educations
                 foreach ($educations as $education) {
                     $this->educations()->create($education);
                 }
-                
+
                 return $this;
             });
         } catch (Exception $e) {
@@ -247,12 +283,12 @@ class Applicant extends Model
             return DB::transaction(function () use ($trainings) {
                 // Delete existing trainings
                 $this->trainings()->delete();
-                
+
                 // Create new trainings
                 foreach ($trainings as $training) {
                     $this->trainings()->create($training);
                 }
-                
+
                 return $this;
             });
         } catch (Exception $e) {
@@ -274,12 +310,12 @@ class Applicant extends Model
             return DB::transaction(function () use ($experiences) {
                 // Delete existing experiences
                 $this->experiences()->delete();
-                
+
                 // Create new experiences
                 foreach ($experiences as $experience) {
                     $this->experiences()->create($experience);
                 }
-                
+
                 return $this;
             });
         } catch (Exception $e) {
@@ -301,12 +337,12 @@ class Applicant extends Model
             return DB::transaction(function () use ($languages) {
                 // Delete existing languages
                 $this->languages()->delete();
-                
+
                 // Create new languages
                 foreach ($languages as $language) {
                     $this->languages()->create($language);
                 }
-                
+
                 return $this;
             });
         } catch (Exception $e) {
@@ -328,12 +364,12 @@ class Applicant extends Model
             return DB::transaction(function () use ($references) {
                 // Delete existing references
                 $this->references()->delete();
-                
+
                 // Create new references
                 foreach ($references as $reference) {
                     $this->references()->create($reference);
                 }
-                
+
                 return $this;
             });
         } catch (Exception $e) {
@@ -355,12 +391,12 @@ class Applicant extends Model
             return DB::transaction(function () use ($skills) {
                 // Delete existing skills
                 $this->skills()->delete();
-                
+
                 // Create new skills
                 foreach ($skills as $skill) {
                     $this->skills()->create($skill);
                 }
-                
+
                 return $this;
             });
         } catch (Exception $e) {
@@ -392,22 +428,6 @@ class Applicant extends Model
         } catch (Exception $e) {
             report($e);
             throw new AppException('Failed to set health record: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Upload and set the applicant's CV
-     * 
-     * @param string $cvUrl
-     * @return bool
-     */
-    public function setCv(string $cvUrl): bool
-    {
-        try {
-            return $this->update(['cv_url' => $cvUrl]);
-        } catch (Exception $e) {
-            report($e);
-            throw new AppException('Failed to set CV: ' . $e->getMessage());
         }
     }
 
@@ -467,5 +487,92 @@ class Applicant extends Model
             report($e);
             throw new AppException('Failed to apply for vacancy: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Scope to search applicants by name or position applied
+     */
+    public function scopeSearch($query, $search)
+    {
+        $texts = explode(' ', $search);
+        foreach ($texts as $text) {
+            $query->where(function ($query) use ($text) {
+                $query->where('first_name', 'like', "%{$text}%")
+                    ->orWhere('middle_name', 'like', "%{$text}%")
+                    ->orWhere('last_name', 'like', "%{$text}%")
+                    ->orWhereHas('applications.vacancy.position', function ($q) use ($text) {
+                        $q->where('name', 'like', "%{$text}%");
+                    });
+            });
+        }
+        return $query;
+    }
+
+    /**
+     * Scope to filter applicants created from a specific date
+     */
+    public function scopeCreatedFrom($query, $date)
+    {
+        return $query->whereDate('created_at', '>=', $date);
+    }
+
+    /**
+     * Scope to filter applicants created to a specific date
+     */
+    public function scopeCreatedTo($query, $date)
+    {
+        return $query->whereDate('created_at', '<=', $date);
+    }
+
+    /**
+     * Scope to filter applicants by military status
+     */
+    public function scopeWithMilitaryStatus($query, $status)
+    {
+        return $query->where('military_status', $status);
+    }
+
+    /**
+     * Scope to filter applicants by marital status
+     */
+    public function scopeWithMaritalStatus($query, $status)
+    {
+        return $query->where('marital_status', $status);
+    }
+
+    /**
+     * Scope to filter applicants by area
+     */
+    public function scopeFromCity($query, $cityId)
+    {
+        return $query->whereHas('area', function ($q) use ($cityId) {
+            $q->where('city_id', $cityId);
+        });
+    }
+
+    /**
+     * Scope to filter applicants by area
+     */
+    public function scopeFromArea($query, $areaId)
+    {
+        return $query->where('area_id', $areaId);
+    }
+
+    /**
+     * Scope to filter applicants older than a specific age
+     */
+    public function scopeOlderThan($query, $years)
+    {
+        $date = now()->subYears($years)->format('Y-m-d');
+        return $query->whereDate('birth_date', '<=', $date);
+    }
+
+    /**
+     * Scope to filter applicants younger than a specific age
+     */
+    public function scopeYoungerThan($query, $years)
+    {
+        $date = now()->subYears($years)->format('Y-m-d');
+        return $query->whereDate('birth_date', '>=', $date);
     }
 }

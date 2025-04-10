@@ -18,7 +18,7 @@ use Livewire\WithPagination;
 class VacancyIndex extends Component
 {
     use WithPagination, AlertFrontEnd;
-    
+
     //page data
     public $positions;
     public $users;
@@ -47,7 +47,7 @@ class VacancyIndex extends Component
     // Questions section
     public $questions = [];
     public $questionTypes = [];
-    
+
     // Slots section
     public $slots = [];
 
@@ -166,7 +166,7 @@ class VacancyIndex extends Component
         $this->jobBenefits = $vacancy->job_benefits;
         $this->arabicJobBenefits = $vacancy->arabic_job_benefits;
         $this->jobSalary = $vacancy->job_salary;
-        
+
         // Load questions
         $this->questions = [];
         foreach ($vacancy->vacancy_questions as $question) {
@@ -179,12 +179,12 @@ class VacancyIndex extends Component
                 'options' => $question->options ? implode(',', $question->options) : '',
             ];
         }
-        
+
         // If no questions, add an empty one
         if (empty($this->questions)) {
             $this->addQuestion();
         }
-        
+
         // Load slots
         $this->slots = [];
         foreach ($vacancy->vacancy_slots as $slot) {
@@ -195,12 +195,12 @@ class VacancyIndex extends Component
                 'end_time' => $slot->end_time->format('H:i'),
             ];
         }
-        
+
         // If no slots, add an empty one
         if (empty($this->slots)) {
             $this->addSlot();
         }
-        
+
         $this->editVacancyModal = true;
     }
 
@@ -220,7 +220,7 @@ class VacancyIndex extends Component
         $this->jobBenefits = $vacancy->job_benefits;
         $this->arabicJobBenefits = $vacancy->arabic_job_benefits;
         $this->jobSalary = $vacancy->job_salary;
-        
+
         // Load questions
         $this->questions = [];
         foreach ($vacancy->vacancy_questions as $question) {
@@ -233,7 +233,7 @@ class VacancyIndex extends Component
                 'options' => $question->options ? implode(',', $question->options) : '',
             ];
         }
-        
+
         // Load slots
         $this->slots = [];
         foreach ($vacancy->vacancy_slots as $slot) {
@@ -244,7 +244,7 @@ class VacancyIndex extends Component
                 'end_time' => $slot->end_time->format('H:i'),
             ];
         }
-        
+
         $this->viewVacancyModal = true;
     }
 
@@ -303,11 +303,11 @@ class VacancyIndex extends Component
                         'required' => isset($question['required']) ? true : false,
                         'options' => !empty($question['options']) ? explode(',', $question['options']) : null,
                     ];
-                    
+
                     if (isset($question['id'])) {
                         $questionData['id'] = $question['id'];
                     }
-                    
+
                     $questionsData[] = $questionData;
                 }
             }
@@ -321,11 +321,11 @@ class VacancyIndex extends Component
                         'start_time' => $slot['start_time'],
                         'end_time' => $slot['end_time'],
                     ];
-                    
+
                     if (isset($slot['id'])) {
                         $slotData['id'] = $slot['id'];
                     }
-                    
+
                     $slotsData[] = $slotData;
                 }
             }
@@ -386,7 +386,7 @@ class VacancyIndex extends Component
         if (isset($this->questions[$index])) {
             array_splice($this->questions, $index, 1);
         }
-        
+
         if (count($this->questions) == 0) {
             $this->addQuestion();
         }
@@ -407,7 +407,7 @@ class VacancyIndex extends Component
         if (isset($this->slots[$index])) {
             array_splice($this->slots, $index, 1);
         }
-        
+
         if (count($this->slots) == 0) {
             $this->addSlot();
         }
@@ -469,7 +469,10 @@ class VacancyIndex extends Component
 
     public function render()
     {
-        $vacancies = Vacancy::with(['position', 'assigned_to_user', 'vacancy_questions', 'vacancy_slots'])
+        $vacancies = Vacancy::withCount('applications', 'vacancy_questions', 'vacancy_slots')->with([
+            'position',
+            'assigned_to_user',
+        ])
             ->when($this->search, function ($query) {
                 $query->search($this->search);
             })
@@ -489,4 +492,4 @@ class VacancyIndex extends Component
             'vacanciesIndex' => 'active'
         ]);
     }
-} 
+}

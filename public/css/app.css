@@ -4743,6 +4743,9 @@ textarea.form-control.is-invalid {
 .h-\[512px\] {
     height: 512px;
 }
+.h-\[720px\] {
+    height: 720px;
+}
 .h-\[120px\] {
     height: 120px;
 }
@@ -4832,6 +4835,9 @@ textarea.form-control.is-invalid {
 }
 .w-full {
     width: 100%;
+}
+.w-\[75\%\] {
+    width: 75%;
 }
 .w-\[3\.23rem\] {
     width: 3.23rem;
@@ -5084,6 +5090,9 @@ textarea.form-control.is-invalid {
 }
 .max-w-\[300px\] {
     max-width: 300px;
+}
+.max-w-\[75\%\] {
+    max-width: 75%;
 }
 .max-w-\[90\%\] {
     max-width: 90%;

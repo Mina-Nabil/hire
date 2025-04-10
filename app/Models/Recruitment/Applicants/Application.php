@@ -3,6 +3,7 @@
 namespace App\Models\Recruitment\Applicants;
 
 use App\Exceptions\AppException;
+use App\Models\Personel\Employee;
 use App\Models\Recruitment\Vacancies\Vacancy;
 use App\Models\Recruitment\Vacancies\VacancySlot;
 use Exception;
@@ -21,6 +22,7 @@ class Application extends Model
         'applicant_id',
         'vacancy_id',
         'cover_letter',
+        'referred_by_id',
         'status',
     ];
     
@@ -72,6 +74,14 @@ class Application extends Model
     }
 
     /**
+     * Get the employee who referred this application.
+     */
+    public function referredBy(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class, 'referred_by_id');
+    }
+
+    /**
      * Create a new application
      * 
      * @param int $applicantId
@@ -79,7 +89,7 @@ class Application extends Model
      * @param string|null $coverLetter
      * @return Application
      */
-    public static function createApplication(int $applicantId, int $vacancyId, ?string $coverLetter = null): Application
+    public static function createApplication(int $applicantId, int $vacancyId, ?string $coverLetter = null, ?int $refered_by_id = null): Application
     {
         try {
             return self::create([
@@ -87,6 +97,7 @@ class Application extends Model
                 'vacancy_id' => $vacancyId,
                 'cover_letter' => $coverLetter,
                 'status' => self::STATUS_PENDING,
+                // 'referred_by_id' => $refered_by_id,
             ]);
         } catch (Exception $e) {
             report($e);

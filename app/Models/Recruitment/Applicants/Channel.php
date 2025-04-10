@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Channel extends Model
 {
+    const MORPH_NAME = 'channel';
+
     use HasFactory;
 
     protected $fillable = ['name'];

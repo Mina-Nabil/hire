@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!-- Template Name: DashCode - HTML, React, Vue, Tailwind Admin Dashboard Template Author: Codeshaper Website: https://codeshaper.net Contact: support@codeshaperbd.net Like: https://www.facebook.com/Codeshaperbd Purchase: https://themeforest.net/item/dashcode-admin-dashboard-template/42600453 License: You must have a valid license purchased only from themeforest(the above link) in order to legally use the theme for your project. -->
 <html lang="zxx" dir="ltr" class="light">
 
 <head>
@@ -24,7 +23,9 @@
     <link href="https://unpkg.com/dropzone@6.0.0-beta.1/dist/dropzone.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 
-
+    <!-- Alpine.js CDN with Focus plugin -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
+    
     <!-- End : Theme CSS-->
     <script src="{{ asset('js/settings.js') }}" sync></script>
     @auth
@@ -33,6 +34,7 @@
     @endauth
 
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     @yield('child_styles')
 
@@ -91,6 +93,18 @@
                             <iconify-icon class="icon-arrow" icon="heroicons-outline:chevron-right"></iconify-icon>
                         </a>
                         <ul class="sidebar-submenu">
+                            @can('create', App\Models\Recruitment\Applicants\Applicant::class)
+                                <li>
+                                    <a class="{{ $applicantsCreate ?? '' }}"
+                                        href="{{ url('/recruitment/applicants/create') }}">New Applicant</a>
+                                </li>
+                            @endcan
+                            @can('viewAny', App\Models\Recruitment\Applicants\Applicant::class)
+                                <li>
+                                    <a class="{{ $applicantsIndex ?? '' }}"
+                                        href="{{ url('/recruitment/applicants') }}">Applicants</a>
+                                </li>
+                            @endcan
                             @can('viewAny', App\Models\Heirarchy\Position::class)
                                 <li>
                                     <a class="{{ $vacanciesIndex ?? '' }}"
@@ -431,6 +445,7 @@
     </script>
 
     @yield('child_scripts')
+    @stack('scripts')
     {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
     </script> --}}

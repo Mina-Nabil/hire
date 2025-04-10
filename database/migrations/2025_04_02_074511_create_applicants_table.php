@@ -2,9 +2,11 @@
 
 use App\Models\Base\Area;
 use App\Models\Base\City;
+use App\Models\Personel\Employee;
 use App\Models\Recruitment\Applicants\Applicant;
 use App\Models\Recruitment\Applicants\ApplicantSkill;
 use App\Models\Recruitment\Applicants\Application;
+use App\Models\Recruitment\Applicants\Channel;
 use App\Models\Recruitment\Applicants\Language;
 use App\Models\Recruitment\Vacancies\Vacancy;
 use App\Models\Recruitment\Vacancies\VacancySlot;
@@ -30,8 +32,9 @@ return new class extends Migration
             $table->string('phone')->unique();
             $table->string('address')->nullable();
             $table->string('social_number')->nullable();
-            $table->string('home_phone')->unique();
+            $table->string('home_phone')->nullable();
             $table->date('birth_date')->nullable();
+            $table->foreignIdFor(Channel::class)->nullable()->constrained('channels');
             $table->enum('military_status', Applicant::MILITARY_STATUS)->nullable();
             $table->enum('gender', Applicant::GENDER)->nullable();
             $table->enum('marital_status', Applicant::MARITAL_STATUS)->nullable();
@@ -113,6 +116,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Applicant::class)->constrained('applicants')->cascadeOnDelete();
             $table->foreignIdFor(Vacancy::class)->constrained('vacancies')->cascadeOnDelete();
+            $table->foreignIdFor(Employee::class, 'referred_by_id')->nullable()->constrained('employees');
             $table->string('cover_letter')->nullable();
             $table->enum('status', Application::APPLICATION_STATUSES)->default(Application::STATUS_PENDING);
             $table->timestamps();

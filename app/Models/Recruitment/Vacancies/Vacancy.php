@@ -52,7 +52,8 @@ class Vacancy extends Model
     ];
 
     protected $casts = [
-        'closing_date' => 'date'
+        'closing_date' => 'date',
+        'created_at' => 'date'
     ];
 
     /**

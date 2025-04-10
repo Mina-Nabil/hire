@@ -26,6 +26,11 @@ class Experience extends Model
         'end_date' => 'date',
     ];
 
+    public function getFormattedSalaryAttribute()
+    {
+        return number_format($this->salary, 2) . 'EGP';
+    }
+
     /**
      * Get the applicant that owns this experience record.
      */

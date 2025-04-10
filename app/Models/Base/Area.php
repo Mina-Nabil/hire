@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class Area extends Model
 {
+    const MORPH_NAME = 'area';
     protected $fillable = ['name', 'city_id'];
     public $timestamps = false;
 

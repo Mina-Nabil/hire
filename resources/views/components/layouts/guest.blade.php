@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
-    <title>HiRe • Login</title>
+    <title>{{ $pageTitle ?? 'HiRe' }} • {{ config('app.name', 'HiRe') }}</title>
     <link rel="icon" type="image/png" href="{{ asset('images/logo/genuine-favicon.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,16 +20,102 @@
     <script src="{{ asset('js/settings.js') }}" sync></script>
     <!-- END : Theme Config js-->
     @livewireStyles
+    <style>
+        .guest-layout-wrapper {
+            min-height: 100vh;
+            background-color: #f1f5f9;
+            padding: 2rem 0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .guest-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+        }
+
+        .guest-header img {
+            height: 60px;
+            margin-bottom: 1rem;
+        }
+
+        .guest-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            flex: 1;
+        }
+
+        .guest-card {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 1.5rem;
+            overflow: hidden;
+        }
+
+        .guest-card-header {
+            background-color: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1.5rem;
+        }
+
+        .guest-card-body {
+            padding: 1.5rem;
+        }
+
+        .guest-footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+        
+        /* Override card styles */
+        .card {
+            margin-bottom: 0;
+            box-shadow: none;
+            border-radius: 0;
+        }
+        
+        .card-header {
+            padding: 1.5rem;
+            background-color: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+    </style>
 </head>
 
-<body class=" font-inter skin-default">
-    <div>
-
+<body class="font-inter skin-default">
+    <div class="guest-layout-wrapper">
         <div id="simpleToast"></div>
 
-        {{ $slot ?? '' }}
+        <div class="guest-header">
+            <img src="{{ asset('images/logo/logo.svg') }}" alt="{{ config('app.name', 'HiRe') }} Logo">
+            <h1 class="text-2xl font-bold text-slate-900">{{ $title ?? 'Welcome' }}</h1>
+            @if(isset($description))
+                <p class="text-slate-500 mt-2">{{ $description }}</p>
+            @endif
+        </div>
 
+        <div class="guest-container">
+            <div class="guest-card">
+                {{ $slot ?? '' }}
+            </div>
+        </div>
+
+        <div class="guest-footer">
+            <p>&copy; {{ date('Y') }} {{ config('app.name', 'HiRe') }}. All rights reserved.</p>
+        </div>
     </div>
+
     <!-- scripts -->
     <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
     <script src="{{ asset('js/rt-plugins.js') }}"></script>

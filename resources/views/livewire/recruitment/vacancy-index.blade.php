@@ -53,7 +53,7 @@
                             </thead>
                             <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
                                 @forelse($vacancies as $vacancy)
-                                    <tr>
+                                    <tr class="even:bg-slate-100 dark:even:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer" wire:click="showVacancy({{ $vacancy->id }})">
                                         <td class="table-td">{{ $vacancy->position->name }}</td>
                                         <td class="table-td">{{ ucfirst($vacancy->type) }}</td>
                                         <td class="table-td">

@@ -22,10 +22,6 @@ class BaseQuestion extends Model
         'updated_at'
     ];
 
-    protected $casts = [
-        'options' => 'array'
-    ];
-
     const TYPE_TEXT = 'text';
     const TYPE_NUMBER = 'number';
     const TYPE_DATE = 'date';
@@ -43,6 +39,11 @@ class BaseQuestion extends Model
         self::TYPE_RADIO,
         self::TYPE_TEXTAREA,
     ];
+
+    public function getOptionsArrayAttribute()
+    {
+        return $this->options ? explode(',', $this->options) : [];
+    }
 
     /**
      * Create a new question

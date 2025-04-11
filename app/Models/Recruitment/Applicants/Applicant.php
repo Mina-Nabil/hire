@@ -586,4 +586,14 @@ class Applicant extends Model
         $date = now()->subYears($years)->format('Y-m-d');
         return $query->whereDate('birth_date', '>=', $date);
     }
+
+    /**
+     * Scope to filter applicants by vacancy ID
+     */
+    public function scopeByVacancyId($query, int $vacancyId)
+    {
+        return $query->whereHas('applications', function ($q) use ($vacancyId) {
+            $q->where('vacancy_id', $vacancyId);
+        });
+    }
 }

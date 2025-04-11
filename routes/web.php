@@ -15,6 +15,7 @@ use App\Http\Controllers\Hierarchy\OrganizationController;
 use App\Livewire\Recruitment\ApplicantShow;
 use App\Livewire\Recruitment\ChannelIndex;
 use App\Livewire\Recruitment\ApplicantsIndex;
+use App\Livewire\Recruitment\VacancyShow;
 
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/', Dashboard::class)->name('home');
@@ -23,6 +24,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/hierarchy/tree', [OrganizationController::class, 'index']);
     Route::get('/hierarchy/positions', PositionIndex::class);
 
+    Route::get('/recruitment/vacancies/{id}', VacancyShow::class)->name('recruitment.vacancies.show');
     Route::get('/recruitment/vacancies', VacancyIndex::class)->name('recruitment.vacancies');
     Route::get('/recruitment/applicants', ApplicantsIndex::class)->name('recruitment.applicants');
     Route::get('/recruitment/applicants/create/{hashed_vacancy_id?}/{hashed_referral_id?}', ApplicantsCreate::class)->name('applicants.create');

@@ -19,9 +19,13 @@ class VacancyQuestion extends Model
     ];
 
     protected $casts = [
-        'required' => 'boolean',
-        'options' => 'array'
+        'required' => 'boolean'
     ];
+
+    public function getOptionsArrayAttribute()
+    {
+        return $this->options ? explode(',', $this->options) : [];
+    }
 
     /**
      * Get the vacancy that owns this question.

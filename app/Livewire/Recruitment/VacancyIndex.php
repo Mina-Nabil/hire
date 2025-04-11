@@ -475,6 +475,11 @@ class VacancyIndex extends Component
         $this->slots = [];
     }
 
+    public function showVacancy($id)
+    {
+        return $this->dispatch('openNewTab', route('recruitment.vacancies.show', $id));
+    }
+
 
     public function mount()
     {

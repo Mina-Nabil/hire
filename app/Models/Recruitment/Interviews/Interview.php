@@ -252,4 +252,18 @@ class Interview extends Model
             throw new AppException('Failed to add note: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Scope to filter interviews by vacancy ID
+     * 
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param int $vacancyId
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeByVacancyId($query, int $vacancyId)
+    {
+        return $query->whereHas('application', function ($q) use ($vacancyId) {
+            $q->where('vacancy_id', $vacancyId);
+        });
+    }
 }

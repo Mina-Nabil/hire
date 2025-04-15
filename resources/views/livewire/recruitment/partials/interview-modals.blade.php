@@ -80,9 +80,9 @@
                 <x-select title="Interview Result" wire:model="interviewResult"
                     errorMessage="{{ $errors->first('interviewResult') }}">
                     <option value="">-- Select Result --</option>
-                    <option value="Passed">Passed</option>
-                    <option value="Failed">Failed</option>
-                    <option value="On Hold">On Hold</option>
+                    @foreach ($interviewResults as $result)
+                        <option value="{{ $result }}">{{ str_replace('_', ' ', ucfirst($result)) }}</option>
+                    @endforeach
                 </x-select>
 
                 <div>
@@ -514,6 +514,210 @@
                 <x-secondary-button wire:click="closeUpdateStatusModal">Cancel</x-secondary-button>
                 <x-primary-button wire:click.prevent="updateInterviewStatus" loadingFunction="updateInterviewStatus">
                     Update Status
+                </x-primary-button>
+            </div>
+        </x-slot>
+    </x-modal>
+
+    <!-- View Application Modal -->
+    <x-modal wire:model="showApplicationModal">
+        <x-slot name="title">Application Details </x-slot>
+
+        <div class="space-y-6">
+            @if (isset($selectedApplication))
+                <!-- Applicant & Vacancy Information -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-lg font-semibold">{{ $selectedApplication->applicant->name }}</h3>
+                                <p class="text-sm text-gray-600">{{ $selectedApplication->applicant->email }}</p>
+                                <p class="text-sm text-gray-600">{{ $selectedApplication->applicant->phone }}</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="badge {{ $selectedApplication->status_class }}">
+                                    {{ ucfirst($selectedApplication->status) }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h4 class="font-medium">Position Details</h4>
+                            <p>{{ $selectedApplication->vacancy->position->name }}</p>
+                            <p class="text-sm text-gray-600">{{ $selectedApplication->vacancy->position->department->name }}</p>
+                        </div>
+
+                        @if($selectedApplication->referredBy)
+                            <div class="mt-4">
+                                <h4 class="font-medium">Referred By</h4>
+                                <p>{{ $selectedApplication->referredBy->name }}</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Booked Slots -->
+                @if($selectedApplication->slots->count() > 0)
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Booked Slots</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="space-y-2">
+                                @foreach($selectedApplication->slots as $slot)
+                                    <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
+                                        <span>{{ $slot->vacancySlot->start_time->format('d M Y H:i') }}</span>
+                                        <span class="text-gray-600">{{ $slot->vacancySlot->duration }} minutes</span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                <!-- Questions & Answers -->
+                @if($selectedApplication->answers->count() > 0)
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Questions & Answers</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="space-y-4">
+                                @foreach($selectedApplication->answers as $answer)
+                                    <div class="border-b pb-3">
+                                        <p class="font-medium">{{ $answer->answerable->question }}</p>
+                                        <p class="mt-1 text-gray-600">{{ $answer->answer }}</p>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                <!-- Documents -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Documents</h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- CV -->
+                        <div class="mb-4">
+                            <h4 class="font-medium mb-2">CV/Resume</h4>
+                            @if($selectedApplication->applicant->cv_path)
+                                <a href="{{ Storage::url($selectedApplication->applicant->cv_path) }}" 
+                                   target="_blank"
+                                   class="btn btn-secondary">
+                                    <i class="fas fa-download mr-2"></i>
+                                    Download CV
+                                </a>
+                            @else
+                                <p class="text-gray-500">No CV uploaded</p>
+                            @endif
+                        </div>
+
+                        <!-- Cover Letter -->
+                        @if($selectedApplication->cover_letter)
+                            <div>
+                                <h4 class="font-medium mb-2">Cover Letter</h4>
+                                <div class="bg-gray-50 p-4 rounded">
+                                    <p class="whitespace-pre-line">{{ $selectedApplication->cover_letter }}</p>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            @else
+                <div class="alert alert-warning">
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        <div>
+                            <p>No application selected to view.</p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        </div>
+
+        <x-slot name="footer">
+            <div class="flex justify-end gap-3">
+                <x-secondary-button wire:click="$set('showApplicationModal', false)">
+                    Close
+                </x-secondary-button>
+            </div>
+        </x-slot>
+    </x-modal>
+
+    <!-- Job Offer Modal -->
+    <x-modal wire:model="showNewOfferModal">
+        <x-slot name="title">Create Job Offer</x-slot>
+
+        <div class="space-y-4">
+            @if (isset($selectedApplication))
+                <div class="alert alert-info mb-4">
+                    <div class="flex items-center">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <div>
+                            <p class="font-medium">Creating job offer for:</p>
+                            <p>{{ $selectedApplication->vacancy->position->name }}
+                                ({{ $selectedApplication->vacancy->position->department->name }})</p>
+                            <p class="text-sm mt-1">Applicant: {{ $selectedApplication->applicant->full_name }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                @if(!$hrApproved || !$hiringManagerApproved)
+                    <div class="alert alert-warning">
+                        <div class="flex items-center">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            <div>
+                                <p class="font-medium">Required Approvals:</p>
+                                @if(!$hrApproved)
+                                    <p class="text-sm">- HR Manager approval pending</p>
+                                @endif
+                                @if(!$hiringManagerApproved)
+                                    <p class="text-sm">- Hiring Manager approval pending</p>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                <x-text-input label="Offered Monthly Gross Salary" type="number" step="0.01" wire:model="offeredSalary"
+                    errorMessage="{{ $errors->first('offeredSalary') }}" />
+
+                <div class="grid grid-cols-2 gap-4">
+                    <x-text-input label="Proposed Start Date" type="date" wire:model="proposedStartDate"
+                        errorMessage="{{ $errors->first('proposedStartDate') }}" />
+
+                    <x-text-input label="Offer Expiry Date" type="date" wire:model="expiryDate"
+                        errorMessage="{{ $errors->first('expiryDate') }}" />
+                </div>
+
+                <x-textarea label="Benefits" wire:model="benefits" rows="3"
+                    errorMessage="{{ $errors->first('benefits') }}"
+                    placeholder="List the benefits included in this offer..." />
+
+                <x-textarea label="Additional Notes" wire:model="offerNotes" rows="3"
+                    errorMessage="{{ $errors->first('offerNotes') }}"
+                    placeholder="Any additional notes or special terms..." />
+            @else
+                <div class="alert alert-warning">
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        <div>
+                            <p>No application selected for job offer.</p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        </div>
+
+        <x-slot name="footer">
+            <div class="mt-4 flex justify-end gap-3">
+                <x-secondary-button wire:click="closeNewOfferModal">Cancel</x-secondary-button>
+                <x-primary-button wire:click.prevent="createOffer" loadingFunction="createOffer"
+                    :disabled="!$hrApproved || !$hiringManagerApproved">
+                    Create Offer
                 </x-primary-button>
             </div>
         </x-slot>

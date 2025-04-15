@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\Storage;
 class Applicant extends Model
 {
     const MORPH_NAME = 'applicant';
+    const CV_PATH = 'applicant-documents';
+    const IMAGE_PATH = 'applicant-images';
 
     protected $table = 'applicants';
     protected $fillable = [
@@ -39,7 +41,8 @@ class Applicant extends Model
         'image_url',
         'cv_url',
         'signature_url',
-        'signature_date'
+        'signature_date',
+        'is_hired'
     ];
 
     protected $casts = [
@@ -203,11 +206,12 @@ class Applicant extends Model
     ): Applicant {
         try {
             return DB::transaction(function () use ($areaId, $firstName, $lastName, $email, $phone, $additionalData) {
-                return self::create(array_merge([
+                return self::updateOrCreate([
+                    'email' => $email,
+                ], array_merge([
                     'area_id' => $areaId,
                     'first_name' => $firstName,
                     'last_name' => $lastName,
-                    'email' => $email,
                     'phone' => $phone,
                 ], $additionalData));
             });
@@ -491,13 +495,23 @@ class Applicant extends Model
                     'vacancy_id' => $vacancyId,
                     'cover_letter' => $coverLetter,
                     'status' => Application::STATUS_PENDING,
-                    // 'referred_by_id' => $refered_by_id,
+                    'referred_by_id' => $refered_by_id,
                 ]);
             });
         } catch (Exception $e) {
             report($e);
             throw new AppException('Failed to apply for vacancy: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Hire the applicant
+     * 
+     * @return bool
+     */
+    public function hire(): bool
+    {
+        return $this->update(['is_hired' => true]);
     }
 
     /**

@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Auth;
 
 class BaseQuestion extends Model
 {
+
+    const MORPH_TYPE = 'base_question';
+
     use HasFactory;
     const MORPH_NAME = 'base_question';
     
@@ -18,8 +21,7 @@ class BaseQuestion extends Model
         'question',
         'type',
         'options',
-        'created_at',
-        'updated_at'
+        'required'
     ];
 
     const TYPE_TEXT = 'text';
@@ -64,7 +66,7 @@ class BaseQuestion extends Model
         $this->question = $questionText;
         $this->type = $type;
         
-        if (in_array($type, [self::TYPE_SELECT, self::TYPE_CHECKBOX, self::TYPE_RADIO]) && !empty($options)) {
+        if (in_array($type, [self::TYPE_SELECT, self::TYPE_RADIO]) && !empty($options)) {
             if (is_string($options)) {
                 $options = explode(',', $options);
                 $options = array_map('trim', $options);

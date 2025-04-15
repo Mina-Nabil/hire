@@ -23,6 +23,16 @@ class InterviewFeedback extends Model
         'feedback',
     ];
 
+    const RESULT_PASSED = 'Passed';
+    const RESULT_FAILED = 'Failed';
+    const RESULT_ON_HOLD = 'On Hold';
+
+    const RESULTS = [
+        self::RESULT_ON_HOLD,
+        self::RESULT_PASSED,
+        self::RESULT_FAILED,
+    ];
+
     public function interview(): BelongsTo
     {
         return $this->belongsTo(Interview::class);

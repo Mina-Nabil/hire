@@ -121,8 +121,7 @@
 
                         <!-- Home Phone -->
                         <div class="form-group">
-                            <label for="homePhone" class="form-label">Home Phone <span
-                                    class="text-danger-500">*</span></label>
+                            <label for="homePhone" class="form-label">Home Phone</label>
                             <input type="text" id="homePhone" wire:model="homePhone"
                                 class="form-control @error('homePhone') !border-danger-500 @enderror">
                             @error('homePhone')
@@ -757,6 +756,7 @@
                                             <option value="computer">Computer Skill</option>
                                             <option value="technical">Technical Skill</option>
                                             <option value="soft">Soft Skill</option>
+                                            <option value="other">Other</option>
                                         </select>
                                         @error('skills.' . $index . '.type')
                                             <span
@@ -832,7 +832,7 @@
                                 work?</label>
                             <div class="flex items-center space-x-4 mt-2">
                                 <label class="flex items-center">
-                                    <input type="radio" wire:model="hasHealthIssues" value="1"
+                                    <input type="radio" wire:model.live="hasHealthIssues" value="1"
                                         class="form-radio">
                                     <span class="text-sm font-medium text-slate-600 ml-2">Yes</span>
                                 </label>
@@ -869,190 +869,127 @@
 
                     @if ($selectedVacancy)
                         <!-- Vacancy Information -->
-                        <div class="p-4 bg-slate-50 rounded-md mb-6">
-                            <h5 class="font-medium mb-2">Vacancy Details:</h5>
-                            <p><strong>Position:</strong> {{ $selectedVacancy?->position?->name }}</p>
-                            <p><strong>Department:</strong>
-                                {{ $selectedVacancy?->position?->department?->name }}</p>
-                            <p><strong>Opening Date:</strong> {{ $selectedVacancy?->created_at->format('d M Y') }}</p>
-                            <p><strong>Closing Date:</strong> {{ $selectedVacancy?->closing_date->format('d M Y') }}
-                            </p>
-                            <p><strong>Status:</strong> <span
-                                    class="badge {{ $selectedVacancy?->status === 'open' ? 'bg-success-500' : 'bg-danger-500' }}">{{ ucfirst($selectedVacancy?->status) }}</span>
-                            </p>
+
+                        <div class="flex justify-between">
+
+                            <div class="w-full p-4 bg-slate-50 rounded-md mb-6">
+                                <h5 class="font-medium mb-2">Vacancy Details:</h5>
+                                <p><strong>Position:</strong> {{ $selectedVacancy?->position?->name }}</p>
+                                <p><strong>Department:</strong>
+                                    {{ $selectedVacancy?->position?->department?->name }}</p>
+                                <p><strong>Opening Date:</strong> {{ $selectedVacancy?->created_at->format('d M Y') }}
+                                </p>
+                                <p><strong>Closing Date:</strong>
+                                    {{ $selectedVacancy?->closing_date->format('d M Y') }}
+                                </p>
+                                <p><strong>Status:</strong> <span
+                                        class="badge {{ $selectedVacancy?->status === 'open' ? 'bg-success-500' : 'bg-danger-500' }}">{{ ucfirst($selectedVacancy?->status) }}</span>
+                                </p>
+                            </div>
+                            @if ($canEditVacancy)
+                                <div class="flex items-center p-4 bg-slate-50 rounded-md mb-6">
+                                    <button type="button" wire:click="clearSelectedVacancy" class="text-danger-500">
+                                        <iconify-icon icon="heroicons:trash"></iconify-icon>
+                                    </button>
+                                </div>
+                            @endif
                         </div>
 
+                        <!-- Pick Preferred Interview Slot -->
+                        @if ($selectedVacancy->vacancy_slots->count() > 0)
+                            <div class="mb-6">
+                                <h5 class="font-medium mb-4">Preferred Interview Slot</h5>
+
+                                <x-select wire:model="slotId">
+                                    <option value="">All slots are Ok</option>
+                                    @foreach ($selectedVacancy->vacancy_slots as $slot)
+                                        <option value="{{ $slot->id }}">
+                                            {{ $slot->date->format('d M Y') }} -
+                                            {{ $slot->start_time->format('H:i') }} to
+                                            {{ $slot->end_time->format('H:i') }}
+                                        </option>
+                                    @endforeach
+                                </x-select>
+
+                            </div>
+                        @endif
+
                         <!-- Base Questions (if any) -->
-                        @if (count($baseQuestions) > 0 || count($selectedVacancy->vacancy_questions) > 0)
+                        @if (count($allVacancyQuestions) > 0)
                             <div class="mb-6">
                                 <h5 class="font-medium mb-4">Application Questions</h5>
-
-                                @foreach ($baseQuestions as $index => $question)
+                                @foreach ($allVacancyQuestions as $index => $question)
                                     <div class="mb-4 p-4 border rounded-md">
                                         <p class="font-medium mb-2">{{ $index + 1 }}.
                                             {{ $question['question'] }}
+                                            @if ($question['required'])
+                                                <span class="text-danger-500">*</span>
+                                            @endif
                                         </p>
 
                                         @if ($question['type'] === 'textarea')
                                             <div class="form-group">
-                                                <textarea wire:model="questionAnswers.{{ $question['id'] }}"
-                                                    class="form-control @error('questionAnswers.' . $question['id']) !border-danger-500 @enderror" rows="3"></textarea>
-                                                @error('questionAnswers.' . $question['id'])
-                                                    <span
-                                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
-                                                @enderror
+                                                <textarea wire:model="questionAnswers.{{ $index }}.answer"
+                                                    class="form-control @error('questionAnswers.' . $index . '.answer') !border-danger-500 @enderror" rows="3"></textarea>
                                             </div>
                                         @elseif ($question['type'] === 'radio')
                                             <div class="space-y-2">
-                                                @foreach ($question['options'] as $option)
+                                                @foreach ($question['options_array'] as $optionIndex => $option)
                                                     <label class="flex items-center">
                                                         <input type="radio"
-                                                            wire:model="questionAnswers.{{ $question['id'] }}"
-                                                            value="{{ $option }}" class="form-radio">
+                                                            wire:model="questionAnswers.{{ $index }}.answer"
+                                                            value="{{ $option }}" class="form-radio"
+                                                            name="radio{{ $optionIndex }}">
                                                         <span
-                                                            class="text-sm font-medium text-slate-600 ml-2">{{ $option }}</span>
+                                                            class="text-sm font-medium text-slate-600 ml-2 @error('questionAnswers.' . $question['id'] . '.answer') !border-danger-500 @enderror ">{{ $option }}</span>
                                                     </label>
                                                 @endforeach
-                                                @error('questionAnswers.' . $question['id'])
-                                                    <span
-                                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
-                                                @enderror
                                             </div>
                                         @elseif ($question['type'] === 'checkbox')
                                             <div class="space-y-2">
-                                                @foreach ($question['options'] as $optionIndex => $option)
-                                                    <label class="flex items-center">
-                                                        <input type="checkbox"
-                                                            wire:model="questionAnswers.{{ $question['id'] }}.{{ $optionIndex }}"
-                                                            value="{{ $option }}" class="form-checkbox">
-                                                        <span
-                                                            class="text-sm font-medium text-slate-600 ml-2">{{ $option }}</span>
-                                                    </label>
-                                                @endforeach
-                                                @error('questionAnswers.' . $question['id'])
+                                                <label class="flex items-center">
+                                                    <input type="checkbox"
+                                                        wire:model="questionAnswers.{{ $index }}.answer"
+                                                        value="true" class="form-checkbox">
                                                     <span
-                                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
-                                                @enderror
+                                                        class="text-sm font-medium text-slate-600 ml-2">True</span>
+                                                </label>
                                             </div>
                                         @elseif ($question['type'] === 'select')
                                             <div class="form-group">
-                                                <select wire:model="questionAnswers.{{ $question['id'] }}"
-                                                    class="form-control @error('questionAnswers.' . $question['id']) !border-danger-500 @enderror">
+                                                <select wire:model="questionAnswers.{{ $index }}.answer"
+                                                    class="form-control @error('questionAnswers.' . $index . '.answer') !border-danger-500 @enderror">
                                                     <option value="">Select an option</option>
-                                                    @foreach ($question['options'] as $option)
+                                                    @foreach ($question['options_array'] as $option)
                                                         <option value="{{ $option }}">{{ $option }}
                                                         </option>
                                                     @endforeach
                                                 </select>
-                                                @error('questionAnswers.' . $question['id'])
-                                                    <span
-                                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
-                                                @enderror
                                             </div>
                                         @elseif ($question['type'] === 'date')
                                             <div class="form-group">
                                                 <input type="date"
-                                                    wire:model="questionAnswers.{{ $question['id'] }}"
-                                                    class="form-control @error('questionAnswers.' . $question['id']) !border-danger-500 @enderror">
+                                                    wire:model="questionAnswers.{{ $index }}.answer"
+                                                    class="form-control @error('questionAnswers.' . $index . '.answer') !border-danger-500 @enderror">
                                             </div>
                                         @elseif($question['type'] === 'number')
                                             <div class="form-group">
                                                 <input type="number"
-                                                    wire:model="questionAnswers.{{ $question['id'] }}"
-                                                    class="form-control @error('questionAnswers.' . $question['id']) !border-danger-500 @enderror">
+                                                    wire:model="questionAnswers.{{ $index }}.answer"
+                                                    class="form-control @error('questionAnswers.' . $index . '.answer') !border-danger-500 @enderror">
                                             </div>
                                         @else
                                             <div class="form-group">
                                                 <input type="text"
-                                                    wire:model="questionAnswers.{{ $question['id'] }}"
-                                                    class="form-control @error('questionAnswers.' . $question['id']) !border-danger-500 @enderror">
+                                                    wire:model="questionAnswers.{{ $index }}.answer"
+                                                    class="form-control @error('questionAnswers.' . $index . '.answer') !border-danger-500 @enderror">
                                             </div>
                                         @endif
+                                        @error('questionAnswers.' . $index . '.answer')
+                                            <span
+                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        @enderror
                                     </div>
-                                @endforeach
-
-                                @foreach ($selectedVacancy->vacancy_questions as $index => $question)
-                                <div class="mb-4 p-4 border rounded-md">
-                                    <p class="font-medium mb-2">{{ $index + 1 }}.
-                                        {{ $question['question'] }}
-                                    </p>
-
-                                    @if ($question['type'] === 'textarea')
-                                        <div class="form-group">
-                                            <textarea wire:model="questionAnswers.{{ $question['id'] }}"
-                                                class="form-control @error('questionAnswers.' . $question['id']) !border-danger-500 @enderror" rows="3"></textarea>
-                                            @error('questionAnswers.' . $question['id'])
-                                                <span
-                                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-                                    @elseif ($question['type'] === 'radio')
-                                        <div class="space-y-2">
-                                            @foreach ($question['options'] as $option)
-                                                <label class="flex items-center">
-                                                    <input type="radio"
-                                                        wire:model="questionAnswers.{{ $question['id'] }}"
-                                                        value="{{ $option }}" class="form-radio">
-                                                    <span
-                                                        class="text-sm font-medium text-slate-600 ml-2">{{ $option }}</span>
-                                                </label>
-                                            @endforeach
-                                            @error('questionAnswers.' . $question['id'])
-                                                <span
-                                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-                                    @elseif ($question['type'] === 'checkbox')
-                                        <div class="space-y-2">
-                                            @foreach ($question['options'] as $optionIndex => $option)
-                                                <label class="flex items-center">
-                                                    <input type="checkbox"
-                                                        wire:model="questionAnswers.{{ $question['id'] }}.{{ $optionIndex }}"
-                                                        value="{{ $option }}" class="form-checkbox">
-                                                    <span
-                                                        class="text-sm font-medium text-slate-600 ml-2">{{ $option }}</span>
-                                                </label>
-                                            @endforeach
-                                            @error('questionAnswers.' . $question['id'])
-                                                <span
-                                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-                                    @elseif ($question['type'] === 'select')
-                                        <div class="form-group">
-                                            <select wire:model="questionAnswers.{{ $question['id'] }}"
-                                                class="form-control @error('questionAnswers.' . $question['id']) !border-danger-500 @enderror">
-                                                <option value="">Select an option</option>
-                                                @foreach ($question['options'] as $option)
-                                                    <option value="{{ $option }}">{{ $option }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                            @error('questionAnswers.' . $question['id'])
-                                                <span
-                                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-                                    @elseif ($question['type'] === 'date')
-                                        <div class="form-group">
-                                            <input type="date"
-                                                wire:model="questionAnswers.{{ $question['id'] }}"
-                                                class="form-control @error('questionAnswers.' . $question['id']) !border-danger-500 @enderror">
-                                        </div>
-                                    @elseif($question['type'] === 'number')
-                                        <div class="form-group">
-                                            <input type="number"
-                                                wire:model="questionAnswers.{{ $question['id'] }}"
-                                                class="form-control @error('questionAnswers.' . $question['id']) !border-danger-500 @enderror">
-                                        </div>
-                                    @else
-                                        <div class="form-group">
-                                            <input type="text"
-                                                wire:model="questionAnswers.{{ $question['id'] }}"
-                                                class="form-control @error('questionAnswers.' . $question['id']) !border-danger-500 @enderror">
-                                        </div>
-                                    @endif
-                                </div>
                                 @endforeach
                             </div>
                         @endif
@@ -1076,12 +1013,12 @@
                         </div>
                     @endif
 
-                    <!-- Additional Comments -->
+                    <!-- Cover Letter -->
                     <div class="form-group mb-4">
-                        <label class="form-label">Additional Comments (Optional)</label>
-                        <textarea wire:model="comments" class="form-control @error('comments') !border-danger-500 @enderror" rows="3"
-                            placeholder="Any additional information you would like to provide"></textarea>
-                        @error('comments')
+                        <label class="form-label">Cover Letter (Optional)</label>
+                        <textarea wire:model="coverLetter" class="form-control @error('coverLetter') !border-danger-500 @enderror" rows="3"
+                            placeholder="Do you want to send a cover letter to the recruiter?"></textarea>
+                        @error('coverLetter')
                             <span class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
                         @enderror
                     </div>

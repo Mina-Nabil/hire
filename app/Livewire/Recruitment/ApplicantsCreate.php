@@ -7,7 +7,6 @@ use App\Models\Base\Area;
 use App\Models\Base\City;
 use App\Models\Personel\Employee;
 use App\Models\Recruitment\Applicants\Applicant;
-use App\Models\Recruitment\Applicants\ApplicantHealth;
 use App\Models\Recruitment\Applicants\Application;
 use App\Models\Recruitment\Applicants\Channel;
 use App\Models\Recruitment\Applicants\Language;
@@ -17,17 +16,10 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithFileUploads;
-use App\Models\Recruitment\Applicants\Education as ApplicantEducation;
-use App\Models\Recruitment\Applicants\Experience as ApplicantExperience;
-use App\Models\Recruitment\Applicants\Language as ApplicantLanguage;
-use App\Models\Recruitment\Applicants\Reference as ApplicantReference;
-use App\Models\Recruitment\Applicants\Training as ApplicantTraining;
-use App\Models\Recruitment\Applicants\ApplicationAnswer;
 use App\Models\Recruitment\Vacancies\BaseQuestion;
-use Illuminate\Validation\Rule;
 use App\Models\Recruitment\Applicants\ApplicantSkill;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class ApplicantsCreate extends Component
 {
@@ -44,7 +36,7 @@ class ApplicantsCreate extends Component
     public $employees = [];
     public $vacancies = [];
     public $baseQuestions = [];
-
+    public $vacancyQuestions = [];
     // Current step
     public $currentStep = 1;
     public $totalSteps = 8;
@@ -97,24 +89,29 @@ class ApplicantsCreate extends Component
     // Step 8: Vacancy & Application
     public $selectedVacancy = null;
     public $selectedReferral = null;
+    public $canEditVacancy = false;
     public $vacancyId = null;
     public $coverLetter = null;
     public $referredById = null;
+    public $allVacancyQuestions = [];
+    public $questionAnswers = [];
+    public $slotId = null;
 
-    public function mount($hashedVacancyId=null, $hashedReferralId=null)
+    public function mount($vacancyID = null, $referralID = null)
     {
-        if ($hashedVacancyId) {
-            $vacancyID = Hash::decode($hashedVacancyId);
+        if ($vacancyID) {
+            $vacancyID = decrypt($vacancyID);
             $this->selectedVacancy = Vacancy::findOrFail($vacancyID);
         }
 
-        if ($hashedReferralId) {
-            $referralID = Hash::decode($hashedReferralId);
+        if ($referralID) {
+            $referralID = decrypt($referralID);
             $this->selectedReferral = Employee::findOrFail($referralID);
         }
 
         if (!$this->selectedVacancy) {
             $this->authorize('viewAny', Vacancy::class);
+            $this->canEditVacancy = true;
         }
 
         // $this->areas = Area::all();
@@ -123,7 +120,7 @@ class ApplicantsCreate extends Component
         $this->employees = Employee::all();
         $this->vacancies = Vacancy::where('status', 'open')->with('position')->get();
         $this->baseQuestions = BaseQuestion::all();
-        
+
         // Initialize with one empty record for each collection
         $this->addEducation();
         $this->addTraining();
@@ -185,9 +182,9 @@ class ApplicantsCreate extends Component
             'areaId' => 'required|exists:areas,id',
             'firstName' => 'required|string|max:255',
             'lastName' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:applicants,email',
-            'phone' => 'required|string|max:255|unique:applicants,phone',
-            'homePhone' => 'required|string|max:255|unique:applicants,home_phone',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:255',
+            'homePhone' => 'nullable|string|max:255',
             'birthDate' => 'nullable|date',
             'gender' => 'nullable|in:' . implode(',', Applicant::GENDER),
             'maritalStatus' => 'nullable|in:' . implode(',', Applicant::MARITAL_STATUS),
@@ -195,6 +192,12 @@ class ApplicantsCreate extends Component
             'channelId' => 'nullable|exists:channels,id',
             'profileImage' => 'nullable|image|max:1024',
             'cv' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
+        ], [
+            'areaId.required' => 'The area is required',
+            'firstName.required' => 'The first name is required',
+            'lastName.required' => 'The last name is required',
+            'email.required' => 'The email is required',
+            'phone.required' => 'The phone is required',
         ]);
     }
 
@@ -232,11 +235,11 @@ class ApplicantsCreate extends Component
                     "educations.{$index}.start_date" => 'required|date',
                     "educations.{$index}.end_date" => 'nullable|date|after_or_equal:educations.' . $index . '.start_date',
                 ], [
-                    'educations.{$index}.school_name.required' => 'The school name is required',
-                    'educations.{$index}.degree.required' => 'The degree is required',
-                    'educations.{$index}.field_of_study.required' => 'The field of study is required',
-                    'educations.{$index}.start_date.required' => 'The start date is required',
-                    'educations.{$index}.end_date.after_or_equal' => 'The end date must be after or equal to the start date',
+                    "educations.{$index}.school_name.required" => 'The school name is required',
+                    "educations.{$index}.degree.required" => 'The degree is required',
+                    "educations.{$index}.field_of_study.required" => 'The field of study is required',
+                    "educations.{$index}.start_date.required" => 'The start date is required',
+                    "educations.{$index}.end_date.after_or_equal" => 'The end date must be after or equal to the start date',
                 ]);
             }
         }
@@ -435,7 +438,7 @@ class ApplicantsCreate extends Component
                 $this->validate([
                     "skills.{$index}.skill" => 'required|string|max:255',
                     "skills.{$index}.level" => 'required|in:' . implode(',', ApplicantSkill::SKILL_LEVELS),
-                    "skills.{$index}.type" => 'required|in:computer,technical,soft',
+                    "skills.{$index}.type" => 'required|in:computer,technical,soft,other',
                 ], [
                     "skills.{$index}.skill.required" => 'The skill is required',
                     "skills.{$index}.level.required" => 'The skill level is required',
@@ -455,15 +458,76 @@ class ApplicantsCreate extends Component
     public function updatedVacancyId($value)
     {
         if ($value) {
-            $this->selectedVacancy = Vacancy::findOrFail($value);
+            $this->selectedVacancy = Vacancy::with('vacancy_questions', 'vacancy_slots')->findOrFail($value);
+
+            foreach ($this->baseQuestions as $question) {
+                $this->allVacancyQuestions[] = [
+                    'id' => $question->id,
+                    'origin' => "base",
+                    'required' => $question->required,
+                    'question' => $question->question,
+                    'type' => $question->type,
+                    'options_array' => $question->options_array
+                ];
+                $this->questionAnswers[] = [
+                    'id' => $question->id,
+                    'origin' => "base",
+                    'answer' => '',
+                ];
+            }
+
+            foreach ($this->selectedVacancy->vacancy_questions as $question) {
+                $this->allVacancyQuestions[] = [
+                    'id' => $question->id,
+                    'origin' => "vacancy",
+                    'required' => $question->required,
+                    'question' => $question->question,
+                    'type' => $question->type,
+                    'options_array' => $question->options_array
+                ];
+                $this->questionAnswers[] = [
+                    'id' => $question->id,
+                    'origin' => "vacancy",
+                    'answer' => '',
+                ];
+            }
         }
+    }
+
+    public function clearSelectedVacancy()
+    {
+        $this->selectedVacancy = null;
+        $this->allVacancyQuestions = [];
+    }
+
+    public function validateAnsweredQuestions()
+    {
+        $validationRules = [];
+        $messages = [];
+        foreach ($this->allVacancyQuestions as $index => &$question) {
+            if ($question['origin'] == "vacancy") {
+                $questionObject = $this->selectedVacancy->vacancy_questions->where('id', $question['id'])->first();
+                if ($questionObject->required) {
+                    $validationRules["questionAnswers.{$index}.answer"] = 'required';
+                    $messages["questionAnswers.{$index}.answer.required"] = 'The question is required';
+                }
+            } else {
+                $questionObject = BaseQuestion::where('id', $question['id'])->first();
+                if ($questionObject->required) {
+                    $validationRules["questionAnswers.{$index}.answer"] = 'required';
+                    $messages["questionAnswers.{$index}.answer.required"] = 'The question is required';
+                }
+            }
+            $question["object"] = $questionObject;
+        }
+        $this->validate($validationRules, $messages);
     }
 
     public function validateVacancyAndApplication()
     {
         $this->validate([
             'vacancyId' => 'required|exists:vacancies,id',
-            'coverLetter' => 'nullable|string|max:2000',
+            'coverLetter' => 'nullable|string|max:6000',
             'referredById' => 'nullable|exists:employees,id',
         ], [
             "vacancyId.required" => 'The vacancy is required',
@@ -476,6 +540,7 @@ class ApplicantsCreate extends Component
     public function createApplicant()
     {
         $this->validateVacancyAndApplication();
+        $this->validateAnsweredQuestions();
 
         try {
             DB::transaction(function () {
@@ -509,13 +574,13 @@ class ApplicantsCreate extends Component
 
                 // 2. Handle file uploads
                 if ($this->profileImage) {
-                    $imagePath = $this->profileImage->store('applicant-images', 'public');
+                    $imagePath = $this->profileImage->store(Applicant::IMAGE_PATH, 's3');
                     $applicant->setImage($imagePath);
                 }
 
                 if ($this->cv) {
-                    $cvPath = $this->cv->store('applicant-cvs', 'public');
-                    $applicant->setCv($cvPath);
+                    $cvPath = $this->cv->store(Applicant::CV_PATH, 's3');
+                    $applicant->updateCv($cvPath);
                 }
 
                 // 3. Set educations
@@ -570,12 +635,21 @@ class ApplicantsCreate extends Component
                 $applicant->setHealth($this->hasHealthIssues, $this->hasHealthIssues ? $this->healthIssues : null);
 
                 // 10. Create application
-                Application::createApplication(
+                $application = Application::createApplication(
                     $applicant->id,
                     $this->vacancyId,
                     $this->coverLetter,
                     $this->referredById
                 );
+
+                // 11. Create application answers
+                if ($this->slotId) {
+                    $application->bookSlot($this->slotId);
+                }
+
+                foreach ($this->questionAnswers as $i => $qa) {
+                    $application->addAnswer($qa['answer'], $this->allVacancyQuestions[$i]['object']);
+                }
             });
 
             $this->alertSuccess('Applicant created successfully!');
@@ -591,19 +665,19 @@ class ApplicantsCreate extends Component
     public function render()
     {
         $isLoggedIn = Auth::check();
-        
+
         if ($isLoggedIn) {
             $this->pageTitle = 'Create New Applicant';
             $this->pageDescription = 'Create a new applicant for the selected vacancy';
             $this->pageLayout = 'components.layouts.app';
         } else {
             $this->pageTitle = 'Apply for ' . env('COMPANY_NAME', 'Our Company');
-            $this->pageDescription = $this->selectedVacancy 
-                ? 'Apply for the ' . $this->selectedVacancy->position->name . ' position' 
+            $this->pageDescription = $this->selectedVacancy
+                ? 'Apply for the ' . $this->selectedVacancy->position->name . ' position'
                 : 'Apply for one of our open positions';
             $this->pageLayout = 'components.layouts.guest';
         }
-        
+
         $view = view('livewire.recruitment.applicants-create', [
             'areas' => $this->areas,
             'channels' => $this->channels,
@@ -622,7 +696,7 @@ class ApplicantsCreate extends Component
             'description' => $this->pageDescription,
             'applicantsCreate' => 'active',
         ]);
-        
+
         return $view;
     }
 }

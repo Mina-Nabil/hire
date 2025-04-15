@@ -2,6 +2,7 @@
 
 use App\Models\Recruitment\Applicants\Application;
 use App\Models\Recruitment\Interviews\Interview;
+use App\Models\Recruitment\Interviews\InterviewFeedback;
 use App\Models\Users\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -45,7 +46,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Interview::class)->constrained('interviews')->cascadeOnDelete();
             $table->foreignIdFor(User::class)->constrained('users');
-            $table->string('result');
+            $table->enum('result', InterviewFeedback::RESULTS);
             $table->integer('rating');
             $table->text('strengths')->nullable();
             $table->text('weaknesses')->nullable();

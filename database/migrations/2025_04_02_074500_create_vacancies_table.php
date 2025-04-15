@@ -44,7 +44,7 @@ return new class extends Migration
             $table->string('arabic_question')->nullable();
             $table->enum('type', BaseQuestion::TYPES);
             $table->boolean('required')->default(false);
-            $table->json('options')->nullable();
+            $table->text('options')->nullable();
             $table->timestamps();
         });
 
@@ -55,7 +55,7 @@ return new class extends Migration
             $table->string('arabic_question')->nullable();
             $table->enum('type', BaseQuestion::TYPES);
             $table->boolean('required')->default(false);
-            $table->json('options')->nullable();
+            $table->text('options')->nullable();
             $table->timestamps();
         });
         

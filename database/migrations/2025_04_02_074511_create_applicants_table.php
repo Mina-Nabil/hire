@@ -48,6 +48,7 @@ return new class extends Migration
             $table->string('cv_url')->nullable();
             $table->string('signature_url')->nullable();
             $table->dateTime('signature_date')->nullable();
+            $table->boolean('is_hired')->default(false);
             $table->timestamps();
         });
 

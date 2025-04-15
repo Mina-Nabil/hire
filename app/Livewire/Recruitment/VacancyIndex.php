@@ -124,7 +124,7 @@ class VacancyIndex extends Component
                         'arabic_question' => $question['arabic_question'] ?? null,
                         'type' => $question['type'],
                         'required' => isset($question['required']) ? true : false,
-                        'options' => !empty($question['options']) ? explode(',', $question['options']) : null,
+                        'options' => isset($question['options']) ? $question['options'] : null,
                     ];
                 }
             }
@@ -478,6 +478,12 @@ class VacancyIndex extends Component
     public function showVacancy($id)
     {
         return $this->dispatch('openNewTab', route('recruitment.vacancies.show', $id));
+    }
+
+    public function copyUrl($id)
+    {
+        $url = route('applicants.guest.create', ['vacancyID' => id_hash($id)]);
+        $this->dispatch('copyUrl', url: $url);
     }
 
 

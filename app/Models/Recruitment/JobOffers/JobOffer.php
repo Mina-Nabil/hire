@@ -19,12 +19,12 @@ class JobOffer extends Model
         'proposed_start_date',
         'expiry_date',
         'offer_date',
-        'response_date',
         'benefits',
-        'special_terms',
         'notes',
+        'response_date',
         'response_notes',
         'status',
+        'created_by'
     ];
 
     protected $casts = [

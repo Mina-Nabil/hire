@@ -25,7 +25,7 @@
 
     <!-- Alpine.js CDN with Focus plugin -->
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
-    
+
     <!-- End : Theme CSS-->
     <script src="{{ asset('js/settings.js') }}" sync></script>
     @auth
@@ -408,38 +408,41 @@
 
 
     <script>
+        function showToast(message, type) {
+            var x = document.getElementById("simpleToast");
+
+            let icon = "";
+
+            if (type === "success") {
+                x.style.backgroundColor = "#50C793";
+                icon = '<iconify-icon icon="material-symbols:check"></iconify-icon>';
+            } else if (type === "failed") {
+                x.style.backgroundColor = "#F1595C";
+                icon = '<iconify-icon icon="ph:warning"></iconify-icon>';
+            } else if (type === "info") {
+                x.style.backgroundColor = "black";
+                icon = '<iconify-icon icon="material-symbols:info-outline"></iconify-icon>';
+            } else {
+                x.style.backgroundColor = "gray";
+            }
+
+            x.innerHTML = icon + "&nbsp;" + (message || " No message provided");
+            x.className = "show";
+
+            setTimeout(function() {
+                x.className = x.className.replace("show", "");
+            }, 3000);
+        }
+
         // Fix for Livewire v3 dispatched events
         document.addEventListener('livewire:initialized', () => {
             Livewire.on('toastalert', (data) => {
-                console.log('Toast event received:', data);
-                var x = document.getElementById("simpleToast");
+                showToast(data[0].message, data[0].type);
+            });
 
-                const {
-                    message,
-                    type
-                } = data[0];
-
-                let icon = "";
-
-                if (type === "success") {
-                    x.style.backgroundColor = "#50C793";
-                    icon = '<iconify-icon icon="material-symbols:check"></iconify-icon>';
-                } else if (type === "failed") {
-                    x.style.backgroundColor = "#F1595C";
-                    icon = '<iconify-icon icon="ph:warning"></iconify-icon>';
-                } else if (type === "info") {
-                    x.style.backgroundColor = "black";
-                    icon = '<iconify-icon icon="material-symbols:info-outline"></iconify-icon>';
-                } else {
-                    x.style.backgroundColor = "gray";
-                }
-
-                x.innerHTML = icon + "&nbsp;" + (message || " No message provided");
-                x.className = "show";
-
-                setTimeout(function() {
-                    x.className = x.className.replace("show", "");
-                }, 3000);
+            Livewire.on('copyUrl', (url) => {
+                navigator.clipboard.writeText(url.url);
+                showToast('URL copied to clipboard', 'success');
             });
         });
     </script>

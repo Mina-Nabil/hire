@@ -73,12 +73,20 @@
                                                 <div class="flex items-center gap-2">
                                                     <a class="btn btn-sm btn-secondary"
                                                         wire:click="showApplicant({{ $applicant->id }})">
-                                                        <i class="fas fa-eye mr-1"></i> View
+                                                        <i class="fas fa-eye mr-1"></i> Profile
+                                                    </a>
+                                                    <a class="btn btn-sm btn-secondary"
+                                                        wire:click="openApplicationModal({{ $applicant->id }})">
+                                                        <i class="fas fa-file-alt mr-1"></i> Application
                                                     </a>
                                                     <a class="btn btn-sm btn-primary"
                                                         wire:click="openNewInterviewModal({{ $applicant->id }})">
-                                                        <i class="fas fa-calendar-alt mr-1"></i> Schedule Interview
+                                                        <i class="fas fa-calendar-alt mr-1"></i> Interview
                                                     </a>
+                                                    <button type="button" class="btn btn-sm btn-primary"
+                                                    wire:click="openNewOfferModal({{ $applicant->id }})">
+                                                    <i class="fas fa-money-bill"></i> Offer
+                                                </button>
                                                 </div>
                                             </td>
                                         </tr>

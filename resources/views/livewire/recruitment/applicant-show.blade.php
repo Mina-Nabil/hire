@@ -3,6 +3,11 @@
         <div class="flex gap-5">
             <h4>
                 <b>{{ $applicant->full_name }}</b>
+                @if ($applicant->is_hired)
+                    <span class="text-success-500 text-xl leading-[0]">
+                        <iconify-icon icon="heroicons-outline:check-circle"></iconify-icon>
+                    </span>
+                @endif
             </h4>
             <div class="dropdown relative">
                 <button class="btn inline-flex justify-center btn-dark items-center btn-sm" type="button"
@@ -146,6 +151,8 @@
                     </div>
                 </div>
             </div>
+            <!-- Include all the interview creation & management modals -->
+            @include('livewire.recruitment.partials.interview-modals')
         @endif
         <!-- Documents Tab -->
         @if ($section === 'documents')

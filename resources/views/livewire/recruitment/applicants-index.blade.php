@@ -159,6 +159,11 @@
                                         @endif
                                         <span
                                             class="text-sm text-slate-600 dark:text-slate-300 capitalize">{{ $applicant->full_name }}</span>
+                                        @if ($applicant->is_hired)
+                                            <span class="text-success-500 text-xl leading-[0]">
+                                                <iconify-icon icon="heroicons-outline:check-circle"></iconify-icon>
+                                            </span>
+                                        @endif
                                     </div>
                                 </td>
                                 <td class="table-td">{{ $applicant->phone }}</td>

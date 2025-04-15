@@ -16,6 +16,7 @@ use App\Livewire\Recruitment\ApplicantShow;
 use App\Livewire\Recruitment\ChannelIndex;
 use App\Livewire\Recruitment\ApplicantsIndex;
 use App\Livewire\Recruitment\VacancyShow;
+use Illuminate\Support\Facades\Auth;
 
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/', Dashboard::class)->name('home');
@@ -27,7 +28,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/recruitment/vacancies/{id}', VacancyShow::class)->name('recruitment.vacancies.show');
     Route::get('/recruitment/vacancies', VacancyIndex::class)->name('recruitment.vacancies');
     Route::get('/recruitment/applicants', ApplicantsIndex::class)->name('recruitment.applicants');
-    Route::get('/recruitment/applicants/create/{hashed_vacancy_id?}/{hashed_referral_id?}', ApplicantsCreate::class)->name('applicants.create');
+    Route::get('/recruitment/applicants/create', ApplicantsCreate::class)->name('applicants.create');
     Route::get('/recruitment/applicants/{applicant}', ApplicantShow::class)->name('recruitment.applicants.show');
     Route::get('/recruitment/base-questions', BaseQuestionsIndex::class);
     Route::get('/recruitment/applicants/success', ApplicantSuccess::class)->name('applicants.success');
@@ -36,9 +37,13 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/settings/channels', ChannelIndex::class);
     Route::get('/profile', Profile::class);
 
+    Route::get('/logout', function () {
+        Auth::logout();
+        return redirect()->route('login');
+    });
 });
 
 Route::group(['middleware' => 'guest'], function () {
-    Route::get('/recruitment/applicants/create/{hashed_vacancy_id}/{hashed_referral_id?}', ApplicantsCreate::class)->name('applicants.create');
     Route::get('/login', Login::class)->name('login');
+    Route::get('/recruitment/apply/{vacancyID}/{referralID?}', ApplicantsCreate::class)->name('applicants.guest.create');
 });

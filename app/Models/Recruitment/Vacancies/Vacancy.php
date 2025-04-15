@@ -7,16 +7,18 @@ use App\Models\Hierarchy\Position;
 use App\Models\Recruitment\Applicants\Application;
 use App\Models\Users\User;
 use Exception;
+use Illuminate\Container\Attributes\DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB as FacadesDB;
 use Illuminate\Support\Facades\Log;
 
 class Vacancy extends Model
 {
     const MORPH_NAME = 'vacancy';
-    
+
     const TYPE_FULL_TIME = 'full_time';
     const TYPE_PART_TIME = 'part_time';
     const TYPE_TEMPORARY = 'temporary';
@@ -117,13 +119,13 @@ class Vacancy extends Model
      */
     public function scopeSearch($query, $search)
     {
-        return $query->where(function($q) use ($search) {
-            $q->whereHas('position', function($p) use ($search) {
+        return $query->where(function ($q) use ($search) {
+            $q->whereHas('position', function ($p) use ($search) {
                 $p->where('name', 'like', '%' . $search . '%')
-                  ->orWhere('arabic_name', 'like', '%' . $search . '%');
+                    ->orWhere('arabic_name', 'like', '%' . $search . '%');
             })
-            ->orWhere('type', 'like', '%' . $search . '%')
-            ->orWhere('status', 'like', '%' . $search . '%');
+                ->orWhere('type', 'like', '%' . $search . '%')
+                ->orWhere('status', 'like', '%' . $search . '%');
         });
     }
 
@@ -177,45 +179,45 @@ class Vacancy extends Model
         }
 
         try {
-            if($data['status'] == self::STATUS_CLOSED && $this->status != self::STATUS_CLOSED) {
+            if ($data['status'] == self::STATUS_CLOSED && $this->status != self::STATUS_CLOSED) {
                 $data['closing_date'] = now();
             }
+            FacadesDB::transaction(function () use ($data) {
+                $this->update($data);
 
-            $this->update($data);
+                // Update questions if provided
+                if (isset($data['questions']) && is_array($data['questions'])) {
+                    Log::info('questions', $data['questions']);
+                    // Remove existing questions if any
+                    if (isset($data['reset_questions']) && $data['reset_questions']) {
+                        $this->vacancy_questions()->delete();
+                    }
 
-            // Update questions if provided
-            if (isset($data['questions']) && is_array($data['questions'])) {
-                Log::info('questions', $data['questions']);
-                // Remove existing questions if any
-                if (isset($data['reset_questions']) && $data['reset_questions']) {
-                    $this->vacancy_questions()->delete();
-                }
-
-                foreach ($data['questions'] as $question) {
-                    if (isset($question['id']) && !$data['reset_questions']) {
-                        $this->vacancy_questions()->where('id', $question['id'])->update($question);
-                    } else {
-                        $this->vacancy_questions()->create($question);
+                    foreach ($data['questions'] as $question) {
+                        if (isset($question['id']) && !$data['reset_questions']) {
+                            $this->vacancy_questions()->where('id', $question['id'])->update($question);
+                        } else {
+                            $this->vacancy_questions()->create($question);
+                        }
                     }
                 }
-            }
 
-            // Update slots if provided
-            if (isset($data['slots']) && is_array($data['slots'])) {
-                // Remove existing slots if any
-                if (isset($data['reset_slots']) && $data['reset_slots']) {
-                    $this->vacancy_slots()->delete();
-                }
+                // Update slots if provided
+                if (isset($data['slots']) && is_array($data['slots'])) {
+                    // Remove existing slots if any
+                    if (isset($data['reset_slots']) && $data['reset_slots']) {
+                        $this->vacancy_slots()->delete();
+                    }
 
-                foreach ($data['slots'] as $slot) {
-                    if (isset($slot['id']) && !$data['reset_slots']) {
-                        $this->vacancy_slots()->where('id', $slot['id'])->update($slot);
-                    } else {
-                        $this->vacancy_slots()->create($slot);
+                    foreach ($data['slots'] as $slot) {
+                        if (isset($slot['id']) && !$data['reset_slots']) {
+                            $this->vacancy_slots()->where('id', $slot['id'])->update($slot);
+                        } else {
+                            $this->vacancy_slots()->create($slot);
+                        }
                     }
                 }
-            }
-
+            });
             return $this;
         } catch (Exception $e) {
             report($e);

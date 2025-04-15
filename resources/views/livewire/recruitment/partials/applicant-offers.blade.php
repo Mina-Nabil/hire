@@ -1,10 +1,6 @@
 <div>
     <div class="flex justify-between items-center mb-4">
         <h3 class="text-lg font-medium">Offers</h3>
-        <button type="button" class="btn btn-primary" wire:click="openNewOfferModal"
-            @if (!$canCreateOffer) disabled @endif>
-            <i class="fas fa-plus-circle mr-1"></i> Create Offer
-        </button>
     </div>
 
     @if ($offers->count() > 0)

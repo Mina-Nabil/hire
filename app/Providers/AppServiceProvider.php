@@ -28,7 +28,6 @@ use App\Models\Recruitment\Vacancies\BaseQuestion;
 use App\Models\Recruitment\Vacancies\Vacancy;
 use App\Models\Recruitment\Vacancies\VacancyQuestion;
 use App\Models\Users\User;
-use Faker\Provider\Base;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
 

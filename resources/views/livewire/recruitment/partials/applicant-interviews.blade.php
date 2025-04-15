@@ -119,6 +119,5 @@
         @endif
     </div>
 
-       <!-- Include all the interview management modals -->
-       @include('livewire.recruitment.partials.interview-modals')
+
 </div>

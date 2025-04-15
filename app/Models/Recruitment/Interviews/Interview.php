@@ -119,6 +119,12 @@ class Interview extends Model
      */
     public function updateStatus(string $status): bool
     {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('update', $this)) {
+            throw new AppException(__('misc.not_authorized'));
+        }
+
         if (!in_array($status, self::INTERVIEW_STATUSES)) {
             throw new AppException('Invalid interview status');
         }
@@ -139,6 +145,13 @@ class Interview extends Model
      */
     public function setInterviewers(array $userIds): void
     {
+
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('update', $this)) {
+            throw new AppException(__('misc.not_authorized'));
+        }
+
         try {
             $this->interviewers()->sync($userIds);
         } catch (Exception $e) {
@@ -160,6 +173,13 @@ class Interview extends Model
      */
     public function addFeedback(int $userId, string $result, int $rating, ?string $strengths, ?string $weaknesses, ?string $feedback): InterviewFeedback
     {   
+
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('update', $this)) {
+            throw new AppException(__('misc.not_authorized'));
+        }
+
         try {
             return $this->feedbacks()->updateOrCreate([ 
                 'interview_id' => $this->id,
@@ -189,6 +209,12 @@ class Interview extends Model
     ?string $newType = null, 
     ?string $newLocation = null, ?string $newZoomLink = null): bool
     {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('update', $this)) {
+            throw new AppException(__('misc.not_authorized'));
+        }
+
         try {
             $data = ['date' => $newDate, 'status' => self::STATUS_RESCHEDULED];
             
@@ -241,6 +267,12 @@ class Interview extends Model
      */
     public function addNote(string $title, ?string $note = null): InterviewNote
     {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('update', $this)) {
+            throw new AppException(__('misc.not_authorized'));
+        }
+
         try {
             return $this->notes()->create([
                 'user_id' => Auth::id() ?? 1,

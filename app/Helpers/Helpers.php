@@ -1,6 +1,7 @@
 <?php
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * Get the week of the month for a given date.
@@ -109,3 +110,12 @@ if (!function_exists('is_url')) {
         return filter_var($string, FILTER_VALIDATE_URL);
     }
 }
+
+
+if (!function_exists('id_hash')) {
+    function id_hash($id)
+    {
+        return encrypt($id);
+    }
+}
+

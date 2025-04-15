@@ -74,6 +74,10 @@
                                                     class="action-btn text-success">
                                                     <iconify-icon icon="heroicons:eye"></iconify-icon>
                                                 </button>
+                                                <button wire:click.stop='copyUrl({{ $vacancy->id }})'
+                                                    class="action-btn text-success">
+                                                    <iconify-icon icon="heroicons:link"></iconify-icon>
+                                                </button>
                                                 @can('update', $vacancy)
                                                     <button wire:click="openEditVacancySec({{ $vacancy->id }})"
                                                         class="action-btn text-primary">
@@ -678,7 +682,7 @@
                                                 <label class="form-label">Options (comma separated)</label>
                                                 <input type="text" class="form-control"
                                                     wire:model="questions.{{ $index }}.options"
-                                                    {{ !in_array($questions[$index]['type'], ['select', 'checkbox', 'radio']) ? 'disabled' : '' }}>
+                                                    {{ !in_array($questions[$index]['type'], ['select', 'radio']) ? 'disabled' : '' }}>
                                             </div>
                                             <div class="from-group flex items-center">
                                                 <label class="inline-flex items-center mt-6">
@@ -999,4 +1003,5 @@
             </div>
         </div>
     @endif
+
 </div>

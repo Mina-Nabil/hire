@@ -154,7 +154,7 @@
                                     <label for="options" class="form-label">Options (comma separated)</label>
                                     <input id="options" type="text"
                                         class="form-control @error('options') !border-danger-500 @enderror"
-                                        wire:model="options" @disabled(!in_array($type, ['select', 'checkbox', 'radio']))>
+                                        wire:model="options" @disabled(!in_array($type, ['select', 'radio']))>
                                     @error('options')
                                         <span
                                             class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>

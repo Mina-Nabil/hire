@@ -7,6 +7,7 @@ use App\Models\Hierarchy\Position;
 use App\Models\Recruitment\Applicants\Applicant;
 use App\Models\Recruitment\Applicants\Application;
 use App\Models\Recruitment\Interviews\Interview;
+use App\Models\Recruitment\Interviews\InterviewFeedback;
 use App\Models\Recruitment\JobOffers\JobOffer;
 use App\Models\Recruitment\Vacancies\BaseQuestion;
 use App\Models\Recruitment\Vacancies\Vacancy;
@@ -70,6 +71,9 @@ class VacancyShow extends Component
     public $feedbackNotes;
     public $nextStep;
     public $newApplicationStatus;
+
+    // View Application Modal
+    public $showApplicationModal = false;
     
     // Interview Management Modals
     public $showNewInterviewModal = false;
@@ -83,6 +87,7 @@ class VacancyShow extends Component
     public $showSetInterviewersModal = false;
     public $interviewers = [];
     public $selectedInterviewers = [];
+    public $interviewResults = InterviewFeedback::RESULTS;
     
     public $showRescheduleModal = false;
     public $newInterviewDate;
@@ -106,18 +111,31 @@ class VacancyShow extends Component
     public $interviewStatuses = Interview::INTERVIEW_STATUSES;
     public $applicationStatuses = Application::APPLICATION_STATUSES;
 
+    // Add these properties after other modal-related properties
+    public $showNewOfferModal = false;
+    public $offeredSalary;
+    public $proposedStartDate;
+    public $expiryDate;
+    public $benefits;
+    public $offerNotes;
+    public $hrApproved = false;
+    public $hiringManagerApproved = false;
+
     protected $listeners = ['dateSelected' => 'onDateSelected'];
 
     public function changeSection($section)
     {
         $this->section = $section;
+        if($section === 'manage'){
+            $this->loadVacancyControls();
+        }
     }
 
     public function mount($id)
     {
         $this->vacancyId = $id;
         $this->questionTypes = BaseQuestion::TYPES;
-        $this->positions = Position::availableForRecruitment()->get();
+        $this->positions = Position::all();
         $this->users = User::hrOrAdmin()->get();
         $this->interviewers = User::hrOrAdmin()->get();
         
@@ -133,7 +151,7 @@ class VacancyShow extends Component
         })->get();
     }
     
-    public function openEditVacancySec()
+    public function loadVacancyControls()
     {
         $vacancy = Vacancy::with(['vacancy_questions', 'vacancy_slots'])->find($this->vacancyId);
         $this->positionId = $vacancy->position_id;
@@ -160,7 +178,7 @@ class VacancyShow extends Component
                 'arabic_question' => $question->arabic_question,
                 'type' => $question->type,
                 'required' => $question->required,
-                'options' => $question->options ? implode(',', $question->options) : '',
+                'options' => $question->options_array,
             ];
         }
 
@@ -184,13 +202,6 @@ class VacancyShow extends Component
         if (empty($this->slots)) {
             $this->addSlot();
         }
-
-        $this->editVacancyModal = true;
-    }
-
-    public function closeEditVacancySec()
-    {
-        $this->editVacancyModal = false;
     }
     
     public function addQuestion()
@@ -238,6 +249,7 @@ class VacancyShow extends Component
     
     public function updateVacancy()
     {
+        
         $this->validate([
             'positionId' => 'required|exists:positions,id',
             'assignedTo' => 'required|exists:users,id',
@@ -252,6 +264,9 @@ class VacancyShow extends Component
             'jobBenefits' => 'nullable|string',
             'arabicJobBenefits' => 'nullable|string',
             'jobSalary' => 'nullable|string',
+            'questions.*.question' => 'nullable|string',
+            'questions.*.type' => 'required_if:questions.*.question,true|string',
+            'questions.*.options' => 'nullable|string',
         ]);
 
         try {
@@ -283,7 +298,7 @@ class VacancyShow extends Component
                         'arabic_question' => $question['arabic_question'] ?? null,
                         'type' => $question['type'],
                         'required' => isset($question['required']) ? true : false,
-                        'options' => !empty($question['options']) ? explode(',', $question['options']) : null,
+                        'options' => isset($question['options']) ? $question['options'] : null,
                     ];
 
                     if (isset($question['id'])) {
@@ -319,7 +334,7 @@ class VacancyShow extends Component
             $data['reset_slots'] = true;
 
             $vacancy->updateVacancy($data);
-            $this->closeEditVacancySec();
+            $this->alert('error', 'Failed to update vacancy. Please try again.');
             $this->alert('success', 'Vacancy updated successfully!');
         } catch (AppException $e) {
             $this->alert('error', $e->getMessage());
@@ -342,6 +357,21 @@ class VacancyShow extends Component
             $this->newInterviewDate = $value;
         }
     }
+
+    //show application modal
+    public function openApplicationModal($applicantId)
+    {
+        $this->showApplicationModal = true;
+        $this->selectedApplication = Application::where('applicant_id', $applicantId)->where('vacancy_id', $this->vacancyId)->first();
+    }
+
+    public function closeApplicationModal()
+    {
+        $this->showApplicationModal = false;
+        $this->selectedApplication = null;
+    }
+
+    
     
     // Interview Management Functions
 
@@ -402,7 +432,10 @@ class VacancyShow extends Component
               $this->closeNewInterviewModal();
               $this->mount($this->vacancyId);
   
+          } catch (AppException $e) {
+              $this->alert('error', $e->getMessage());
           } catch (Exception $e) {
+              report($e);
               $this->alert('error', 'Failed to schedule interview: ' . $e->getMessage());
           }
       }
@@ -520,7 +553,10 @@ class VacancyShow extends Component
             
             // Refresh interviews data
             $this->refreshInterviews();
+        } catch (AppException $e) {
+            $this->alert('error', $e->getMessage());
         } catch (Exception $e) {
+            report($e);
             $this->alert('error', 'Failed to assign interviewers: ' . $e->getMessage());
         }
     }
@@ -578,7 +614,10 @@ class VacancyShow extends Component
             
             // Refresh interviews data
             $this->refreshInterviews();
+        } catch (AppException $e) {
+            $this->alert('error', $e->getMessage());
         } catch (Exception $e) {
+            report($e);
             $this->alert('error', 'Failed to reschedule interview: ' . $e->getMessage());
         }
     }
@@ -618,7 +657,10 @@ class VacancyShow extends Component
             
             // Refresh interviews data
             $this->refreshInterviews();
+        } catch (AppException $e) {
+            $this->alert('error', $e->getMessage());
         } catch (Exception $e) {
+            report($e);
             $this->alert('error', 'Failed to cancel interview: ' . $e->getMessage());
         }
     }
@@ -649,7 +691,10 @@ class VacancyShow extends Component
             
             // Refresh interviews data
             $this->refreshInterviews();
+        } catch (AppException $e) {
+            $this->alert('error', $e->getMessage());
         } catch (Exception $e) {
+            report($e);
             $this->alert('error', 'Failed to complete interview: ' . $e->getMessage());
         }
     }
@@ -686,7 +731,10 @@ class VacancyShow extends Component
             
             // Refresh interviews data
             $this->refreshInterviews();
+        } catch (AppException $e) {
+            $this->alert('error', $e->getMessage());
         } catch (Exception $e) {
+            report($e);
             $this->alert('error', 'Failed to add note: ' . $e->getMessage());
         }
     }
@@ -720,7 +768,10 @@ class VacancyShow extends Component
             
             // Refresh interviews data
             $this->refreshInterviews();
+        } catch (AppException $e) {
+            $this->alert('error', $e->getMessage());
         } catch (Exception $e) {
+            report($e);
             $this->alert('error', 'Failed to update interview status: ' . $e->getMessage());
         }
     }
@@ -728,6 +779,78 @@ class VacancyShow extends Component
     public function showApplicant($applicantId)
     {
         return $this->dispatch('openNewTab', route('recruitment.applicants.show', $applicantId));
+    }
+
+    // Add these functions after other modal-related functions
+    public function openNewOfferModal($applicantId)
+    {
+        $this->selectedApplication = Application::with(['vacancy.position.department', 'applicant', 'feedbacks.user'])->where('applicant_id', $applicantId)->where('vacancy_id', $this->vacancyId)->first();
+
+        if(!$this->selectedApplication) {
+            $this->alert('error', 'Application not found');
+            return;
+        }
+        
+        // Check approvals
+        $hiringManager = $this->selectedApplication->vacancy->hiring_manager;
+        $hr = $this->selectedApplication->vacancy->hr_manager;
+        
+        foreach ($this->selectedApplication->feedbacks as $feedback) {
+            if ($feedback->result == InterviewFeedback::RESULT_PASSED) {
+                if ($feedback->user_id == $hiringManager->id) {
+                    $this->hiringManagerApproved = true;
+                } 
+                if ($feedback->user_id == $hr->id) {
+                    $this->hrApproved = true;
+                }
+            }
+        }
+
+        // Set default dates
+        $this->proposedStartDate = now()->addMonth()->startOfMonth()->format('Y-m-d');
+        $this->expiryDate = now()->addDays(14)->format('Y-m-d');
+        
+        $this->showNewOfferModal = true;
+    }
+
+    public function closeNewOfferModal()
+    {
+        $this->showNewOfferModal = false;
+        $this->selectedApplication = null;
+        $this->reset(['offeredSalary', 'proposedStartDate', 'expiryDate', 'benefits', 'offerNotes', 'hrApproved', 'hiringManagerApproved']);
+        $this->resetValidation();
+    }
+
+    public function createOffer()
+    {
+        $this->validate([
+            'offeredSalary' => 'required|numeric|min:0',
+            'proposedStartDate' => 'required|date|after:today',
+            'expiryDate' => 'required|date|after:today|before:proposedStartDate',
+            'benefits' => 'required|string',
+            'offerNotes' => 'nullable|string',
+        ]);
+
+        try {
+            $this->selectedApplication->offer(
+                $this->offeredSalary,
+                new \DateTime($this->proposedStartDate),
+                new \DateTime($this->expiryDate),
+                $this->benefits,
+                $this->offerNotes
+            );
+
+            $this->alert('success', 'Job offer created successfully');
+            $this->closeNewOfferModal();
+
+            // Refresh data
+            $this->refreshInterviews();
+        } catch (AppException $e) {
+            $this->alert('error', $e->getMessage());
+        } catch (Exception $e) {
+            report($e);
+            $this->alert('error', 'Failed to create job offer: ' . $e->getMessage());
+        }
     }
 
     public function render()

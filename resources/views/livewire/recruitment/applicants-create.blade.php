@@ -13,7 +13,7 @@
                     <div
                         class="step-item {{ $currentStep >= $i ? 'active' : '' }} {{ $currentStep > $i ? 'completed' : '' }}">
                         <div class="step-number">{{ $i }}</div>
-                        <div class="step-title">
+                        <div class="step-title hidden md:block">
                             @switch($i)
                                 @case(1)
                                     Personal Info
@@ -48,6 +48,7 @@
                                 @break
                             @endswitch
                         </div>
+
                     </div>
                 @endfor
             </div>
@@ -59,40 +60,44 @@
                 <!-- Step 1: Personal Information -->
                 @if ($currentStep === 1)
                     <h4 class="text-xl font-medium mb-5">Personal Information</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="grid  lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
                         <!-- First Name -->
-                        <div class="form-group">
-                            <label for="firstName" class="form-label">First Name <span
-                                    class="text-danger-500">*</span></label>
-                            <input type="text" id="firstName" wire:model="firstName"
-                                class="form-control @error('firstName') !border-danger-500 @enderror">
-                            @error('firstName')
-                                <span
-                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
-                            @enderror
+                        <div>
+                            <div class="form-group">
+                                <label for="firstName" class="form-label">First Name <span
+                                        class="text-danger-500">*</span></label>
+                                <input type="text" id="firstName" wire:model="firstName"
+                                    class="form-control @error('firstName') !border-danger-500 @enderror">
+                                @error('firstName')
+                                    <span
+                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                @enderror
+                            </div>
                         </div>
-
                         <!-- Middle Name -->
-                        <div class="form-group">
-                            <label for="middleName" class="form-label">Middle Name</label>
-                            <input type="text" id="middleName" wire:model="middleName"
-                                class="form-control @error('middleName') !border-danger-500 @enderror">
-                            @error('middleName')
-                                <span
-                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
-                            @enderror
+                        <div>
+                            <div class="form-group">
+                                <label for="middleName" class="form-label">Middle Name</label>
+                                <input type="text" id="middleName" wire:model="middleName"
+                                    class="form-control @error('middleName') !border-danger-500 @enderror">
+                                @error('middleName')
+                                    <span
+                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                @enderror
+                            </div>
                         </div>
-
                         <!-- Last Name -->
-                        <div class="form-group">
-                            <label for="lastName" class="form-label">Last Name <span
-                                    class="text-danger-500">*</span></label>
-                            <input type="text" id="lastName" wire:model="lastName"
-                                class="form-control @error('lastName') !border-danger-500 @enderror">
-                            @error('lastName')
-                                <span
-                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
-                            @enderror
+                        <div>
+                            <div class="form-group">
+                                <label for="lastName" class="form-label">Last Name <span
+                                        class="text-danger-500">*</span></label>
+                                <input type="text" id="lastName" wire:model="lastName"
+                                    class="form-control @error('lastName') !border-danger-500 @enderror">
+                                @error('lastName')
+                                    <span
+                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                @enderror
+                            </div>
                         </div>
 
                         <!-- Email -->
@@ -951,8 +956,7 @@
                                                     <input type="checkbox"
                                                         wire:model="questionAnswers.{{ $index }}.answer"
                                                         value="true" class="form-checkbox">
-                                                    <span
-                                                        class="text-sm font-medium text-slate-600 ml-2">True</span>
+                                                    <span class="text-sm font-medium text-slate-600 ml-2">True</span>
                                                 </label>
                                             </div>
                                         @elseif ($question['type'] === 'select')
@@ -1016,8 +1020,8 @@
                     <!-- Cover Letter -->
                     <div class="form-group mb-4">
                         <label class="form-label">Cover Letter (Optional)</label>
-                        <textarea wire:model="coverLetter" class="form-control @error('coverLetter') !border-danger-500 @enderror" rows="3"
-                            placeholder="Do you want to send a cover letter to the recruiter?"></textarea>
+                        <textarea wire:model="coverLetter" class="form-control @error('coverLetter') !border-danger-500 @enderror"
+                            rows="3" placeholder="Do you want to send a cover letter to the recruiter?"></textarea>
                         @error('coverLetter')
                             <span class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
                         @enderror
@@ -1050,9 +1054,9 @@
                     @endif
 
                     @if ($currentStep < $totalSteps)
-                        <button type="button" wire:click="nextStep" class="btn btn-primary">
-                            Next
-                            <iconify-icon class="text-xl ltr:ml-2 rtl:mr-2" icon="ph:arrow-right-bold"></iconify-icon>
+                        <button type="button" wire:click="nextStep" class="btn btn-primary flex items-center">
+                            <span>Next</span>
+                            <iconify-icon class="text-sm ltr:ml-2 rtl:mr-2" icon="ph:arrow-right-bold"></iconify-icon>
                         </button>
                     @else
                         <button type="button" wire:click="createApplicant" class="btn btn-success"

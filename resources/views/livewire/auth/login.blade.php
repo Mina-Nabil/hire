@@ -9,9 +9,9 @@
                         <div class="mobile-logo text-center mb-6  block flex justify-center">
 
                             {{-- <img src="assets/images/logo/logo.svg" alt="" class="mb-10 dark_logo"> --}}
-                            <img src="{{ asset('assets/img/demos/law-firm/logoOnly.png') }}" alt=""
+                            <img src="{{ asset('images/logo/hire-logo-wide.png') }}" alt=""
                                 class="dark_logo" width="250px">
-                            <img src="{{ asset('assets/img/demos/law-firm/logo-footer.png') }}" alt=""
+                            <img src="{{ asset('images/logo/hire-logo-wide-white.png') }}" alt=""
                                 class="white_logo" width="250px">
 
                         </div>

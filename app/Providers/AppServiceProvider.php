@@ -24,6 +24,7 @@ use App\Models\Recruitment\Applicants\Language as ApplicantLanguage;
 use App\Models\Recruitment\Applicants\Reference as ApplicantReference;
 use App\Models\Recruitment\Applicants\Training as ApplicantTraining;
 use App\Models\Recruitment\Interviews\Interview;
+use App\Models\Recruitment\JobOffers\JobOffer;
 use App\Models\Recruitment\Vacancies\BaseQuestion;
 use App\Models\Recruitment\Vacancies\Vacancy;
 use App\Models\Recruitment\Vacancies\VacancyQuestion;
@@ -73,6 +74,7 @@ class AppServiceProvider extends ServiceProvider
             VacancyQuestion::MORPH_NAME => VacancyQuestion::class,
             Vacancy::MORPH_NAME => Vacancy::class,
             Interview::MORPH_NAME => Interview::class,
+            JobOffer::MORPH_NAME => JobOffer::class,
         ]);
     }
 }

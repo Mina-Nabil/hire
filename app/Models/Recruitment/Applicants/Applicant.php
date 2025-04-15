@@ -92,6 +92,11 @@ class Applicant extends Model
         return $this->cv_url ? Storage::disk('s3')->url($this->cv_url) : null;
     }
 
+    public function getFullImageUrlAttribute(): string
+    {
+        return $this->image_url ? Storage::disk('s3')->url($this->image_url) : null;
+    }
+
     ////static methods
 
 

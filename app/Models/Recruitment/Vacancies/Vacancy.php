@@ -5,12 +5,14 @@ namespace App\Models\Recruitment\Vacancies;
 use App\Exceptions\AppException;
 use App\Models\Hierarchy\Position;
 use App\Models\Recruitment\Applicants\Application;
+use App\Models\Recruitment\JobOffers\JobOffer;
 use App\Models\Users\User;
 use Exception;
 use Illuminate\Container\Attributes\DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB as FacadesDB;
 use Illuminate\Support\Facades\Log;
@@ -112,6 +114,14 @@ class Vacancy extends Model
     public function hr_manager(): BelongsTo
     {
         return $this->belongsTo(User::class, 'hr_manager_id');
+    }
+
+    /**
+     * The job offers for this vacancy.
+     */
+    public function job_offers(): HasManyThrough
+    {
+        return $this->hasManyThrough(JobOffer::class, Application::class);
     }
 
     /**

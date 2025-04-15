@@ -151,7 +151,7 @@
                                         @if ($applicant->image_url)
                                             <div class="flex-none">
                                                 <div class="h-10 w-10 rounded-full overflow-hidden mr-2">
-                                                    <img src="{{ Storage::url($applicant->image_url) }}"
+                                                    <img src="{{ $applicant->full_image_url }}"
                                                         alt="{{ $applicant->full_name }}"
                                                         class="h-full w-full object-cover">
                                                 </div>

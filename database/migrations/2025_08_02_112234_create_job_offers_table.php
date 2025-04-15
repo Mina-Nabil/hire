@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignIdFor(Application::class)->constrained()->cascadeOnDelete();
             $table->decimal('offered_salary', 10, 2);
             $table->date('proposed_start_date');
+            $table->foreignIdFor(User::class, 'created_by')->constrained('users');
             $table->date('expiry_date');
             $table->date('offer_date')->nullable();
             $table->date('response_date')->nullable();
@@ -26,7 +27,6 @@ return new class extends Migration
             $table->text('notes')->nullable();
             $table->text('response_notes')->nullable();
             $table->enum('status', JobOffer::JOB_OFFER_STATUSES)->default(JobOffer::STATUS_DRAFT);
-            $table->foreignIdFor(User::class, 'created_by')->nullable()->constrained('users');
             $table->timestamps();
         });
     }

@@ -647,7 +647,7 @@
         </x-slot>
     </x-modal>
 
-    <!-- Job Offer Modal -->
+    <!-- Create Job Offer Modal -->
     <x-modal wire:model="showNewOfferModal">
         <x-slot name="title">Create Job Offer</x-slot>
 
@@ -719,6 +719,152 @@
                     :disabled="!$hrApproved || !$hiringManagerApproved">
                     Create Offer
                 </x-primary-button>
+            </div>
+        </x-slot>
+    </x-modal>
+
+    <!-- Edit Job Offer Modal -->
+    <x-modal wire:model="showEditOfferModal">
+        <x-slot name="title">Edit Job Offer</x-slot>
+
+        <div class="space-y-4">
+            @if (isset($selectedOffer))
+                <div class="alert alert-info mb-4">
+                    <div class="flex items-center">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <div>
+                            <p class="font-medium">Editing job offer for:</p>
+                            <p>{{ $selectedOffer->application->vacancy->position->name }}
+                                ({{ $selectedOffer->application->vacancy->position->department->name }})</p>
+                            <p class="text-sm mt-1">Applicant: {{ $selectedOffer->application->applicant->full_name }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <x-text-input label="Offered Monthly Gross Salary" type="number" step="0.01" wire:model="editOfferedSalary"
+                    errorMessage="{{ $errors->first('editOfferedSalary') }}" />
+
+                <div class="grid grid-cols-2 gap-4">
+                    <x-text-input label="Proposed Start Date" type="date" wire:model="editProposedStartDate"
+                        errorMessage="{{ $errors->first('editProposedStartDate') }}" />
+
+                    <x-text-input label="Offer Expiry Date" type="date" wire:model="editExpiryDate"
+                        errorMessage="{{ $errors->first('editExpiryDate') }}" />
+                </div>
+
+                <x-textarea label="Benefits" wire:model="editBenefits" rows="3"
+                    errorMessage="{{ $errors->first('editBenefits') }}"
+                    placeholder="List the benefits included in this offer..." />
+
+                <x-textarea label="Additional Notes" wire:model="editOfferNotes" rows="3"
+                    errorMessage="{{ $errors->first('editOfferNotes') }}"
+                    placeholder="Any additional notes or special terms..." />
+            @else
+                <div class="alert alert-warning">
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        <div>
+                            <p>No offer selected for editing.</p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        </div>
+
+        <x-slot name="footer">
+            <div class="mt-4 flex justify-end gap-3">
+                <x-secondary-button wire:click="closeEditOfferModal">Cancel</x-secondary-button>
+                <x-primary-button wire:click.prevent="updateOffer" loadingFunction="updateOffer">
+                    Update Offer
+                </x-primary-button>
+            </div>
+        </x-slot>
+    </x-modal>
+
+    <!-- Accept Offer Modal -->
+    <x-modal wire:model="showAcceptOfferModal">
+        <x-slot name="title">Accept Job Offer</x-slot>
+
+        <div class="space-y-4">
+            @if (isset($selectedOffer))
+                <div class="alert alert-success mb-4">
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        <div>
+                            <p class="font-medium">You are about to accept this job offer:</p>
+                            <p>{{ $selectedOffer->application->vacancy->position->name }}
+                                ({{ $selectedOffer->application->vacancy->position->department->name }})</p>
+                            <p class="text-sm mt-1">Salary: {{ $selectedOffer->formatted_salary }}</p>
+                            <p class="text-sm">Start Date: {{ $selectedOffer->proposed_start_date->format('d M Y') }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <x-textarea title="Response Notes" wire:model="offerResponseNotes" rows="3"
+                    errorMessage="{{ $errors->first('offerResponseNotes') }}"
+                    placeholder="Add any notes or comments about accepting this offer..." />
+            @else
+                <div class="alert alert-warning">
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        <div>
+                            <p>No offer selected.</p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        </div>
+
+        <x-slot name="footer">
+            <div class="mt-4 flex justify-end gap-3">
+                <x-secondary-button wire:click="closeAcceptOfferModal">Cancel</x-secondary-button>
+                <x-primary-button wire:click.prevent="confirmAcceptOffer" loadingFunction="confirmAcceptOffer">
+                    Accept Offer
+                </x-primary-button>
+            </div>
+        </x-slot>
+    </x-modal>
+
+    <!-- Reject Offer Modal -->
+    <x-modal wire:model="showRejectOfferModal">
+        <x-slot name="title">Reject Job Offer</x-slot>
+
+        <div class="space-y-4">
+            @if (isset($selectedOffer))
+                <div class="alert alert-danger mb-4">
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        <div>
+                            <p class="font-medium">You are about to reject this job offer:</p>
+                            <p>{{ $selectedOffer->application->vacancy->position->name }}
+                                ({{ $selectedOffer->application->vacancy->position->department->name }})</p>
+                            <p class="text-sm mt-1">Salary: {{ $selectedOffer->formatted_salary }}</p>
+                            <p class="text-sm">Start Date: {{ $selectedOffer->proposed_start_date->format('d M Y') }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <x-textarea title="Response Notes" wire:model="offerResponseNotes" rows="3"
+                    errorMessage="{{ $errors->first('offerResponseNotes') }}"
+                    placeholder="Please provide a reason for rejecting this offer..." />
+            @else
+                <div class="alert alert-warning">
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        <div>
+                            <p>No offer selected.</p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        </div>
+
+        <x-slot name="footer">
+            <div class="mt-4 flex justify-end gap-3">
+                <x-secondary-button wire:click="closeRejectOfferModal">Cancel</x-secondary-button>
+                <x-danger-button wire:click.prevent="confirmRejectOffer" loadingFunction="confirmRejectOffer">
+                    Reject Offer
+                </x-danger-button>
             </div>
         </x-slot>
     </x-modal>

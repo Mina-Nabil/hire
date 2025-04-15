@@ -29,7 +29,7 @@
                                         <th scope="col" class="table-th">Applicant</th>
                                         <th scope="col" class="table-th">Email</th>
                                         <th scope="col" class="table-th">Phone</th>
-                                        <th scope="col" class="table-th">Application Date</th>
+                                        <th scope="col" class="table-th">Applied</th>
                                         <th scope="col" class="table-th">Status</th>
                                         <th scope="col" class="table-th">Actions</th>
                                     </tr>
@@ -45,7 +45,7 @@
                                         <tr>
                                             <td class="table-td">
                                                 <div class="flex items-center">
-                                                    @if ($applicant->image_url)
+                                                    {{-- @if ($applicant->image_url)
                                                         <img src="{{ Storage::url($applicant->image_url) }}"
                                                             alt="{{ $applicant->full_name }}"
                                                             class="h-8 w-8 rounded-full mr-2">
@@ -54,7 +54,7 @@
                                                             class="h-8 w-8 rounded-full bg-primary-500 flex items-center justify-center text-white text-sm mr-2">
                                                             {{ substr($applicant->first_name, 0, 1) }}
                                                         </div>
-                                                    @endif
+                                                    @endif --}}
                                                     <div>
                                                         <p class="font-medium text-sm">{{ $applicant->full_name }}</p>
                                                     </div>
@@ -71,22 +71,22 @@
                                             </td>
                                             <td class="table-td">
                                                 <div class="flex items-center gap-2">
-                                                    <a class="btn btn-sm btn-secondary"
+                                                    <a class="btn btn-xs btn-secondary"
                                                         wire:click="showApplicant({{ $applicant->id }})">
-                                                        <i class="fas fa-eye mr-1"></i> Profile
+                                                        <i class="fas fa-eye"></i>
                                                     </a>
-                                                    <a class="btn btn-sm btn-secondary"
+                                                    <a class="btn btn-xs btn-secondary"
                                                         wire:click="openApplicationModal({{ $applicant->id }})">
-                                                        <i class="fas fa-file-alt mr-1"></i> Application
+                                                        <i class="fas fa-file-alt"></i>
                                                     </a>
-                                                    <a class="btn btn-sm btn-primary"
+                                                    <a class="btn btn-xs btn-primary"
                                                         wire:click="openNewInterviewModal({{ $applicant->id }})">
-                                                        <i class="fas fa-calendar-alt mr-1"></i> Interview
+                                                        <i class="fas fa-calendar-alt"></i>
                                                     </a>
-                                                    <button type="button" class="btn btn-sm btn-primary"
-                                                    wire:click="openNewOfferModal({{ $applicant->id }})">
-                                                    <i class="fas fa-money-bill"></i> Offer
-                                                </button>
+                                                    <button type="button" class="btn btn-xs btn-primary"
+                                                        wire:click="openNewOfferModal({{ $applicant->id }})">
+                                                        <i class="fas fa-money-bill"></i>
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -251,9 +251,10 @@
                                     class="border-t border-slate-100 dark:border-slate-800 bg-slate-200 dark:bg-slate-700">
                                     <tr>
                                         <th scope="col" class="table-th">Applicant</th>
-                                        <th scope="col" class="table-th">Offered Salary</th>
-                                        <th scope="col" class="table-th">Proposed Start Date</th>
-                                        <th scope="col" class="table-th">Expiry Date</th>
+                                        <th scope="col" class="table-th">Salary</th>
+                                        <th scope="col" class="table-th">Sent</th>
+                                        <th scope="col" class="table-th">Start</th>
+                                        <th scope="col" class="table-th">Expiry</th>
                                         <th scope="col" class="table-th">Status</th>
                                         <th scope="col" class="table-th">Actions</th>
                                     </tr>
@@ -263,10 +264,13 @@
                                     @foreach ($offers as $offer)
                                         <tr>
                                             <td class="table-td">{{ $offer->application->applicant->full_name }}</td>
-                                            <td class="table-td">{{ $offer->offered_salary }}</td>
-                                            <td class="table-td">{{ $offer->proposed_start_date->format('d M Y') }}
+                                            <td class="table-td">{{ $offer->formatted_salary }}</td>
+                                            <td class="table-td">{{ $offer->offer_date ? $offer->offer_date->format('d M Y') : 'Not sent' }}
                                             </td>
-                                            <td class="table-td">{{ $offer->expiry_date->format('d M Y') }}</td>
+                                            <td class="table-td">{{ $offer->proposed_start_date ? $offer->proposed_start_date->format('d M Y') : 'N/A' }}
+                                            </td>
+                                            <td class="table-td">{{ $offer->expiry_date ? $offer->expiry_date->format('d M Y') : 'N/A' }}
+                                            </td>
                                             <td class="table-td">
                                                 <span
                                                     class="badge {{ $offer->status == 'Accepted' ? 'bg-success-200' : ($offer->status == 'Rejected' ? 'bg-danger-200' : 'bg-warning-200') }}">
@@ -274,10 +278,30 @@
                                                 </span>
                                             </td>
                                             <td class="table-td">
-                                                <a href="{{ route('recruitment.applicants.show', $offer->application->applicant->id) }}"
-                                                    class="btn btn-sm btn-secondary">
-                                                    <i class="fas fa-eye mr-1"></i> View
-                                                </a>
+                                                <div class="flex space-x-2">
+                                                    <button type="button" class="btn btn-xs btn-outline-primary"
+                                                        wire:click="openEditOfferModal({{ $offer->id }})">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                              
+                                                    <button type="button" class="btn btn-xs btn-outline-info"
+                                                        wire:click="$dispatch('showConfirmation', {
+                                                            title: 'Send Offer',
+                                                            message: 'Are you sure you want to send this offer?',
+                                                            color: 'info',
+                                                            callback: 'sendOffer({{ $offer->id }})',
+                                                        })">
+                                                        <i class="fas fa-paper-plane"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-xs btn-outline-success"
+                                                        wire:click="openAcceptOfferModal({{ $offer->id }})">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-xs btn-outline-danger"
+                                                        wire:click="openRejectOfferModal({{ $offer->id }})">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     @endforeach

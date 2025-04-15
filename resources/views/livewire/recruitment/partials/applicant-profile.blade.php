@@ -4,9 +4,9 @@
         <div>
             <div class="card mb-6">
                 <div class="card-body text-center p-4">
-                    @if ($applicant->profile_image)
+                    @if ($applicant->image_url)
                         <div class="mb-4">
-                            <img src="{{ Storage::url($applicant->profile_image) }}" alt="{{ $applicant->full_name }}"
+                            <img src="{{ $applicant->full_image_url }}" alt="{{ $applicant->full_name }}"
                                 class="w-32 h-32 object-cover rounded-full mx-auto border-4 border-white shadow">
                         </div>
                     @else

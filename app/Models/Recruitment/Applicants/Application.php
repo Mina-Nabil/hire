@@ -336,7 +336,8 @@ class Application extends Model
             if ($feedback->result == InterviewFeedback::RESULT_PASSED) {
                 if ($feedback->user_id == $hiringManager->id) {
                     $hiring_manager_approved = true;
-                } else if ($feedback->user_id == $hr->id) {
+                }
+                if ($feedback->user_id == $hr->id) {
                     $hr_approved = true;
                 }
             }
@@ -350,10 +351,12 @@ class Application extends Model
             throw new AppException('The application is not approved by the hiring manager');
         }
         try {
-            DB::transaction(function () use ($salary, $proposed_start_date, $expiry_date, $benefits, $notes) {
+            DB::transaction(function () use ($salary, $proposed_start_date, $expiry_date, $benefits, $notes, $loggedInUser) {
                 $this->jobOffer()->updateOrCreate([
                     'application_id' => $this->id,
                 ], [
+                    'status' => JobOffer::STATUS_DRAFT,
+                    'created_by' => $loggedInUser->id,
                     'offered_salary' => $salary,
                     'proposed_start_date' => $proposed_start_date,
                     'expiry_date' => $expiry_date,

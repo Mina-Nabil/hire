@@ -23,6 +23,7 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\Users\User;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class ApplicantShow extends Component
 {
@@ -45,7 +46,10 @@ class ApplicantShow extends Component
         'deleteExperience',
         'deleteLanguage',
         'deleteSkill',
-        'deleteReference'
+        'deleteReference',
+        'sendOffer',
+        'acceptOffer',
+        'rejectOffer'
     ];
 
     public $applicant;
@@ -115,7 +119,6 @@ class ApplicantShow extends Component
 
     // Offer related properties
     public $showNewOfferModal = false;
-    public $showViewOfferModal = false;
     public $applicationId;
     public $offeredSalary;
     public $proposedStartDate;
@@ -179,6 +182,19 @@ class ApplicantShow extends Component
     // Image Upload
     public $showImageUploadModal = false;
     public $newImage;
+
+    // Add these properties after other modal-related properties
+    public $showEditOfferModal = false;
+    public $editOfferedSalary;
+    public $editProposedStartDate;
+    public $editExpiryDate;
+    public $editBenefits;
+    public $editOfferNotes;
+
+    // Add these properties after other modal-related properties
+    public $showAcceptOfferModal = false;
+    public $showRejectOfferModal = false;
+    public $offerResponseNotes;
 
     //delete function
     public function deleteApplicant()
@@ -291,14 +307,19 @@ class ApplicantShow extends Component
             'documents'
         ]);
 
-        // Load interviews related to this applicant
-        $this->interviews = Interview::whereIn('application_id', $this->applicant->applications->pluck('id')->toArray())->get();
-
-        // Load job offers related to this applicant
-        $this->offers = JobOffer::whereIn('application_id', $this->applicant->applications->pluck('id')->toArray())->get();
+        $this->refreshApplicantRelations();
 
         $this->channels = Channel::all();
         $this->areas = Area::all();
+    }
+
+    public function refreshApplicantRelations()
+    {
+     // Load interviews related to this applicant
+     $this->interviews = Interview::whereIn('application_id', $this->applicant->applications->pluck('id')->toArray())->get();
+
+     // Load job offers related to this applicant
+     $this->offers = JobOffer::whereIn('application_id', $this->applicant->applications->pluck('id')->toArray())->get();
     }
 
     // Application management
@@ -409,7 +430,7 @@ class ApplicantShow extends Component
 
             // Refresh data
             $this->applicant->refresh();
-            $this->interviews = Interview::whereIn('application_id', $this->applicant->applications->pluck('id')->toArray())->get();
+            $this->refreshApplicantRelations();
         } catch (AppException $e) {
             $this->alert('error', $e->getMessage());
         } catch (Exception $e) {
@@ -548,7 +569,7 @@ class ApplicantShow extends Component
 
             // Refresh data
             $this->applicant->refresh();
-            $this->offers = JobOffer::whereIn('application_id', $this->applicant->applications->pluck('id')->toArray())->get();
+            $this->refreshApplicantRelations();
         } catch (AppException $e) {
             $this->alert('error', $e->getMessage());
         } catch (Exception $e) {
@@ -557,42 +578,18 @@ class ApplicantShow extends Component
         }
     }
 
-    public function viewOffer($offerId)
-    {
-        $this->selectedOffer = JobOffer::with('application.vacancy.position.department')->find($offerId);
-        $this->showViewOfferModal = true;
-    }
-
-    public function closeViewOfferModal()
-    {
-        $this->showViewOfferModal = false;
-        $this->selectedOffer = null;
-    }
-
     public function sendOffer($offerId)
     {
         try {
             $offer = JobOffer::find($offerId);
-            $offer->status = 'Sent';
-            $offer->offer_date = now();
-            $offer->save();
-
-            // Update application status
-            $application = $offer->application;
-            $application->status = 'Offer';
-            $application->save();
-
+            $offer->send();
             $this->alert('success', 'Job offer sent successfully');
-            $this->closeViewOfferModal();
-
-            // Refresh data
-            $this->offers = JobOffer::whereIn('application_id', $this->applicant->applications->pluck('id')->toArray())->get();
-            $this->applicant->refresh();
+            $this->refreshApplicantRelations();
         } catch (AppException $e) {
             $this->alert('error', $e->getMessage());
         } catch (Exception $e) {
             report($e);
-            $this->alert('error', 'Failed to send job offer: ' . $e->getMessage());
+            $this->alert('error', 'Failed to send job offer');
         }
     }
 
@@ -600,20 +597,9 @@ class ApplicantShow extends Component
     {
         try {
             $offer = JobOffer::find($offerId);
-            $offer->status = 'Accepted';
-            $offer->response_date = now();
-            $offer->save();
-
-            // Update application status
-            $application = $offer->application;
-            $application->status = 'Offer Accepted';
-            $application->save();
-
+            $offer->accept();
             $this->alert('success', 'Job offer marked as accepted');
-
-            // Refresh data
-            $this->offers = JobOffer::whereIn('application_id', $this->applicant->applications->pluck('id')->toArray())->get();
-            $this->applicant->refresh();
+            $this->refreshApplicantRelations();
         } catch (AppException $e) {
             $this->alert('error', $e->getMessage());
         } catch (Exception $e) {
@@ -626,20 +612,9 @@ class ApplicantShow extends Component
     {
         try {
             $offer = JobOffer::find($offerId);
-            $offer->status = 'Rejected';
-            $offer->response_date = now();
-            $offer->save();
-
-            // Update application status
-            $application = $offer->application;
-            $application->status = 'Offer Rejected';
-            $application->save();
-
+            $offer->reject();
             $this->alert('success', 'Job offer marked as rejected');
-
-            // Refresh data
-            $this->offers = JobOffer::whereIn('application_id', $this->applicant->applications->pluck('id')->toArray())->get();
-            $this->applicant->refresh();
+            $this->refreshApplicantRelations();
         } catch (AppException $e) {
             $this->alert('error', $e->getMessage());
         } catch (Exception $e) {
@@ -1153,7 +1128,7 @@ class ApplicantShow extends Component
             $this->closeSetInterviewersModal();
             
             // Refresh interviews data
-            $this->interviews = Interview::whereIn('application_id', $this->applicant->applications->pluck('id')->toArray())->get();
+            $this->refreshApplicantRelations();
         } catch (AppException $e) {
             $this->alert('error', $e->getMessage());
         } catch (Exception $e) {
@@ -1214,7 +1189,7 @@ class ApplicantShow extends Component
             $this->closeRescheduleModal();
             
             // Refresh interviews data
-            $this->interviews = Interview::whereIn('application_id', $this->applicant->applications->pluck('id')->toArray())->get();
+            $this->refreshApplicantRelations();
         } catch (AppException $e) {
             $this->alert('error', $e->getMessage());
         } catch (Exception $e) {
@@ -1257,7 +1232,7 @@ class ApplicantShow extends Component
             $this->closeCancelModal();
             
             // Refresh interviews data
-            $this->interviews = Interview::whereIn('application_id', $this->applicant->applications->pluck('id')->toArray())->get();
+            $this->refreshApplicantRelations();
         } catch (AppException $e) {
             $this->alert('error', $e->getMessage());
         } catch (Exception $e) {
@@ -1290,7 +1265,7 @@ class ApplicantShow extends Component
             
             $this->closeCompleteModal();
             // Refresh interviews data
-            $this->interviews = Interview::whereIn('application_id', $this->applicant->applications->pluck('id')->toArray())->get();
+            $this->refreshApplicantRelations();
         } catch (AppException $e) {
             $this->alert('error', $e->getMessage());
         } catch (Exception $e) {
@@ -1344,7 +1319,7 @@ class ApplicantShow extends Component
             $this->closeAddNoteModal();
             
             // Refresh interviews data
-            $this->interviews = Interview::whereIn('application_id', $this->applicant->applications->pluck('id')->toArray())->get();
+            $this->refreshApplicantRelations();
         } catch (AppException $e) {
             $this->alert('error', $e->getMessage());
         } catch (Exception $e) {
@@ -1381,7 +1356,7 @@ class ApplicantShow extends Component
             $this->closeUpdateStatusModal();
             
             // Refresh interviews data
-            $this->interviews = Interview::whereIn('application_id', $this->applicant->applications->pluck('id')->toArray())->get();
+            $this->refreshApplicantRelations();
         } catch (AppException $e) {
             $this->alert('error', $e->getMessage());
         } catch (Exception $e) {
@@ -1406,5 +1381,134 @@ class ApplicantShow extends Component
     public function closeShowFeedbacksModal()
     {
         $this->showFeedbacksHistoryModal = false;
+    }
+
+    public function openEditOfferModal($offerId)
+    {
+        $this->selectedOffer = JobOffer::find($offerId);
+        
+        if(!$this->selectedOffer) {
+            $this->alert('error', 'Offer not found');
+            return;
+        }
+
+        // Pre-populate the form
+        $this->editOfferedSalary = $this->selectedOffer->offered_salary;
+        $this->editProposedStartDate = $this->selectedOffer->proposed_start_date->format('Y-m-d');
+        $this->editExpiryDate = $this->selectedOffer->expiry_date->format('Y-m-d');
+        $this->editBenefits = $this->selectedOffer->benefits;
+        $this->editOfferNotes = $this->selectedOffer->notes;
+        
+        $this->showEditOfferModal = true;
+    }
+
+    public function closeEditOfferModal()
+    {
+        $this->showEditOfferModal = false;
+        $this->selectedOffer = null;
+        $this->reset(['editOfferedSalary', 'editProposedStartDate', 'editExpiryDate', 'editBenefits', 'editOfferNotes']);
+        $this->resetValidation();
+    }
+
+    public function updateOffer()
+    {
+        $this->validate([
+            'editOfferedSalary' => 'required|numeric|min:0',
+            'editProposedStartDate' => 'required|date|after:today',
+            'editExpiryDate' => 'required|date|after:today|before:editProposedStartDate',
+            'editBenefits' => 'required|string',
+            'editOfferNotes' => 'nullable|string',
+        ]);
+
+        try {
+            $this->selectedOffer->editOffer(
+                $this->editOfferedSalary,
+                new Carbon($this->editProposedStartDate),
+                new Carbon($this->editExpiryDate),
+                $this->editBenefits,
+                $this->editOfferNotes
+            );
+
+            $this->alert('success', 'Job offer updated successfully');
+            $this->closeEditOfferModal();
+
+        } catch (AppException $e) {
+            $this->alert('error', $e->getMessage());
+        } catch (Exception $e) {
+            report($e);
+            $this->alert('error', 'Failed to update job offer: ' . $e->getMessage());
+        }
+    }
+
+    public function openAcceptOfferModal($offerId)
+    {
+        $this->selectedOffer = JobOffer::with('application.vacancy.position.department')->find($offerId);
+        if (!$this->selectedOffer) {
+            $this->alert('error', 'Offer not found');
+            return;
+        }
+        $this->offerResponseNotes = null;
+        $this->showAcceptOfferModal = true;
+    }
+
+    public function closeAcceptOfferModal()
+    {
+        $this->showAcceptOfferModal = false;
+        $this->selectedOffer = null;
+        $this->offerResponseNotes = null;
+        $this->resetValidation();
+    }
+
+    public function confirmAcceptOffer()
+    {
+        try {
+            $this->selectedOffer->accept($this->offerResponseNotes);
+            $this->alert('success', 'Job offer accepted successfully');
+            $this->closeAcceptOfferModal();
+            $this->refreshApplicantRelations();
+        } catch (AppException $e) {
+            $this->alert('error', $e->getMessage());
+        } catch (Exception $e) {
+            report($e);
+            $this->alert('error', 'Failed to accept job offer');
+        }
+    }
+
+    public function openRejectOfferModal($offerId)
+    {
+        $this->selectedOffer = JobOffer::with('application.vacancy.position.department')->find($offerId);
+        if (!$this->selectedOffer) {
+            $this->alert('error', 'Offer not found');
+            return;
+        }
+        $this->offerResponseNotes = null;
+        $this->showRejectOfferModal = true;
+    }
+
+    public function closeRejectOfferModal()
+    {
+        $this->showRejectOfferModal = false;
+        $this->selectedOffer = null;
+        $this->offerResponseNotes = null;
+        $this->resetValidation();
+    }
+
+    public function confirmRejectOffer()
+    {
+        $this->validate([
+            'offerResponseNotes' => 'required|string|max:1000',
+        ]);
+
+        try {
+            $this->selectedOffer->reject($this->offerResponseNotes);
+            $this->alert('success', 'Job offer rejected successfully');
+            $this->closeRejectOfferModal();
+            $this->refreshApplicantRelations();
+        } catch (AppException $e) {
+            $this->alert('error', $e->getMessage());
+        } catch (Exception $e) {
+            report($e);
+            $this->alert('error', 'Failed to reject job offer');
+        }
     }
 }

@@ -121,6 +121,20 @@ class VacancyShow extends Component
     public $hrApproved = false;
     public $hiringManagerApproved = false;
 
+    // Add these properties after other modal-related properties
+    public $showEditOfferModal = false;
+    public $editOfferedSalary;
+    public $editProposedStartDate;
+    public $editExpiryDate;
+    public $editBenefits;
+    public $editOfferNotes;
+    public $selectedOffer;
+
+    // Add these properties after other modal-related properties
+    public $showAcceptOfferModal = false;
+    public $showRejectOfferModal = false;
+    public $offerResponseNotes;
+
     protected $listeners = ['dateSelected' => 'onDateSelected'];
 
     public function changeSection($section)
@@ -850,6 +864,137 @@ class VacancyShow extends Component
         } catch (Exception $e) {
             report($e);
             $this->alert('error', 'Failed to create job offer: ' . $e->getMessage());
+        }
+    }
+
+    public function openEditOfferModal($offerId)
+    {
+        $this->selectedOffer = JobOffer::find($offerId);
+        
+        if(!$this->selectedOffer) {
+            $this->alert('error', 'Offer not found');
+            return;
+        }
+
+        // Pre-populate the form
+        $this->editOfferedSalary = $this->selectedOffer->offered_salary;
+        $this->editProposedStartDate = $this->selectedOffer->proposed_start_date->format('Y-m-d');
+        $this->editExpiryDate = $this->selectedOffer->expiry_date->format('Y-m-d');
+        $this->editBenefits = $this->selectedOffer->benefits;
+        $this->editOfferNotes = $this->selectedOffer->notes;
+        
+        $this->showEditOfferModal = true;
+    }
+
+    public function closeEditOfferModal()
+    {
+        $this->showEditOfferModal = false;
+        $this->selectedOffer = null;
+        $this->reset(['editOfferedSalary', 'editProposedStartDate', 'editExpiryDate', 'editBenefits', 'editOfferNotes']);
+        $this->resetValidation();
+    }
+
+    public function updateOffer()
+    {
+        $this->validate([
+            'editOfferedSalary' => 'required|numeric|min:0',
+            'editProposedStartDate' => 'required|date|after:today',
+            'editExpiryDate' => 'required|date|after:today|before:editProposedStartDate',
+            'editBenefits' => 'required|string',
+            'editOfferNotes' => 'nullable|string',
+        ]);
+
+        try {
+            $this->selectedOffer->editOffer(
+                $this->editOfferedSalary,
+                new Carbon($this->editProposedStartDate),
+                new Carbon($this->editExpiryDate),
+                $this->editBenefits,
+                $this->editOfferNotes
+            );
+
+            $this->alert('success', 'Job offer updated successfully');
+            $this->closeEditOfferModal();
+
+            // Refresh data
+            $this->refreshInterviews();
+        } catch (AppException $e) {
+            $this->alert('error', $e->getMessage());
+        } catch (Exception $e) {
+            report($e);
+            $this->alert('error', 'Failed to update job offer: ' . $e->getMessage());
+        }
+    }
+
+    public function openAcceptOfferModal($offerId)
+    {
+        $this->selectedOffer = JobOffer::with('application.vacancy.position.department')->find($offerId);
+        if (!$this->selectedOffer) {
+            $this->alert('error', 'Offer not found');
+            return;
+        }
+        $this->offerResponseNotes = null;
+        $this->showAcceptOfferModal = true;
+    }
+
+    public function closeAcceptOfferModal()
+    {
+        $this->showAcceptOfferModal = false;
+        $this->selectedOffer = null;
+        $this->offerResponseNotes = null;
+        $this->resetValidation();
+    }
+
+    public function confirmAcceptOffer()
+    {
+        try {
+            $this->selectedOffer->accept($this->offerResponseNotes);
+            $this->alert('success', 'Job offer accepted successfully');
+            $this->closeAcceptOfferModal();
+            $this->refreshInterviews();
+        } catch (AppException $e) {
+            $this->alert('error', $e->getMessage());
+        } catch (Exception $e) {
+            report($e);
+            $this->alert('error', 'Failed to accept job offer');
+        }
+    }
+
+    public function openRejectOfferModal($offerId)
+    {
+        $this->selectedOffer = JobOffer::with('application.vacancy.position.department')->find($offerId);
+        if (!$this->selectedOffer) {
+            $this->alert('error', 'Offer not found');
+            return;
+        }
+        $this->offerResponseNotes = null;
+        $this->showRejectOfferModal = true;
+    }
+
+    public function closeRejectOfferModal()
+    {
+        $this->showRejectOfferModal = false;
+        $this->selectedOffer = null;
+        $this->offerResponseNotes = null;
+        $this->resetValidation();
+    }
+
+    public function confirmRejectOffer()
+    {
+        $this->validate([
+            'offerResponseNotes' => 'required|string|max:1000',
+        ]);
+
+        try {
+            $this->selectedOffer->reject($this->offerResponseNotes);
+            $this->alert('success', 'Job offer rejected successfully');
+            $this->closeRejectOfferModal();
+            $this->refreshInterviews();
+        } catch (AppException $e) {
+            $this->alert('error', $e->getMessage());
+        } catch (Exception $e) {
+            report($e);
+            $this->alert('error', 'Failed to reject job offer');
         }
     }
 

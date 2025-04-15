@@ -37,17 +37,17 @@
                                             </td>
                                             <td class="table-td">
                                                 <div class="flex space-x-2">
-                                                    <a class="btn btn-sm btn-secondary"
+                                                    <a class="btn btn-xs btn-secondary"
                                                         wire:click="openApplicationModal({{ $application->vacancy->id }})">
-                                                        <i class="fas fa-file-alt mr-1"></i> Application
+                                                        <i class="fas fa-file-alt"></i>
                                                     </a>
-                                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                                    <button type="button" class="btn btn-xs btn-outline-primary"
                                                         wire:click="openNewInterviewModal({{ $application->id }})">
-                                                        <i class="fas fa-calendar-alt"></i> Interview
+                                                        <i class="fas fa-calendar-alt"></i>
                                                     </button>
-                                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                                    <button type="button" class="btn btn-xs btn-outline-primary"
                                                         wire:click="openNewOfferModal({{ $application->id }})">
-                                                        <i class="fas fa-money-bill"></i> Offer
+                                                        <i class="fas fa-money-bill"></i>
                                                     </button>
                                                 </div>
                                             </td>

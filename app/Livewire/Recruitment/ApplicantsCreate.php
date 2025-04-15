@@ -190,8 +190,8 @@ class ApplicantsCreate extends Component
             'maritalStatus' => 'nullable|in:' . implode(',', Applicant::MARITAL_STATUS),
             'militaryStatus' => 'nullable|in:' . implode(',', Applicant::MILITARY_STATUS),
             'channelId' => 'nullable|exists:channels,id',
-            'profileImage' => 'nullable|image|max:1024',
-            'cv' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
+            'profileImage' => 'nullable|image|max:4096',
+            'cv' => 'nullable|file|mimes:pdf,doc,docx|max:4096',
         ], [
             'areaId.required' => 'The area is required',
             'firstName.required' => 'The first name is required',

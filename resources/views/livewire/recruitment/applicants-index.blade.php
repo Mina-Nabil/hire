@@ -17,116 +17,116 @@
                         placeholder="Search by name or position" wire:model.live.debounce.400ms="search">
                 </div>
 
-                <div>
-                    <button type="button" class="btn inline-flex justify-center btn-outline-primary dropdown-toggle"
-                        wire:click="toggleFilters" aria-expanded="false">
-                        <span class="flex items-center">
-                            <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2"
-                                icon="heroicons-outline:filter"></iconify-icon>
-                            <span>Filters</span>
-                        </span>
-                    </button>
-
-
-                </div>
-            </div>
-        </header>
-
-            @if ($showFilters)
-                <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-2" style="min-width: 550px;">
-                    <!-- Date Range -->
-                    <div class="mb-4">
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="form-label text-sm">Created From</label>
-                                <input type="date" wire:model.live="startDate" class="form-control">
-                            </div>
-                            <div>
-                                <label class="form-label text-sm">Created To</label>
-                                <input type="date" wire:model.live="endDate" class="form-control">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Military Status -->
-                    <div class="mb-4">
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="form-label">Military Status</label>
-                                <select wire:model.live="militaryStatus" class="form-control">
-                                    <option value="">All</option>
-                                    @foreach ($militaryStatusOptions as $status)
-                                        <option value="{{ $status }}">{{ $status }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label class="form-label">Marital Status</label>
-                                <select wire:model.live="maritalStatus" class="form-control">
-                                    <option value="">All</option>
-                                    @foreach ($maritalStatusOptions as $status)
-                                        <option value="{{ $status }}">{{ $status }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- City -->
-                    <div class="mb-4">
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="form-label">City</label>
-                                <select wire:model.live="cityId" class="form-control">
-                                    <option value="">All</option>
-                                    @foreach ($cities as $city)
-                                        <option value="{{ $city->id }}">{{ $city->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div>
-
-
-                                <!-- Area -->
-                                <label class="form-label">Area</label>
-                                <select wire:model.live="areaId" class="form-control">
-                                    <option value="">Please select a city first</option>
-                                    @foreach ($areas as $area)
-                                        <option value="{{ $area->id }}">{{ $area->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Age Range -->
-                    <div class="mb-4">
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="form-label text-sm">Min Age</label>
-                                <input type="number" wire:model.live="minAge" min="16" max="100"
-                                    class="form-control" placeholder="Min">
-                            </div>
-                            <div>
-                                <label class="form-label text-sm">Max Age</label>
-                                <input type="number" wire:model.live="maxAge" min="16" max="100"
-                                    class="form-control" placeholder="Max">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-end mt-4">
-                        <button type="button" wire:click="resetFilters" class="btn btn-sm btn-outline-danger">
+                <div class="flex items-center sm:mt-2">
+                    @if ($showFilters)
+                        <button type="button" wire:click="resetFilters" class="btn btn-sm btn-outline-danger btn-sm mr-2">
                             <span class="flex items-center">
-                                <iconify-icon class="text-lg ltr:mr-1 rtl:ml-1"
+                                <iconify-icon class="text-lg ltr:mr-1 rtl:ml-1 text-sm"
                                     icon="heroicons-outline:x"></iconify-icon>
                                 <span>Clear Filters</span>
                             </span>
                         </button>
+                    @endif
+                    <button type="button"
+                        class="btn inline-flex justify-center btn-outline-primary dropdown-toggle btn-sm"
+                        wire:click="toggleFilters" aria-expanded="false">
+                        <span class="flex items-center">
+                            <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2 text-sm"
+                                icon="heroicons-outline:filter"></iconify-icon>
+                            <span>Filters</span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        @if ($showFilters)
+            <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-2">
+                <!-- Date Range -->
+                <div class="mb-4">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="form-label text-sm">Created From</label>
+                            <input type="date" wire:model.live="startDate" class="form-control">
+                        </div>
+                        <div>
+                            <label class="form-label text-sm">Created To</label>
+                            <input type="date" wire:model.live="endDate" class="form-control">
+                        </div>
                     </div>
                 </div>
-            @endif
+
+                <!-- Military Status -->
+                <div class="mb-4">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="form-label">Military Status</label>
+                            <select wire:model.live="militaryStatus" class="form-control">
+                                <option value="">All</option>
+                                @foreach ($militaryStatusOptions as $status)
+                                    <option value="{{ $status }}">{{ $status }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Marital Status</label>
+                            <select wire:model.live="maritalStatus" class="form-control">
+                                <option value="">All</option>
+                                @foreach ($maritalStatusOptions as $status)
+                                    <option value="{{ $status }}">{{ $status }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- City -->
+                <div class="mb-4">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="form-label">City</label>
+                            <select wire:model.live="cityId" class="form-control">
+                                <option value="">All</option>
+                                @foreach ($cities as $city)
+                                    <option value="{{ $city->id }}">{{ $city->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+
+
+                            <!-- Area -->
+                            <label class="form-label">Area</label>
+                            <select wire:model.live="areaId" class="form-control">
+                                <option value="">Please select a city first</option>
+                                @foreach ($areas as $area)
+                                    <option value="{{ $area->id }}">{{ $area->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Age Range -->
+                <div class="mb-4">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="form-label text-sm">Min Age</label>
+                            <input type="number" wire:model.live="minAge" min="16" max="100"
+                                class="form-control" placeholder="Min">
+                        </div>
+                        <div>
+                            <label class="form-label text-sm">Max Age</label>
+                            <input type="number" wire:model.live="maxAge" min="16" max="100"
+                                class="form-control" placeholder="Max">
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        @endif
 
         <div class="card-body">
             <div class="overflow-x-auto">

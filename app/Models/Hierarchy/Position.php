@@ -22,7 +22,6 @@ class Position extends Model
     protected $fillable = [
         'department_id',
         'code',
-        'sap_code',
         'name',
         'arabic_name',
         'job_description',
@@ -102,7 +101,6 @@ class Position extends Model
         ?string $jobBenefits,
         ?string $arabicJobBenefits,
         ?string $code,
-        ?string $sapCode,
     ): Position {
         /** @var User $loggerInUser */
         $loggerInUser = Auth::user();
@@ -125,7 +123,7 @@ class Position extends Model
                 'arabic_job_benefits' => $arabicJobBenefits,
                 'parent_id' => $parentId,
                 'code' => $code,
-                'sap_code' => $sapCode,
+                // 'sap_code' => $sapCode,
             ]);
             return $newPosition;
         } catch (Exception $e) {
@@ -151,7 +149,6 @@ class Position extends Model
         ?string $jobBenefits,
         ?string $arabicJobBenefits,
         ?string $code,
-        ?string $sapCode,
     ): bool {
         try {
             /** @var User $loggerInUser */
@@ -175,7 +172,6 @@ class Position extends Model
                 'arabic_job_benefits' => $arabicJobBenefits,
                 'parent_id' => $parentId,
                 'code' => $code,
-                'sap_code' => $sapCode,
             ]);
         } catch (Exception $e) {
             report($e);

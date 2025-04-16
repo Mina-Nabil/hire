@@ -34,10 +34,10 @@ return new class extends Migration
             $table->string('middle_name')->nullable();
             $table->string('last_name');
             $table->string('nationality')->nullable();
+            $table->string('social_number')->unique();
             $table->string('email')->unique();
             $table->string('phone')->unique();
             $table->string('address')->nullable();
-            $table->string('social_number')->nullable();
             $table->string('home_phone')->nullable();
             $table->date('birth_date')->nullable();
             $table->foreignIdFor(Channel::class)->nullable()->constrained('channels');

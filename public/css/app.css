@@ -16496,6 +16496,9 @@ ul.custom-list ul {
     .sm\:mb-2 {
         margin-bottom: 0.5rem;
     }
+    .sm\:mt-2 {
+        margin-top: 0.5rem !important;
+    }
     .sm\:mb-0 {
         margin-bottom: 0px;
     }
@@ -16649,6 +16652,9 @@ ul.custom-list ul {
     }
     .sm\:hidden {
         display: none;
+    }
+    .sm\:mt-2 {
+        margin-top: 0.5rem;
     }
     .md\:block {
         display: block;

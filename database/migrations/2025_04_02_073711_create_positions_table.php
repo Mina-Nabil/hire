@@ -19,7 +19,8 @@ return new class extends Migration
             $table->foreignIdFor(Department::class)->constrained('departments');
             $table->string('name');
             $table->string('arabic_name');
-
+            $table->string('code');
+            
             $table->text('job_description')->nullable();
             $table->text('arabic_job_description')->nullable();
 

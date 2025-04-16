@@ -207,17 +207,19 @@ class Applicant extends Model
         string $lastName,
         string $email,
         string $phone,
+        string $socialNumber,
         array $additionalData = []
     ): Applicant {
         try {
-            return DB::transaction(function () use ($areaId, $firstName, $lastName, $email, $phone, $additionalData) {
+            return DB::transaction(function () use ($areaId, $firstName, $lastName, $email, $phone, $socialNumber, $additionalData) {
                 return self::updateOrCreate([
-                    'email' => $email,
+                    'socialNumber' => $socialNumber,
                 ], array_merge([
                     'area_id' => $areaId,
                     'first_name' => $firstName,
                     'last_name' => $lastName,
                     'phone' => $phone,
+                    'email' =>  $email
                 ], $additionalData));
             });
         } catch (Exception $e) {

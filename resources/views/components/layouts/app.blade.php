@@ -50,9 +50,9 @@
                 class="w-screen h-screen fixed top-0 bg-slate-900 bg-opacity-50 backdrop-blur-sm z-10 hidden"></div>
             <div class="logo-segment">
                 <a class="flex items-center" href="{{ url('/') }}">
-                    <img src="{{ asset('admin/assets/images/logo/tawasoa-logo-wide.png') }}" class="black_logo"
+                    <img src="{{ asset('images/logo/hire-logo-wide.png') }}" class="black_logo"
                         alt="logo">
-                    <img src="{{ asset('admin/assets/images/logo/tawasoa-logo-wide-white.png') }}" class="white_logo"
+                    <img src="{{ asset('images/logo/hire-logo-wide-white.png') }}" class="white_logo"
                         alt="logo">
                     {{-- <span
                         class="ltr:ml-3 rtl:mr-3 text-xl font-Inter font-bold text-slate-900 dark:text-white">Wise
@@ -194,9 +194,9 @@
                             <div
                                 class="flex items-center md:space-x-4 space-x-2 xl:space-x-0 rtl:space-x-reverse vertical-box">
                                 <a href="{{ url('/') }}" class="mobile-logo xl:hidden inline-block">
-                                    <img src="{{ asset('admin/assets/images/logo/tawasoa-icon.png') }}"
+                                    <img src="{{ asset('images/logo/hire-icon.png') }}"
                                         class="black_logo" alt="logo">
-                                    <img src="{{ asset('admin/assets/images/logo/tawasoa-icon-white.png') }}"
+                                    <img src="{{ asset('images/logo/hire-icon-white.png') }}"
                                         class="white_logo" alt="logoo">
                                 </a>
 

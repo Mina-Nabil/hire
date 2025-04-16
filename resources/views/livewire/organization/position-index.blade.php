@@ -323,7 +323,7 @@
                         <!-- Modal body -->
                         <div class="p-6 space-y-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="from-group">
+                                <div class="from-group col-span-2">
                                     <label for="code" class="form-label">Code</label>
                                     <input id="code" type="text"
                                         class="form-control @error('code') !border-danger-500 @enderror"
@@ -334,11 +334,6 @@
                                     @enderror
                                 </div>
                                 <div class="from-group">
-                                    <label for="sapCode" class="form-label">SAP Code</label>
-                                    <input id="sapCode" type="text"
-                                        class="form-control @error('sapCode') !border-danger-500 @enderror"
-                                        wire:model="sapCode">
-                                </div>
 
                                     <label for="positionName" class="form-label">Position Name (English)</label>
                                     <input id="positionName" type="text"
@@ -381,7 +376,8 @@
                                     <select id="parentId" class="form-control" wire:model="parentId">
                                         <option value="">None</option>
                                         @foreach ($allPositions as $pos)
-                                            <option value="{{ $pos->id }}">{{ $pos->code }} - {{ $pos->department->name }} - {{ $pos->name }}</option>
+                                            <option value="{{ $pos->id }}">{{ $pos->code }} -
+                                                {{ $pos->department->name }} - {{ $pos->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -476,6 +472,16 @@
                         </div>
                         <!-- Modal body -->
                         <div class="p-6 space-y-4">
+                            <div class="from-group col-span-2">
+                                <label for="code" class="form-label">Code</label>
+                                <input id="code" type="text"
+                                    class="form-control @error('code') !border-danger-500 @enderror"
+                                    wire:model="code">
+                                @error('code')
+                                    <span
+                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                @enderror
+                            </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div class="from-group">
                                     <label for="positionName" class="form-label">Position Name (English)</label>

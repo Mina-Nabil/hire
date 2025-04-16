@@ -183,6 +183,7 @@ class ApplicantsCreate extends Component
             'firstName' => 'required|string|max:255',
             'lastName' => 'required|string|max:255',
             'email' => 'required|email|max:255',
+            'socialNumber' => 'required',
             'phone' => 'required|string|max:255',
             'homePhone' => 'nullable|string|max:255',
             'birthDate' => 'nullable|date',
@@ -554,7 +555,6 @@ class ApplicantsCreate extends Component
                     'email' => $this->email,
                     'phone' => $this->phone,
                     'address' => $this->address,
-                    'social_number' => $this->socialNumber,
                     'home_phone' => $this->homePhone,
                     'birth_date' => $this->birthDate,
                     'channel_id' => $this->channelId,
@@ -569,6 +569,7 @@ class ApplicantsCreate extends Component
                     $this->lastName,
                     $this->email,
                     $this->phone,
+                    $this->socialNumber,
                     $applicantData
                 );
 

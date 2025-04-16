@@ -294,7 +294,18 @@ class Application extends Model
      */
     public function hire(): bool
     {
-        return $this->updateStatus(self::STATUS_HIRED);
+        try {
+
+            DB::transaction(function () {
+                $this->applicant->hire();
+                $this->updateStatus(self::STATUS_HIRED);
+            });
+            return true;
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException("Failed to accept offer");
+            return false;
+        }
     }
 
     /**
@@ -363,7 +374,6 @@ class Application extends Model
                     'benefits' => $benefits,
                     'notes' => $notes,
                 ]);
-                $this->applicant->hire();
                 return $this->updateStatus(self::STATUS_OFFER);
             });
             return true;

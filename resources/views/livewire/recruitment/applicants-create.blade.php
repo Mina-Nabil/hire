@@ -55,14 +55,14 @@
         </div>
 
         <!-- Form Content -->
-        <div class="card-body p-6">
+        <div class="card-body px-6 pb-6">
             <form wire:submit.prevent="{{ $currentStep < $totalSteps ? 'nextStep' : 'createApplicant' }}">
                 <!-- Step 1: Personal Information -->
                 @if ($currentStep === 1)
                     <h4 class="text-xl font-medium mb-5">Personal Information</h4>
-                    <div class="grid  lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
                         <!-- First Name -->
-                        <div>
+                        <div class="w-full">
                             <div class="form-group">
                                 <label for="firstName" class="form-label">First Name <span
                                         class="text-danger-500">*</span></label>
@@ -75,7 +75,7 @@
                             </div>
                         </div>
                         <!-- Middle Name -->
-                        <div>
+                        <div class="w-full">
                             <div class="form-group">
                                 <label for="middleName" class="form-label">Middle Name</label>
                                 <input type="text" id="middleName" wire:model="middleName"
@@ -87,7 +87,7 @@
                             </div>
                         </div>
                         <!-- Last Name -->
-                        <div>
+                        <div class="w-full">
                             <div class="form-group">
                                 <label for="lastName" class="form-label">Last Name <span
                                         class="text-danger-500">*</span></label>
@@ -101,7 +101,7 @@
                         </div>
 
                         <!-- Email -->
-                        <div class="form-group">
+                        <div class="form-group w-full">
                             <label for="email" class="form-label">Email <span
                                     class="text-danger-500">*</span></label>
                             <input type="email" id="email" wire:model="email"
@@ -113,7 +113,7 @@
                         </div>
 
                         <!-- Phone -->
-                        <div class="form-group">
+                        <div class="form-group w-full">
                             <label for="phone" class="form-label">Phone <span
                                     class="text-danger-500">*</span></label>
                             <input type="text" id="phone" wire:model="phone"
@@ -125,7 +125,7 @@
                         </div>
 
                         <!-- Home Phone -->
-                        <div class="form-group">
+                        <div class="form-group w-full">
                             <label for="homePhone" class="form-label">Home Phone</label>
                             <input type="text" id="homePhone" wire:model="homePhone"
                                 class="form-control @error('homePhone') !border-danger-500 @enderror">
@@ -136,7 +136,7 @@
                         </div>
 
                         <!-- Area -->
-                        <div class="form-group">
+                        <div class="form-group w-full">
                             <label for="cityId" class="form-label">City <span class="text-danger-500">*</span></label>
                             <select id="cityId" wire:model.live="cityId"
                                 class="form-control @error('cityId') !border-danger-500 @enderror">
@@ -151,7 +151,7 @@
                             @enderror
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group w-full">
                             <label for="areaId" class="form-label">Area <span class="text-danger-500">*</span></label>
                             <select id="areaId" wire:model="areaId"
                                 class="form-control @error('areaId') !border-danger-500 @enderror">
@@ -173,7 +173,7 @@
                         </div>
 
                         <!-- Nationality -->
-                        <div class="form-group">
+                        <div class="form-group w-full">
                             <label for="nationality" class="form-label">Nationality</label>
                             <input type="text" id="nationality" wire:model="nationality"
                                 class="form-control @error('nationality') !border-danger-500 @enderror">
@@ -184,7 +184,7 @@
                         </div>
 
                         <!-- Address -->
-                        <div class="form-group col-span-3">
+                        <div class="form-group col-span-3 w-full">
                             <label for="address" class="form-label">Address</label>
                             <textarea id="address" wire:model="address" class="form-control @error('address') !border-danger-500 @enderror"
                                 rows="2"></textarea>
@@ -195,7 +195,7 @@
                         </div>
 
                         <!-- Birth Date -->
-                        <div class="form-group">
+                        <div class="form-group w-full">
                             <label for="birthDate" class="form-label">Birth Date</label>
                             <input type="date" id="birthDate" wire:model="birthDate"
                                 class="form-control @error('birthDate') !border-danger-500 @enderror">
@@ -206,7 +206,7 @@
                         </div>
 
                         <!-- Gender -->
-                        <div class="form-group">
+                        <div class="form-group w-full">
                             <label for="gender" class="form-label">Gender</label>
                             <select id="gender" wire:model="gender"
                                 class="form-control @error('gender') !border-danger-500 @enderror">
@@ -222,7 +222,7 @@
                         </div>
 
                         <!-- Marital Status -->
-                        <div class="form-group">
+                        <div class="form-group w-full">
                             <label for="maritalStatus" class="form-label">Marital Status</label>
                             <select id="maritalStatus" wire:model="maritalStatus"
                                 class="form-control @error('maritalStatus') !border-danger-500 @enderror">
@@ -238,7 +238,7 @@
                         </div>
 
                         <!-- Military Status -->
-                        <div class="form-group">
+                        <div class="form-group w-full">
                             <label for="militaryStatus" class="form-label">Military Status</label>
                             <select id="militaryStatus" wire:model="militaryStatus"
                                 class="form-control @error('militaryStatus') !border-danger-500 @enderror">
@@ -254,7 +254,7 @@
                         </div>
 
                         <!-- Social Number -->
-                        <div class="form-group">
+                        <div class="form-group w-full">
                             <label for="socialNumber" class="form-label">Social Number</label>
                             <input type="text" id="socialNumber" wire:model="socialNumber"
                                 class="form-control @error('socialNumber') !border-danger-500 @enderror">
@@ -265,7 +265,7 @@
                         </div>
 
                         <!-- Channel -->
-                        <div class="form-group">
+                        <div class="form-group w-full">
                             <label for="channelId" class="form-label">Application Channel</label>
                             <select id="channelId" wire:model="channelId"
                                 class="form-control @error('channelId') !border-danger-500 @enderror">
@@ -397,8 +397,9 @@
                         </div>
                     @endforeach
 
-                    <button type="button" wire:click="addEducation" class="btn btn-outline-primary mt-2">
-                        <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2" icon="ph:plus-bold"></iconify-icon>
+                    <button type="button" wire:click="addEducation"
+                        class="btn btn-dark flex items-center btn-sm mt-2">
+                        <iconify-icon class="text-sm ltr:mr-2 rtl:ml-2" icon="ph:plus-bold"></iconify-icon>
                         Add Education
                     </button>
                 @endif
@@ -468,8 +469,9 @@
                         </div>
                     @endforeach
 
-                    <button type="button" wire:click="addTraining" class="btn btn-outline-primary mt-2">
-                        <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2" icon="ph:plus-bold"></iconify-icon>
+                    <button type="button" wire:click="addTraining"
+                        class="btn btn-dark flex items-center btn-sm mt-2">
+                        <iconify-icon class="text-sm ltr:mr-2 rtl:ml-2" icon="ph:plus-bold"></iconify-icon>
                         Add Training
                     </button>
                 @endif
@@ -561,8 +563,9 @@
                         </div>
                     @endforeach
 
-                    <button type="button" wire:click="addExperience" class="btn btn-outline-primary mt-2">
-                        <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2" icon="ph:plus-bold"></iconify-icon>
+                    <button type="button" wire:click="addExperience"
+                        class="btn btn-dark flex items-center btn-sm mt-2">
+                        <iconify-icon class="text-sm ltr:mr-2 rtl:ml-2" icon="ph:plus-bold"></iconify-icon>
                         Add Experience
                     </button>
                 @endif
@@ -647,8 +650,9 @@
                         </div>
                     @endforeach
 
-                    <button type="button" wire:click="addLanguage" class="btn btn-outline-primary mt-2">
-                        <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2" icon="ph:plus-bold"></iconify-icon>
+                    <button type="button" wire:click="addLanguage"
+                        class="btn btn-dark flex items-center btn-sm mt-2">
+                        <iconify-icon class="text-sm ltr:mr-2 rtl:ml-2" icon="ph:plus-bold"></iconify-icon>
                         Add Language
                     </button>
                 @endif
@@ -726,8 +730,9 @@
                         </div>
                     @endforeach
 
-                    <button type="button" wire:click="addReference" class="btn btn-outline-primary mt-2">
-                        <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2" icon="ph:plus-bold"></iconify-icon>
+                    <button type="button" wire:click="addReference"
+                        class="btn btn-dark flex items-center btn-sm mt-2">
+                        <iconify-icon class="text-sm ltr:mr-2 rtl:ml-2" icon="ph:plus-bold"></iconify-icon>
                         Add Reference
                     </button>
                 @endif
@@ -822,8 +827,9 @@
                             </div>
                         @endforeach
 
-                        <button type="button" wire:click="addSkill" class="btn btn-outline-primary mt-2">
-                            <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2" icon="ph:plus-bold"></iconify-icon>
+                        <button type="button" wire:click="addSkill"
+                            class="btn btn-dark flex items-center btn-sm mt-2">
+                            <iconify-icon class="text-sm ltr:mr-2 rtl:ml-2" icon="ph:plus-bold"></iconify-icon>
                             Add Skill
                         </button>
                     </div>
@@ -1045,8 +1051,9 @@
                 <!-- Step navigation -->
                 <div class="flex justify-between mt-10">
                     @if ($currentStep > 1)
-                        <button type="button" wire:click="previousStep" class="btn btn-outline-primary">
-                            <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2" icon="ph:arrow-left-bold"></iconify-icon>
+                        <button type="button" wire:click="previousStep"
+                            class="btn btn-outline-primary flex items-center btn-sm">
+                            <iconify-icon class="text-sm ltr:mr-2 rtl:ml-2" icon="ph:arrow-left-bold"></iconify-icon>
                             Previous
                         </button>
                     @else
@@ -1054,15 +1061,16 @@
                     @endif
 
                     @if ($currentStep < $totalSteps)
-                        <button type="button" wire:click="nextStep" class="btn btn-primary flex items-center">
+                        <button type="button" wire:click="nextStep"
+                            class="btn btn-primary flex items-center btn-sm">
                             <span>Next</span>
                             <iconify-icon class="text-sm ltr:ml-2 rtl:mr-2" icon="ph:arrow-right-bold"></iconify-icon>
                         </button>
                     @else
-                        <button type="button" wire:click="createApplicant" class="btn btn-success"
+                        <button type="button" wire:click="createApplicant" class="btn btn-success btn-sm"
                             wire:loading.attr="disabled">
                             <span wire:loading.remove wire:target="createApplicant">
-                                <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2" icon="ph:check-bold"></iconify-icon>
+                                <iconify-icon class="text-sm ltr:mr-2 rtl:ml-2" icon="ph:check-bold"></iconify-icon>
                                 Submit Application
                             </span>
                             <span wire:loading wire:target="createApplicant">

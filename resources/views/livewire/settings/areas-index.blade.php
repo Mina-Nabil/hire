@@ -132,7 +132,7 @@
     <!-- New City Modal -->
     @if ($newCityModal)
         <div class="modal fade fixed top-0 left-0 hidden w-full h-full outline-none overflow-x-hidden overflow-y-auto show" tabindex="-1" aria-modal="true" role="dialog" style="display: block;">
-            <div class="modal-dialog top-1/2 !-translate-y-1/2 relative w-auto pointer-events-none">
+            <div class="modal-dialog relative w-auto pointer-events-none">
                 <div class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
                     <div class="relative bg-white rounded-lg shadow dark:bg-slate-700">
                         <!-- Modal header -->
@@ -173,7 +173,7 @@
     <!-- Edit City Modal -->
     @if ($editCityModal)
         <div class="modal fade fixed top-0 left-0 hidden w-full h-full outline-none overflow-x-hidden overflow-y-auto show" tabindex="-1" aria-modal="true" role="dialog" style="display: block;">
-            <div class="modal-dialog top-1/2 !-translate-y-1/2 relative w-auto pointer-events-none">
+            <div class="modal-dialog relative w-auto pointer-events-none">
                 <div class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
                     <div class="relative bg-white rounded-lg shadow dark:bg-slate-700">
                         <!-- Modal header -->
@@ -214,7 +214,7 @@
     <!-- New Area Modal -->
     @if ($newAreaModal)
         <div class="modal fade fixed top-0 left-0 hidden w-full h-full outline-none overflow-x-hidden overflow-y-auto show" tabindex="-1" aria-modal="true" role="dialog" style="display: block;">
-            <div class="modal-dialog top-1/2 !-translate-y-1/2 relative w-auto pointer-events-none">
+            <div class="modal-dialog relative w-auto pointer-events-none">
                 <div class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
                     <div class="relative bg-white rounded-lg shadow dark:bg-slate-700">
                         <!-- Modal header -->
@@ -267,7 +267,7 @@
     <!-- Edit Area Modal -->
     @if ($editAreaModal)
         <div class="modal fade fixed top-0 left-0 hidden w-full h-full outline-none overflow-x-hidden overflow-y-auto show" tabindex="-1" aria-modal="true" role="dialog" style="display: block;">
-            <div class="modal-dialog top-1/2 !-translate-y-1/2 relative w-auto pointer-events-none">
+            <div class="modal-dialog relative w-auto pointer-events-none">
                 <div class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
                     <div class="relative bg-white rounded-lg shadow dark:bg-slate-700">
                         <!-- Modal header -->
@@ -320,7 +320,7 @@
     <!-- Delete Confirmation Modal -->
     @if ($deleteConfirmationModal)
         <div class="modal fade fixed top-0 left-0 hidden w-full h-full outline-none overflow-x-hidden overflow-y-auto show" tabindex="-1" aria-modal="true" role="dialog" style="display: block;">
-            <div class="modal-dialog top-1/2 !-translate-y-1/2 relative w-auto pointer-events-none">
+            <div class="modal-dialog relative w-auto pointer-events-none">
                 <div class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
                     <div class="relative bg-white rounded-lg shadow dark:bg-slate-700">
                         <!-- Modal header -->

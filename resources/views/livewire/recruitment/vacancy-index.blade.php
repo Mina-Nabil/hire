@@ -46,14 +46,14 @@
                                 @forelse($vacancies as $vacancy)
                                     <tr class="even:bg-slate-100 dark:even:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer" wire:click="showVacancy({{ $vacancy->id }})">
                                         <td class="table-td">{{ $vacancy->position->name }}</td>
-                                        <td class="table-td">{{ ucfirst($vacancy->type) }}</td>
+                                        <td class="table-td">{{ ucfirst(str_replace('_', ' ', $vacancy->type)) }}</td>
                                         <td class="table-td">
                                             <span class="badge {{ $vacancy->status === 'open' ? 'bg-success-500' : 'bg-danger-500' }} bg-opacity-50 text-dark capitalize">
                                                 {{ ucfirst($vacancy->status) }}
                                             </span>
                                         </td>
                                         <td class="table-td">
-                                            {{ $vacancy->closing_date ? $vacancy->closing_date->format('Y-m-d') : 'N/A' }}
+                                            {{ $vacancy->closing_date ? $vacancy->closing_date->format('D Y-m-d') : 'N/A' }}
                                         </td>
                                         <td class="table-td">{{ $vacancy->vacancy_questions_count }}</td>
                                         <td class="table-td">{{ $vacancy->vacancy_slots_count }}</td>

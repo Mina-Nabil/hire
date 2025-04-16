@@ -90,7 +90,7 @@ class ApplicantsIndex extends Component
                 $query->youngerThan($this->maxAge);
             })
             ->with(['area', 'applications'])
-            ->paginate(10);
+            ->paginate(30);
 
         return view('livewire.recruitment.applicants-index', [
             'applicants' => $applicants

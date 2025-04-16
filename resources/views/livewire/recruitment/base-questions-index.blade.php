@@ -23,23 +23,13 @@
         </div>
     </div>
 
-    <!-- Search Bar -->
-    <div class="flex flex-wrap sm:flex-nowrap justify-between space-x-3 rtl:space-x-reverse mb-6">
-        <div class="flex-0 w-full sm:w-auto mb-3 sm:mb-0">
-            <div class="relative">
-                <input type="text" class="form-control" placeholder="Search..."
-                    wire:model.live.debounce.300ms="search">
-                <span class="absolute right-0 top-0 w-9 h-full flex items-center justify-center text-slate-400">
-                    <iconify-icon icon="heroicons-solid:search"></iconify-icon>
-                </span>
-            </div>
-        </div>
-    </div>
-
     <!-- Base Questions Table -->
     <div class="card">
-        <header class="card-header noborder">
-            <h4 class="card-title">Base Questions</h4>
+        <header class="card-header cust-card-header noborder">
+            <iconify-icon wire:loading wire:target="search" class="loading-icon text-lg"
+                icon="line-md:loading-twotone-loop"></iconify-icon>
+            <input type="text" class="form-control !pl-9 mr-1 basis-1/4" placeholder="Search"
+                wire:model.live.debounce.300ms="search">
         </header>
         <div class="card-body px-6 pb-6">
             <div class="overflow-x-auto -mx-6">

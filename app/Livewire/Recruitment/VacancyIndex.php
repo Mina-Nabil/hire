@@ -504,7 +504,7 @@ class VacancyIndex extends Component
                 $query->search($this->search);
             })
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(30);
 
 
         $vacancyTypes = Vacancy::TYPE_OPTIONS;

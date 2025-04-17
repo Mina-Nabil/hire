@@ -106,7 +106,7 @@ class PositionIndex extends Component
     {
         $this->validate([
             'departmentName' => 'required|string|max:255',
-            'departmentPrefixCode' => 'required|string|max:10',
+            'departmentPrefixCode' => 'required|string|max:10|unique:departments,prefix_code,' . $this->departmentId,
             'departmentDescription' => 'nullable|string',
         ]);
 

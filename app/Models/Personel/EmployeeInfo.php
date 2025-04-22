@@ -1,0 +1,37 @@
+<?php
+
+namespace App\Models\Personel;
+
+use App\Models\Base\InsuranceOffice;
+use Illuminate\Database\Eloquent\Model;
+
+class EmployeeInfo extends Model
+{
+    const MORPH_NAME = 'employee_info';
+    protected $table = 'employee_info';
+    protected $fillable = [
+        'employee_id',
+        'insurance_office_id',
+        'insurance_number',
+        'insurance_amount',
+        'academic_qualification',
+        'university',
+        'graduation_year',
+        'military_status',
+        'gender',
+        'marital_status',
+    ];
+
+
+    ///relations
+    public function insuranceOffice()
+    {
+        return $this->belongsTo(InsuranceOffice::class);
+    }
+
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class);
+    }
+
+}

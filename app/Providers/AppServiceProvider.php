@@ -7,7 +7,21 @@ use App\Models\Base\City;
 use App\Models\Hierarchy\Department;
 use App\Models\Hierarchy\OrganizationalChart;
 use App\Models\Hierarchy\Position;
+use App\Models\Personel\Docs\BankAccount;
+use App\Models\Personel\Docs\DriverLicense;
+use App\Models\Personel\Docs\EmployeeContract;
+use App\Models\Personel\Docs\EmployeeS1Doc;
+use App\Models\Personel\Docs\EmployeeS2Doc;
+use App\Models\Personel\Docs\EmployeeS6Doc;
+use App\Models\Personel\Docs\HrLetter;
+use App\Models\Personel\Docs\IDCard;
+use App\Models\Personel\Docs\MedicalRecord;
+use App\Models\Personel\Docs\PoliceRecord;
+use App\Models\Personel\Docs\PracticeCard;
+use App\Models\Personel\Docs\SkillsQualification;
+use App\Models\Personel\Docs\SyndicateCard;
 use App\Models\Personel\Employee;
+use App\Models\Personel\EmployeeInfo;
 use App\Models\Recruitment\Applicants\Applicant;
 use App\Models\Recruitment\Applicants\ApplicantHealth;
 use App\Models\Recruitment\Applicants\ApplicantSkill;
@@ -75,6 +89,20 @@ class AppServiceProvider extends ServiceProvider
             Vacancy::MORPH_NAME => Vacancy::class,
             Interview::MORPH_NAME => Interview::class,
             JobOffer::MORPH_NAME => JobOffer::class,
+            EmployeeInfo::MORPH_NAME => EmployeeInfo::class,
+            EmployeeContract::MORPH_NAME => EmployeeContract::class,
+            BankAccount::MORPH_NAME => BankAccount::class,
+            SyndicateCard::MORPH_NAME => SyndicateCard::class,
+            PracticeCard::MORPH_NAME => PracticeCard::class,
+            EmployeeS1Doc::MORPH_NAME => EmployeeS1Doc::class,
+            EmployeeS2Doc::MORPH_NAME => EmployeeS2Doc::class,
+            IDCard::MORPH_NAME => IDCard::class,
+            DriverLicense::MORPH_NAME => DriverLicense::class,
+            MedicalRecord::MORPH_NAME => MedicalRecord::class,
+            EmployeeS6Doc::MORPH_NAME => EmployeeS6Doc::class,
+            HrLetter::MORPH_NAME => HrLetter::class,
+            PoliceRecord::MORPH_NAME => PoliceRecord::class,
+            SkillsQualification::MORPH_NAME => SkillsQualification::class,
         ]);
     }
 }

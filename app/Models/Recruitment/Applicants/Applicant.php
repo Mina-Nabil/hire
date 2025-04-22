@@ -97,10 +97,6 @@ class Applicant extends Model
         return $this->image_url ? Storage::disk('s3')->url($this->image_url) : null;
     }
 
-    ////static methods
-
-
-
     ///relations
     /**
      * Get the area that the applicant belongs to
@@ -189,6 +185,8 @@ class Applicant extends Model
     {
         return $this->morphMany(Document::class, 'doc_owner');
     }
+
+    ///static methods
 
     /**
      * Create a new applicant

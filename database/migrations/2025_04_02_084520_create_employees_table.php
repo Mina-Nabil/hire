@@ -3,6 +3,7 @@
 use App\Models\Base\City;
 use App\Models\Personel\Employee;
 use App\Models\Recruitment\Applicants\Applicant;
+use App\Models\Users\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -17,20 +18,21 @@ return new class extends Migration
         Schema::create('employees', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Applicant::class)->nullable()->constrained('applicants')->nullOnDelete();
-            $table->string('first_name');
-            $table->string('last_name');
+            $table->foreignIdFor(User::class)->constrained('users');
+            $table->foreignIdFor(User::class, 'created_by')->constrained('users');
+            $table->string('name');
             $table->string('email');
             $table->string('phone');
             $table->string('address');
-            $table->string('college_study');
             $table->string('nationality');
-            $table->enum('gender', ['male', 'female']);
+            $table->enum('gender', Applicant::GENDER);
             $table->date('birth_date');
             $table->string('image_url')->nullable();
             $table->foreignIdFor(City::class, 'birth_place_id')->constrained('cities');
             $table->boolean('license_required')->default(false);
             $table->date('employment_date');
             $table->date('termination_date')->nullable();
+
             $table->timestamps();
         });
 

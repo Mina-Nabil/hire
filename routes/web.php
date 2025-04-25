@@ -12,6 +12,7 @@ use App\Livewire\Settings\AreasIndex;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\UsersIndex;
 use App\Http\Controllers\Hierarchy\OrganizationController;
+use App\Livewire\Employee\EmployeeShow;
 use App\Livewire\Recruitment\ApplicantShow;
 use App\Livewire\Recruitment\ChannelIndex;
 use App\Livewire\Recruitment\ApplicantsIndex;
@@ -32,6 +33,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/recruitment/applicants/{applicant}', ApplicantShow::class)->name('recruitment.applicants.show');
     Route::get('/recruitment/base-questions', BaseQuestionsIndex::class);
     Route::get('/recruitment/applicants/success', ApplicantSuccess::class)->name('applicants.success');
+    Route::get('/employees/{id}', EmployeeShow::class)->name('employees.show');
     Route::get('/settings/users', UsersIndex::class);
     Route::get('/settings/areas', AreasIndex::class);
     Route::get('/settings/channels', ChannelIndex::class);

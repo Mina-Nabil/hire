@@ -14,6 +14,8 @@ class InsuranceOffice extends Model
         'arabic_name',
     ];
 
+    const MORPH_NAME = 'insurance_office';
+
 
     ///static methods
     public static function createInsuranceOffice($name, $arabic_name)

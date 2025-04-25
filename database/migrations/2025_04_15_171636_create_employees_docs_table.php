@@ -106,6 +106,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Employee::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(User::class, 'created_by')->constrained('users');
+            $table->string('file_path');
             $table->double('s2_amount', 10, 2);
             $table->unsignedInteger('year');
             $table->date('issue_date');

@@ -4,12 +4,15 @@ namespace App\Models\Personel\Docs;
 
 use App\Traits\DocumentModel;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class IDCard extends Model
 {
     use DocumentModel;
 
     const MORPH_NAME = 'id_card';
+
+    protected $table = 'id_cards';
 
     protected $fillable = [
         'employee_id',

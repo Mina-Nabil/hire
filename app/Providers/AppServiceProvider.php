@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Base\Area;
 use App\Models\Base\City;
+use App\Models\Base\InsuranceOffice;
 use App\Models\Hierarchy\Department;
 use App\Models\Hierarchy\OrganizationalChart;
 use App\Models\Hierarchy\Position;
@@ -103,6 +104,7 @@ class AppServiceProvider extends ServiceProvider
             HrLetter::MORPH_NAME => HrLetter::class,
             PoliceRecord::MORPH_NAME => PoliceRecord::class,
             SkillsQualification::MORPH_NAME => SkillsQualification::class,
+            InsuranceOffice::MORPH_NAME => InsuranceOffice::class,
         ]);
     }
 }

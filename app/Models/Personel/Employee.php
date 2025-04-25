@@ -35,20 +35,14 @@ class Employee extends Model
 {
     const MORPH_NAME = 'employee';
 
-    protected $fillable = [
-        'name',
-        'email',
-        'phone',
-        'address',
-        'nationality',
-        'gender',
-        'birth_date',
-        'image_url',
-        'birth_place_id',
-        'license_required',
-        'employment_date',
-    ];
+    const FILES_DIRECTORY = 'employees';
 
+    protected $fillable = ['name', 'email', 'phone', 'address', 'nationality', 'gender', 'birth_date', 'image_url', 'birth_place_id', 'license_required', 'employment_date'];
+
+    protected $casts = [
+        'employment_date' => 'date',
+        'birth_date' => 'date',
+    ];
 
     ////model functions
     public function setArmyServicePaper($file_path, Carbon $issue_date, $type = ArmyServicePaper::TYPE_ORIGINAL, ?Carbon $expiry_date)
@@ -60,35 +54,47 @@ class Employee extends Model
         }
 
         try {
-            $this->armyServicePaper()->firstOrCreate([], [
-                'created_by' => $loggedInUser->id,
-                'file_path' => $file_path,
-                'issue_date' => $issue_date,
-                'expiry_date' => $expiry_date,
-                'type' => $type,
-            ]);
+            $this->armyServicePaper()->updateOrCreate(
+                [
+                    'employee_id' => $this->id,
+                ],
+                [
+                    'created_by' => $loggedInUser->id,
+                    'file_path' => $file_path,
+                    'issue_date' => $issue_date,
+                    'expiry_date' => $expiry_date,
+                    'type' => $type,
+                ],
+            );
+            return true;
         } catch (Exception $e) {
             report($e);
             throw new AppException('Error setting army service paper');
         }
     }
 
-    public function setBirthCertificate($file_path, Carbon $issue_date, $type = BirthCertificate::TYPE_ORIGINAL, ?Carbon $expiry_date)
+    public function setBirthCertificate($file_path, Carbon $issue_date, $type = BirthCertificate::TYPE_ORIGINAL, ?Carbon $expiry_date = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
         if (!$loggedInUser->can('setDocs', $this)) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
-
+        
         try {
-            $this->birthCertificate()->firstOrCreate([], [
-                'created_by' => $loggedInUser->id,
-                'file_path' => $file_path,
-                'issue_date' => $issue_date,
-                'expiry_date' => $expiry_date,
-                'type' => $type,
-            ]);
+            $this->birthCertificate()->updateOrCreate(
+                [
+                    'employee_id' => $this->id,
+                ],
+                [
+                    'created_by' => $loggedInUser->id,
+                    'file_path' => $file_path,
+                    'issue_date' => $issue_date,
+                    'expiry_date' => $expiry_date,
+                    'type' => $type,
+                ],
+            );
+            return true;
         } catch (Exception $e) {
             report($e);
             throw new AppException('Error setting birth certificate');
@@ -104,13 +110,19 @@ class Employee extends Model
         }
 
         try {
-            $this->idCard()->firstOrCreate([], [
-                'created_by' => $loggedInUser->id,
-                'file_path' => $file_path,
-                'issue_date' => $issue_date,
-                'expiry_date' => $expiry_date,
-                'id_number' => $id_number,
-            ]);
+            $this->idCard()->updateOrCreate(
+                [
+                    'employee_id' => $this->id,
+                ],
+                [
+                    'created_by' => $loggedInUser->id,
+                    'file_path' => $file_path,
+                    'issue_date' => $issue_date,
+                    'expiry_date' => $expiry_date,
+                    'id_number' => $id_number,
+                ],
+            );
+            return true;
         } catch (Exception $e) {
             report($e);
             throw new AppException('Error setting ID card');
@@ -126,12 +138,18 @@ class Employee extends Model
         }
 
         try {
-            $this->driverLicense()->firstOrCreate([], [
-                'created_by' => $loggedInUser->id,
-                'file_path' => $file_path,
-                'issue_date' => $issue_date,
-                'expiry_date' => $expiry_date
-            ]);
+            $this->driverLicense()->updateOrCreate(
+                [
+                    'employee_id' => $this->id,
+                ],
+                [
+                    'created_by' => $loggedInUser->id,
+                    'file_path' => $file_path,
+                    'issue_date' => $issue_date,
+                    'expiry_date' => $expiry_date,
+                ],
+            );
+            return true;
         } catch (Exception $e) {
             report($e);
             throw new AppException('Error setting driver license');
@@ -147,13 +165,17 @@ class Employee extends Model
         }
 
         try {
-            $this->employeeContract()->firstOrCreate([
-                'issue_date' => $issue_date,
-            ], [
-                'created_by' => $loggedInUser->id,
-                'file_path' => $file_path,
-                'expiry_date' => $expiry_date
-            ]);
+            $this->employeeContract()->updateOrCreate(
+                [
+                    'issue_date' => $issue_date,
+                ],
+                [
+                    'created_by' => $loggedInUser->id,
+                    'file_path' => $file_path,
+                    'expiry_date' => $expiry_date,
+                ],
+            );
+            return true;
         } catch (Exception $e) {
             report($e);
             throw new AppException('Error setting employee contract');
@@ -169,13 +191,19 @@ class Employee extends Model
         }
 
         try {
-            $this->employeeS1Doc()->firstOrCreate([], [
-                'created_by' => $loggedInUser->id,
-                'file_path' => $file_path,
-                'issue_date' => $issue_date,
-                'expiry_date' => $expiry_date,
-                's1_number' => $s1_number,
-            ]);
+            $this->employeeS1Doc()->updateOrCreate(
+                [
+                    'employee_id' => $this->id,
+                ],
+                [
+                    'created_by' => $loggedInUser->id,
+                    'file_path' => $file_path,
+                    'issue_date' => $issue_date,
+                    'expiry_date' => $expiry_date,
+                    's1_number' => $s1_number,
+                ],
+            );
+            return true;
         } catch (Exception $e) {
             report($e);
             throw new AppException('Error setting employee S1 doc');
@@ -191,15 +219,16 @@ class Employee extends Model
         }
 
         try {
-            $this->employeeS2Doc()->firstOrCreate([
-                'year' => $year,
-            ], [
+            // Create a new record instead of updating existing one to support multiple S2 docs
+            $this->employeeS2Doc()->create([
                 'created_by' => $loggedInUser->id,
                 'file_path' => $file_path,
                 'issue_date' => $issue_date,
                 'expiry_date' => $expiry_date,
                 's2_amount' => $s2_amount,
+                'year' => $year,
             ]);
+            return true;
         } catch (Exception $e) {
             report($e);
             throw new AppException('Error setting employee S2 doc');
@@ -215,7 +244,8 @@ class Employee extends Model
         }
 
         try {
-            $this->employeeS6Doc()->firstOrCreate([], [
+            // Create a new record instead of updating existing one to support multiple S6 docs
+            $doc = $this->employeeS6Doc()->create([
                 'created_by' => $loggedInUser->id,
                 'file_path' => $file_path,
                 'issue_date' => $issue_date,
@@ -223,6 +253,7 @@ class Employee extends Model
                 's6_number' => $s6_number,
                 'leaving_reason' => $leaving_reason,
             ]);
+            return true;
         } catch (Exception $e) {
             report($e);
             throw new AppException('Error setting employee S6 doc');
@@ -238,12 +269,13 @@ class Employee extends Model
         }
 
         try {
-            $this->policeRecord()->firstOrCreate([], [
+            $this->policeRecords()->create([
                 'created_by' => $loggedInUser->id,
                 'file_path' => $file_path,
                 'issue_date' => $issue_date,
                 'expiry_date' => $expiry_date,
             ]);
+            return true;
         } catch (Exception $e) {
             report($e);
             throw new AppException('Error setting police record');
@@ -259,18 +291,104 @@ class Employee extends Model
         }
 
         try {
-            $this->hrLetters()->firstOrCreate([
+            $this->hrLetters()->create([
                 'created_by' => $loggedInUser->id,
                 'file_path' => $file_path,
                 'issue_date' => $issue_date,
                 'expiry_date' => $expiry_date,
             ]);
+            return true;
         } catch (Exception $e) {
             report($e);
             throw new AppException('Error setting hr letter');
         }
     }
-    
+
+    /**
+     * Update employee base information
+     *
+     * @param string $name
+     * @param string $email
+     * @param string $phone
+     * @param string $address
+     * @param string $nationality
+     * @param string $gender
+     * @param string|Carbon $birth_date
+     * @param string|Carbon $employment_date
+     * @return Employee
+     * @throws AppException
+     */
+    public function updateBaseInfo(string $name, string $email, string $phone, string $address, string $nationality, string $gender, $birth_date, $employment_date)
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('update', $this)) {
+            throw new AppException('You do not have permission to update this employee');
+        }
+
+        try {
+            $this->update([
+                'name' => $name,
+                'email' => $email,
+                'phone' => $phone,
+                'address' => $address,
+                'nationality' => $nationality,
+                'gender' => $gender,
+                'birth_date' => $birth_date,
+                'employment_date' => $employment_date,
+            ]);
+
+            return $this->fresh();
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException('Error updating employee base information: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Update or create employee information
+     *
+     * @param int $insurance_office_id
+     * @param string|null $insurance_number
+     * @param string|null $insurance_amount
+     * @param string|null $academic_qualification
+     * @param string|null $university
+     * @param int|null $graduation_year
+     * @param string|null $military_status
+     * @param string|null $marital_status
+     * @return EmployeeInfo
+     * @throws AppException
+     */
+    public function updateEmployeeInfo(int $insurance_office_id, ?string $insurance_number = null, ?string $insurance_amount = null, ?string $academic_qualification = null, ?string $university = null, ?int $graduation_year = null, ?string $military_status = null, ?string $marital_status = null)
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('update', $this)) {
+            throw new AppException('You do not have permission to update this employee information');
+        }
+
+        try {
+            $employeeInfo = $this->info()->updateOrCreate(
+                ['employee_id' => $this->id],
+                [
+                    'insurance_office_id' => $insurance_office_id,
+                    'insurance_number' => $insurance_number,
+                    'insurance_amount' => $insurance_amount,
+                    'academic_qualification' => $academic_qualification,
+                    'university' => $university,
+                    'graduation_year' => $graduation_year,
+                    'military_status' => $military_status,
+                    'marital_status' => $marital_status,
+                    'gender' => $this->gender, // Copy from employee
+                ],
+            );
+
+            return $employeeInfo;
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException('Error updating employee information: ' . $e->getMessage());
+        }
+    }
 
     //scopes
     public function scopeCurrent($query)
@@ -280,7 +398,6 @@ class Employee extends Model
             $query->whereNull('termination_date');
         });
     }
-
 
     ////relations
     public function user()

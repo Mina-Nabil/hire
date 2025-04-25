@@ -18,19 +18,60 @@ trait DocumentModel
         return pathinfo($this->file_path, PATHINFO_EXTENSION);
     }
 
-    public function getFilePathAttribute()
+    // public function getFilePathAttribute()
+    // {
+    //     return $this->file_path ? Storage::url($this->file_path) : "N/A";
+    // }
+
+    // public function getIssueDateAttribute()
+    // {
+    //     return $this->issue_date ? $this->issue_date->format('Y-m-d') : "N/A";
+    // }
+
+    // public function getExpiryDateAttribute()
+    // {
+    //     return $this->expiry_date ? $this->expiry_date->format('Y-m-d') : "N/A";
+    // }
+
+    /**
+     * Download the document file
+     *
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse|string
+     */
+    public function downloadFile()
     {
-        return $this->file_path ? Storage::url($this->file_path) : "N/A";
+        try {
+            if (!$this->file_path) {
+                throw new AppException('No file available for download');
+            }
+            
+            $filePath = str_replace('storage/', '', $this->getRawOriginal('file_path'));
+            
+            if (!Storage::disk('s3')->exists($filePath)) {
+                throw new AppException('File not found on storage');
+            }
+            
+            $fileName = basename($filePath);
+            
+            return Storage::disk('s3')->download($filePath, $fileName);
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
     }
 
-    public function getIssueDateAttribute()
+    public function getFilePathAttribute($value)
     {
-        return $this->issue_date ? $this->issue_date->format('Y-m-d') : "N/A";
+        return $value ? Storage::disk('s3')->url(str_replace('storage/', '', $value)) : "N/A";
     }
 
-    public function getExpiryDateAttribute()
+    public function getIssueDateAttribute($value)
     {
-        return $this->expiry_date ? $this->expiry_date->format('Y-m-d') : "N/A";
+        return $value ? date('Y-m-d', strtotime($value)) : "N/A";
+    }
+
+    public function getExpiryDateAttribute($value)
+    {
+        return $value ? date('Y-m-d', strtotime($value)) : "N/A";
     }
 
     public function getDaysLeftAttribute()

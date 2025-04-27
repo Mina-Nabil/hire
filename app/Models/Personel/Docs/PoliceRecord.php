@@ -2,6 +2,7 @@
 
 namespace App\Models\Personel\Docs;
 
+use App\Exceptions\AppException;
 use App\Traits\DocumentModel;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
@@ -36,6 +37,12 @@ class PoliceRecord extends Model
      */
     public function updateRecord($file_path, Carbon $issue_date, ?Carbon $expiry_date = null)
     {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('setDocs', $this->employee)) {
+            throw new AppException('You dont have permission to set docs for this employee');
+        }
+
         try {
             $this->update([
                 'file_path' => $file_path,
@@ -46,7 +53,29 @@ class PoliceRecord extends Model
             return true;
         } catch (\Exception $e) {
             report($e);
-            return false;
+            throw new AppException('Error updating police record');
+        }
+    }
+
+    /**
+     * Delete the record
+     * 
+     * @return bool
+     */
+    public function deleteRecord()
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('deleteDocs', $this->employee)) {
+            throw new AppException('You dont have permission to delete docs for this employee');
+        }
+
+        try {
+            $this->delete();
+            return true;
+        } catch (\Exception $e) {
+            report($e);
+            throw new AppException('Error deleting police record');
         }
     }
 }

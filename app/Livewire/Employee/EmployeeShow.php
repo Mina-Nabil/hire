@@ -7,6 +7,7 @@ use App\Models\Base\InsuranceOffice;
 use App\Models\Personel\Docs\ArmyServicePaper;
 use App\Models\Personel\Docs\BirthCertificate;
 use App\Models\Personel\Docs\EmployeeS6Doc;
+use App\Models\Personel\Docs\PoliceRecord;
 use App\Models\Personel\Employee;
 use App\Models\Personel\EmployeeInfo;
 use App\Models\Recruitment\Applicants\Applicant;
@@ -110,6 +111,14 @@ class EmployeeShow extends Component
     public $keep_existing_employee_s6_doc = false;
     public $employeeS6DocLeavingReasons;
     
+    // Employee Contract Modal
+    public $editEmployeeContractModal = false;
+    public $employee_contract_file;
+    public $employee_contract_issue_date;
+    public $employee_contract_expiry_date;
+    public $keep_existing_employee_contract = false;
+    public $editing_contract_id = null;
+    
     // Driver License Properties
     public $editDriverLicenseModal = false;
     public $keep_existing_driver_license = false;
@@ -123,7 +132,6 @@ class EmployeeShow extends Component
     public $police_record_file;
     public $police_record_issue_date;
     public $police_record_expiry_date;
-    public $editing_record_id = null;
 
     // HR Letter Properties
     public $editHrLetterModal = false;
@@ -131,6 +139,9 @@ class EmployeeShow extends Component
     public $hr_letter_file;
     public $hr_letter_issue_date;
     public $hr_letter_expiry_date;
+
+    // Common properties
+    public $editing_record_id = null;
 
     protected $rules = [
         // Base Info validation rules
@@ -191,6 +202,11 @@ class EmployeeShow extends Component
         'employee_s6_doc_issue_date' => 'required|date',
         'employee_s6_doc_expiry_date' => 'nullable|date|after:employee_s6_doc_issue_date',
 
+        // Employee Contract validation rules
+        'employee_contract_file' => 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
+        'employee_contract_issue_date' => 'required|date',
+        'employee_contract_expiry_date' => 'nullable|date|after:employee_contract_issue_date',
+
         // Driver License Rules
         'driver_license_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         'driver_license_issue_date' => 'required|date',
@@ -209,7 +225,7 @@ class EmployeeShow extends Component
 
     public function mount($id)
     {
-        $this->employee = Employee::with(['info', 'idCard', 'birthCertificate', 'armyServicePaper', 'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'policeRecords', 'hrLetters', 'driverLicense'])->findorFail($id);
+        $this->employee = Employee::with(['info', 'idCard', 'birthCertificate', 'armyServicePaper', 'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'policeRecords', 'hrLetters', 'driverLicense', 'contracts'])->findorFail($id);
         $this->insuranceOffices = InsuranceOffice::all();
         $this->militaryStatuses = Applicant::MILITARY_STATUS;
         $this->birthCertificateTypes = BirthCertificate::TYPES;
@@ -520,8 +536,8 @@ class EmployeeShow extends Component
         $this->editArmyServicePaperModal = true;
 
         if ($this->employee->armyServicePaper) {
-            $this->army_service_paper_issue_date = $this->employee->armyServicePaper->issue_date->format('Y-m-d');
-            $this->army_service_paper_expiry_date = $this->employee->armyServicePaper->expiry_date->format('Y-m-d');
+            $this->army_service_paper_issue_date = $this->employee->armyServicePaper->issue_date;
+            $this->army_service_paper_expiry_date = $this->employee->armyServicePaper->expiry_date;
         }
     }
     
@@ -707,6 +723,7 @@ class EmployeeShow extends Component
     {
         $this->resetValidation();
         $this->editEmployeeS2DocModal = true;
+        $this->editing_record_id = null;
         
         // Reset form fields for new record
         $this->s2_amount = null;
@@ -715,50 +732,110 @@ class EmployeeShow extends Component
         $this->employee_s2_doc_expiry_date = null;
     }
     
+    public function openEditSpecificS2DocModal($recordId)
+    {
+        $this->resetValidation();
+        $s2Doc = \App\Models\Personel\Docs\EmployeeS2Doc::findOrFail($recordId);
+        
+        if ($s2Doc->employee_id != $this->employee->id) {
+            $this->alertError('Invalid record');
+            return;
+        }
+        
+        $this->editing_record_id = $recordId;
+        $this->s2_amount = $s2Doc->s2_amount;
+        $this->s2_year = $s2Doc->year;
+        $this->employee_s2_doc_issue_date = $s2Doc->issue_date ? $s2Doc->issue_date : null;
+        $this->employee_s2_doc_expiry_date = $s2Doc->expiry_date ? $s2Doc->expiry_date : null;
+        $this->keep_existing_employee_s2_doc = true;
+        $this->editEmployeeS2DocModal = true;
+    }
+    
     public function closeEditEmployeeS2DocModal()
     {
         $this->editEmployeeS2DocModal = false;
         $this->employee_s2_doc_file = null;
         $this->keep_existing_employee_s2_doc = false;
+        $this->editing_record_id = null;
         $this->resetValidation();
     }
     
     public function updateEmployeeS2Doc()
     {
-        // Validation rules
-        $validationRules = [
-            'employee_s2_doc_file' => 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
-            's2_amount' => 'required|numeric|min:0',
-            's2_year' => 'required|integer|min:1900|max:2040',
-            'employee_s2_doc_issue_date' => 'required|date',
-            'employee_s2_doc_expiry_date' => 'nullable|date|after:employee_s2_doc_issue_date',
-        ];
+        // Different validation rules for updating vs creating
+        if ($this->editing_record_id && $this->keep_existing_employee_s2_doc) {
+            $validationRules = [
+                's2_amount' => 'required|numeric|min:0',
+                's2_year' => 'required|integer|min:1900|max:2040',
+                'employee_s2_doc_issue_date' => 'required|date',
+                'employee_s2_doc_expiry_date' => 'nullable|date|after:employee_s2_doc_issue_date',
+            ];
+        } else {
+            $validationRules = [
+                'employee_s2_doc_file' => 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
+                's2_amount' => 'required|numeric|min:0',
+                's2_year' => 'required|integer|min:1900|max:2040',
+                'employee_s2_doc_issue_date' => 'required|date',
+                'employee_s2_doc_expiry_date' => 'nullable|date|after:employee_s2_doc_issue_date',
+            ];
+        }
 
         // Validation rules
         $this->validate($validationRules);
 
         try {
-            // Upload file to S3
-            $path = $this->employee_s2_doc_file->store(Employee::FILES_DIRECTORY.'/employee_s2_docs', 's3');
-            
-            // Update employee S2 doc - always create a new record for S2
-            $res = $this->employee->setEmployeeS2Doc(
-                $path,
-                Carbon::parse($this->employee_s2_doc_issue_date),
-                $this->employee_s2_doc_expiry_date ? Carbon::parse($this->employee_s2_doc_expiry_date) : null,
-                $this->s2_amount,
-                $this->s2_year
-            );
-
-            if ($res) {
-                $this->closeEditEmployeeS2DocModal();
-                $this->alertSuccess('Employee S2 doc added successfully!');
+            if ($this->editing_record_id) {
+                // Editing existing record
+                $s2Doc = \App\Models\Personel\Docs\EmployeeS2Doc::findOrFail($this->editing_record_id);
                 
-                // Refresh employee data
-                $this->employee = Employee::with(['info', 'idCard', 'birthCertificate', 'armyServicePaper', 'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc'])->findOrFail($this->employee->id);
+                $path = null;
+                if ($this->keep_existing_employee_s2_doc) {
+                    // Keep existing file path
+                    $path = $s2Doc->getRawOriginal('file_path');
+                } else {
+                    // Delete existing file if it exists
+                    $existingFilePath = str_replace('storage/', '', $s2Doc->getRawOriginal('file_path'));
+                    if (Storage::disk('s3')->exists($existingFilePath)) {
+                        Storage::disk('s3')->delete($existingFilePath);
+                    }
+                    // Upload file to S3
+                    $path = $this->employee_s2_doc_file->store(Employee::FILES_DIRECTORY.'/employee_s2_docs', 's3');
+                }
+                
+                // Update existing record using the updateRecord method
+                $res = $s2Doc->updateRecord(
+                    $path,
+                    Carbon::parse($this->employee_s2_doc_issue_date),
+                    $this->employee_s2_doc_expiry_date ? Carbon::parse($this->employee_s2_doc_expiry_date) : null,
+                    $this->s2_amount,
+                    $this->s2_year
+                );
+                
+                $this->closeEditEmployeeS2DocModal();
+                $this->alertSuccess('Employee S2 doc updated successfully!');
             } else {
-                $this->alertError();
+                // Creating a new record
+                $path = $this->employee_s2_doc_file->store(Employee::FILES_DIRECTORY.'/employee_s2_docs', 's3');
+                
+                // Update employee S2 doc - always create a new record for S2
+                $res = $this->employee->setEmployeeS2Doc(
+                    $path,
+                    Carbon::parse($this->employee_s2_doc_issue_date),
+                    $this->employee_s2_doc_expiry_date ? Carbon::parse($this->employee_s2_doc_expiry_date) : null,
+                    $this->s2_amount,
+                    $this->s2_year
+                );
+
+                if ($res) {
+                    $this->closeEditEmployeeS2DocModal();
+                    $this->alertSuccess('Employee S2 doc added successfully!');
+                } else {
+                    $this->alertError();
+                }
             }
+            
+            // Refresh employee data
+            $this->employee = Employee::with(['info', 'idCard', 'birthCertificate', 'armyServicePaper', 'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'contracts'])->findOrFail($this->employee->id);
         } catch (\Exception $e) {
             $this->alertError($e->getMessage());
         }
@@ -797,17 +874,21 @@ class EmployeeShow extends Component
     public function openEditEmployeeS6DocModal()
     {
         $this->resetValidation();
-        $this->editEmployeeS6DocModal = true;
-
-        // Reset form fields for new record
-        $this->s6_number = null;
-        $this->employee_s6_doc_issue_date = date('Y-m-d');
-        $this->employee_s6_doc_expiry_date = null;
+        $s6Doc = $this->employee->employeeS6Doc()->first();
         
-        // Set default leaving reason if available
-        if (count($this->employeeS6DocLeavingReasons) > 0) {
-            $this->leaving_reason = $this->employeeS6DocLeavingReasons[0];
+        if ($s6Doc->employee_id != $this->employee->id) {
+            $this->alertError('Invalid record');
+            return;
         }
+        
+        if ($s6Doc) {
+        $this->s6_number = $s6Doc->s6_number;
+        $this->leaving_reason = $s6Doc->leaving_reason;
+        $this->employee_s6_doc_issue_date = $s6Doc->issue_date ? $s6Doc->issue_date : null;
+        $this->employee_s6_doc_expiry_date = $s6Doc->expiry_date ? $s6Doc->expiry_date : null;
+        $this->keep_existing_employee_s6_doc = true;
+        }
+        $this->editEmployeeS6DocModal = true;
     }
     
     public function closeEditEmployeeS6DocModal()
@@ -815,28 +896,50 @@ class EmployeeShow extends Component
         $this->editEmployeeS6DocModal = false;
         $this->employee_s6_doc_file = null;
         $this->keep_existing_employee_s6_doc = false;
+        $this->editing_record_id = null;
         $this->resetValidation();
     }
     
     public function updateEmployeeS6Doc()
     {
-        // Create validation rules array with the dynamic validation for leaving_reason
-        $validationRules = [
-            'employee_s6_doc_file' => 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
-            's6_number' => 'required|string|max:50',
-            'leaving_reason' => 'required|string|in:' . implode(',', \App\Models\Personel\Docs\EmployeeS6Doc::LEAVING_REASONS),
-            'employee_s6_doc_issue_date' => 'required|date',
-            'employee_s6_doc_expiry_date' => 'nullable|date|after:employee_s6_doc_issue_date',
-        ];
-
-        // Validation rules
-        $this->validate($validationRules);
+        // Validation rules change when keeping existing file
+        if ($this->keep_existing_employee_s6_doc && $this->employee->employeeS6Doc()->first()) {
+            $this->validate([
+                's6_number' => 'required|string|max:50',
+                'leaving_reason' => 'required|string|in:' . implode(',', \App\Models\Personel\Docs\EmployeeS6Doc::LEAVING_REASONS),
+                'employee_s6_doc_issue_date' => 'required|date',
+                'employee_s6_doc_expiry_date' => 'nullable|date|after:employee_s6_doc_issue_date',
+            ]);
+        } else {
+            $this->validate([
+                'employee_s6_doc_file' => 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
+                's6_number' => 'required|string|max:50',
+                'leaving_reason' => 'required|string|in:' . implode(',', \App\Models\Personel\Docs\EmployeeS6Doc::LEAVING_REASONS),
+                'employee_s6_doc_issue_date' => 'required|date',
+                'employee_s6_doc_expiry_date' => 'nullable|date|after:employee_s6_doc_issue_date',
+            ]);
+        }
 
         try {
-            // Upload file to S3
-            $path = $this->employee_s6_doc_file->store(Employee::FILES_DIRECTORY.'/employee_s6_docs', 's3');
+            // Get existing file path
+            $path = null;
             
-            // Update employee S6 doc - always create a new record
+            if ($this->keep_existing_employee_s6_doc && $this->employee->employeeS6Doc()->first()) {
+                // Keep existing file path
+                $path = $this->employee->employeeS6Doc()->first()->getRawOriginal('file_path');
+            } else {
+                // Delete existing S6 doc file if it exists
+                if ($this->employee->employeeS6Doc()->first() && $this->employee->employeeS6Doc()->first()->file_path) {
+                    $existingFilePath = str_replace('storage/', '', $this->employee->employeeS6Doc()->first()->getRawOriginal('file_path'));
+                    if (Storage::disk('s3')->exists($existingFilePath)) {
+                        Storage::disk('s3')->delete($existingFilePath);
+                    }
+                }
+                // Upload file to S3
+                $path = $this->employee_s6_doc_file->store(Employee::FILES_DIRECTORY.'/employee_s6_docs', 's3');
+            }
+            
+            // Update employee S6 doc
             $res = $this->employee->setEmployeeS6Doc(
                 $path,
                 Carbon::parse($this->employee_s6_doc_issue_date),
@@ -847,7 +950,7 @@ class EmployeeShow extends Component
 
             if ($res) {
                 $this->closeEditEmployeeS6DocModal();
-                $this->alertSuccess('Employee S6 doc added successfully!');
+                $this->alertSuccess('Employee S6 doc updated successfully!');
                 
                 // Refresh employee data
                 $this->employee = Employee::with(['info', 'idCard', 'birthCertificate', 'armyServicePaper', 'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc'])->findOrFail($this->employee->id);
@@ -886,6 +989,140 @@ class EmployeeShow extends Component
                 'message' => 'Error downloading document: ' . $e->getMessage()
             ]);
         }
+    }
+
+    public function openEditEmployeeContractModal()
+    {
+        $this->resetValidation();
+        $this->editEmployeeContractModal = true;
+        $this->editing_contract_id = null;
+
+        if ($this->employee->contracts && $this->employee->contracts->count() > 0) {
+            $this->employee_contract_issue_date = date('Y-m-d');
+            $this->employee_contract_expiry_date = null;
+        }
+    }
+
+    public function openEditSpecificContractModal($contractId)
+    {
+        $this->resetValidation();
+        $contract = \App\Models\Personel\Docs\EmployeeContract::findOrFail($contractId);
+        
+        if ($contract->employee_id != $this->employee->id) {
+            $this->alertError('Invalid record');
+            return;
+        }
+        
+        $this->editing_contract_id = $contractId;
+        $this->employee_contract_issue_date = $contract->issue_date ? $contract->issue_date : null;
+        $this->employee_contract_expiry_date = $contract->expiry_date ? $contract->expiry_date : null;
+        $this->keep_existing_employee_contract = true;
+        $this->editEmployeeContractModal = true;
+    }
+    
+    public function closeEditEmployeeContractModal()
+    {
+        $this->editEmployeeContractModal = false;
+        $this->resetEmployeeContractFields();
+    }
+
+    private function resetEmployeeContractFields()
+    {
+        $this->reset([
+            'keep_existing_employee_contract',
+            'employee_contract_file',
+            'employee_contract_issue_date',
+            'employee_contract_expiry_date',
+            'editing_contract_id'
+        ]);
+    }
+
+    public function updateEmployeeContract()
+    {
+        $validationRules = [
+            'employee_contract_issue_date' => 'required|date',
+            'employee_contract_expiry_date' => 'nullable|date',
+        ];
+
+        if (!$this->keep_existing_employee_contract) {
+            $validationRules['employee_contract_file'] = 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif';
+        }
+
+        $this->validate($validationRules);
+
+        try {
+            $path = null;
+            if (!$this->keep_existing_employee_contract && $this->employee_contract_file) {
+                $path = $this->employee_contract_file->store(Employee::FILES_DIRECTORY.'/employee_contracts', 's3');
+            } else if ($this->keep_existing_employee_contract && $this->editing_contract_id) {
+                $existingRecord = \App\Models\Personel\Docs\EmployeeContract::findOrFail($this->editing_contract_id);
+                $path = $existingRecord->getRawOriginal('file_path');
+            } else if ($this->keep_existing_employee_contract && $this->employee->contracts->count() > 0) {
+                $path = $this->employee->contracts->last()->getRawOriginal('file_path');
+            }
+
+            // If editing an existing record
+            if ($this->editing_contract_id) {
+                $employeeContract = \App\Models\Personel\Docs\EmployeeContract::findOrFail($this->editing_contract_id);
+                $res = $employeeContract->updateRecord(
+                    $path,
+                    Carbon::parse($this->employee_contract_issue_date),
+                    $this->employee_contract_expiry_date ? Carbon::parse($this->employee_contract_expiry_date) : null
+                );
+            } else {
+                // Creating a new record
+                $res = $this->employee->setEmployeeContract(
+                    $path,
+                    Carbon::parse($this->employee_contract_issue_date),
+                    $this->employee_contract_expiry_date ? Carbon::parse($this->employee_contract_expiry_date) : null
+                );
+            }
+
+            if ($res) {
+                $this->alertSuccess('Employee contract updated successfully!');
+                $this->closeEditEmployeeContractModal();
+                
+                // Refresh employee data
+                $this->employee = Employee::with(['info', 'idCard', 'birthCertificate', 'armyServicePaper', 'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'policeRecords', 'hrLetters', 'driverLicense', 'contracts'])->findOrFail($this->employee->id);
+            } else {
+                $this->alertError();
+            }
+        } catch (\Exception $e) {
+            $this->alertError($e->getMessage());
+        }
+    }
+
+    public function downloadEmployeeContract($docId = null)
+    {
+        try {
+            if ($docId) {
+                // Find the specific Employee Contract by ID
+                $employeeContract = \App\Models\Personel\Docs\EmployeeContract::findOrFail($docId);
+                if ($employeeContract->employee_id != $this->employee->id) {
+                    throw new \Exception('Document not associated with this employee');
+                }
+                return $employeeContract->downloadFile();
+            } else {
+                // Fallback to download the first doc if no ID provided
+                if ($this->employee->contracts->count() > 0) {
+                    return $this->employee->contracts->first()->downloadFile();
+                }
+            }
+            
+            $this->alertError('No employee contract found.');
+        } catch (\Exception $e) {
+            $this->alertError('Error downloading document: ' . $e->getMessage());
+        }
+    }
+
+    public function deleteEmployeeContractModal($recordId)
+    {
+        $employeeContract = \App\Models\Personel\Docs\EmployeeContract::findOrFail($recordId);
+        $employeeContract->deleteRecord();
+        $this->alertSuccess('Employee contract deleted successfully!');
+        
+        // Refresh employee data
+        $this->employee = Employee::with(['info', 'idCard', 'birthCertificate', 'armyServicePaper', 'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'policeRecords', 'hrLetters', 'driverLicense', 'contracts'])->findOrFail($this->employee->id);
     }
 
     public function openEditDriverLicenseModal()
@@ -956,6 +1193,8 @@ class EmployeeShow extends Component
     }
 
     // Police Record Edit Methods
+
+    protected $listeners = ['deletePoliceRecordModal', 'deleteHrLetterModal', 'deleteEmployeeS2DocModal', 'deleteEmployeeS6DocModal', 'deleteEmployeeContractModal'];
     public function openEditPoliceRecordModal()
     {
         $this->resetValidation();
@@ -1001,7 +1240,7 @@ class EmployeeShow extends Component
     {
         $validationRules = [
             'police_record_issue_date' => 'required|date',
-            'police_record_expiry_date' => 'nullable|date',
+            'police_record_expiry_date' => 'nullable|date|after:police_record_issue_date',
         ];
 
         if (!$this->keep_existing_police_record) {
@@ -1052,6 +1291,16 @@ class EmployeeShow extends Component
         }
     }
 
+    public function deletePoliceRecordModal($recordId)
+    {
+        $policeRecord = PoliceRecord::findOrFail($recordId);
+        $policeRecord->deleteRecord();
+        $this->alertSuccess('Police record deleted successfully!');
+        
+        // Refresh employee data
+        $this->employee = Employee::with(['info', 'idCard', 'birthCertificate', 'armyServicePaper', 'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'policeRecords', 'hrLetters', 'driverLicense'])->findOrFail($this->employee->id);
+    }
+
     public function downloadPoliceRecord($docId = null)
     {
         try {
@@ -1095,8 +1344,8 @@ class EmployeeShow extends Component
         }
         
         $this->editing_record_id = $recordId;
-        $this->hr_letter_issue_date = $hrLetter->issue_date->format('Y-m-d');
-        $this->hr_letter_expiry_date = $hrLetter->expiry_date ? $hrLetter->expiry_date->format('Y-m-d') : null;
+        $this->hr_letter_issue_date = $hrLetter->issue_date;
+        $this->hr_letter_expiry_date = $hrLetter->expiry_date ? $hrLetter->expiry_date : null;
         $this->editHrLetterModal = true;
     }
 
@@ -1192,6 +1441,48 @@ class EmployeeShow extends Component
             $this->alertError('No HR letter found.');
         } catch (\Exception $e) {
             $this->alertError('Error downloading document: ' . $e->getMessage());
+        }
+    }
+
+    public function deleteHrLetterModal($recordId)
+    {
+        $hrLetter = \App\Models\Personel\Docs\HrLetter::findOrFail($recordId);
+        $hrLetter->deleteRecord();
+        $this->alertSuccess('HR letter deleted successfully!');
+        
+        // Refresh employee data
+        $this->employee = Employee::with(['info', 'idCard', 'birthCertificate', 'armyServicePaper', 'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'policeRecords', 'hrLetters', 'driverLicense'])->findOrFail($this->employee->id);
+    }
+
+    public function deleteEmployeeS2DocModal($recordId)
+    {
+        $s2Doc = \App\Models\Personel\Docs\EmployeeS2Doc::findOrFail($recordId);
+        
+        try {
+            // Delete the S2 document
+            $s2Doc->delete();
+            $this->alertSuccess('Employee S2 document deleted successfully!');
+            
+            // Refresh employee data
+            $this->employee = Employee::with(['info', 'idCard', 'birthCertificate', 'armyServicePaper', 'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'policeRecords', 'hrLetters', 'driverLicense'])->findOrFail($this->employee->id);
+        } catch (\Exception $e) {
+            $this->alertError('Error deleting Employee S2 document: ' . $e->getMessage());
+        }
+    }
+
+    public function deleteEmployeeS6DocModal($recordId)
+    {
+        $s6Doc = \App\Models\Personel\Docs\EmployeeS6Doc::findOrFail($recordId);
+        
+        try {
+            // Delete the S6 document
+            $s6Doc->delete();
+            $this->alertSuccess('Employee S6 document deleted successfully!');
+            
+            // Refresh employee data
+            $this->employee = Employee::with(['info', 'idCard', 'birthCertificate', 'armyServicePaper', 'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'policeRecords', 'hrLetters', 'driverLicense'])->findOrFail($this->employee->id);
+        } catch (\Exception $e) {
+            $this->alertError('Error deleting Employee S6 document: ' . $e->getMessage());
         }
     }
 

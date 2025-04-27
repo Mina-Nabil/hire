@@ -71,7 +71,7 @@ trait DocumentModel
 
     public function getExpiryDateAttribute($value)
     {
-        return $value ? date('Y-m-d', strtotime($value)) : "N/A";
+        return $value ? date('Y-m-d', strtotime($value)) : null;
     }
 
     public function getDaysLeftAttribute()
@@ -80,6 +80,35 @@ trait DocumentModel
         return $this->expiry_date ? $this->expiry_date->diffInDays($now) : null;
     }
 
+    /**
+     * Check if the document is currently valid
+     * 
+     * @return bool
+     */
+    public function isValid()
+    {
+        $now = Carbon::now();
+        
+        // Document is valid if today is after or equal to issue date
+        $isAfterIssueDate = $this->issue_date ? $now->greaterThanOrEqualTo($this->issue_date) : true;
+        
+        // Document is valid if today is before or equal to expiry date (or if there's no expiry date)
+        $isBeforeExpiryDate = $this->expiry_date ? $now->lessThanOrEqualTo($this->expiry_date) : true;
+        
+        return $isAfterIssueDate && $isBeforeExpiryDate;
+    }
+
+    public function isExpired()
+    {
+        $now = Carbon::now();
+        return $this->expiry_date ? $now->greaterThan($this->expiry_date) : false;
+    }
+
+    public function isExpiringSoon()
+    {
+        $now = Carbon::now();
+        return $this->expiry_date ? $now->diffInDays($this->expiry_date) <= 30 : false;
+    }
 
 
     ////relations

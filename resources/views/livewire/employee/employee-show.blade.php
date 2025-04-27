@@ -42,6 +42,17 @@
                             class="block py-[8px] p-6  {{ $section == 'id_card' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
                                 ID Card
+                                <span>
+                                    @if ($employee->checkIDCardStatus()['status'] === 'valid')
+                                        <span class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                    @elseif($employee->checkIDCardStatus()['status'] === 'near_expiry')
+                                        <span class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near Expiry</span>
+                                    @elseif($employee->checkIDCardStatus()['status'] === 'expired')
+                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                    @elseif($employee->checkIDCardStatus()['status'] === 'missing')
+                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                    @endif
+                                </span>
 
                                 @if ($section == 'id_card')
                                     <div class="flex-none">
@@ -59,6 +70,17 @@
                             class="block py-[8px] p-6  {{ $section == 'birth_certificate' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
                                 Birth Certificate
+                                <span>
+                                    @if ($employee->checkBirthCertificateStatus()['status'] === 'valid')
+                                        <span class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                    @elseif($employee->checkBirthCertificateStatus()['status'] === 'near_expiry')
+                                        <span class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near Expiry</span>
+                                    @elseif($employee->checkBirthCertificateStatus()['status'] === 'expired')
+                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                    @elseif($employee->checkBirthCertificateStatus()['status'] === 'missing')
+                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                    @endif
+                                </span>
 
                                 @if ($section == 'birth_certificate')
                                     <div class="flex-none">
@@ -76,6 +98,17 @@
                             class="block py-[8px] p-6  {{ $section == 'army_service_paper' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
                                 Army Service Paper
+                                <span>
+                                    @if ($employee->checkArmyServicePaperStatus()['status'] === 'valid')
+                                        <span class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                    @elseif($employee->checkArmyServicePaperStatus()['status'] === 'near_expiry')
+                                        <span class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near Expiry</span>
+                                    @elseif($employee->checkArmyServicePaperStatus()['status'] === 'expired')
+                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                    @elseif($employee->checkArmyServicePaperStatus()['status'] === 'missing')
+                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                    @endif
+                                </span>
 
                                 @if ($section == 'army_service_paper')
                                     <div class="flex-none">
@@ -93,6 +126,17 @@
                             class="block py-[8px] p-6  {{ $section == 'driver_license' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
                                 Driver License
+                                <span>
+                                    @if ($employee->checkDriverLicenseStatus()['status'] === 'valid')
+                                        <span class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                    @elseif($employee->checkDriverLicenseStatus()['status'] === 'near_expiry')
+                                        <span class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near Expiry</span>
+                                    @elseif($employee->checkDriverLicenseStatus()['status'] === 'expired')
+                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                    @elseif($employee->checkDriverLicenseStatus()['status'] === 'missing')
+                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                    @endif
+                                </span>
 
                                 @if ($section == 'driver_license')
                                     <div class="flex-none">
@@ -110,6 +154,17 @@
                             class="block py-[8px] p-6  {{ $section == 'employee_contract' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
                                 Employee Contract
+                                <span>
+                                    @if ($employee->checkContractStatus()['status'] === 'valid')
+                                        <span class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                    @elseif($employee->checkContractStatus()['status'] === 'near_expiry')
+                                        <span class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near Expiry</span>
+                                    @elseif($employee->checkContractStatus()['status'] === 'expired')
+                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                    @elseif($employee->checkContractStatus()['status'] === 'missing')
+                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                    @endif
+                                </span>
 
                                 @if ($section == 'employee_contract')
                                     <div class="flex-none">
@@ -127,6 +182,18 @@
                             class="block py-[8px] p-6  {{ $section == 'employee_s1_doc' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
                                 Employee S1 Doc
+                                <span>
+                                    
+                                    @if ($employee->checkS1DocStatus()['status'] === 'valid')
+                                        <span class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                    @elseif($employee->checkS1DocStatus()['status'] === 'near_expiry')
+                                        <span class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near Expiry</span>
+                                    @elseif($employee->checkS1DocStatus()['status'] === 'expired')
+                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                    @elseif($employee->checkS1DocStatus()['status'] === 'missing')
+                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                    @endif
+                                </span>
 
                                 @if ($section == 'employee_s1_doc')
                                     <div class="flex-none">
@@ -144,6 +211,17 @@
                             class="block py-[8px] p-6  {{ $section == 'employee_s2_doc' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
                                 Employee S2 Doc
+                                <span>
+                                    @if ($employee->checkS2DocsStatus()['status'] === 'valid')
+                                        <span class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                    @elseif($employee->checkS2DocsStatus()['status'] === 'near_expiry')
+                                        <span class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near Expiry</span>
+                                    @elseif($employee->checkS2DocsStatus()['status'] === 'expired')
+                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                    @elseif($employee->checkS2DocsStatus()['status'] === 'missing')
+                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                    @endif
+                                </span>
 
                                 @if ($section == 'employee_s2_doc')
                                     <div class="flex-none">
@@ -161,6 +239,17 @@
                             class="block py-[8px] p-6  {{ $section == 'employee_s6_doc' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
                                 Employee S6 Doc
+                                <span>
+                                @if ($employee->checkS6DocsStatus()['status'] === 'valid')
+                                    <span class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                @elseif($employee->checkS6DocsStatus()['status'] === 'near_expiry')
+                                    <span class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near Expiry</span>
+                                @elseif($employee->checkS6DocsStatus()['status'] === 'expired')
+                                    <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                @elseif($employee->checkS6DocsStatus()['status'] === 'missing')
+                                    <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                @endif
+                                </span>
 
                                 @if ($section == 'employee_s6_doc')
                                     <div class="flex-none">
@@ -177,8 +266,18 @@
                         <li wire:click="changeSection('police_record')"
                             class="block py-[8px] p-6  {{ $section == 'police_record' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                Police Record
-
+                                Police Record 
+                                <span>
+                                @if ($employee->checkPoliceRecordStatus()['status'] === 'valid')
+                                    <span class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                @elseif($employee->checkPoliceRecordStatus()['status'] === 'near_expiry')
+                                    <span class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near Expiry</span>
+                                @elseif($employee->checkPoliceRecordStatus()['status'] === 'expired')
+                                    <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                @elseif($employee->checkPoliceRecordStatus()['status'] === 'missing')
+                                    <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                @endif
+                                </span>
                                 @if ($section == 'police_record')
                                     <div class="flex-none">
                                         <button type="button"
@@ -195,6 +294,17 @@
                             class="block py-[8px] p-6  {{ $section == 'hr_letter' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
                                 HR Letter
+                                <span>
+                                    @if ($employee->checkHrLettersStatus()['status'] === 'valid')
+                                        <span class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                    @elseif($employee->checkHrLettersStatus()['status'] === 'near_expiry')
+                                        <span class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near Expiry</span>
+                                    @elseif($employee->checkHrLettersStatus()['status'] === 'expired')
+                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                    @elseif($employee->checkHrLettersStatus()['status'] === 'missing')
+                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                    @endif
+                                </span>
 
                                 @if ($section == 'hr_letter')
                                     <div class="flex-none">
@@ -646,9 +756,9 @@
                     </div>
                 </div>
             @elseif ($section === 'driver_license')
-            <div class="card">
-                <div class="card-header flex justify-between items-center">
-                    <h4
+                <div class="card">
+                    <div class="card-header flex justify-between items-center">
+                        <h4
                             class="font-medium lg:text-2xl text-xl capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
                             Driver License Information
                         </h4>
@@ -660,508 +770,751 @@
                     </div>
                     <div class="card-body p-6">
                         @if ($employee->driverLicense)
-                        <div class="grid grid-cols-12 gap-5 pb-5">
-                            <div class="xl:col-span-6 lg:col-span-6 md:col-span-6 col-span-12">
-                                <div class="mb-5 text-wrap">
-                                    <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Issue
-                                        Date</label>
-                                    <div class="text-base text-slate-900 dark:text-white">
-                                        {{ $employee->driverLicense->issue_date }}
-                                    </div>
-                                </div>
-                                @if ($employee->driverLicense->expiry_date)
+                            <div class="grid grid-cols-12 gap-5 pb-5">
+                                <div class="xl:col-span-6 lg:col-span-6 md:col-span-6 col-span-12">
                                     <div class="mb-5 text-wrap">
-                                        <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Expiry
+                                        <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Issue
                                             Date</label>
                                         <div class="text-base text-slate-900 dark:text-white">
-                                            {{ $employee->driverLicense->expiry_date }}
+                                            {{ $employee->driverLicense->issue_date }}
                                         </div>
                                     </div>
-                                @endif
-                            </div>
-                            <div class="xl:col-span-6 lg:col-span-6 md:col-span-6 col-span-12">
-                                <div class="mb-5 text-wrap">
-                                    <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Document</label>
-                                    <div class="mt-3">
-                                        @php
-                                            $fileExt = $this->getFileExtension(
-                                                $employee->driverLicense->file_path,
-                                            );
-                                        @endphp
-
-                                        @if ($fileExt == 'pdf')
-                                            <!-- PDF Preview -->
-                                            <div class="border border-slate-200 rounded-md p-2">
-                                                <iframe src="{{ $employee->driverLicense->file_path }}"
-                                                    width="100%" height="400" class="border-0"></iframe>
+                                    @if ($employee->driverLicense->expiry_date)
+                                        <div class="mb-5 text-wrap">
+                                            <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Expiry
+                                                Date</label>
+                                            <div class="text-base text-slate-900 dark:text-white">
+                                                {{ $employee->driverLicense->expiry_date }}
                                             </div>
-                                        @else
-                                            <!-- Image Preview -->
-                                            <div class="mb-3">
-                                                <img src="{{ $employee->driverLicense->file_path }}"
-                                                    alt="Driver License"
-                                                    class="max-w-full h-auto rounded-md shadow-sm">
-                                            </div>
-                                        @endif
-
-                                        <!-- Download Button -->
-                                        <button wire:click="downloadDriverLicense" type="button"
-                                            class="btn btn-dark btn-sm mt-2" style="min-width: 150px;">
-                                            <span class="inline-flex justify-center" wire:loading.remove
-                                                wire:target="downloadDriverLicense">
-                                                <iconify-icon icon="fluent:arrow-download-28-filled"
-                                                    class="mr-1" width="18" height="18"></iconify-icon>
-                                                Download Document
-                                            </span>
-                                            <iconify-icon wire:loading wire:target="downloadDriverLicense"
-                                                icon="line-md:loading-twotone-loop" width="18"
-                                                height="18"></iconify-icon>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @else
-                        <div class="text-center py-5">
-                            <div class="mb-5">
-                                <iconify-icon icon="mingcute:document-line" width="60" height="60"
-                                    class="text-slate-400"></iconify-icon>
-                            </div>
-                            <h5 class="text-xl font-semibold mb-4">No Driver License Found</h5>
-                            <p class="text-slate-500 mb-5">Please upload a driver license for this employee</p>
-                            <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
-                                wire:click="openEditDriverLicenseModal">
-                                <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
-                                    class="mr-1"></iconify-icon>
-                                Upload Driver License
-                            </button>
-                        </div>
-                    @endif
-                </div>
-            </div>
-            @elseif ($section === 'employee_s1_doc')
-            <div class="card">
-                <div class="card-header flex justify-between items-center">
-                    <h4 class="font-medium lg:text-2xl text-xl capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
-                        Employee S1 Doc Information
-                    </h4>
-
-                    <button type="button" class="text-slate-900 dark:text-white"
-                        wire:click="openEditEmployeeS1DocModal">
-                        <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
-                    </button>
-                </div>
-                <div class="card-body p-6">
-                    @if ($employee->employeeS1Doc)
-                    <div class="grid grid-cols-12 gap-5 pb-5">
-                        <div class="xl:col-span-6 lg:col-span-6 md:col-span-6 col-span-12">
-                            <div class="mb-5 text-wrap">
-                                <label class="text-xs text-slate-500 dark:text-slate-400 m-0">S1 Number</label>
-                                <div class="text-base text-slate-900 dark:text-white">
-                                    {{ $employee->employeeS1Doc->s1_number }}
-                                </div>
-                            </div>
-                            <div class="mb-5 text-wrap">
-                                <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Issue Date</label>
-                                <div class="text-base text-slate-900 dark:text-white">
-                                    {{ $employee->employeeS1Doc->issue_date }}
-                                </div>
-                            </div>
-                            @if ($employee->employeeS1Doc->expiry_date)
-                                <div class="mb-5 text-wrap">
-                                    <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Expiry Date</label>
-                                    <div class="text-base text-slate-900 dark:text-white">
-                                        {{ $employee->employeeS1Doc->expiry_date }}
-                                    </div>
-                                </div>
-                            @endif
-                        </div>
-                        <div class="xl:col-span-6 lg:col-span-6 md:col-span-6 col-span-12">
-                            <div class="mb-5 text-wrap">
-                                <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Document</label>
-                                <div class="mt-3">
-                                    @php
-                                        $fileExt = $this->getFileExtension(
-                                            $employee->employeeS1Doc->file_path,
-                                        );
-                                    @endphp
-
-                                    @if ($fileExt == 'pdf')
-                                        <!-- PDF Preview -->
-                                        <div class="border border-slate-200 rounded-md p-2">
-                                            <iframe src="{{ $employee->employeeS1Doc->file_path }}"
-                                                width="100%" height="400" class="border-0"></iframe>
-                                        </div>
-                                    @else
-                                        <!-- Image Preview -->
-                                        <div class="mb-3">
-                                            <img src="{{ $employee->employeeS1Doc->file_path }}"
-                                                alt="Employee S1 Doc"
-                                                class="max-w-full h-auto rounded-md shadow-sm">
                                         </div>
                                     @endif
+                                </div>
+                                <div class="xl:col-span-6 lg:col-span-6 md:col-span-6 col-span-12">
+                                    <div class="mb-5 text-wrap">
+                                        <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Document</label>
+                                        <div class="mt-3">
+                                            @php
+                                                $fileExt = $this->getFileExtension($employee->driverLicense->file_path);
+                                            @endphp
 
-                                    <!-- Download Button -->
-                                    <button wire:click="downloadEmployeeS1Doc" type="button"
-                                        class="btn btn-dark btn-sm mt-2" style="min-width: 150px;">
-                                        <span class="inline-flex justify-center" wire:loading.remove
-                                            wire:target="downloadEmployeeS1Doc">
-                                            <iconify-icon icon="fluent:arrow-download-28-filled"
-                                                class="mr-1" width="18" height="18"></iconify-icon>
-                                            Download Document
-                                        </span>
-                                        <iconify-icon wire:loading wire:target="downloadEmployeeS1Doc"
-                                            icon="line-md:loading-twotone-loop" width="18"
-                                            height="18"></iconify-icon>
-                                    </button>
+                                            @if ($fileExt == 'pdf')
+                                                <!-- PDF Preview -->
+                                                <div class="border border-slate-200 rounded-md p-2">
+                                                    <iframe src="{{ $employee->driverLicense->file_path }}"
+                                                        width="100%" height="400" class="border-0"></iframe>
+                                                </div>
+                                            @else
+                                                <!-- Image Preview -->
+                                                <div class="mb-3">
+                                                    <img src="{{ $employee->driverLicense->file_path }}"
+                                                        alt="Driver License"
+                                                        class="max-w-full h-auto rounded-md shadow-sm">
+                                                </div>
+                                            @endif
+
+                                            <!-- Download Button -->
+                                            <button wire:click="downloadDriverLicense" type="button"
+                                                class="btn btn-dark btn-sm mt-2" style="min-width: 150px;">
+                                                <span class="inline-flex justify-center" wire:loading.remove
+                                                    wire:target="downloadDriverLicense">
+                                                    <iconify-icon icon="fluent:arrow-download-28-filled"
+                                                        class="mr-1" width="18" height="18"></iconify-icon>
+                                                    Download Document
+                                                </span>
+                                                <iconify-icon wire:loading wire:target="downloadDriverLicense"
+                                                    icon="line-md:loading-twotone-loop" width="18"
+                                                    height="18"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @else
+                            <div class="text-center py-5">
+                                <div class="mb-5">
+                                    <iconify-icon icon="mingcute:document-line" width="60" height="60"
+                                        class="text-slate-400"></iconify-icon>
+                                </div>
+                                <h5 class="text-xl font-semibold mb-4">No Driver License Found</h5>
+                                <p class="text-slate-500 mb-5">Please upload a driver license for this employee</p>
+                                <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                    wire:click="openEditDriverLicenseModal">
+                                    <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                        class="mr-1"></iconify-icon>
+                                    Upload Driver License
+                                </button>
+                            </div>
+                        @endif
                     </div>
-                @else
-                    <div class="text-center py-5">
-                        <div class="mb-5">
-                            <iconify-icon icon="mingcute:document-line" width="60" height="60"
-                                class="text-slate-400"></iconify-icon>
-                        </div>
-                        <h5 class="text-xl font-semibold mb-4">No Employee S1 Doc Found</h5>
-                        <p class="text-slate-500 mb-5">Please upload an S1 document for this employee</p>
-                        <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
-                            wire:click="openEditEmployeeS1DocModal">
-                            <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
-                                class="mr-1"></iconify-icon>
-                            Upload S1 Document
+                </div>
+            @elseif ($section === 'employee_contract')
+                <div class="card">
+                    <div class="card-header flex justify-between items-center">
+                        <h4
+                            class="font-medium lg:text-2xl text-xl capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
+                            Employee Contract Information
+                        </h4>
+
+                        <button wire:click="openEditEmployeeContractModal" class="action-btn" type="button">
+                            <iconify-icon icon="heroicons:plus"></iconify-icon>
                         </button>
                     </div>
-                @endif
-                </div>
-            </div>
-            @elseif ($section === 'employee_s2_doc')
-            <div class="card">
-                <div class="card-header flex justify-between items-center">
-                    <h4 class="font-medium lg:text-2xl text-xl capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
-                        Employee S2 Doc Information
-                    </h4>
+                    <div class="card-body p-6">
+                        @if ($employee->contracts && count($employee->contracts) > 0)
+                            @foreach ($employee->contracts as $index => $contract)
+                                <div class="card border border-slate-200 dark:border-slate-700 mb-5">
+                                    <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
+                                        <h5 class="card-title text-slate-900 dark:text-white">Contract - Issue Date
+                                            {{ $contract->issue_date }}</h5>
+                                        <div class="flex space-x-3 rtl:space-x-reverse">
+                                            <button
+                                                wire:click="openEditSpecificContractModal({{ $contract->id }})"
+                                                class="action-btn" type="button">
+                                                <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                                            </button>
+                                            <button
+                                                wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to delete this contract?',color:'danger',callback:'deleteEmployeeContractModal',params:{{ $contract->id }}})"
+                                                class="action-btn" type="button">
+                                                <iconify-icon icon="heroicons:trash"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body p-4">
+                                        <div class="grid grid-cols-4 gap-4">
+                                            <!-- Document Preview -->
+                                            <div class="col-span-3 flex justify-center items-center">
+                                                @php
+                                                    $fileExt = $this->getFileExtension($contract->file_path);
+                                                @endphp
 
-                    <button type="button" class="text-slate-900 dark:text-white"
-                        wire:click="openEditEmployeeS2DocModal">
-                        <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
-                    </button>
-                </div>
-                <div class="card-body p-6">
-                    @if ($employee->employeeS2Doc && count($employee->employeeS2Doc) > 0)
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
-                                <thead class="bg-slate-200 dark:bg-slate-700">
-                                    <tr>
-                                        <th scope="col" class="table-th">Year</th>
-                                        <th scope="col" class="table-th">S2 Amount</th>
-                                        <th scope="col" class="table-th">Issue Date</th>
-                                        <th scope="col" class="table-th">Expiry Date</th>
-                                        <th scope="col" class="table-th">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
-                                    @foreach($employee->employeeS2Doc as $index => $s2Doc)
-                                        <tr>
-                                            <td class="table-td">{{ $s2Doc->year }}</td>
-                                            <td class="table-td">{{ $s2Doc->s2_amount }}</td>
-                                            <td class="table-td">{{ $s2Doc->issue_date }}</td>
-                                            <td class="table-td">{{ $s2Doc->expiry_date ?? 'N/A' }}</td>
-                                            <td class="table-td">
-                                                <button wire:click="downloadEmployeeS2Doc({{ $s2Doc->id }})" type="button" 
-                                                    class="btn btn-dark btn-sm inline-flex justify-center" style="min-width: 100px;">
-                                                    <span class="inline-flex justify-center" wire:loading.remove
-                                                        wire:target="downloadEmployeeS2Doc({{ $s2Doc->id }})">
-                                                        <iconify-icon icon="fluent:arrow-download-28-filled"
-                                                            class="mr-1" width="18" height="18"></iconify-icon>
-                                                        Download
-                                                    </span>
-                                                    <iconify-icon wire:loading wire:target="downloadEmployeeS2Doc({{ $s2Doc->id }})"
-                                                        icon="line-md:loading-twotone-loop" width="18"
-                                                        height="18"></iconify-icon>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @else
-                        <div class="text-center py-5">
-                            <div class="mb-5">
-                                <iconify-icon icon="mingcute:document-line" width="60" height="60"
-                                    class="text-slate-400"></iconify-icon>
+                                                @if ($fileExt == 'pdf')
+                                                    <div class="border border-slate-200 rounded-md p-2 w-full">
+                                                        <iframe src="{{ $contract->file_path }}" width="100%"
+                                                            height="800" class="border-0"></iframe>
+                                                    </div>
+                                                @else
+                                                    <img src="{{ $contract->file_path }}" alt="Employee Contract"
+                                                        class="max-h-32 max-w-full rounded-md shadow-sm object-contain">
+                                                @endif
+                                            </div>
+
+                                            <!-- Document Info -->
+                                            <div class="col-span-1 pl-4 space-y-2">
+                                                <div class="flex justify-between">
+                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Issue Date:</span>
+                                                    <span class="text-sm font-medium">{{ $contract->issue_date }}</span>
+                                                </div>
+                                                <div class="flex justify-between">
+                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Expiry Date:</span>
+                                                    <span class="text-sm font-medium">{{ $contract->expiry_date ? $contract->expiry_date : 'N/A' }}</span>
+                                                </div>
+
+                                                <!-- Download Button -->
+                                                <div class="mt-3">
+                                                    <button wire:click="downloadEmployeeContract({{ $contract->id }})"
+                                                        type="button" class="btn btn-dark btn-sm">
+                                                        <span class="inline-flex items-center justify-center"
+                                                            wire:loading.remove
+                                                            wire:target="downloadEmployeeContract({{ $contract->id }})">
+                                                            <iconify-icon icon="fluent:arrow-download-28-filled"
+                                                                class="mr-1" width="16"
+                                                                height="16"></iconify-icon>
+                                                            Download
+                                                        </span>
+                                                        <iconify-icon wire:loading
+                                                            wire:target="downloadEmployeeContract({{ $contract->id }})"
+                                                            icon="line-md:loading-twotone-loop" width="16"
+                                                            height="16"></iconify-icon>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="text-center py-5">
+                                <div class="mb-5">
+                                    <iconify-icon icon="mingcute:document-line" width="60" height="60"
+                                        class="text-slate-400"></iconify-icon>
+                                </div>
+                                <h5 class="text-xl font-semibold mb-4">No Employee Contracts Found</h5>
+                                <p class="text-slate-500 mb-5">Please upload a contract for this employee</p>
+                                <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                    wire:click="openEditEmployeeContractModal">
+                                    <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                        class="mr-1"></iconify-icon>
+                                    Upload Contract
+                                </button>
                             </div>
-                            <h5 class="text-xl font-semibold mb-4">No Employee S2 Docs Found</h5>
-                            <p class="text-slate-500 mb-5">Please upload an S2 document for this employee</p>
-                            <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
-                                wire:click="openEditEmployeeS2DocModal">
-                                <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
-                                    class="mr-1"></iconify-icon>
-                                Upload S2 Document
-                            </button>
-                        </div>
-                    @endif
+                        @endif
+                    </div>
                 </div>
-            </div>
             @elseif ($section === 'employee_s6_doc')
-            <div class="card">
-                <div class="card-header flex justify-between items-center">
-                    <h4 class="font-medium lg:text-2xl text-xl capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
-                        Employee S6 Doc Information
-                    </h4>
+                <div class="card">
+                    <div class="card-header flex justify-between items-center">
+                        <h4
+                            class="font-medium lg:text-2xl text-xl capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
+                            Employee S6 Doc Information
+                        </h4>
 
-                    <button type="button" class="text-slate-900 dark:text-white"
-                        wire:click="openEditEmployeeS6DocModal">
-                        <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
-                    </button>
-                </div>
-                <div class="card-body p-6">
-                    @if ($employee->employeeS6Doc && count($employee->employeeS6Doc) > 0)
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
-                                <thead class="bg-slate-200 dark:bg-slate-700">
-                                    <tr>
-                                        <th scope="col" class="table-th">S6 Number</th>
-                                        <th scope="col" class="table-th">Leaving Reason</th>
-                                        <th scope="col" class="table-th">Issue Date</th>
-                                        <th scope="col" class="table-th">Expiry Date</th>
-                                        <th scope="col" class="table-th">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
-                                    @foreach($employee->employeeS6Doc as $index => $s6Doc)
-                                        <tr>
-                                            <td class="table-td">{{ $s6Doc->s6_number }}</td>
-                                            <td class="table-td">{{ $s6Doc->leaving_reason }}</td>
-                                            <td class="table-td">{{ $s6Doc->issue_date }}</td>
-                                            <td class="table-td">{{ $s6Doc->expiry_date ?? 'N/A' }}</td>
-                                            <td class="table-td">
-                                                <button wire:click="downloadEmployeeS6Doc({{ $s6Doc->id }})" type="button" 
-                                                    class="btn btn-dark btn-sm inline-flex justify-center" style="min-width: 100px;">
-                                                    <span class="inline-flex justify-center" wire:loading.remove
-                                                        wire:target="downloadEmployeeS6Doc({{ $s6Doc->id }})">
-                                                        <iconify-icon icon="fluent:arrow-download-28-filled"
-                                                            class="mr-1" width="18" height="18"></iconify-icon>
-                                                        Download
-                                                    </span>
-                                                    <iconify-icon wire:loading wire:target="downloadEmployeeS6Doc({{ $s6Doc->id }})"
-                                                        icon="line-md:loading-twotone-loop" width="18"
-                                                        height="18"></iconify-icon>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @else
-                        <div class="text-center py-5">
-                            <div class="mb-5">
-                                <iconify-icon icon="mingcute:document-line" width="60" height="60"
-                                    class="text-slate-400"></iconify-icon>
+                        <button type="button" class="text-slate-900 dark:text-white"
+                            wire:click="openEditEmployeeS6DocModal">
+                            <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
+                        </button>
+                    </div>
+                    <div class="card-body p-6">
+                        @if ($employee->employeeS6Doc && count($employee->employeeS6Doc) > 0)
+                            @foreach ($employee->employeeS6Doc as $index => $s6Doc)
+                                <div class="card mb-5">
+                                    <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
+                                        <h5 class="card-title text-slate-900 dark:text-white">S6 Document</h5>
+                                        <div class="flex space-x-3 rtl:space-x-reverse">
+                                            <button type="button" class="text-slate-900 dark:text-white"
+                                                wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to delete this S6 document?',color:'danger',callback:'deleteEmployeeS6DocModal',params:{{ $s6Doc->id }}})">
+                                                <iconify-icon icon="mingcute:delete-line" width="20"
+                                                    height="20"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body p-4">
+                                        <div class="grid grid-cols-12 gap-5 pb-5">
+                                            <div class="xl:col-span-6 lg:col-span-6 md:col-span-6 col-span-12">
+                                                <div class="mb-5 text-wrap">
+                                                    <label class="text-xs text-slate-500 dark:text-slate-400 m-0">S6
+                                                        Number</label>
+                                                    <div class="text-base text-slate-900 dark:text-white">
+                                                        {{ $s6Doc->s6_number }}
+                                                    </div>
+                                                </div>
+                                                <div class="mb-5 text-wrap">
+                                                    <label
+                                                        class="text-xs text-slate-500 dark:text-slate-400 m-0">Leaving
+                                                        Reason</label>
+                                                    <div class="text-base text-slate-900 dark:text-white">
+                                                        {{ $s6Doc->leaving_reason }}
+                                                    </div>
+                                                </div>
+                                                <div class="mb-5 text-wrap">
+                                                    <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Issue
+                                                        Date</label>
+                                                    <div class="text-base text-slate-900 dark:text-white">
+                                                        {{ $s6Doc->issue_date }}
+                                                    </div>
+                                                </div>
+                                                @if ($s6Doc->expiry_date)
+                                                    <div class="mb-5 text-wrap">
+                                                        <label
+                                                            class="text-xs text-slate-500 dark:text-slate-400 m-0">Expiry
+                                                            Date</label>
+                                                        <div class="text-base text-slate-900 dark:text-white">
+                                                            {{ $s6Doc->expiry_date }}
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                            <div class="xl:col-span-6 lg:col-span-6 md:col-span-6 col-span-12">
+                                                <div class="mb-5 text-wrap">
+                                                    <label
+                                                        class="text-xs text-slate-500 dark:text-slate-400 m-0">Document</label>
+                                                    <div class="mt-3">
+                                                        @php
+                                                            $fileExt = $this->getFileExtension($s6Doc->file_path);
+                                                        @endphp
+
+                                                        @if ($fileExt == 'pdf')
+                                                            <!-- PDF Preview -->
+                                                            <div class="border border-slate-200 rounded-md p-2">
+                                                                <iframe src="{{ $s6Doc->file_path }}" width="100%"
+                                                                    height="400" class="border-0"></iframe>
+                                                            </div>
+                                                        @else
+                                                            <!-- Image Preview -->
+                                                            <div class="mb-3">
+                                                                <img src="{{ $s6Doc->file_path }}" alt="S6 Document"
+                                                                    class="max-w-full h-auto rounded-md shadow-sm">
+                                                            </div>
+                                                        @endif
+
+                                                        <!-- Download Button -->
+                                                        <button
+                                                            wire:click="downloadEmployeeS6Doc({{ $s6Doc->id }})"
+                                                            type="button" class="btn btn-dark btn-sm mt-2"
+                                                            style="min-width: 150px;">
+                                                            <span class="inline-flex justify-center"
+                                                                wire:loading.remove
+                                                                wire:target="downloadEmployeeS6Doc({{ $s6Doc->id }})">
+                                                                <iconify-icon icon="fluent:arrow-download-28-filled"
+                                                                    class="mr-1" width="18"
+                                                                    height="18"></iconify-icon>
+                                                                Download Document
+                                                            </span>
+                                                            <iconify-icon wire:loading
+                                                                wire:target="downloadEmployeeS6Doc({{ $s6Doc->id }})"
+                                                                icon="line-md:loading-twotone-loop" width="18"
+                                                                height="18"></iconify-icon>
+                                                        </button>
+
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="text-center py-5">
+                                <div class="mb-5">
+                                    <iconify-icon icon="mingcute:document-line" width="60" height="60"
+                                        class="text-slate-400"></iconify-icon>
+                                </div>
+                                <h5 class="text-xl font-semibold mb-4">No S6 Documents Found</h5>
+                                <p class="text-slate-500 mb-5">Please upload an S6 document for this employee</p>
+                                <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                    wire:click="openEditEmployeeS6DocModal">
+                                    <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                        class="mr-1"></iconify-icon>
+                                    Upload S6 Document
+                                </button>
                             </div>
-                            <h5 class="text-xl font-semibold mb-4">No Employee S6 Docs Found</h5>
-                            <p class="text-slate-500 mb-5">Please upload an S6 document for this employee</p>
-                            <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
-                                wire:click="openEditEmployeeS6DocModal">
-                                <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
-                                    class="mr-1"></iconify-icon>
-                                Upload S6 Document
-                            </button>
-                        </div>
-                    @endif
+                        @endif
+                    </div>
                 </div>
-            </div>
             @elseif ($section === 'police_record')
-            <div class="card">
-                <div class="card-header flex justify-between items-center">
-                    <h4 class="font-medium lg:text-2xl text-xl capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
-                        Police Record Information
-                    </h4>
+                <div class="card">
+                    <div class="card-header flex justify-between items-center">
+                        <h4
+                            class="font-medium lg:text-2xl text-xl capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
+                            Police Record Information
+                        </h4>
 
-                    <button type="button" class="text-slate-900 dark:text-white"
-                        wire:click="openEditPoliceRecordModal">
-                        <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
-                    </button>
-                </div>
-                <div class="card-body p-6">
-                    @if ($employee->policeRecords && count($employee->policeRecords) > 0)
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                            @foreach($employee->policeRecords as $index => $policeRecord)
-                                <div class="card border border-slate-200 dark:border-slate-700">
+                        <button wire:click="openEditPoliceRecordModal" class="action-btn" type="button">
+                            <iconify-icon icon="heroicons:plus"></iconify-icon>
+                        </button>
+                    </div>
+                    <div class="card-body p-6">
+                        @if ($employee->policeRecords && $employee->policeRecords->count() > 0)
+                            @foreach ($employee->policeRecords as $record)
+                                <div class="card border border-slate-200 dark:border-slate-700 mb-5">
                                     <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
-                                        <h5 class="card-title text-slate-900 dark:text-white">Police Record</h5>
-                                        <div class="flex space-x-2">
-                                            <button type="button" wire:click="openEditSpecificPoliceRecordModal({{ $policeRecord->id }})" class="text-primary-500">
-                                                <iconify-icon icon="mingcute:edit-line" width="18" height="18"></iconify-icon>
+                                        <h5 class="card-title text-slate-900 dark:text-white">Police Record - Issue Date
+                                            {{ $record->issue_date }}</h5>
+                                        <div class="flex space-x-3 rtl:space-x-reverse">
+                                            <button
+                                                wire:click="openEditSpecificPoliceRecordModal({{ $record->id }})"
+                                                class="action-btn" type="button">
+                                                <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                                            </button>
+                                            <button
+                                                wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to delete this police record?',color:'danger',callback:'deletePoliceRecordModal',params:{{ $record->id }}})"
+                                                class="action-btn" type="button">
+                                                <iconify-icon icon="heroicons:trash"></iconify-icon>
                                             </button>
                                         </div>
                                     </div>
                                     <div class="card-body p-4">
-                                        <!-- Document Preview -->
-                                        <div class="mb-3 flex justify-center">
-                                            @php
-                                                $fileExt = $this->getFileExtension($policeRecord->file_path);
-                                            @endphp
+                                        <div class="grid grid-cols-4 gap-4">
+                                            <!-- Document Preview -->
+                                            <div class="col-span-3 flex justify-center items-center">
+                                                @php
+                                                    $fileExt = $this->getFileExtension($record->file_path);
+                                                @endphp
 
-                                            @if ($fileExt == 'pdf')
-                                                <div class="flex items-center justify-center mb-2">
-                                                    <iconify-icon icon="mingcute:file-pdf-fill" width="64"
-                                                        height="64" class="text-red-500"></iconify-icon>
+                                                @if ($fileExt == 'pdf')
+                                                    <div class="border border-slate-200 rounded-md p-2 w-full">
+                                                        <iframe src="{{ $record->file_path }}" width="100%"
+                                                            height="800" class="border-0"></iframe>
+                                                    </div>
+                                                @else
+                                                    <img src="{{ $record->file_path }}" alt="Police Record"
+                                                        class="max-h-32 max-w-full rounded-md shadow-sm object-contain">
+                                                @endif
+                                            </div>
+
+                                            <!-- Document Info -->
+                                            <div class="col-span-1 pl-4 space-y-2">
+                                                <div class="flex justify-between">
+                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Issue Date:</span>
+                                                    <span class="text-sm font-medium">{{ $record->issue_date }}</span>
                                                 </div>
-                                            @else
-                                                <img src="{{ $policeRecord->file_path }}" 
-                                                     alt="Police Record" 
-                                                     class="max-h-32 max-w-full rounded-md shadow-sm object-contain">
-                                            @endif
-                                        </div>
+                                                <div class="flex justify-between">
+                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Expiry Date:</span>
+                                                    <span class="text-sm font-medium">{{ $record->expiry_date ?? 'N/A' }}</span>
+                                                </div>
 
-                                        <!-- Document Info -->
-                                        <div class="space-y-2">
-                                            <div class="flex justify-between">
-                                                <span class="text-sm text-slate-500 dark:text-slate-400">Issue Date:</span>
-                                                <span class="text-sm font-medium">{{ $policeRecord->issue_date }}</span>
-                                            </div>
-                                            <div class="flex justify-between">
-                                                <span class="text-sm text-slate-500 dark:text-slate-400">Expiry Date:</span>
-                                                <span class="text-sm font-medium">{{ $policeRecord->expiry_date ? $policeRecord->expiry_date : 'N/A' }}</span>
-                                            </div>
-
-                                            <!-- Download Button -->
-                                            <div class="mt-3 text-center">
-                                                <button wire:click="downloadPoliceRecord({{ $policeRecord->id }})" type="button" 
-                                                    class="btn btn-dark btn-sm w-full">
-                                                    <span class="inline-flex items-center justify-center" wire:loading.remove
-                                                        wire:target="downloadPoliceRecord({{ $policeRecord->id }})">
-                                                        <iconify-icon icon="fluent:arrow-download-28-filled"
-                                                            class="mr-1" width="16" height="16"></iconify-icon>
-                                                        Download
-                                                    </span>
-                                                    <iconify-icon wire:loading wire:target="downloadPoliceRecord({{ $policeRecord->id }})"
-                                                        icon="line-md:loading-twotone-loop" width="16"
-                                                        height="16"></iconify-icon>
-                                                </button>
+                                                <!-- Download Button -->
+                                                <div class="mt-3">
+                                                    <button wire:click="downloadPoliceRecord({{ $record->id }})"
+                                                        type="button" class="btn btn-dark btn-sm">
+                                                        <span class="inline-flex items-center justify-center"
+                                                            wire:loading.remove
+                                                            wire:target="downloadPoliceRecord({{ $record->id }})">
+                                                            <iconify-icon icon="fluent:arrow-download-28-filled"
+                                                                class="mr-1" width="16"
+                                                                height="16"></iconify-icon>
+                                                            Download
+                                                        </span>
+                                                        <iconify-icon wire:loading
+                                                            wire:target="downloadPoliceRecord({{ $record->id }})"
+                                                            icon="line-md:loading-twotone-loop" width="16"
+                                                            height="16"></iconify-icon>
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             @endforeach
-                        </div>
-                    @else
-                        <div class="text-center py-5">
-                            <div class="mb-5">
-                                <iconify-icon icon="mingcute:document-line" width="60" height="60"
-                                    class="text-slate-400"></iconify-icon>
+                        @else
+                            <div class="text-center py-5">
+                                <div class="mb-5">
+                                    <iconify-icon icon="mingcute:document-line" width="60" height="60"
+                                        class="text-slate-400"></iconify-icon>
+                                </div>
+                                <h5 class="text-xl font-semibold mb-4">No Police Records Found</h5>
+                                <p class="text-slate-500 mb-5">Please upload a police record for this employee</p>
+                                <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                    wire:click="openEditPoliceRecordModal">
+                                    <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                        class="mr-1"></iconify-icon>
+                                    Upload Police Record
+                                </button>
                             </div>
-                            <h5 class="text-xl font-semibold mb-4">No Police Records Found</h5>
-                            <p class="text-slate-500 mb-5">Please upload a police record for this employee</p>
-                            <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
-                                wire:click="openEditPoliceRecordModal">
-                                <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
-                                    class="mr-1"></iconify-icon>
-                                Upload Police Record
-                            </button>
-                        </div>
-                    @endif
+                        @endif
+                    </div>
                 </div>
-            </div>
             @elseif ($section === 'hr_letter')
-            <div class="card">
-                <div class="card-header flex justify-between items-center">
-                    <h4 class="font-medium lg:text-2xl text-xl capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
-                        HR Letter Information
-                    </h4>
+                <div class="card">
+                    <div class="card-header flex justify-between items-center">
+                        <h4
+                            class="font-medium lg:text-2xl text-xl capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
+                            HR Letter Information
+                        </h4>
 
-                    <button type="button" class="text-slate-900 dark:text-white"
-                        wire:click="openEditHrLetterModal">
-                        <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
-                    </button>
-                </div>
-                <div class="card-body p-6">
-                    @if ($employee->hrLetters && count($employee->hrLetters) > 0)
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                            @foreach($employee->hrLetters as $index => $hrLetter)
-                                <div class="card border border-slate-200 dark:border-slate-700">
+                        <button wire:click="openEditHrLetterModal" class="action-btn" type="button">
+                            <iconify-icon icon="heroicons:plus"></iconify-icon>
+                        </button>
+                    </div>
+                    <div class="card-body p-6">
+                        @if ($employee->hrLetters && $employee->hrLetters->count() > 0)
+                            @foreach ($employee->hrLetters as $letter)
+                                <div class="card border border-slate-200 dark:border-slate-700 mb-5">
                                     <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
-                                        <h5 class="card-title text-slate-900 dark:text-white">HR Letter</h5>
-                                        <div class="flex space-x-2">
-                                            <button type="button" wire:click="openEditSpecificHrLetterModal({{ $hrLetter->id }})" class="text-primary-500">
-                                                <iconify-icon icon="mingcute:edit-line" width="18" height="18"></iconify-icon>
+                                        <h5 class="card-title text-slate-900 dark:text-white">HR Letter - Issue Date
+                                            {{ $letter->issue_date }}</h5>
+                                        <div class="flex space-x-3 rtl:space-x-reverse">
+                                            <button
+                                                wire:click="openEditSpecificHrLetterModal({{ $letter->id }})"
+                                                class="action-btn" type="button">
+                                                <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                                            </button>
+                                            <button
+                                                wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to delete this HR letter?',color:'danger',callback:'deleteHrLetterModal',params:{{ $letter->id }}})"
+                                                class="action-btn" type="button">
+                                                <iconify-icon icon="heroicons:trash"></iconify-icon>
                                             </button>
                                         </div>
                                     </div>
                                     <div class="card-body p-4">
-                                        <!-- Document Preview -->
-                                        <div class="mb-3 flex justify-center">
-                                            @php
-                                                $fileExt = $this->getFileExtension($hrLetter->file_path);
-                                            @endphp
+                                        <div class="grid grid-cols-4 gap-4">
+                                            <!-- Document Preview -->
+                                            <div class="col-span-3 flex justify-center items-center">
+                                                @php
+                                                    $fileExt = $this->getFileExtension($letter->file_path);
+                                                @endphp
 
-                                            @if ($fileExt == 'pdf')
-                                                <div class="flex items-center justify-center mb-2">
-                                                    <iconify-icon icon="mingcute:file-pdf-fill" width="64"
-                                                        height="64" class="text-red-500"></iconify-icon>
+                                                @if ($fileExt == 'pdf')
+                                                    <div class="border border-slate-200 rounded-md p-2 w-full">
+                                                        <iframe src="{{ $letter->file_path }}" width="100%"
+                                                            height="800" class="border-0"></iframe>
+                                                    </div>
+                                                @else
+                                                    <img src="{{ $letter->file_path }}" alt="HR Letter"
+                                                        class="max-h-32 max-w-full rounded-md shadow-sm object-contain">
+                                                @endif
+                                            </div>
+
+                                            <!-- Document Info -->
+                                            <div class="col-span-1 pl-4 space-y-2">
+                                                <div class="flex justify-between">
+                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Issue Date:</span>
+                                                    <span class="text-sm font-medium">{{ $letter->issue_date }}</span>
                                                 </div>
-                                            @else
-                                                <img src="{{ $hrLetter->file_path }}" 
-                                                     alt="HR Letter" 
-                                                     class="max-h-32 max-w-full rounded-md shadow-sm object-contain">
-                                            @endif
-                                        </div>
+                                                <div class="flex justify-between">
+                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Expiry Date:</span>
+                                                    <span class="text-sm font-medium">{{ $letter->expiry_date ?? 'N/A' }}</span>
+                                                </div>
 
-                                        <!-- Document Info -->
-                                        <div class="space-y-2">
-                                            <div class="flex justify-between">
-                                                <span class="text-sm text-slate-500 dark:text-slate-400">Issue Date:</span>
-                                                <span class="text-sm font-medium">{{ $hrLetter->issue_date->format('d/m/Y') }}</span>
-                                            </div>
-                                            <div class="flex justify-between">
-                                                <span class="text-sm text-slate-500 dark:text-slate-400">Expiry Date:</span>
-                                                <span class="text-sm font-medium">{{ $hrLetter->expiry_date ? $hrLetter->expiry_date->format('d/m/Y') : 'N/A' }}</span>
-                                            </div>
-
-                                            <!-- Download Button -->
-                                            <div class="mt-3 text-center">
-                                                <button wire:click="downloadHrLetter({{ $hrLetter->id }})" type="button" 
-                                                    class="btn btn-dark btn-sm w-full">
-                                                    <span class="inline-flex items-center justify-center" wire:loading.remove
-                                                        wire:target="downloadHrLetter({{ $hrLetter->id }})">
-                                                        <iconify-icon icon="fluent:arrow-download-28-filled"
-                                                            class="mr-1" width="16" height="16"></iconify-icon>
-                                                        Download
-                                                    </span>
-                                                    <iconify-icon wire:loading wire:target="downloadHrLetter({{ $hrLetter->id }})"
-                                                        icon="line-md:loading-twotone-loop" width="16"
-                                                        height="16"></iconify-icon>
-                                                </button>
+                                                <!-- Download Button -->
+                                                <div class="mt-3">
+                                                    <button wire:click="downloadHrLetter({{ $letter->id }})"
+                                                        type="button" class="btn btn-dark btn-sm">
+                                                        <span class="inline-flex items-center justify-center"
+                                                            wire:loading.remove
+                                                            wire:target="downloadHrLetter({{ $letter->id }})">
+                                                            <iconify-icon icon="fluent:arrow-download-28-filled"
+                                                                class="mr-1" width="16"
+                                                                height="16"></iconify-icon>
+                                                            Download
+                                                        </span>
+                                                        <iconify-icon wire:loading
+                                                            wire:target="downloadHrLetter({{ $letter->id }})"
+                                                            icon="line-md:loading-twotone-loop" width="16"
+                                                            height="16"></iconify-icon>
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             @endforeach
-                        </div>
-                    @else
-                        <div class="text-center py-5">
-                            <div class="mb-5">
-                                <iconify-icon icon="mingcute:document-line" width="60" height="60"
-                                    class="text-slate-400"></iconify-icon>
+                        @else
+                            <div class="text-center py-5">
+                                <div class="mb-5">
+                                    <iconify-icon icon="mingcute:document-line" width="60" height="60"
+                                        class="text-slate-400"></iconify-icon>
+                                </div>
+                                <h5 class="text-xl font-semibold mb-4">No HR Letters Found</h5>
+                                <p class="text-slate-500 mb-5">Please upload an HR letter for this employee</p>
+                                <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                    wire:click="openEditHrLetterModal">
+                                    <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                        class="mr-1"></iconify-icon>
+                                    Upload HR Letter
+                                </button>
                             </div>
-                            <h5 class="text-xl font-semibold mb-4">No HR Letters Found</h5>
-                            <p class="text-slate-500 mb-5">Please upload an HR letter for this employee</p>
-                            <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
-                                wire:click="openEditHrLetterModal">
-                                <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
-                                    class="mr-1"></iconify-icon>
-                                Upload HR Letter
-                            </button>
-                        </div>
-                    @endif
+                        @endif
+                    </div>
                 </div>
-            </div>
+            @elseif ($section === 'employee_s1_doc')
+                <div class="card">
+                    <div class="card-header flex justify-between items-center">
+                        <h4
+                            class="font-medium lg:text-2xl text-xl capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
+                            Employee S1 Doc Information
+                        </h4>
+
+                        <button type="button" class="text-slate-900 dark:text-white"
+                            wire:click="openEditEmployeeS1DocModal">
+                            <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
+                        </button>
+                    </div>
+                    <div class="card-body p-6">
+                        @if ($employee->employeeS1Doc)
+                            <div class="grid grid-cols-12 gap-5 pb-5">
+                                <div class="xl:col-span-6 lg:col-span-6 md:col-span-6 col-span-12">
+                                    <div class="mb-5 text-wrap">
+                                        <label class="text-xs text-slate-500 dark:text-slate-400 m-0">S1 Number</label>
+                                        <div class="text-base text-slate-900 dark:text-white">
+                                            {{ $employee->employeeS1Doc->s1_number }}
+                                        </div>
+                                    </div>
+                                    <div class="mb-5 text-wrap">
+                                        <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Issue
+                                            Date</label>
+                                        <div class="text-base text-slate-900 dark:text-white">
+                                            {{ $employee->employeeS1Doc->issue_date }}
+                                        </div>
+                                    </div>
+                                    @if ($employee->employeeS1Doc->expiry_date)
+                                        <div class="mb-5 text-wrap">
+                                            <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Expiry
+                                                Date</label>
+                                            <div class="text-base text-slate-900 dark:text-white">
+                                                {{ $employee->employeeS1Doc->expiry_date }}
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="xl:col-span-6 lg:col-span-6 md:col-span-6 col-span-12">
+                                    <div class="mb-5 text-wrap">
+                                        <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Document</label>
+                                        <div class="mt-3">
+                                            @php
+                                                $fileExt = $this->getFileExtension($employee->employeeS1Doc->file_path);
+                                            @endphp
+
+                                            @if ($fileExt == 'pdf')
+                                                <!-- PDF Preview -->
+                                                <div class="border border-slate-200 rounded-md p-2">
+                                                    <iframe src="{{ $employee->employeeS1Doc->file_path }}"
+                                                        width="100%" height="400" class="border-0"></iframe>
+                                                </div>
+                                            @else
+                                                <!-- Image Preview -->
+                                                <div class="mb-3">
+                                                    <img src="{{ $employee->employeeS1Doc->file_path }}"
+                                                        alt="Employee S1 Doc"
+                                                        class="max-w-full h-auto rounded-md shadow-sm">
+                                                </div>
+                                            @endif
+
+                                            <!-- Download Button -->
+                                            <button wire:click="downloadEmployeeS1Doc" type="button"
+                                                class="btn btn-dark btn-sm mt-2" style="min-width: 150px;">
+                                                <span class="inline-flex justify-center" wire:loading.remove
+                                                    wire:target="downloadEmployeeS1Doc">
+                                                    <iconify-icon icon="fluent:arrow-download-28-filled"
+                                                        class="mr-1" width="18" height="18"></iconify-icon>
+                                                    Download Document
+                                                </span>
+                                                <iconify-icon wire:loading wire:target="downloadEmployeeS1Doc"
+                                                    icon="line-md:loading-twotone-loop" width="18"
+                                                    height="18"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            <div class="text-center py-5">
+                                <div class="mb-5">
+                                    <iconify-icon icon="mingcute:document-line" width="60" height="60"
+                                        class="text-slate-400"></iconify-icon>
+                                </div>
+                                <h5 class="text-xl font-semibold mb-4">No Employee S1 Doc Found</h5>
+                                <p class="text-slate-500 mb-5">Please upload an S1 document for this employee</p>
+                                <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                    wire:click="openEditEmployeeS1DocModal">
+                                    <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                        class="mr-1"></iconify-icon>
+                                    Upload S1 Document
+                                </button>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            @elseif ($section === 'employee_s2_doc')
+                <div class="card">
+                    <div class="card-header flex justify-between items-center">
+                        <h4
+                            class="font-medium lg:text-2xl text-xl capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
+                            Employee S2 Doc Information
+                        </h4>
+
+                        <button wire:click="openEditEmployeeS2DocModal" class="action-btn" type="button">
+                            <iconify-icon icon="heroicons:plus"></iconify-icon>
+                        </button>
+                    </div>
+                    <div class="card-body p-6">
+                        @if ($employee->employeeS2Doc && count($employee->employeeS2Doc) > 0)
+                            <div
+                                class="py-[18px] px-6 font-normal text-sm rounded-md bg-white text-warning-500 border border-warning-500
+                                    dark:bg-slate-800 mb-2">
+                                <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                                    <iconify-icon class="text-2xl flex-0"
+                                        icon="heroicons:information-circle"></iconify-icon>
+                                    <p class="flex-1 font-Inter">
+                                        The year field must be unique. If you add a new S2 document with an existing
+                                        year,
+                                        it will update the existing record instead of creating a new one.
+                                    </p>
+                                </div>
+                            </div>
+                            @foreach ($employee->employeeS2Doc as $index => $s2Doc)
+                                <div class="card border border-slate-200 dark:border-slate-700 mb-5">
+                                    <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
+                                        <h5 class="card-title text-slate-900 dark:text-white">S2 Doc - Year
+                                            {{ $s2Doc->year }}</h5>
+                                        <div class="flex space-x-3 rtl:space-x-reverse">
+                                            <button
+                                                wire:click="openEditSpecificS2DocModal({{ $s2Doc->id }})"
+                                                class="action-btn" type="button">
+                                                <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                                            </button>
+                                            <button
+                                                wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to delete this S2 document?',color:'danger',callback:'deleteEmployeeS2DocModal',params:{{ $s2Doc->id }}})"
+                                                class="action-btn" type="button">
+                                                <iconify-icon icon="heroicons:trash"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body p-4">
+                                        <div class="grid grid-cols-4 gap-4">
+                                            <!-- Document Preview -->
+                                            <div class="col-span-3 flex justify-center items-center">
+                                                @php
+                                                    $fileExt = $this->getFileExtension($s2Doc->file_path);
+                                                @endphp
+
+                                                @if ($fileExt == 'pdf')
+                                                    <div class="border border-slate-200 rounded-md p-2 w-full">
+                                                        <iframe src="{{ $s2Doc->file_path }}" width="100%"
+                                                            height="800" class="border-0"></iframe>
+                                                    </div>
+                                                @else
+                                                    <img src="{{ $s2Doc->file_path }}" alt="S2 Document"
+                                                        class="max-h-32 max-w-full rounded-md shadow-sm object-contain">
+                                                @endif
+                                            </div>
+
+                                            <!-- Document Info -->
+                                            <div class="col-span-1 pl-4 space-y-2">
+                                                <div class="flex justify-between">
+                                                    <span
+                                                        class="text-sm text-slate-500 dark:text-slate-400">Year:</span>
+                                                    <span class="text-sm font-medium">{{ $s2Doc->year }}</span>
+                                                </div>
+                                                <div class="flex justify-between">
+                                                    <span class="text-sm text-slate-500 dark:text-slate-400">S2
+                                                        Amount:</span>
+                                                    <span class="text-sm font-medium">{{ $s2Doc->s2_amount }}</span>
+                                                </div>
+                                                <div class="flex justify-between">
+                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Issue
+                                                        Date:</span>
+                                                    <span class="text-sm font-medium">{{ $s2Doc->issue_date }}</span>
+                                                </div>
+                                                <div class="flex justify-between">
+                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Expiry
+                                                        Date:</span>
+                                                    <span
+                                                        class="text-sm font-medium">{{ $s2Doc->expiry_date ?? 'N/A' }}</span>
+                                                </div>
+
+                                                <!-- Download Button -->
+                                                <div class="mt-3">
+                                                    <button wire:click="downloadEmployeeS2Doc({{ $s2Doc->id }})"
+                                                        type="button" class="btn btn-dark btn-sm">
+                                                        <span class="inline-flex items-center justify-center"
+                                                            wire:loading.remove
+                                                            wire:target="downloadEmployeeS2Doc({{ $s2Doc->id }})">
+                                                            <iconify-icon icon="fluent:arrow-download-28-filled"
+                                                                class="mr-1" width="16"
+                                                                height="16"></iconify-icon>
+                                                            Download
+                                                        </span>
+                                                        <iconify-icon wire:loading
+                                                            wire:target="downloadEmployeeS2Doc({{ $s2Doc->id }})"
+                                                            icon="line-md:loading-twotone-loop" width="16"
+                                                            height="16"></iconify-icon>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="text-center py-5">
+                                <div class="mb-5">
+                                    <iconify-icon icon="mingcute:document-line" width="60" height="60"
+                                        class="text-slate-400"></iconify-icon>
+                                </div>
+                                <h5 class="text-xl font-semibold mb-4">No Employee S2 Docs Found</h5>
+                                <p class="text-slate-500 mb-5">Please upload an S2 document for this employee</p>
+                                <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                    wire:click="openEditEmployeeS2DocModal">
+                                    <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                        class="mr-1"></iconify-icon>
+                                    Upload S2 Document
+                                </button>
+                            </div>
+                        @endif
+                    </div>
+                </div>
             @endif
-            
         </div>
     </div>
 
@@ -1285,7 +1638,8 @@
                                                     wire:model.live="keep_existing_driver_license">
                                                 <span
                                                     class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
-                                                    <img src="{{ asset('images/icon/ck-white.svg') }}" alt=""
+                                                    <img src="{{ asset('images/icon/ck-white.svg') }}"
+                                                        alt=""
                                                         class="h-[10px] w-[10px] block m-auto opacity-0"></span>
                                                 <span class="text-slate-500 dark:text-slate-400 text-sm leading-6">Keep
                                                     existing document</span>
@@ -1333,7 +1687,6 @@
                     </div>
                 </div>
             </div>
-        </div>
     @endif
 
     <!-- Base Information Edit Modal -->
@@ -1653,8 +2006,9 @@
                                                 @if ($id_card_file)
                                                     <div class="flex items-center justify-center mb-3">
                                                         @if (in_array($id_card_file->getClientOriginalExtension(), ['pdf']))
-                                                            <iconify-icon icon="mingcute:file-pdf-fill" width="48"
-                                                                height="48" class="text-red-500"></iconify-icon>
+                                                            <iconify-icon icon="mingcute:file-pdf-fill"
+                                                                width="48" height="48"
+                                                                class="text-red-500"></iconify-icon>
                                                         @else
                                                             <img src="{{ $id_card_file->temporaryUrl() }}"
                                                                 class="h-40 max-w-full rounded-md object-contain"
@@ -1695,7 +2049,8 @@
                                                             </label>
                                                         @endif
                                                     @else
-                                                        <label for="id_card_file_input" class="cursor-pointer block">
+                                                        <label for="id_card_file_input"
+                                                            class="cursor-pointer block">
                                                             <iconify-icon icon="mingcute:upload-line" width="32"
                                                                 height="32"
                                                                 class="text-slate-400 mx-auto"></iconify-icon>
@@ -1724,7 +2079,8 @@
                                                 <label class="inline-flex items-center cursor-pointer"
                                                     for="keep_existing_file">
                                                     <input type="checkbox" class="hidden" name="checkbox"
-                                                        id="keep_existing_file" wire:model.live="keep_existing_file">
+                                                        id="keep_existing_file"
+                                                        wire:model.live="keep_existing_file">
                                                     <span
                                                         class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
                                                         <img src="{{ asset('images/icon/ck-white.svg') }}"
@@ -1773,7 +2129,8 @@
                                 <button wire:click="closeEditIdCardModal" type="button"
                                     class="btn inline-flex justify-center btn-outline-dark">Cancel</button>
                                 <button wire:click="updateIdCard" type="button" wire:target='updateIdCard'
-                                    wire:loading.remove class="btn inline-flex justify-center btn-dark">Upload</button>
+                                    wire:loading.remove
+                                    class="btn inline-flex justify-center btn-dark">Upload</button>
                                 <button wire:loading wire:target="updateIdCard" type="button"
                                     class="btn inline-flex justify-center btn-dark">
                                     <span class="flex items-center">
@@ -1794,7 +2151,8 @@
         <div>
             <div id="editBirthCertificateModal"
                 class="modal fade fixed top-0 left-0 show w-full h-full outline-none overflow-x-hidden overflow-y-auto"
-                tabindex="-1" aria-labelledby="editBirthCertificateModalLabel" aria-hidden="true" wire:ignore.self>
+                tabindex="-1" aria-labelledby="editBirthCertificateModalLabel" aria-hidden="true"
+                wire:ignore.self>
                 <div class="modal-dialog relative w-auto pointer-events-none">
                     <div
                         class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
@@ -1832,8 +2190,9 @@
                                                 @if ($birth_certificate_file)
                                                     <div class="flex items-center justify-center mb-3">
                                                         @if (in_array($birth_certificate_file->getClientOriginalExtension(), ['pdf']))
-                                                            <iconify-icon icon="mingcute:file-pdf-fill" width="48"
-                                                                height="48" class="text-red-500"></iconify-icon>
+                                                            <iconify-icon icon="mingcute:file-pdf-fill"
+                                                                width="48" height="48"
+                                                                class="text-red-500"></iconify-icon>
                                                         @else
                                                             <img src="{{ $birth_certificate_file->temporaryUrl() }}"
                                                                 class="h-40 max-w-full rounded-md object-contain"
@@ -1943,7 +2302,8 @@
                                         @enderror
                                     </div>
                                     <div class="col-span-12 xl:col-span-6">
-                                        <label for="birth_certificate_expiry_date" class="form-label">Expiry Date (if
+                                        <label for="birth_certificate_expiry_date" class="form-label">Expiry Date
+                                            (if
                                             applicable)</label>
                                         <input type="date"
                                             class="form-control @error('birth_certificate_expiry_date') !border-danger-500 @enderror"
@@ -1982,7 +2342,8 @@
         <div>
             <div id="editArmyServicePaperModal"
                 class="modal fade fixed top-0 left-0 show w-full h-full outline-none overflow-x-hidden overflow-y-auto"
-                tabindex="-1" aria-labelledby="editArmyServicePaperModalLabel" aria-hidden="true" wire:ignore.self>
+                tabindex="-1" aria-labelledby="editArmyServicePaperModalLabel" aria-hidden="true"
+                wire:ignore.self>
                 <div class="modal-dialog relative w-auto pointer-events-none">
                     <div
                         class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
@@ -2010,7 +2371,8 @@
                                 <div class="grid grid-cols-12 gap-4">
                                     @if (!$keep_existing_army_service_paper)
                                         <div class="col-span-12">
-                                            <label for="army_service_paper_file" class="form-label">Army Service Paper
+                                            <label for="army_service_paper_file" class="form-label">Army Service
+                                                Paper
                                                 Document
                                                 <iconify-icon wire:loading wire:target="army_service_paper_file"
                                                     icon="line-md:loading-twotone-loop" width="18"
@@ -2020,8 +2382,9 @@
                                                 @if ($army_service_paper_file)
                                                     <div class="flex items-center justify-center mb-3">
                                                         @if (in_array($army_service_paper_file->getClientOriginalExtension(), ['pdf']))
-                                                            <iconify-icon icon="mingcute:file-pdf-fill" width="48"
-                                                                height="48" class="text-red-500"></iconify-icon>
+                                                            <iconify-icon icon="mingcute:file-pdf-fill"
+                                                                width="48" height="48"
+                                                                class="text-red-500"></iconify-icon>
                                                         @else
                                                             <img src="{{ $army_service_paper_file->temporaryUrl() }}"
                                                                 class="h-40 max-w-full rounded-md object-contain"
@@ -2199,7 +2562,8 @@
                                 <div class="grid grid-cols-12 gap-4">
                                     @if (!$keep_existing_employee_s1_doc)
                                         <div class="col-span-12">
-                                            <label for="employee_s1_doc_file" class="form-label">Employee S1 Doc Document
+                                            <label for="employee_s1_doc_file" class="form-label">Employee S1 Doc
+                                                Document
                                                 <iconify-icon wire:loading wire:target="employee_s1_doc_file"
                                                     icon="line-md:loading-twotone-loop" width="18"
                                                     height="18"></iconify-icon></label>
@@ -2208,8 +2572,9 @@
                                                 @if ($employee_s1_doc_file)
                                                     <div class="flex items-center justify-center mb-3">
                                                         @if (in_array($employee_s1_doc_file->getClientOriginalExtension(), ['pdf']))
-                                                            <iconify-icon icon="mingcute:file-pdf-fill" width="48"
-                                                                height="48" class="text-red-500"></iconify-icon>
+                                                            <iconify-icon icon="mingcute:file-pdf-fill"
+                                                                width="48" height="48"
+                                                                class="text-red-500"></iconify-icon>
                                                         @else
                                                             <img src="{{ $employee_s1_doc_file->temporaryUrl() }}"
                                                                 class="h-40 max-w-full rounded-md object-contain"
@@ -2295,7 +2660,8 @@
                                     @endif
                                     <div class="col-span-12">
                                         <label for="s1_number" class="form-label">S1 Number</label>
-                                        <input type="text" id="s1_number" class="form-control @error('s1_number') !border-danger-500 @enderror"
+                                        <input type="text" id="s1_number"
+                                            class="form-control @error('s1_number') !border-danger-500 @enderror"
                                             wire:model="s1_number">
                                         @error('s1_number')
                                             <span class="text-danger-500 text-sm mt-1">{{ $message }}</span>
@@ -2377,9 +2743,32 @@
                             <!-- Modal body -->
                             <div class="p-6 space-y-4">
                                 <div class="grid grid-cols-12 gap-4">
+                                    @if ($editing_record_id)
+                                    <div class="col-span-12 form-check">
+                                        <div class="checkbox-area">
+                                            <label class="inline-flex items-center cursor-pointer"
+                                                for="keep_existing_employee_s2_doc">
+                                                <input type="checkbox" class="hidden" name="checkbox"
+                                                    id="keep_existing_employee_s2_doc"
+                                                    wire:model.live="keep_existing_employee_s2_doc">
+                                                <span
+                                                    class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
+                                                    <img src="{{ asset('images/icon/ck-white.svg') }}"
+                                                        alt=""
+                                                        class="h-[10px] w-[10px] block m-auto opacity-0"></span>
+                                                <span
+                                                    class="text-slate-500 dark:text-slate-400 text-sm leading-6">Keep
+                                                    existing document</span>
+                                            </label>
+                                        </div>
+
+                                    </div>
+                                        
+                                    @endif
                                     @if (!$keep_existing_employee_s2_doc)
                                         <div class="col-span-12">
-                                            <label for="employee_s2_doc_file" class="form-label">Employee S2 Doc Document
+                                            <label for="employee_s2_doc_file" class="form-label">Employee S2 Doc
+                                                Document
                                                 <iconify-icon wire:loading wire:target="employee_s2_doc_file"
                                                     icon="line-md:loading-twotone-loop" width="18"
                                                     height="18"></iconify-icon></label>
@@ -2388,8 +2777,9 @@
                                                 @if ($employee_s2_doc_file)
                                                     <div class="flex items-center justify-center mb-3">
                                                         @if (in_array($employee_s2_doc_file->getClientOriginalExtension(), ['pdf']))
-                                                            <iconify-icon icon="mingcute:file-pdf-fill" width="48"
-                                                                height="48" class="text-red-500"></iconify-icon>
+                                                            <iconify-icon icon="mingcute:file-pdf-fill"
+                                                                width="48" height="48"
+                                                                class="text-red-500"></iconify-icon>
                                                         @else
                                                             <img src="{{ $employee_s2_doc_file->temporaryUrl() }}"
                                                                 class="h-40 max-w-full rounded-md object-contain"
@@ -2427,7 +2817,8 @@
                                     @endif
                                     <div class="col-span-12">
                                         <label for="s2_amount" class="form-label">S2 Amount</label>
-                                        <input type="number" step="0.01" id="s2_amount" class="form-control @error('s2_amount') !border-danger-500 @enderror"
+                                        <input type="number" step="0.01" id="s2_amount"
+                                            class="form-control @error('s2_amount') !border-danger-500 @enderror"
                                             wire:model="s2_amount">
                                         @error('s2_amount')
                                             <span class="text-danger-500 text-sm mt-1">{{ $message }}</span>
@@ -2435,14 +2826,16 @@
                                     </div>
                                     <div class="col-span-12">
                                         <label for="s2_year" class="form-label">Year</label>
-                                        <input type="number" id="s2_year" class="form-control @error('s2_year') !border-danger-500 @enderror"
+                                        <input type="number" id="s2_year"
+                                            class="form-control @error('s2_year') !border-danger-500 @enderror"
                                             wire:model="s2_year">
                                         @error('s2_year')
                                             <span class="text-danger-500 text-sm mt-1">{{ $message }}</span>
                                         @enderror
                                     </div>
                                     <div class="col-span-12 xl:col-span-6">
-                                        <label for="employee_s2_doc_issue_date" class="form-label">Issue Date</label>
+                                        <label for="employee_s2_doc_issue_date" class="form-label">Issue
+                                            Date</label>
                                         <input type="date"
                                             class="form-control @error('employee_s2_doc_issue_date') !border-danger-500 @enderror"
                                             wire:model="employee_s2_doc_issue_date">
@@ -2451,7 +2844,8 @@
                                         @enderror
                                     </div>
                                     <div class="col-span-12 xl:col-span-6">
-                                        <label for="employee_s2_doc_expiry_date" class="form-label">Expiry Date (if applicable)</label>
+                                        <label for="employee_s2_doc_expiry_date" class="form-label">Expiry Date (if
+                                            applicable)</label>
                                         <input type="date"
                                             class="form-control @error('employee_s2_doc_expiry_date') !border-danger-500 @enderror"
                                             wire:model="employee_s2_doc_expiry_date">
@@ -2484,7 +2878,7 @@
         </div>
     @endif
 
-    <!-- Employee S6 Doc Modal -->
+    <!-- Employee S6 Doc Edit Modal -->
     @if ($editEmployeeS6DocModal)
         <div>
             <div id="editEmployeeS6DocModal"
@@ -2500,9 +2894,9 @@
                                 <h3 class="text-xl font-medium text-white dark:text-white capitalize">
                                     Edit Employee S6 Doc
                                 </h3>
-                                <button type="button"
+                                <button wire:click="closeEditEmployeeS6DocModal" type="button"
                                     class="text-slate-400 bg-transparent hover:text-slate-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-slate-600 dark:hover:text-white"
-                                    wire:click="closeEditEmployeeS6DocModal">
+                                    data-bs-dismiss="modal">
                                     <svg aria-hidden="true" class="w-5 h-5" fill="#ffffff" viewBox="0 0 20 20"
                                         xmlns="http://www.w3.org/2000/svg">
                                         <path fill-rule="evenodd"
@@ -2512,12 +2906,13 @@
                                     <span class="sr-only">Close modal</span>
                                 </button>
                             </div>
+
                             <!-- Modal body -->
                             <div class="p-6 space-y-4">
                                 <div class="grid grid-cols-12 gap-4">
                                     @if (!$keep_existing_employee_s6_doc)
                                         <div class="col-span-12">
-                                            <label for="employee_s6_doc_file" class="form-label">Employee S6 Doc Document
+                                            <label for="employee_s6_doc_file" class="form-label">S6 Document
                                                 <iconify-icon wire:loading wire:target="employee_s6_doc_file"
                                                     icon="line-md:loading-twotone-loop" width="18"
                                                     height="18"></iconify-icon></label>
@@ -2526,12 +2921,13 @@
                                                 @if ($employee_s6_doc_file)
                                                     <div class="flex items-center justify-center mb-3">
                                                         @if (in_array($employee_s6_doc_file->getClientOriginalExtension(), ['pdf']))
-                                                            <iconify-icon icon="mingcute:file-pdf-fill" width="48"
-                                                                height="48" class="text-red-500"></iconify-icon>
+                                                            <iconify-icon icon="mingcute:file-pdf-fill"
+                                                                width="48" height="48"
+                                                                class="text-red-500"></iconify-icon>
                                                         @else
                                                             <img src="{{ $employee_s6_doc_file->temporaryUrl() }}"
                                                                 class="h-40 max-w-full rounded-md object-contain"
-                                                                alt="Employee S6 Doc Preview">
+                                                                alt="S6 Document Preview">
                                                         @endif
                                                     </div>
                                                     <p class="text-sm text-slate-500">
@@ -2541,21 +2937,49 @@
                                                         Remove File
                                                     </button>
                                                 @else
-                                                    <label for="employee_s6_doc_file_input"
-                                                        class="cursor-pointer block">
-                                                        <iconify-icon icon="mingcute:upload-line" width="32"
-                                                            height="32"
-                                                            class="text-slate-400 mx-auto"></iconify-icon>
-                                                        <p class="mt-2 text-sm text-slate-500">Click to upload or
-                                                            drag
-                                                            and drop</p>
-                                                        <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF (Max
-                                                            10MB)
-                                                        </p>
-                                                        <input id="employee_s6_doc_file_input" type="file"
-                                                            class="hidden" wire:model="employee_s6_doc_file"
-                                                            accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
-                                                    </label>
+                                                    @if ($editing_record_id)
+                                                        <div class="mb-3">
+                                                            <small class="text-muted">
+                                                                Current file: <a
+                                                                    href="{{ $employee->employeeS6Doc->find($editing_record_id)->file_path }}"
+                                                                    target="_blank"
+                                                                    class="text-sm text-blue-500">View</a>
+                                                            </small>
+                                                        </div>
+                                                        @if (!$keep_existing_employee_s6_doc)
+                                                            <label for="employee_s6_doc_file_input"
+                                                                class="cursor-pointer block">
+                                                                <iconify-icon icon="mingcute:upload-line"
+                                                                    width="32" height="32"
+                                                                    class="text-slate-400 mx-auto"></iconify-icon>
+                                                                <p class="mt-2 text-sm text-slate-500">Click to upload
+                                                                </p>
+                                                                <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF
+                                                                    (Max
+                                                                    10MB)</p>
+                                                                <input id="employee_s6_doc_file_input"
+                                                                    type="file" class="hidden"
+                                                                    wire:model="employee_s6_doc_file"
+                                                                    accept=".pdf,.jpg,.jpeg,.png,.gif,.bmp">
+                                                            </label>
+                                                        @endif
+                                                    @else
+                                                        <label for="employee_s6_doc_file_input"
+                                                            class="cursor-pointer block">
+                                                            <iconify-icon icon="mingcute:upload-line" width="32"
+                                                                height="32"
+                                                                class="text-slate-400 mx-auto"></iconify-icon>
+                                                            <p class="mt-2 text-sm text-slate-500">Click to upload or
+                                                                drag
+                                                                and drop</p>
+                                                            <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF (Max
+                                                                10MB)
+                                                            </p>
+                                                            <input id="employee_s6_doc_file_input" type="file"
+                                                                class="hidden" wire:model="employee_s6_doc_file"
+                                                                accept=".pdf,.jpg,.jpeg,.png,.gif,.bmp">
+                                                        </label>
+                                                    @endif
                                                 @endif
                                             </div>
                                             @error('employee_s6_doc_file')
@@ -2563,9 +2987,30 @@
                                             @enderror
                                         </div>
                                     @endif
+                                    @if ($employee->employeeS6Doc)
+                                        <div class="col-span-12 form-check">
+                                            <div class="checkbox-area">
+                                                <label class="inline-flex items-center cursor-pointer"
+                                                    for="keep_existing_employee_s6_doc">
+                                                    <input type="checkbox" class="hidden" name="checkbox"
+                                                        id="keep_existing_employee_s6_doc"
+                                                        wire:model.live="keep_existing_employee_s6_doc">
+                                                    <span
+                                                        class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
+                                                        <img src="{{ asset('images/icon/ck-white.svg') }}"
+                                                            alt=""
+                                                            class="h-[10px] w-[10px] block m-auto opacity-0"></span>
+                                                    <span
+                                                        class="text-slate-500 dark:text-slate-400 text-sm leading-6">Keep
+                                                        existing document</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    @endif
                                     <div class="col-span-12">
                                         <label for="s6_number" class="form-label">S6 Number</label>
-                                        <input type="text" id="s6_number" class="form-control @error('s6_number') !border-danger-500 @enderror"
+                                        <input type="text" id="s6_number"
+                                            class="form-control @error('s6_number') !border-danger-500 @enderror"
                                             wire:model="s6_number">
                                         @error('s6_number')
                                             <span class="text-danger-500 text-sm mt-1">{{ $message }}</span>
@@ -2584,7 +3029,8 @@
                                         @enderror
                                     </div>
                                     <div class="col-span-12 xl:col-span-6">
-                                        <label for="employee_s6_doc_issue_date" class="form-label">Issue Date</label>
+                                        <label for="employee_s6_doc_issue_date" class="form-label">Issue
+                                            Date</label>
                                         <input type="date"
                                             class="form-control @error('employee_s6_doc_issue_date') !border-danger-500 @enderror"
                                             wire:model="employee_s6_doc_issue_date">
@@ -2593,7 +3039,8 @@
                                         @enderror
                                     </div>
                                     <div class="col-span-12 xl:col-span-6">
-                                        <label for="employee_s6_doc_expiry_date" class="form-label">Expiry Date (if applicable)</label>
+                                        <label for="employee_s6_doc_expiry_date" class="form-label">Expiry Date (if
+                                            applicable)</label>
                                         <input type="date"
                                             class="form-control @error('employee_s6_doc_expiry_date') !border-danger-500 @enderror"
                                             wire:model="employee_s6_doc_expiry_date">
@@ -2610,7 +3057,7 @@
                                     class="btn inline-flex justify-center btn-outline-dark">Cancel</button>
                                 <button wire:click="updateEmployeeS6Doc" type="button"
                                     wire:target='updateEmployeeS6Doc' wire:loading.remove
-                                    class="btn inline-flex justify-center btn-dark">Upload</button>
+                                    class="btn inline-flex justify-center btn-dark">{{ $editing_record_id ? 'Update' : 'Upload' }}</button>
                                 <button wire:loading wire:target="updateEmployeeS6Doc" type="button"
                                     class="btn inline-flex justify-center btn-dark">
                                     <span class="flex items-center">
@@ -2660,7 +3107,8 @@
                                 <div class="grid grid-cols-12 gap-4">
                                     @if (!$keep_existing_police_record)
                                         <div class="col-span-12">
-                                            <label for="police_record_file" class="form-label">Police Record Document
+                                            <label for="police_record_file" class="form-label">Police Record
+                                                Document
                                                 <iconify-icon wire:loading wire:target="police_record_file"
                                                     icon="line-md:loading-twotone-loop" width="18"
                                                     height="18"></iconify-icon></label>
@@ -2669,8 +3117,9 @@
                                                 @if ($police_record_file)
                                                     <div class="flex items-center justify-center mb-3">
                                                         @if (in_array($police_record_file->getClientOriginalExtension(), ['pdf']))
-                                                            <iconify-icon icon="mingcute:file-pdf-fill" width="48"
-                                                                height="48" class="text-red-500"></iconify-icon>
+                                                            <iconify-icon icon="mingcute:file-pdf-fill"
+                                                                width="48" height="48"
+                                                                class="text-red-500"></iconify-icon>
                                                         @else
                                                             <img src="{{ $police_record_file->temporaryUrl() }}"
                                                                 class="h-40 max-w-full rounded-md object-contain"
@@ -2704,9 +3153,8 @@
                                                                 <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF
                                                                     (Max
                                                                     2MB)</p>
-                                                                <input id="police_record_file_input"
-                                                                    type="file" class="hidden"
-                                                                    wire:model="police_record_file"
+                                                                <input id="police_record_file_input" type="file"
+                                                                    class="hidden" wire:model="police_record_file"
                                                                     accept=".pdf,.jpg,.jpeg,.png">
                                                             </label>
                                                         @endif
@@ -2842,8 +3290,9 @@
                                                 @if ($hr_letter_file)
                                                     <div class="flex items-center justify-center mb-3">
                                                         @if (in_array($hr_letter_file->getClientOriginalExtension(), ['pdf']))
-                                                            <iconify-icon icon="mingcute:file-pdf-fill" width="48"
-                                                                height="48" class="text-red-500"></iconify-icon>
+                                                            <iconify-icon icon="mingcute:file-pdf-fill"
+                                                                width="48" height="48"
+                                                                class="text-red-500"></iconify-icon>
                                                         @else
                                                             <img src="{{ $hr_letter_file->temporaryUrl() }}"
                                                                 class="h-40 max-w-full rounded-md object-contain"
@@ -2877,9 +3326,8 @@
                                                                 <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF
                                                                     (Max
                                                                     2MB)</p>
-                                                                <input id="hr_letter_file_input"
-                                                                    type="file" class="hidden"
-                                                                    wire:model="hr_letter_file"
+                                                                <input id="hr_letter_file_input" type="file"
+                                                                    class="hidden" wire:model="hr_letter_file"
                                                                     accept=".pdf,.jpg,.jpeg,.png">
                                                             </label>
                                                         @endif
@@ -2954,10 +3402,181 @@
                                 class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
                                 <button wire:click="closeEditHrLetterModal" type="button"
                                     class="btn inline-flex justify-center btn-outline-dark">Cancel</button>
-                                <button wire:click="updateHrLetter" type="button"
-                                    wire:target='updateHrLetter' wire:loading.remove
+                                <button wire:click="updateHrLetter" type="button" wire:target='updateHrLetter'
+                                    wire:loading.remove
                                     class="btn inline-flex justify-center btn-dark">{{ $editing_record_id ? 'Update' : 'Upload' }}</button>
                                 <button wire:loading wire:target="updateHrLetter" type="button"
+                                    class="btn inline-flex justify-center btn-dark">
+                                    <span class="flex items-center">
+                                        <iconify-icon icon="line-md:loading-twotone-loop" width="25"
+                                            height="25"></iconify-icon>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Employee Contract Edit Modal -->
+    @if ($editEmployeeContractModal)
+        <div>
+            <div id="editEmployeeContractModal"
+                class="modal fade fixed top-0 left-0 show w-full h-full outline-none overflow-x-hidden overflow-y-auto"
+                tabindex="-1" aria-labelledby="editEmployeeContractModalLabel" aria-hidden="true" wire:ignore.self>
+                <div class="modal-dialog relative w-auto pointer-events-none">
+                    <div
+                        class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
+                        <div class="relative bg-white rounded-lg shadow dark:bg-slate-700">
+                            <!-- Modal header -->
+                            <div
+                                class="flex items-center justify-between p-5 border-b rounded-t dark:border-slate-600 bg-black-500">
+                                <h3 class="text-xl font-medium text-white dark:text-white capitalize">
+                                    {{ $editing_contract_id ? 'Edit' : 'Add' }} Employee Contract
+                                </h3>
+                                <button wire:click="closeEditEmployeeContractModal" type="button"
+                                    class="text-slate-400 bg-transparent hover:text-slate-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-slate-600 dark:hover:text-white"
+                                    data-bs-dismiss="modal">
+                                    <svg aria-hidden="true" class="w-5 h-5" fill="#ffffff" viewBox="0 0 20 20"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd"
+                                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span class="sr-only">Close modal</span>
+                                </button>
+                            </div>
+
+                            <!-- Modal body -->
+                            <div class="p-6 space-y-4">
+                                <div class="grid grid-cols-12 gap-4">
+                                    @if (!$keep_existing_employee_contract)
+                                        <div class="col-span-12">
+                                            <label for="employee_contract_file" class="form-label">Employee Contract Document
+                                                <iconify-icon wire:loading wire:target="employee_contract_file"
+                                                    icon="line-md:loading-twotone-loop" width="18"
+                                                    height="18"></iconify-icon></label>
+                                            <div
+                                                class="border-2 border-dashed border-slate-200 rounded-md p-4 text-center">
+                                                @if ($employee_contract_file)
+                                                    <div class="flex items-center justify-center mb-3">
+                                                        @if (in_array($employee_contract_file->getClientOriginalExtension(), ['pdf']))
+                                                            <iconify-icon icon="mingcute:file-pdf-fill" width="48"
+                                                                height="48" class="text-red-500"></iconify-icon>
+                                                        @else
+                                                            <img src="{{ $employee_contract_file->temporaryUrl() }}"
+                                                                class="h-40 max-w-full rounded-md object-contain"
+                                                                alt="Employee Contract Preview">
+                                                        @endif
+                                                    </div>
+                                                    <p class="text-sm text-slate-500">
+                                                        {{ $employee_contract_file->getClientOriginalName() }}</p>
+                                                    <button type="button" class="text-sm text-red-500 mt-2"
+                                                        wire:click="$set('employee_contract_file', null)">
+                                                        Remove File
+                                                    </button>
+                                                @else
+                                                    @if ($editing_contract_id)
+                                                        <div class="mb-3">
+                                                            <small class="text-muted">
+                                                                Current file: <a
+                                                                    href="{{ $employee->contracts->find($editing_contract_id)->file_path }}"
+                                                                    target="_blank"
+                                                                    class="text-sm text-blue-500">View</a>
+                                                            </small>
+                                                        </div>
+                                                        @if (!$keep_existing_employee_contract)
+                                                            <label for="employee_contract_file_input"
+                                                                class="cursor-pointer block">
+                                                                <iconify-icon icon="mingcute:upload-line"
+                                                                    width="32" height="32"
+                                                                    class="text-slate-400 mx-auto"></iconify-icon>
+                                                                <p class="mt-2 text-sm text-slate-500">Click to upload
+                                                                </p>
+                                                                <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF
+                                                                    (Max
+                                                                    10MB)</p>
+                                                                <input id="employee_contract_file_input" type="file"
+                                                                    class="hidden" wire:model="employee_contract_file"
+                                                                    accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
+                                                            </label>
+                                                        @endif
+                                                    @else
+                                                        <label for="employee_contract_file_input"
+                                                            class="cursor-pointer block">
+                                                            <iconify-icon icon="mingcute:upload-line" width="32"
+                                                                height="32"
+                                                                class="text-slate-400 mx-auto"></iconify-icon>
+                                                            <p class="mt-2 text-sm text-slate-500">Click to upload or
+                                                                drag
+                                                                and drop</p>
+                                                            <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF (Max
+                                                                10MB)
+                                                            </p>
+                                                            <input id="employee_contract_file_input" type="file"
+                                                                class="hidden" wire:model="employee_contract_file"
+                                                                accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
+                                                        </label>
+                                                    @endif
+                                                @endif
+                                            </div>
+                                            @error('employee_contract_file')
+                                                <span class="text-danger-500 text-sm mt-1">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    @endif
+                                    @if ($editing_contract_id)
+                                        <div class="col-span-12 form-check">
+                                            <div class="checkbox-area">
+                                                <label class="inline-flex items-center cursor-pointer"
+                                                    for="keep_existing_employee_contract">
+                                                    <input type="checkbox" class="hidden" name="checkbox"
+                                                        id="keep_existing_employee_contract"
+                                                        wire:model.live="keep_existing_employee_contract">
+                                                    <span
+                                                        class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
+                                                        <img src="{{ asset('images/icon/ck-white.svg') }}"
+                                                            alt=""
+                                                            class="h-[10px] w-[10px] block m-auto opacity-0"></span>
+                                                    <span
+                                                        class="text-slate-500 dark:text-slate-400 text-sm leading-6">Keep
+                                                        existing document</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    @endif
+                                    <div class="col-span-12 xl:col-span-6">
+                                        <label for="employee_contract_issue_date" class="form-label">Issue
+                                            Date</label>
+                                        <input type="date"
+                                            class="form-control @error('employee_contract_issue_date') !border-danger-500 @enderror"
+                                            wire:model="employee_contract_issue_date">
+                                        @error('employee_contract_issue_date')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-span-12 xl:col-span-6">
+                                        <label for="employee_contract_expiry_date" class="form-label">Expiry Date</label>
+                                        <input type="date"
+                                            class="form-control @error('employee_contract_expiry_date') !border-danger-500 @enderror"
+                                            wire:model="employee_contract_expiry_date">
+                                        @error('employee_contract_expiry_date')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Modal footer -->
+                            <div
+                                class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
+                                <button wire:click="closeEditEmployeeContractModal" type="button"
+                                    class="btn inline-flex justify-center btn-outline-dark">Cancel</button>
+                                <button wire:click="updateEmployeeContract" type="button" wire:target='updateEmployeeContract'
+                                    wire:loading.remove
+                                    class="btn inline-flex justify-center btn-dark">{{ $editing_contract_id ? 'Update' : 'Upload' }}</button>
+                                <button wire:loading wire:target="updateEmployeeContract" type="button"
                                     class="btn inline-flex justify-center btn-dark">
                                     <span class="flex items-center">
                                         <iconify-icon icon="line-md:loading-twotone-loop" width="25"

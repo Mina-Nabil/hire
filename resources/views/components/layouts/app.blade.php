@@ -44,7 +44,6 @@
     <!-- [if IE]> <p class="browserupgrade"> You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security. </p> <![endif] -->
     <main class="app-wrapper">
         <!-- BEGIN: Sidebar -->
-        <!-- BEGIN: Sidebar -->
         <div class="sidebar-wrapper group">
             <div id="bodyOverlay"
                 class="w-screen h-screen fixed top-0 bg-slate-900 bg-opacity-50 backdrop-blur-sm z-10 hidden"></div>
@@ -152,6 +151,21 @@
 
                         </ul>
                     </li>
+                    
+                    <li class="">
+                        <a href="javascript:void(0)" class="navItem">
+                            <span class="flex items-center">
+                                <span>Employees</span>
+                            </span>
+                            <iconify-icon class="icon-arrow" icon="heroicons-outline:chevron-right"></iconify-icon>
+                        </a>
+                        <ul class="sidebar-submenu">
+                            <li>
+                                <a class="{{ $missingDocReport ?? '' }}"
+                                    href="{{ route('employees.reports.missing-documents') }}">Document Status</a>
+                            </li>
+                        </ul>
+                    </li>
 
                     <li class="">
                         <a href="javascript:void(0)" class="navItem">
@@ -179,7 +193,6 @@
                 </ul>
             </div>
         </div>
-        <!-- End: Sidebar -->
         <!-- End: Sidebar -->
 
         <!-- End: Settings -->

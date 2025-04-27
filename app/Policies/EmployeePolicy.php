@@ -41,6 +41,14 @@ class EmployeePolicy
     }
 
     /**
+     * Determine whether the user can delete employee docs.
+     */
+    public function deleteDocs(User $user, Employee $employee): bool
+    {
+        return $user->is_admin || $user->is_hr || $user->id === $employee->user_id;
+    }
+
+    /**
      * Determine whether the user can update the model.
      */
     public function update(User $user, Employee $employee): bool

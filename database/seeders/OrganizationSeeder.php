@@ -105,7 +105,8 @@ class OrganizationSeeder extends Seeder
                 'arabic_name' => 'الرئيس التنفيذي',
                 'job_description' => 'Provides overall leadership and strategic direction for the entire organization.',
                 'arabic_job_description' => 'يوفر القيادة العامة والتوجيه الاستراتيجي للمؤسسة بأكملها.',
-                'parent_id' => null
+                'parent_id' => null,
+                'code' => 'CEO'
             ])
             ->create();
             
@@ -146,7 +147,8 @@ class OrganizationSeeder extends Seeder
                     'arabic_name' => $role['arabic'],
                     'job_description' => 'Executive leadership for the ' . $department->name . ' department, reporting to the CEO.',
                     'arabic_job_description' => 'القيادة التنفيذية لقسم ' . $department->name . '، والإبلاغ المباشر للرئيس التنفيذي.',
-                    'parent_id' => $ceo->id
+                    'parent_id' => $ceo->id,
+                    'code' => $role['code']
                 ])
                 ->create();
                 
@@ -188,7 +190,8 @@ class OrganizationSeeder extends Seeder
                         'name' => $managerTitle,
                         'arabic_name' => 'مدير ' . $managerTitle,
                         'job_description' => 'Manages a division within the ' . $department->name . ' department, reporting to the ' . $executive->name . '.',
-                        'parent_id' => $executive->id
+                        'parent_id' => $executive->id,
+                        'code' => $managerTitle
                     ])
                     ->create();
                     
@@ -232,7 +235,8 @@ class OrganizationSeeder extends Seeder
                         'name' => $staffTitle,
                         'arabic_name' => $staffTitle . ' (Arabic)',
                         'job_description' => 'Responsible for ' . strtolower($staffTitle) . ' duties within the ' . $department->name . ' department.',
-                        'parent_id' => $manager->id
+                        'parent_id' => $manager->id,
+                        'code' => $staffTitle
                     ])
                     ->create();
             }

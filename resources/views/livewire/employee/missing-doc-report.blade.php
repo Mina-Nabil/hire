@@ -142,7 +142,7 @@
                     <div class="relative bg-white rounded-lg shadow dark:bg-slate-700">
                         <!-- Modal header -->
                         <div
-                            class="flex items-center justify-between p-5 border-b rounded-t dark:border-slate-600 bg-warning-500">
+                            class="flex items-center justify-between p-5 border-b rounded-t dark:border-slate-600 bg-slate-900">
                             <h3 class="text-xl font-medium text-white dark:text-white capitalize">
                                 Missing Documents for {{ $selectedEmployee->name }}
                             </h3>
@@ -175,8 +175,7 @@
                         <div
                             class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
                             <a href="{{ route('employees.show', $selectedEmployee->id) }}"
-                                class="btn inline-flex justify-center text-white bg-primary-500">
-                                <iconify-icon icon="heroicons:user"></iconify-icon>
+                                class="btn inline-flex justify-center text-white bg-slate-900">
                                 <span class="ml-2">Go to Employee</span>
                             </a>
                             <button type="button" class="btn inline-flex justify-center text-white bg-slate-500"
@@ -231,8 +230,7 @@
                         <div
                             class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
                             <a href="{{ route('employees.show', $selectedEmployee->id) }}"
-                                class="btn inline-flex justify-center text-white bg-primary-500">
-                                <iconify-icon icon="heroicons:user"></iconify-icon>
+                                class="btn inline-flex justify-center text-white bg-slate-900">
                                 <span class="ml-2">Go to Employee</span>
                             </a>
                             <button type="button" class="btn inline-flex justify-center text-white bg-slate-500"

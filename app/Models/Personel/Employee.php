@@ -43,7 +43,7 @@ class Employee extends Model
     const DOC_STATUS_EXPIRED = 'expired';
     const DOC_STATUS_MISSING = 'missing';
 
-    // Default days threshold for near expiry warning (30 days)
+    // Default days threshold for near expiry warning (7 days)
     const NEAR_EXPIRY_DAYS = 7;
 
     protected $fillable = ['name', 'email', 'phone', 'address', 'nationality', 'gender', 'birth_date', 'image_url', 'birth_place_id', 'license_required', 'employment_date'];
@@ -447,7 +447,7 @@ class Employee extends Model
                 })
                 // 5. Driver License - only if required
                 ->orWhere(function ($query) {
-                    $query->where('license_required', true)->whereDoesntHave('driverLicense');
+                    $query->where('license_required', 1)->whereDoesntHave('driverLicense');
                 })
                 // 6. Police Record
                 ->orWhereDoesntHave('policeRecords')
@@ -542,7 +542,7 @@ class Employee extends Model
         }
 
         // 4. Army Service Paper
-        if ($this->gender === 'male' && (!$this->info || !in_array($this->info->military_status, ['exempt', 'completed'])) && !$this->armyServicePaper) {
+        if ($this->gender === Applicant::GENDER_MALE && ($this->info && in_array($this->info->military_status, [Applicant::MILITARY_STATUS_EXEMPTED, Applicant::MILITARY_STATUS_COMPLETED])) && !$this->armyServicePaper) {
             $missingDocs[] = 'Army Service Paper';
         }
 

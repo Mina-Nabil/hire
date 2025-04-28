@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             VacancySeeder::class,
             ApplicantSeeder::class,
             InterviewSeeder::class,
+            EmployeeSeeder::class,
         ]);
     }
 }

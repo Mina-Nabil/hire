@@ -19,6 +19,7 @@ class EmployeeDashboard extends Component
     public $s6DocStats;
     public $medicalRecordStats;
     public $externalMedicalRecordStats;
+    public $practiceCardStats;
 
     public function mount()
     {
@@ -34,6 +35,7 @@ class EmployeeDashboard extends Component
         $this->loadS6DocStats();
         $this->loadMedicalRecordStats();
         $this->loadExternalMedicalRecordStats();
+        $this->loadPracticeCardStats();
     }
 
     public function loadIdCardStats()
@@ -94,6 +96,11 @@ class EmployeeDashboard extends Component
     public function loadExternalMedicalRecordStats()
     {
         $this->externalMedicalRecordStats = Employee::getExternalMedicalRecordStatistics();
+    }
+
+    public function loadPracticeCardStats()
+    {
+        $this->practiceCardStats = Employee::getPracticeCardStatistics();
     }
 
     public function render()

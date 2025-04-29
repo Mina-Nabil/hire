@@ -162,6 +162,13 @@ class EmployeeShow extends Component
     public $external_medical_record_expiry_date;
     public $external_medical_record_id_number;
     public $keep_existing_external_medical_record = false;
+    
+    // Practice Card Properties
+    public $showEditPracticeCardModal = false;
+    public $practice_card_file;
+    public $practice_card_issue_date;
+    public $practice_card_expiry_date;
+    public $keep_existing_practice_card = false;
 
     // protected $rules = [
     //     // Base Info validation rules
@@ -261,7 +268,21 @@ class EmployeeShow extends Component
 
     public function mount($id)
     {
-        $this->employee = Employee::with(['info', 'idCard', 'birthCertificate', 'armyServicePaper', 'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'policeRecords', 'hrLetters', 'driverLicense', 'contracts', 'medicalRecord'])->findorFail($id);
+        $this->employee = Employee::with([
+            'info', 
+            'idCard', 
+            'birthCertificate', 
+            'armyServicePaper', 
+            'employeeS1Doc', 
+            'employeeS2Doc', 
+            'employeeS6Doc', 
+            'policeRecords', 
+            'hrLetters', 
+            'driverLicense', 
+            'medicalRecord',
+            'externalMedicalRecord',
+            'practiceCard',
+        ])->findOrFail($id);
         $this->insuranceOffices = InsuranceOffice::all();
         $this->militaryStatuses = Applicant::MILITARY_STATUS;
         $this->birthCertificateTypes = BirthCertificate::TYPES;
@@ -1639,8 +1660,9 @@ class EmployeeShow extends Component
         $this->showEditExternalMedicalRecordModal = true;
 
         if ($this->employee->externalMedicalRecord) {
-            $this->external_medical_record_issue_date = $this->employee->externalMedicalRecord->issue_date->format('Y-m-d');
-            $this->external_medical_record_expiry_date = $this->employee->externalMedicalRecord->expiry_date->format('Y-m-d');
+            $this->external_medical_record_issue_date = $this->employee->externalMedicalRecord->issue_date;
+            $this->external_medical_record_expiry_date = $this->employee->externalMedicalRecord->expiry_date;
+            $this->external_medical_record_id_number = $this->employee->externalMedicalRecord->id_number;
             $this->keep_existing_external_medical_record = true;
         } else {
             $this->resetExternalMedicalRecordFields();
@@ -1672,10 +1694,19 @@ class EmployeeShow extends Component
         ]);
 
         try {
-            $filePath = $this->employee->externalMedicalRecord ? $this->employee->externalMedicalRecord->file_path : null;
-            
-            if ($this->external_medical_record_file) {
+            $filePath = null;
+            if (!$this->keep_existing_external_medical_record && $this->external_medical_record_file) {
+                // Delete existing medical record file if it exists
+                if ($this->employee->externalMedicalRecord && $this->employee->externalMedicalRecord->file_path) {
+                    $existingFilePath = str_replace('storage/', '', $this->employee->externalMedicalRecord->getRawOriginal('file_path'));
+                    if (Storage::disk('s3')->exists($existingFilePath)) {
+                        Storage::disk('s3')->delete($existingFilePath);
+                    }
+                }
+                // Upload new file to S3
                 $filePath = $this->external_medical_record_file->store(Employee::FILES_DIRECTORY.'/external_medical_records', 's3');
+            } else if ($this->keep_existing_external_medical_record && $this->employee->externalMedicalRecord) {
+                $filePath = $this->employee->externalMedicalRecord->getRawOriginal('file_path');
             }
 
             $this->employee->setExternalMedicalRecord(
@@ -1700,6 +1731,107 @@ class EmployeeShow extends Component
                 return $this->employee->externalMedicalRecord->downloadFile();
             } else {
                 $this->alertError('No external medical record found.');
+            }
+        } catch (\Exception $e) {
+            $this->alertError('Error downloading document: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Open the edit Practice Card modal
+     */
+    public function openEditPracticeCardModal()
+    {
+        $this->showEditPracticeCardModal = true;
+
+        if ($this->employee->practiceCard) {
+            $this->practice_card_issue_date = $this->employee->practiceCard->issue_date;
+            $this->practice_card_expiry_date = $this->employee->practiceCard->expiry_date;
+            $this->keep_existing_practice_card = true;
+        } else {
+            $this->resetPracticeCardFields();
+        }
+    }
+
+    /**
+     * Close the edit Practice Card modal
+     */
+    public function closeEditPracticeCardModal()
+    {
+        $this->showEditPracticeCardModal = false;
+        $this->resetPracticeCardFields();
+    }
+
+    /**
+     * Reset the Practice Card form fields
+     */
+    private function resetPracticeCardFields()
+    {
+        $this->practice_card_file = null;
+        $this->practice_card_issue_date = null;
+        $this->practice_card_expiry_date = null;
+        $this->keep_existing_practice_card = false;
+    }
+
+    /**
+     * Update the Practice Card
+     */
+    public function updatePracticeCard()
+    {
+        $this->validate([
+            'practice_card_issue_date' => 'required|date',
+            'practice_card_expiry_date' => 'required|date|after:practice_card_issue_date',
+            'practice_card_file' => $this->keep_existing_practice_card ? 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif' : 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
+        ]);
+
+        try {
+            $filePath = null;
+            if (!$this->keep_existing_practice_card && $this->practice_card_file) {
+                // Delete existing medical record file if it exists
+                if ($this->employee->practiceCard && $this->employee->practiceCard->file_path) {
+                    $existingFilePath = str_replace('storage/', '', $this->employee->practiceCard->getRawOriginal('file_path'));
+                    if (Storage::disk('s3')->exists($existingFilePath)) {
+                        Storage::disk('s3')->delete($existingFilePath);
+                    }
+                }
+                // Upload new file to S3
+                $filePath = $this->practice_card_file->store(Employee::FILES_DIRECTORY.'/practice_cards', 's3');
+            } else if ($this->keep_existing_practice_card && $this->employee->practiceCard) {
+                $filePath = $this->employee->practiceCard->getRawOriginal('file_path');
+            }
+
+            $this->employee->setPracticeCard(
+                $filePath,
+                Carbon::parse($this->practice_card_issue_date),
+                Carbon::parse($this->practice_card_expiry_date)
+            );
+
+            $this->closeEditPracticeCardModal();
+            $this->alertSuccess('Practice Card has been updated successfully!');
+            
+            // Refresh employee data
+            $this->employee = Employee::with([
+                'info', 'idCard', 'birthCertificate', 'armyServicePaper', 
+                'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'policeRecords', 
+                'hrLetters', 'driverLicense', 'medicalRecord', 'externalMedicalRecord',
+                'practiceCard'
+            ])->findOrFail($this->employee->id);
+            
+        } catch (Exception $e) {
+            $this->alertError($e->getMessage());
+        }
+    }
+
+    /**
+     * Download the Practice Card file
+     */
+    public function downloadPracticeCard()
+    {
+        try {
+            if ($this->employee->practiceCard) {
+                return $this->employee->practiceCard->downloadFile();
+            } else {
+                $this->alertError('No practice card found.');
             }
         } catch (\Exception $e) {
             $this->alertError('Error downloading document: ' . $e->getMessage());

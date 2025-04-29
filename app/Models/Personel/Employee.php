@@ -528,7 +528,9 @@ class Employee extends Model
                 // 11. Medical Record
                 ->orWhereDoesntHave('medicalRecord')
                 // 12. External Medical Record
-                ->orWhereDoesntHave('externalMedicalRecord');
+                ->orWhereDoesntHave('externalMedicalRecord')
+                // 13. Practice Card
+                ->orWhereDoesntHave('practiceCard');
         });
     }
 
@@ -544,27 +546,26 @@ class Employee extends Model
 
         return $query->where(function ($query) use ($today) {
             // 1. ID Card expired
-            $query
-                ->whereHas('idCard', function ($q) use ($today) {
-                    $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
-                })
-                // 2. Birth certificate expired
+            $query->whereHas('idCard', function ($q) use ($today) {
+                $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
+            })
+                // 2. Birth Certificate expired
                 ->orWhereHas('birthCertificate', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
                 })
-                // 3. Contract expired
+                // 3. Employment Contract expired
                 ->orWhereHas('contracts', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
                 })
-                // 4. Army service paper expired
+                // 4. Army Service Paper expired
                 ->orWhereHas('armyServicePaper', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
                 })
-                // 5. Driver license expired
+                // 5. Driver License expired
                 ->orWhereHas('driverLicense', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
                 })
-                // 6. Police records expired
+                // 6. Police Record expired
                 ->orWhereHas('policeRecords', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
                 })
@@ -590,6 +591,10 @@ class Employee extends Model
                 })
                 // 12. External Medical Record expired
                 ->orWhereHas('externalMedicalRecord', function ($q) use ($today) {
+                    $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
+                })
+                // 13. Practice Card expired
+                ->orWhereHas('practiceCard', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
                 });
         });
@@ -1215,6 +1220,11 @@ class Employee extends Model
         if (!$this->externalMedicalRecord) {
             $missingDocs[] = 'External Medical Record';
         }
+        
+        // 13. Practice Card
+        if (!$this->practiceCard) {
+            $missingDocs[] = 'Practice Card';
+        }
 
         return $missingDocs;
     }
@@ -1302,6 +1312,11 @@ class Employee extends Model
         // 12. External Medical Record
         if ($this->externalMedicalRecord && $this->externalMedicalRecord->expiry_date && $today->gt($this->externalMedicalRecord->expiry_date)) {
             $expiredDocs[] = 'External Medical Record';
+        }
+        
+        // 13. Practice Card
+        if ($this->practiceCard && $this->practiceCard->expiry_date && $today->gt($this->practiceCard->expiry_date)) {
+            $expiredDocs[] = 'Practice Card';
         }
 
         return $expiredDocs;
@@ -1917,6 +1932,42 @@ class Employee extends Model
         }
     }
 
+    /**
+     * Set practice card for the employee
+     *
+     * @param string $file_path
+     * @param Carbon $issue_date
+     * @param Carbon $expiry_date
+     * @return bool
+     * @throws AppException
+     */
+    public function setPracticeCard($file_path, Carbon $issue_date, Carbon $expiry_date)
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('setDocs', $this)) {
+            throw new AppException('You dont have permission to set docs for this employee');
+        }
+
+        try {
+            $this->practiceCard()->updateOrCreate(
+                [
+                    'employee_id' => $this->id,
+                ],
+                [
+                    'created_by' => $loggedInUser->id,
+                    'file_path' => $file_path,
+                    'issue_date' => $issue_date,
+                    'expiry_date' => $expiry_date,
+                ],
+            );
+            return true;
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException('Error setting practice card: ' . $e->getMessage());
+        }
+    }
+
     public static function getExternalMedicalRecordStatistics()
     {
         $total = Employee::count();
@@ -1949,6 +2000,8 @@ class Employee extends Model
             'missing' => $missing
         ];
     }
+
+    
 
     public function includeInReportExternalMedicalRecord()
     {

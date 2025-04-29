@@ -540,5 +540,42 @@
                 </div>
             </div>
         </div>
+
+        <!-- Practice Card Statistics Section -->
+        <div class="mb-8">
+            <h3 class="text-xl font-semibold mb-4">Practice Card Status</h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <!-- Total Employees Card -->
+                <div class="bg-white rounded-lg shadow p-4">
+                    <div class="text-gray-500 text-sm">Total Employees</div>
+                    <div class="text-2xl font-bold">{{ $practiceCardStats['total'] }}</div>
+                </div>
+
+                <!-- Valid Practice Cards -->
+                <div class="bg-success-100 border border-success-500 rounded-lg shadow p-4">
+                    <div class="text-gray-500 text-sm">Valid Records</div>
+                    <div class="text-2xl font-bold text-success-600">{{ $practiceCardStats['valid'] }}</div>
+                </div>
+
+                <!-- Near Expiry Card -->
+                <div class="bg-warning-50 border border-warning-500 rounded-lg shadow p-4">
+                    <div class="text-warning-100 text-sm">Near Expiry</div>
+                    <div class="text-2xl font-bold text-warning-600">{{ $practiceCardStats['near_expiry'] }}</div>
+                </div>
+
+                <!-- Expired Card -->
+                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
+                    <div class="text-danger-100 text-sm">Expired</div>
+                    <div class="text-2xl font-bold text-danger-600">{{ $practiceCardStats['expired'] }}</div>
+                </div>
+
+                <!-- Missing Card -->
+                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
+                    <div class="text-danger-100 text-sm">Missing</div>
+                    <div class="text-2xl font-bold text-danger-600">{{ $practiceCardStats['missing'] }}</div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

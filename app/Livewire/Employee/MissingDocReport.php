@@ -34,6 +34,7 @@ class MissingDocReport extends Component
         'S6 Document' => false,
         'Medical Record' => false,
         'External Medical Record' => false,
+        'Practice Card' => false,
     ];
     
     // Separate filters for missing and expired documents

@@ -14,6 +14,7 @@ class ExternalMedicalRecord extends Model
     protected $fillable = [
         'employee_id',
         'created_by',
+        'id_number',
         'file_path',
         'issue_date',
         'expiry_date',

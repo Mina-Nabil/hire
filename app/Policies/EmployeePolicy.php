@@ -33,6 +33,14 @@ class EmployeePolicy
     }
 
     /**
+     * Determine whether the user can view the missing document report.
+     */
+    public function viewMissingDocReport(User $user): bool
+    {
+        return $user->is_admin || $user->is_hr;
+    }
+
+    /**
      * Determine whether the user can create models.
      */
     public function create(User $user): bool

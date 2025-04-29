@@ -143,89 +143,125 @@ class EmployeeShow extends Component
     // Common properties
     public $editing_record_id = null;
 
-    protected $rules = [
-        // Base Info validation rules
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|max:255',
-        'phone' => 'required|string|max:20',
-        'address' => 'required|string|max:255',
-        'nationality' => 'required|string|max:50',
-        'gender' => 'required|in:Male,Female',
-        'birth_date' => 'required|date',
-        'employment_date' => 'required|date',
+    public $showEditHrLetterModal = false;
+    public $showEditMedicalRecordModal = false;
+    public $medical_record_file;
+    public $medical_record_issue_date;
+    public $medical_record_expiry_date;
+    public $medical_record_status;
+    public $medical_record_insurance_number;
+    public $medical_record_medical_card_code;
+    public $medical_record_medical_card_start;
+    public $medical_record_medical_card_expiry;
+    public $keep_existing_medical_record = false;
 
-        // Employee Info validation rules
-        'insurance_office_id' => 'required|exists:insurance_offices,id',
-        'insurance_number' => 'nullable|string|max:50',
-        'insurance_amount' => 'nullable|string|max:50',
-        'academic_qualification' => 'nullable|string|max:255',
-        'university' => 'nullable|string|max:255',
-        'graduation_year' => 'nullable|integer',
-        'military_status' => 'nullable|string|max:50',
-        'marital_status' => 'nullable|string|max:50',
+    // External Medical Record Properties
+    public $showEditExternalMedicalRecordModal = false;
+    public $external_medical_record_file;
+    public $external_medical_record_issue_date;
+    public $external_medical_record_expiry_date;
+    public $external_medical_record_id_number;
+    public $keep_existing_external_medical_record = false;
+
+    // protected $rules = [
+    //     // Base Info validation rules
+    //     'name' => 'required|string|max:255',
+    //     'email' => 'required|email|max:255',
+    //     'phone' => 'required|string|max:20',
+    //     'address' => 'required|string|max:255',
+    //     'nationality' => 'required|string|max:50',
+    //     'gender' => 'required|in:Male,Female',
+    //     'birth_date' => 'required|date',
+    //     'employment_date' => 'required|date',
+
+    //     // Employee Info validation rules
+    //     'insurance_office_id' => 'required|exists:insurance_offices,id',
+    //     'insurance_number' => 'nullable|string|max:50',
+    //     'insurance_amount' => 'nullable|string|max:50',
+    //     'academic_qualification' => 'nullable|string|max:255',
+    //     'university' => 'nullable|string|max:255',
+    //     'graduation_year' => 'nullable|integer',
+    //     'military_status' => 'nullable|string|max:50',
+    //     'marital_status' => 'nullable|string|max:50',
         
-        // ID Card validation rules
-        'id_card_file' => 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
-        'id_number' => 'required|string|max:50',
-        'id_issue_date' => 'required|date',
-        'id_expiry_date' => 'required|date|after:id_issue_date',
+    //     // ID Card validation rules
+    //     'id_card_file' => 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
+    //     'id_number' => 'required|string|max:50',
+    //     'id_issue_date' => 'required|date',
+    //     'id_expiry_date' => 'required|date|after:id_issue_date',
         
-        // Birth Certificate validation rules
-        'birth_certificate_file' => 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
-        'birth_certificate_issue_date' => 'required|date',
-        'birth_certificate_expiry_date' => 'nullable|date|after:birth_certificate_issue_date',
-        'birth_certificate_type' => 'required|in:Original,Copy,Verified Copy',
+    //     // Birth Certificate validation rules
+    //     'birth_certificate_file' => 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
+    //     'birth_certificate_issue_date' => 'required|date',
+    //     'birth_certificate_expiry_date' => 'nullable|date|after:birth_certificate_issue_date',
+    //     'birth_certificate_type' => 'required|in:Original,Copy,Verified Copy',
         
-        // Army Service Paper validation rules
-        'army_service_paper_file' => 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
-        'army_service_paper_issue_date' => 'required|date',
-        'army_service_paper_expiry_date' => 'nullable|date|after:army_service_paper_issue_date',
-        'army_service_paper_type' => 'required|in:Original,Exemption,Postponed',
+    //     // Army Service Paper validation rules
+    //     'army_service_paper_file' => 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
+    //     'army_service_paper_issue_date' => 'required|date',
+    //     'army_service_paper_expiry_date' => 'nullable|date|after:army_service_paper_issue_date',
+    //     'army_service_paper_type' => 'required|in:Original,Exemption,Postponed',
 
-        // Employee S1 Doc validation rules
-        'employee_s1_doc_file' => 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
-        's1_number' => 'required|string|max:50',
-        'employee_s1_doc_issue_date' => 'required|date',
-        'employee_s1_doc_expiry_date' => 'nullable|date|after:employee_s1_doc_issue_date',
+    //     // Employee S1 Doc validation rules
+    //     'employee_s1_doc_file' => 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
+    //     's1_number' => 'required|string|max:50',
+    //     'employee_s1_doc_issue_date' => 'required|date',
+    //     'employee_s1_doc_expiry_date' => 'nullable|date|after:employee_s1_doc_issue_date',
 
-        // Employee S2 Doc validation rules
-        'employee_s2_doc_file' => 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
-        's2_amount' => 'required|numeric|min:0',
-        's2_year' => 'required|integer|min:1900|max:2040',
-        'employee_s2_doc_issue_date' => 'required|date',
-        'employee_s2_doc_expiry_date' => 'nullable|date|after:employee_s2_doc_issue_date',
+    //     // Employee S2 Doc validation rules
+    //     'employee_s2_doc_file' => 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
+    //     's2_amount' => 'required|numeric|min:0',
+    //     's2_year' => 'required|integer|min:1900|max:2040',
+    //     'employee_s2_doc_issue_date' => 'required|date',
+    //     'employee_s2_doc_expiry_date' => 'nullable|date|after:employee_s2_doc_issue_date',
 
-        // Employee S6 Doc validation rules
-        'employee_s6_doc_file' => 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
-        's6_number' => 'required|string|max:50',
-        'leaving_reason' => 'required|string',
-        'employee_s6_doc_issue_date' => 'required|date',
-        'employee_s6_doc_expiry_date' => 'nullable|date|after:employee_s6_doc_issue_date',
+    //     // Employee S6 Doc validation rules
+    //     'employee_s6_doc_file' => 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
+    //     's6_number' => 'required|string|max:50',
+    //     'leaving_reason' => 'required|string',
+    //     'employee_s6_doc_issue_date' => 'required|date',
+    //     'employee_s6_doc_expiry_date' => 'nullable|date|after:employee_s6_doc_issue_date',
 
-        // Employee Contract validation rules
-        'employee_contract_file' => 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
-        'employee_contract_issue_date' => 'required|date',
-        'employee_contract_expiry_date' => 'nullable|date|after:employee_contract_issue_date',
+    //     // Employee Contract validation rules
+    //     'employee_contract_file' => 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
+    //     'employee_contract_issue_date' => 'required|date',
+    //     'employee_contract_expiry_date' => 'nullable|date|after:employee_contract_issue_date',
 
-        // Driver License Rules
-        'driver_license_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
-        'driver_license_issue_date' => 'required|date',
-        'driver_license_expiry_date' => 'required|date',
+    //     // Driver License Rules
+    //     'driver_license_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+    //     'driver_license_issue_date' => 'required|date',
+    //     'driver_license_expiry_date' => 'required|date',
 
-        // Police Record Rules
-        'police_record_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
-        'police_record_issue_date' => 'required|date',
-        'police_record_expiry_date' => 'nullable|date',
+    //     // Police Record Rules
+    //     'police_record_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+    //     'police_record_issue_date' => 'required|date',
+    //     'police_record_expiry_date' => 'nullable|date',
 
-        // HR Letter Rules
-        'hr_letter_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
-        'hr_letter_issue_date' => 'required|date',
-        'hr_letter_expiry_date' => 'nullable|date',
-    ];
+    //     // HR Letter Rules
+    //     'hr_letter_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+    //     'hr_letter_issue_date' => 'required|date',
+    //     'hr_letter_expiry_date' => 'nullable|date',
+
+    //     // Medical Record validation rules
+    //     'medical_record_file' => !$this->keep_existing_medical_record ? 'required|file|mimes:pdf,jpg,jpeg,png|max:10240' : 'nullable',
+    //     'medical_record_issue_date' => 'required|date',
+    //     'medical_record_expiry_date' => 'required|date|after:medical_record_issue_date',
+    //     'medical_record_status' => 'required|in:Not Covered,Examination,Issuing,Covered,External Cover',
+    //     'medical_record_insurance_number' => 'nullable|string|max:50',
+    //     'medical_record_medical_card_code' => 'nullable|string|max:50',
+    //     'medical_record_medical_card_start' => 'nullable|date',
+    //     'medical_record_medical_card_expiry' => 'nullable|date|after:medical_record_medical_card_start',
+        
+    //     // External Medical Record validation rules
+    //     'external_medical_record_file' => !$this->keep_existing_external_medical_record ? 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif' : 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
+    //     'external_medical_record_issue_date' => 'required|date',
+    //     'external_medical_record_expiry_date' => 'required|date|after:external_medical_record_issue_date',
+    //     'external_medical_record_id_number' => 'required|string|max:50',
+    // ];
 
     public function mount($id)
     {
-        $this->employee = Employee::with(['info', 'idCard', 'birthCertificate', 'armyServicePaper', 'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'policeRecords', 'hrLetters', 'driverLicense', 'contracts'])->findorFail($id);
+        $this->employee = Employee::with(['info', 'idCard', 'birthCertificate', 'armyServicePaper', 'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'policeRecords', 'hrLetters', 'driverLicense', 'contracts', 'medicalRecord'])->findorFail($id);
         $this->insuranceOffices = InsuranceOffice::all();
         $this->militaryStatuses = Applicant::MILITARY_STATUS;
         $this->birthCertificateTypes = BirthCertificate::TYPES;
@@ -1483,6 +1519,190 @@ class EmployeeShow extends Component
             $this->employee = Employee::with(['info', 'idCard', 'birthCertificate', 'armyServicePaper', 'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'policeRecords', 'hrLetters', 'driverLicense'])->findOrFail($this->employee->id);
         } catch (\Exception $e) {
             $this->alertError('Error deleting Employee S6 document: ' . $e->getMessage());
+        }
+    }
+
+    public function openEditMedicalRecordModal()
+    {
+        $this->showEditMedicalRecordModal = true;
+        $this->resetMedicalRecordFields();
+        
+        // If employee has an existing medical record, pre-fill the form
+        if ($this->employee->medicalRecord) {
+            $medicalRecord = $this->employee->medicalRecord;
+            $this->medical_record_issue_date = $medicalRecord->issue_date;
+            $this->medical_record_expiry_date = $medicalRecord->expiry_date;
+            $this->medical_record_status = $medicalRecord->status;
+            $this->medical_record_insurance_number = $medicalRecord->insurance_number;
+            $this->medical_record_medical_card_code = $medicalRecord->medical_card_code;
+            
+            if ($medicalRecord->medical_card_start) {
+                $this->medical_record_medical_card_start = $medicalRecord->medical_card_start;
+            }
+            
+            if ($medicalRecord->medical_card_expiry) {
+                $this->medical_record_medical_card_expiry = $medicalRecord->medical_card_expiry;
+            }
+            
+            // Default to keeping existing file
+            $this->keep_existing_medical_record = true;
+        }
+    }
+
+    public function closeEditMedicalRecordModal()
+    {
+        $this->showEditMedicalRecordModal = false;
+        $this->resetMedicalRecordFields();
+    }
+
+    private function resetMedicalRecordFields()
+    {
+        $this->medical_record_file = null;
+        $this->medical_record_issue_date = null;
+        $this->medical_record_expiry_date = null;
+        $this->medical_record_status = null;
+        $this->medical_record_insurance_number = null;
+        $this->medical_record_medical_card_code = null;
+        $this->medical_record_medical_card_start = null;
+        $this->medical_record_medical_card_expiry = null;
+    }
+
+    public function updateMedicalRecord()
+    {
+        $this->validate([
+            'medical_record_file' => !$this->keep_existing_medical_record ? 'required|file|mimes:pdf,jpg,jpeg,png|max:10240' : 'nullable',
+            'medical_record_issue_date' => 'required|date',
+            'medical_record_expiry_date' => 'required|date|after:medical_record_issue_date',
+            'medical_record_status' => 'required|in:Not Covered,Examination,Issuing,Covered,External Cover',
+            'medical_record_insurance_number' => 'nullable|string|max:50',
+            'medical_record_medical_card_code' => 'nullable|string|max:50',
+            'medical_record_medical_card_start' => 'nullable|date',
+            'medical_record_medical_card_expiry' => 'nullable|date|after:medical_record_medical_card_start',
+        ]);
+
+        try {
+            $filePath = null;
+            if (!$this->keep_existing_medical_record && $this->medical_record_file) {
+                // Delete existing medical record file if it exists
+                if ($this->employee->medicalRecord && $this->employee->medicalRecord->file_path) {
+                    $existingFilePath = str_replace('storage/', '', $this->employee->medicalRecord->getRawOriginal('file_path'));
+                    if (Storage::disk('s3')->exists($existingFilePath)) {
+                        Storage::disk('s3')->delete($existingFilePath);
+                    }
+                }
+                // Upload new file to S3
+                $filePath = $this->medical_record_file->store(Employee::FILES_DIRECTORY.'/medical_records', 's3');
+            } else if ($this->keep_existing_medical_record && $this->employee->medicalRecord) {
+                $filePath = $this->employee->medicalRecord->getRawOriginal('file_path');
+            }
+            
+            $res = $this->employee->setMedicalRecord(
+                $filePath,
+                Carbon::parse($this->medical_record_issue_date),
+                Carbon::parse($this->medical_record_expiry_date),
+                $this->medical_record_status,
+                $this->medical_record_insurance_number,
+                $this->medical_record_medical_card_code,
+                $this->medical_record_medical_card_start ? Carbon::parse($this->medical_record_medical_card_start) : null,
+                $this->medical_record_medical_card_expiry ? Carbon::parse($this->medical_record_medical_card_expiry) : null
+            );
+
+            if ($res) {
+                $this->closeEditMedicalRecordModal();
+                $this->alertSuccess('Medical record updated successfully!');
+                
+                // Refresh employee data
+                $this->employee = Employee::with(['info', 'idCard', 'birthCertificate', 'armyServicePaper', 'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'policeRecords', 'hrLetters', 'driverLicense', 'medicalRecord'])->findOrFail($this->employee->id);
+            } else {
+                $this->alertError();
+            }
+        } catch (\Exception $e) {
+            $this->alertError($e->getMessage());
+        }
+    }
+
+    public function downloadMedicalRecord()
+    {
+        try {
+            if ($this->employee->medicalRecord) {
+                return $this->employee->medicalRecord->downloadFile();
+            } else {
+                $this->alertError('No medical record found.');
+            }
+        } catch (\Exception $e) {
+            $this->alertError('Error downloading document: ' . $e->getMessage());
+        }
+    }
+
+    public function openEditExternalMedicalRecordModal()
+    {
+        $this->showEditExternalMedicalRecordModal = true;
+
+        if ($this->employee->externalMedicalRecord) {
+            $this->external_medical_record_issue_date = $this->employee->externalMedicalRecord->issue_date->format('Y-m-d');
+            $this->external_medical_record_expiry_date = $this->employee->externalMedicalRecord->expiry_date->format('Y-m-d');
+            $this->keep_existing_external_medical_record = true;
+        } else {
+            $this->resetExternalMedicalRecordFields();
+        }
+    }
+
+    public function closeEditExternalMedicalRecordModal()
+    {
+        $this->showEditExternalMedicalRecordModal = false;
+        $this->resetExternalMedicalRecordFields();
+    }
+
+    private function resetExternalMedicalRecordFields()
+    {
+        $this->external_medical_record_file = null;
+        $this->external_medical_record_issue_date = null;
+        $this->external_medical_record_expiry_date = null;
+        $this->external_medical_record_id_number = null;
+        $this->keep_existing_external_medical_record = false;
+    }
+
+    public function updateExternalMedicalRecord()
+    {
+        $this->validate([
+            'external_medical_record_issue_date' => 'required|date',
+            'external_medical_record_expiry_date' => 'required|date|after:external_medical_record_issue_date',
+            'external_medical_record_file' => $this->keep_existing_external_medical_record ? 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif' : 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
+            'external_medical_record_id_number' => 'required|string|max:50',
+        ]);
+
+        try {
+            $filePath = $this->employee->externalMedicalRecord ? $this->employee->externalMedicalRecord->file_path : null;
+            
+            if ($this->external_medical_record_file) {
+                $filePath = $this->external_medical_record_file->store(Employee::FILES_DIRECTORY.'/external_medical_records', 's3');
+            }
+
+            $this->employee->setExternalMedicalRecord(
+                $filePath,
+                Carbon::parse($this->external_medical_record_issue_date),
+                Carbon::parse($this->external_medical_record_expiry_date),
+                $this->external_medical_record_id_number
+            );
+
+            $this->closeEditExternalMedicalRecordModal();
+            $this->alertSuccess('External Medical Record has been updated successfully!');
+            $this->employee = Employee::with(['info', 'idCard', 'birthCertificate', 'armyServicePaper', 'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'policeRecords', 'hrLetters', 'driverLicense', 'medicalRecord', 'externalMedicalRecord'])->findOrFail($this->employee->id);
+        } catch (Exception $e) {
+            $this->alertError($e->getMessage());
+        }
+    }
+
+    public function downloadExternalMedicalRecord()
+    {
+        try {
+            if ($this->employee->externalMedicalRecord) {
+                return $this->employee->externalMedicalRecord->downloadFile();
+            } else {
+                $this->alertError('No external medical record found.');
+            }
+        } catch (\Exception $e) {
+            $this->alertError('Error downloading document: ' . $e->getMessage());
         }
     }
 

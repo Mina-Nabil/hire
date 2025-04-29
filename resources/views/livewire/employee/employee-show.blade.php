@@ -44,13 +44,18 @@
                                 ID Card
                                 <span>
                                     @if ($employee->checkIDCardStatus()['status'] === 'valid')
-                                        <span class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                        <span
+                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
                                     @elseif($employee->checkIDCardStatus()['status'] === 'near_expiry')
-                                        <span class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near Expiry</span>
+                                        <span
+                                            class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
+                                            Expiry</span>
                                     @elseif($employee->checkIDCardStatus()['status'] === 'expired')
-                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
                                     @elseif($employee->checkIDCardStatus()['status'] === 'missing')
-                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
                                     @endif
                                 </span>
 
@@ -72,13 +77,18 @@
                                 Birth Certificate
                                 <span>
                                     @if ($employee->checkBirthCertificateStatus()['status'] === 'valid')
-                                        <span class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                        <span
+                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
                                     @elseif($employee->checkBirthCertificateStatus()['status'] === 'near_expiry')
-                                        <span class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near Expiry</span>
+                                        <span
+                                            class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
+                                            Expiry</span>
                                     @elseif($employee->checkBirthCertificateStatus()['status'] === 'expired')
-                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
                                     @elseif($employee->checkBirthCertificateStatus()['status'] === 'missing')
-                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
                                     @endif
                                 </span>
 
@@ -100,13 +110,18 @@
                                 Army Service Paper
                                 <span>
                                     @if ($employee->checkArmyServicePaperStatus()['status'] === 'valid')
-                                        <span class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                        <span
+                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
                                     @elseif($employee->checkArmyServicePaperStatus()['status'] === 'near_expiry')
-                                        <span class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near Expiry</span>
+                                        <span
+                                            class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
+                                            Expiry</span>
                                     @elseif($employee->checkArmyServicePaperStatus()['status'] === 'expired')
-                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
                                     @elseif($employee->checkArmyServicePaperStatus()['status'] === 'missing')
-                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
                                     @endif
                                 </span>
 
@@ -128,13 +143,18 @@
                                 Driver License
                                 <span>
                                     @if ($employee->checkDriverLicenseStatus()['status'] === 'valid')
-                                        <span class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                        <span
+                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
                                     @elseif($employee->checkDriverLicenseStatus()['status'] === 'near_expiry')
-                                        <span class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near Expiry</span>
+                                        <span
+                                            class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
+                                            Expiry</span>
                                     @elseif($employee->checkDriverLicenseStatus()['status'] === 'expired')
-                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
                                     @elseif($employee->checkDriverLicenseStatus()['status'] === 'missing')
-                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
                                     @endif
                                 </span>
 
@@ -156,13 +176,18 @@
                                 Employee Contract
                                 <span>
                                     @if ($employee->checkContractStatus()['status'] === 'valid')
-                                        <span class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                        <span
+                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
                                     @elseif($employee->checkContractStatus()['status'] === 'near_expiry')
-                                        <span class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near Expiry</span>
+                                        <span
+                                            class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
+                                            Expiry</span>
                                     @elseif($employee->checkContractStatus()['status'] === 'expired')
-                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
                                     @elseif($employee->checkContractStatus()['status'] === 'missing')
-                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
                                     @endif
                                 </span>
 
@@ -183,15 +208,20 @@
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
                                 Employee S1 Doc
                                 <span>
-                                    
+
                                     @if ($employee->checkS1DocStatus()['status'] === 'valid')
-                                        <span class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                        <span
+                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
                                     @elseif($employee->checkS1DocStatus()['status'] === 'near_expiry')
-                                        <span class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near Expiry</span>
+                                        <span
+                                            class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
+                                            Expiry</span>
                                     @elseif($employee->checkS1DocStatus()['status'] === 'expired')
-                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
                                     @elseif($employee->checkS1DocStatus()['status'] === 'missing')
-                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
                                     @endif
                                 </span>
 
@@ -213,13 +243,18 @@
                                 Employee S2 Doc
                                 <span>
                                     @if ($employee->checkS2DocsStatus()['status'] === 'valid')
-                                        <span class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                        <span
+                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
                                     @elseif($employee->checkS2DocsStatus()['status'] === 'near_expiry')
-                                        <span class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near Expiry</span>
+                                        <span
+                                            class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
+                                            Expiry</span>
                                     @elseif($employee->checkS2DocsStatus()['status'] === 'expired')
-                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
                                     @elseif($employee->checkS2DocsStatus()['status'] === 'missing')
-                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
                                     @endif
                                 </span>
 
@@ -240,15 +275,20 @@
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
                                 Employee S6 Doc
                                 <span>
-                                @if ($employee->checkS6DocsStatus()['status'] === 'valid')
-                                    <span class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
-                                @elseif($employee->checkS6DocsStatus()['status'] === 'near_expiry')
-                                    <span class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near Expiry</span>
-                                @elseif($employee->checkS6DocsStatus()['status'] === 'expired')
-                                    <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
-                                @elseif($employee->checkS6DocsStatus()['status'] === 'missing')
-                                    <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
-                                @endif
+                                    @if ($employee->checkS6DocsStatus()['status'] === 'valid')
+                                        <span
+                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                    @elseif($employee->checkS6DocsStatus()['status'] === 'near_expiry')
+                                        <span
+                                            class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
+                                            Expiry</span>
+                                    @elseif($employee->checkS6DocsStatus()['status'] === 'expired')
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                    @elseif($employee->checkS6DocsStatus()['status'] === 'missing')
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                    @endif
                                 </span>
 
                                 @if ($section == 'employee_s6_doc')
@@ -310,6 +350,73 @@
                                     <div class="flex-none">
                                         <button type="button"
                                             class="text-xs text-slate-900 dark:text-white {{ $section == 'hr_letter' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
+                                            <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
+                                                height="25"></iconify-icon>
+                                        </button>
+                                    </div>
+                                @endif
+                            </div>
+                        </li>
+
+                        <li wire:click="changeSection('medical_record')"
+                            class="block py-[8px] p-6  {{ $section == 'medical_record' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
+                            <div class="flex justify-between space-x-2 rtl:space-x-reverse">
+                                Medical Record
+                                <span>
+                                    @if ($employee->checkMedicalRecordStatus()['status'] === 'valid')
+                                        <span
+                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                    @elseif($employee->checkMedicalRecordStatus()['status'] === 'near_expiry')
+                                        <span
+                                            class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
+                                            Expiry</span>
+                                    @elseif($employee->checkMedicalRecordStatus()['status'] === 'expired')
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                    @elseif($employee->checkMedicalRecordStatus()['status'] === 'missing')
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                    @endif
+                                </span>
+
+                                @if ($section == 'medical_record')
+                                    <div class="flex-none">
+                                        <button type="button"
+                                            class="text-xs text-slate-900 dark:text-white {{ $section == 'medical_record' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
+                                            <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
+                                                height="25"></iconify-icon>
+                                        </button>
+                                    </div>
+                                @endif
+                            </div>
+                        </li>
+
+                        <li wire:click="changeSection('external_medical_record')"
+                            class="block py-[8px] p-6  {{ $section == 'external_medical_record' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
+                            <div class="flex justify-between space-x-2 rtl:space-x-reverse">
+                                External Medical Record
+
+                                <span>
+                                    @if ($employee->checkExternalMedicalRecordStatus()['status'] === 'valid')
+                                        <span
+                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                    @elseif($employee->checkExternalMedicalRecordStatus()['status'] === 'near_expiry')
+                                        <span
+                                            class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
+                                            Expiry</span>
+                                    @elseif($employee->checkExternalMedicalRecordStatus()['status'] === 'expired')
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                    @elseif($employee->checkExternalMedicalRecordStatus()['status'] === 'missing')
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                    @endif
+                                </span>
+
+                                @if ($section == 'external_medical_record')
+                                    <div class="flex-none">
+                                        <button type="button"
+                                            class="text-xs text-slate-900 dark:text-white {{ $section == 'external_medical_record' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
                                             <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
                                                 height="25"></iconify-icon>
                                         </button>
@@ -867,8 +974,7 @@
                                         <h5 class="card-title text-slate-900 dark:text-white">Contract - Issue Date
                                             {{ $contract->issue_date }}</h5>
                                         <div class="flex space-x-3 rtl:space-x-reverse">
-                                            <button
-                                                wire:click="openEditSpecificContractModal({{ $contract->id }})"
+                                            <button wire:click="openEditSpecificContractModal({{ $contract->id }})"
                                                 class="action-btn" type="button">
                                                 <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
                                             </button>
@@ -901,12 +1007,16 @@
                                             <!-- Document Info -->
                                             <div class="col-span-1 pl-4 space-y-2">
                                                 <div class="flex justify-between">
-                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Issue Date:</span>
-                                                    <span class="text-sm font-medium">{{ $contract->issue_date }}</span>
+                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Issue
+                                                        Date:</span>
+                                                    <span
+                                                        class="text-sm font-medium">{{ $contract->issue_date }}</span>
                                                 </div>
                                                 <div class="flex justify-between">
-                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Expiry Date:</span>
-                                                    <span class="text-sm font-medium">{{ $contract->expiry_date ? $contract->expiry_date : 'N/A' }}</span>
+                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Expiry
+                                                        Date:</span>
+                                                    <span
+                                                        class="text-sm font-medium">{{ $contract->expiry_date ? $contract->expiry_date : 'N/A' }}</span>
                                                 </div>
 
                                                 <!-- Download Button -->
@@ -1098,7 +1208,8 @@
                             @foreach ($employee->policeRecords as $record)
                                 <div class="card border border-slate-200 dark:border-slate-700 mb-5">
                                     <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
-                                        <h5 class="card-title text-slate-900 dark:text-white">Police Record - Issue Date
+                                        <h5 class="card-title text-slate-900 dark:text-white">Police Record - Issue
+                                            Date
                                             {{ $record->issue_date }}</h5>
                                         <div class="flex space-x-3 rtl:space-x-reverse">
                                             <button
@@ -1135,12 +1246,15 @@
                                             <!-- Document Info -->
                                             <div class="col-span-1 pl-4 space-y-2">
                                                 <div class="flex justify-between">
-                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Issue Date:</span>
+                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Issue
+                                                        Date:</span>
                                                     <span class="text-sm font-medium">{{ $record->issue_date }}</span>
                                                 </div>
                                                 <div class="flex justify-between">
-                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Expiry Date:</span>
-                                                    <span class="text-sm font-medium">{{ $record->expiry_date ?? 'N/A' }}</span>
+                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Expiry
+                                                        Date:</span>
+                                                    <span
+                                                        class="text-sm font-medium">{{ $record->expiry_date ?? 'N/A' }}</span>
                                                 </div>
 
                                                 <!-- Download Button -->
@@ -1204,8 +1318,7 @@
                                         <h5 class="card-title text-slate-900 dark:text-white">HR Letter - Issue Date
                                             {{ $letter->issue_date }}</h5>
                                         <div class="flex space-x-3 rtl:space-x-reverse">
-                                            <button
-                                                wire:click="openEditSpecificHrLetterModal({{ $letter->id }})"
+                                            <button wire:click="openEditSpecificHrLetterModal({{ $letter->id }})"
                                                 class="action-btn" type="button">
                                                 <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
                                             </button>
@@ -1238,12 +1351,15 @@
                                             <!-- Document Info -->
                                             <div class="col-span-1 pl-4 space-y-2">
                                                 <div class="flex justify-between">
-                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Issue Date:</span>
+                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Issue
+                                                        Date:</span>
                                                     <span class="text-sm font-medium">{{ $letter->issue_date }}</span>
                                                 </div>
                                                 <div class="flex justify-between">
-                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Expiry Date:</span>
-                                                    <span class="text-sm font-medium">{{ $letter->expiry_date ?? 'N/A' }}</span>
+                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Expiry
+                                                        Date:</span>
+                                                    <span
+                                                        class="text-sm font-medium">{{ $letter->expiry_date ?? 'N/A' }}</span>
                                                 </div>
 
                                                 <!-- Download Button -->
@@ -1418,8 +1534,7 @@
                                         <h5 class="card-title text-slate-900 dark:text-white">S2 Doc - Year
                                             {{ $s2Doc->year }}</h5>
                                         <div class="flex space-x-3 rtl:space-x-reverse">
-                                            <button
-                                                wire:click="openEditSpecificS2DocModal({{ $s2Doc->id }})"
+                                            <button wire:click="openEditSpecificS2DocModal({{ $s2Doc->id }})"
                                                 class="action-btn" type="button">
                                                 <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
                                             </button>
@@ -1514,6 +1629,230 @@
                         @endif
                     </div>
                 </div>
+            @elseif ($section === 'medical_record')
+                <div class="card">
+                    <div class="card-header flex justify-between items-center">
+                        <h4
+                            class="font-medium lg:text-2xl text-xl capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
+                            Medical Record Information
+                        </h4>
+
+                        <button wire:click="openEditMedicalRecordModal" class="action-btn" type="button">
+                            <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                        </button>
+                    </div>
+                    <div class="card-body p-6">
+                        @if ($employee->medicalRecord)
+                            <div class="card border border-slate-200 dark:border-slate-700 mb-5">
+                                <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
+                                    <h5 class="card-title text-slate-900 dark:text-white">Medical Record - Issue Date
+                                        {{ $employee->medicalRecord->issue_date }}</h5>
+                                </div>
+                                <div class="card-body p-4">
+                                    <div class="grid grid-cols-4 gap-4">
+                                        <!-- Document Preview -->
+                                        <div class="col-span-3 flex justify-center items-center">
+                                            @php
+                                                $fileExt = $this->getFileExtension($employee->medicalRecord->file_path);
+                                            @endphp
+
+                                            @if ($fileExt == 'pdf')
+                                                <div class="border border-slate-200 rounded-md p-2 w-full">
+                                                    <iframe src="{{ $employee->medicalRecord->file_path }}"
+                                                        width="100%" height="800" class="border-0"></iframe>
+                                                </div>
+                                            @else
+                                                <img src="{{ $employee->medicalRecord->file_path }}"
+                                                    alt="Medical Record"
+                                                    class="max-h-32 max-w-full rounded-md shadow-sm object-contain">
+                                            @endif
+                                        </div>
+
+                                        <!-- Document Info -->
+                                        <div class="col-span-1 pl-4 space-y-2">
+                                            <div class="flex justify-between">
+                                                <span class="text-sm text-slate-500 dark:text-slate-400">Issue
+                                                    Date:</span>
+                                                <span
+                                                    class="text-sm font-medium">{{ $employee->medicalRecord->issue_date }}</span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span class="text-sm text-slate-500 dark:text-slate-400">Expiry
+                                                    Date:</span>
+                                                <span
+                                                    class="text-sm font-medium">{{ $employee->medicalRecord->expiry_date ?? 'N/A' }}</span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span class="text-sm text-slate-500 dark:text-slate-400">Status:</span>
+                                                <span
+                                                    class="text-sm font-medium">{{ $employee->medicalRecord->status }}</span>
+                                            </div>
+                                            @if ($employee->medicalRecord->insurance_number)
+                                                <div class="flex justify-between">
+                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Insurance
+                                                        Number:</span>
+                                                    <span
+                                                        class="text-sm font-medium">{{ $employee->medicalRecord->insurance_number }}</span>
+                                                </div>
+                                            @endif
+                                            @if ($employee->medicalRecord->medical_card_code)
+                                                <div class="flex justify-between">
+                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Medical
+                                                        Card Code:</span>
+                                                    <span
+                                                        class="text-sm font-medium">{{ $employee->medicalRecord->medical_card_code }}</span>
+                                                </div>
+                                            @endif
+                                            @if ($employee->medicalRecord->medical_card_start)
+                                                <div class="flex justify-between">
+                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Medical
+                                                        Card Start:</span>
+                                                    <span
+                                                        class="text-sm font-medium">{{ $employee->medicalRecord->medical_card_start }}</span>
+                                                </div>
+                                            @endif
+                                            @if ($employee->medicalRecord->medical_card_expiry)
+                                                <div class="flex justify-between">
+                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Medical
+                                                        Card Expiry:</span>
+                                                    <span
+                                                        class="text-sm font-medium">{{ $employee->medicalRecord->medical_card_expiry }}</span>
+                                                </div>
+                                            @endif
+
+                                            <!-- Download Button -->
+                                            <div class="mt-3">
+                                                <button wire:click="downloadMedicalRecord" type="button"
+                                                    class="btn btn-dark btn-sm">
+                                                    <span class="inline-flex items-center justify-center"
+                                                        wire:loading.remove wire:target="downloadMedicalRecord">
+                                                        <iconify-icon icon="fluent:arrow-download-28-filled"
+                                                            class="mr-1" width="16"
+                                                            height="16"></iconify-icon>
+                                                        Download
+                                                    </span>
+                                                    <iconify-icon wire:loading wire:target="downloadMedicalRecord"
+                                                        icon="line-md:loading-twotone-loop" width="16"
+                                                        height="16"></iconify-icon>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            <div class="text-center py-5">
+                                <div class="mb-5">
+                                    <iconify-icon icon="mingcute:document-line" width="60" height="60"
+                                        class="text-slate-400"></iconify-icon>
+                                </div>
+                                <h5 class="text-xl font-semibold mb-4">No Medical Record Found</h5>
+                                <p class="text-slate-500 mb-5">Please upload a medical record for this employee</p>
+                                <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                    wire:click="openEditMedicalRecordModal">
+                                    <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                        class="mr-1"></iconify-icon>
+                                    Upload Medical Record
+                                </button>
+                            </div>
+                        @endif
+
+                        
+                    </div>
+                </div>
+            
+            @elseif ($section == 'external_medical_record')
+                <!-- External Medical Record Section -->
+                <div class="card">
+                    <div class="card-header flex justify-between items-center">
+                        <h4 class="font-medium lg:text-xl text-lg capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
+                        External Medical Record
+                        </h4>
+
+                        <button wire:click="openEditExternalMedicalRecordModal" class="action-btn" type="button">
+                            <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                        </button>
+                    </div>
+
+                    @if ($employee->externalMedicalRecord)
+                        <div class="card border border-slate-200 dark:border-slate-700 mb-5">
+                            <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
+                                <h5 class="card-title text-slate-900 dark:text-white">External Medical Record - Issue Date
+                                    {{ $employee->externalMedicalRecord->issue_date }}</h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                    <!-- Document Preview -->
+                                    <div class="col-span-3 flex justify-center items-center">
+                                        @php
+                                            $fileExt = $this->getFileExtension($employee->externalMedicalRecord->file_path);
+                                        @endphp
+
+                                        @if ($fileExt == 'pdf')
+                                            <div class="border border-slate-200 rounded-md p-2 w-full">
+                                                <iframe src="{{ $employee->externalMedicalRecord->file_path }}"
+                                                    width="100%" height="800" class="border-0"></iframe>
+                                            </div>
+                                        @else
+                                            <img src="{{ $employee->externalMedicalRecord->file_path }}"
+                                                alt="External Medical Record"
+                                                class="max-h-32 max-w-full rounded-md shadow-sm object-contain">
+                                        @endif
+                                    </div>
+
+                                    <!-- Document Info -->
+                                    <div class="col-span-1 pl-4 space-y-2">
+                                        <div class="flex justify-between">
+                                            <span class="text-sm text-slate-500 dark:text-slate-400">ID Number:</span>
+                                            <span class="text-sm font-medium">{{ $employee->externalMedicalRecord->id_number }}</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-sm text-slate-500 dark:text-slate-400">Issue Date:</span>
+                                            <span class="text-sm font-medium">{{ $employee->externalMedicalRecord->issue_date }}</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-sm text-slate-500 dark:text-slate-400">Expiry Date:</span>
+                                            <span class="text-sm font-medium">{{ $employee->externalMedicalRecord->expiry_date ?? 'N/A' }}</span>
+                                        </div>
+
+                                        <!-- Download Button -->
+                                        <div class="mt-3">
+                                            <button wire:click="downloadExternalMedicalRecord" type="button"
+                                                class="btn btn-dark btn-sm">
+                                                <span class="inline-flex items-center justify-center"
+                                                    wire:loading.remove wire:target="downloadExternalMedicalRecord">
+                                                    <iconify-icon icon="fluent:arrow-download-28-filled"
+                                                        class="mr-1" width="16"
+                                                        height="16"></iconify-icon>
+                                                    Download
+                                                </span>
+                                                <iconify-icon wire:loading wire:target="downloadExternalMedicalRecord"
+                                                    icon="line-md:loading-twotone-loop" width="16"
+                                                    height="16"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        <div class="text-center py-5">
+                            <div class="mb-5">
+                                <iconify-icon icon="mingcute:document-line" width="60" height="60"
+                                    class="text-slate-400"></iconify-icon>
+                            </div>
+                            <h5 class="text-xl font-semibold mb-4">No External Medical Record Found</h5>
+                            <p class="text-slate-500 mb-5">Please upload an external medical record for this employee</p>
+                            <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                wire:click="openEditExternalMedicalRecordModal">
+                                <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                    class="mr-1"></iconify-icon>
+                                Upload External Medical Record
+                            </button>
+                        </div>
+                    @endif
+                </div>
+
             @endif
         </div>
     </div>
@@ -1585,7 +1924,8 @@
                                                         <small class="text-muted">
                                                             Current file: <a
                                                                 href="{{ $employee->driverLicense->file_path }}"
-                                                                target="_blank" class="text-sm text-blue-500">View</a>
+                                                                target="_blank"
+                                                                class="text-sm text-blue-500">View</a>
                                                         </small>
                                                     </div>
                                                     @if (!$keep_existing_driver_license)
@@ -1636,12 +1976,13 @@
                                                 <input type="checkbox" class="hidden" name="checkbox"
                                                     id="keep_existing_driver_license"
                                                     wire:model.live="keep_existing_driver_license">
-                                                <span
+                                        <span
                                                     class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
                                                     <img src="{{ asset('images/icon/ck-white.svg') }}"
                                                         alt=""
                                                         class="h-[10px] w-[10px] block m-auto opacity-0"></span>
-                                                <span class="text-slate-500 dark:text-slate-400 text-sm leading-6">Keep
+                                        <span
+                                                    class="text-slate-500 dark:text-slate-400 text-sm leading-6">Keep
                                                     existing document</span>
                                             </label>
                                         </div>
@@ -1687,7 +2028,7 @@
                     </div>
                 </div>
             </div>
-    @endif
+                                    @endif
 
     <!-- Base Information Edit Modal -->
     @if ($editBaseInfoModal)
@@ -1803,13 +2144,14 @@
                                 <button wire:click="closeEditBaseInfoModal" type="button"
                                     class="btn inline-flex justify-center btn-outline-dark">Cancel</button>
                                 <button wire:click="updateBaseInfo" type="button" wire:target='updateBaseInfo'
-                                    wire:loading.remove class="btn inline-flex justify-center btn-dark">Update</button>
+                                    wire:loading.remove
+                                    class="btn inline-flex justify-center btn-dark">Update</button>
                                 <button wire:loading wire:target="updateBaseInfo" type="button"
                                     class="btn inline-flex justify-center btn-dark">
                                     <span class="flex items-center">
                                         <iconify-icon icon="line-md:loading-twotone-loop" width="25"
                                             height="25"></iconify-icon>
-                                    </span>
+                                </span>
                                 </button>
                             </div>
                         </div>
@@ -1834,7 +2176,7 @@
                                 <h3 class="text-xl font-medium text-white dark:text-white capitalize">
                                     Edit Employee Information
                                 </h3>
-                                <button type="button"
+                                        <button type="button"
                                     class="text-slate-400 bg-transparent hover:text-slate-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-slate-600 dark:hover:text-white"
                                     wire:click="closeEditEmployeeInfoModal">
                                     <svg aria-hidden="true" class="w-5 h-5" fill="#ffffff" viewBox="0 0 20 20"
@@ -1952,16 +2294,16 @@
                                     class="btn inline-flex justify-center btn-dark">
                                     <span class="flex items-center">
                                         <iconify-icon icon="line-md:loading-twotone-loop" width="25"
-                                            height="25"></iconify-icon>
+                                                height="25"></iconify-icon>
                                     </span>
-                                </button>
+                                        </button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    @endif
+                                    </div>
+                                @endif
 
     <!-- ID Card Modal -->
     @if ($editIdCardModal)
@@ -2744,25 +3086,28 @@
                             <div class="p-6 space-y-4">
                                 <div class="grid grid-cols-12 gap-4">
                                     @if ($editing_record_id)
-                                    <div class="col-span-12 form-check">
-                                        <div class="checkbox-area">
-                                            <label class="inline-flex items-center cursor-pointer"
-                                                for="keep_existing_employee_s2_doc">
-                                                <input type="checkbox" class="hidden" name="checkbox"
-                                                    id="keep_existing_employee_s2_doc"
-                                                    wire:model.live="keep_existing_employee_s2_doc">
-                                                <span
-                                                    class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
-                                                    <img src="{{ asset('images/icon/ck-white.svg') }}"
-                                                        alt=""
-                                                        class="h-[10px] w-[10px] block m-auto opacity-0"></span>
-                                                <span
-                                                    class="text-slate-500 dark:text-slate-400 text-sm leading-6">Keep
-                                                    existing document</span>
-                                            </label>
-                                        </div>
+                                        <div class="col-span-12 form-check">
+                                            <div class="checkbox-area">
+                                                <label class="inline-flex items-center cursor-pointer"
+                                                    for="keep_existing_employee_s2_doc">
+                                                    <input type="checkbox" class="hidden" name="checkbox"
+                                                        id="keep_existing_employee_s2_doc"
+                                                        wire:model.live="keep_existing_employee_s2_doc">
+                                                    <span
+                                                        class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
+                                                        <img src="{{ asset('images/icon/ck-white.svg') }}"
+                                                            alt=""
+                                                            class="h-[10px] w-[10px] block m-auto opacity-0"></span>
+                                                    <span
+                                                        class="text-slate-500 dark:text-slate-400 text-sm leading-6">Keep
+                                                        existing document</span>
+                                                </label>
+                                            </div>
 
                                     </div>
+                                    </div>
+                                        
+                                        </div>
                                         
                                     @endif
                                     @if (!$keep_existing_employee_s2_doc)
@@ -3425,7 +3770,8 @@
         <div>
             <div id="editEmployeeContractModal"
                 class="modal fade fixed top-0 left-0 show w-full h-full outline-none overflow-x-hidden overflow-y-auto"
-                tabindex="-1" aria-labelledby="editEmployeeContractModalLabel" aria-hidden="true" wire:ignore.self>
+                tabindex="-1" aria-labelledby="editEmployeeContractModalLabel" aria-hidden="true"
+                wire:ignore.self>
                 <div class="modal-dialog relative w-auto pointer-events-none">
                     <div
                         class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
@@ -3454,7 +3800,8 @@
                                 <div class="grid grid-cols-12 gap-4">
                                     @if (!$keep_existing_employee_contract)
                                         <div class="col-span-12">
-                                            <label for="employee_contract_file" class="form-label">Employee Contract Document
+                                            <label for="employee_contract_file" class="form-label">Employee Contract
+                                                Document
                                                 <iconify-icon wire:loading wire:target="employee_contract_file"
                                                     icon="line-md:loading-twotone-loop" width="18"
                                                     height="18"></iconify-icon></label>
@@ -3463,8 +3810,9 @@
                                                 @if ($employee_contract_file)
                                                     <div class="flex items-center justify-center mb-3">
                                                         @if (in_array($employee_contract_file->getClientOriginalExtension(), ['pdf']))
-                                                            <iconify-icon icon="mingcute:file-pdf-fill" width="48"
-                                                                height="48" class="text-red-500"></iconify-icon>
+                                                            <iconify-icon icon="mingcute:file-pdf-fill"
+                                                                width="48" height="48"
+                                                                class="text-red-500"></iconify-icon>
                                                         @else
                                                             <img src="{{ $employee_contract_file->temporaryUrl() }}"
                                                                 class="h-40 max-w-full rounded-md object-contain"
@@ -3498,8 +3846,9 @@
                                                                 <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF
                                                                     (Max
                                                                     10MB)</p>
-                                                                <input id="employee_contract_file_input" type="file"
-                                                                    class="hidden" wire:model="employee_contract_file"
+                                                                <input id="employee_contract_file_input"
+                                                                    type="file" class="hidden"
+                                                                    wire:model="employee_contract_file"
                                                                     accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
                                                             </label>
                                                         @endif
@@ -3558,7 +3907,8 @@
                                         @enderror
                                     </div>
                                     <div class="col-span-12 xl:col-span-6">
-                                        <label for="employee_contract_expiry_date" class="form-label">Expiry Date</label>
+                                        <label for="employee_contract_expiry_date" class="form-label">Expiry
+                                            Date</label>
                                         <input type="date"
                                             class="form-control @error('employee_contract_expiry_date') !border-danger-500 @enderror"
                                             wire:model="employee_contract_expiry_date">
@@ -3573,10 +3923,456 @@
                                 class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
                                 <button wire:click="closeEditEmployeeContractModal" type="button"
                                     class="btn inline-flex justify-center btn-outline-dark">Cancel</button>
-                                <button wire:click="updateEmployeeContract" type="button" wire:target='updateEmployeeContract'
-                                    wire:loading.remove
+                                <button wire:click="updateEmployeeContract" type="button"
+                                    wire:target='updateEmployeeContract' wire:loading.remove
                                     class="btn inline-flex justify-center btn-dark">{{ $editing_contract_id ? 'Update' : 'Upload' }}</button>
                                 <button wire:loading wire:target="updateEmployeeContract" type="button"
+                                    class="btn inline-flex justify-center btn-dark">
+                                    <span class="flex items-center">
+                                        <iconify-icon icon="line-md:loading-twotone-loop" width="25"
+                                            height="25"></iconify-icon>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Medical Record Edit Modal -->
+    @if ($showEditMedicalRecordModal)
+        <div>
+            <div id="editMedicalRecordModal"
+                class="modal fade fixed top-0 left-0 show w-full h-full outline-none overflow-x-hidden overflow-y-auto"
+                tabindex="-1" aria-labelledby="editMedicalRecordModalLabel" aria-hidden="true" wire:ignore.self>
+                <div class="modal-dialog relative w-auto pointer-events-none">
+                    <div
+                        class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
+                        <div class="relative bg-white rounded-lg shadow dark:bg-slate-700">
+                            <!-- Modal header -->
+                            <div
+                                class="flex items-center justify-between p-5 border-b rounded-t dark:border-slate-600 bg-black-500">
+                                <h3 class="text-xl font-medium text-white dark:text-white capitalize">
+                                    Edit Medical Record
+                                </h3>
+                                <button wire:click="closeEditMedicalRecordModal" type="button"
+                                    class="text-slate-400 bg-transparent hover:text-slate-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-slate-600 dark:hover:text-white"
+                                    data-bs-dismiss="modal">
+                                    <svg aria-hidden="true" class="w-5 h-5" fill="#ffffff" viewBox="0 0 20 20"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd"
+                                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span class="sr-only">Close modal</span>
+                                </button>
+                            </div>
+
+                            
+
+                            <!-- Modal body -->
+                            <div class="p-6 space-y-4">
+                                <!-- Validation Errors Summary -->
+                            @if ($errors->any())
+                            <div class="p-4 mb-4 text-sm text-danger-700 bg-danger-100 rounded-lg dark:bg-danger-200 dark:text-danger-800" role="alert">
+                                <div class="font-medium">Please fix the following errors:</div>
+                                <ul class="mt-1.5 list-disc list-inside">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                    </ul>
+                </div>
+                            @endif
+                                <div class="grid grid-cols-12 gap-4">
+                                    @if (!$keep_existing_medical_record)
+                                        <div class="col-span-12">
+                                            <label for="medical_record_file" class="form-label">Medical Record
+                                                Document
+                                                <iconify-icon wire:loading wire:target="medical_record_file"
+                                                    icon="line-md:loading-twotone-loop" width="18"
+                                                    height="18"></iconify-icon>
+                                            </label>
+                                            <div
+                                                class="border-2 border-dashed border-slate-200 rounded-md p-4 text-center">
+                                                @if ($medical_record_file)
+                                                    <div class="flex items-center justify-center mb-3">
+                                                        @if (in_array($medical_record_file->getClientOriginalExtension(), ['pdf']))
+                                                            <iconify-icon icon="mingcute:file-pdf-fill"
+                                                                width="48" height="48"
+                                                                class="text-red-500"></iconify-icon>
+                                                        @else
+                                                            <img src="{{ $medical_record_file->temporaryUrl() }}"
+                                                                class="h-40 max-w-full rounded-md object-contain"
+                                                                alt="Medical Record Preview">
+                                                        @endif
+            </div>
+                                                    <p class="text-sm text-slate-500">
+                                                        {{ $medical_record_file->getClientOriginalName() }}</p>
+                                                    <button type="button" class="text-sm text-red-500 mt-2"
+                                                        wire:click="$set('medical_record_file', null)">
+                                                        Remove File
+                                                    </button>
+                                                @else
+                                                    @if ($employee->medicalRecord)
+                                                        <div class="mb-3">
+                                                            <small class="text-muted">
+                                                                Current file: <a
+                                                                    href="{{ $employee->medicalRecord->file_path }}"
+                                                                    target="_blank"
+                                                                    class="text-sm text-blue-500">View</a>
+                                                            </small>
+                                                        </div>
+                                                        @if (!$keep_existing_medical_record)
+                                                            <label for="medical_record_file_input"
+                                                                class="cursor-pointer block">
+                                                                <iconify-icon icon="mingcute:upload-line"
+                                                                    width="32" height="32"
+                                                                    class="text-slate-400 mx-auto"></iconify-icon>
+                                                                <p class="mt-2 text-sm text-slate-500">Click to upload
+                                                                </p>
+                                                                <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF
+                                                                    (Max
+                                                                    10MB)</p>
+                                                                <input id="medical_record_file_input"
+                                                                    type="file" class="hidden"
+                                                                    wire:model="medical_record_file"
+                                                                    accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
+                                                            </label>
+                                                        @endif
+                                                    @else
+                                                        <label for="medical_record_file_input"
+                                                            class="cursor-pointer block">
+                                                            <iconify-icon icon="mingcute:upload-line" width="32"
+                                                                height="32"
+                                                                class="text-slate-400 mx-auto"></iconify-icon>
+                                                            <p class="mt-2 text-sm text-slate-500">Click to upload or
+                                                                drag
+                                                                and drop</p>
+                                                            <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF (Max
+                                                                10MB)
+                                                            </p>
+                                                            <input id="medical_record_file_input" type="file"
+                                                                class="hidden" wire:model="medical_record_file"
+                                                                accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
+                                                        </label>
+                                                    @endif
+                                                @endif
+                                            </div>
+                                            @error('medical_record_file')
+                                                <span class="text-danger-500 text-sm mt-1">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    @endif
+                                    @if ($employee->medicalRecord)
+                                        <div class="col-span-12">
+                                            <div class="checkbox-area">
+                                                <label class="inline-flex items-center cursor-pointer">
+                                                    <input type="checkbox" class="hidden"
+                                                        wire:model.live="keep_existing_medical_record">
+                                                    <span
+                                                        class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
+                                                        <img src="{{ asset('images/icon/ck-white.svg') }}"
+                                                            alt=""
+                                                            class="h-[10px] w-[10px] block m-auto opacity-0" />
+                                                    </span>
+                                                    <span
+                                                        class="text-slate-600 dark:text-slate-300 text-sm leading-6">Keep
+                                                        existing document</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    @endif
+                                    <div class="col-span-12">
+                                        <label for="medical_record_issue_date" class="form-label">Issue Date</label>
+                                        <input type="date" wire:model="medical_record_issue_date"
+                                            class="form-control @error('medical_record_issue_date') !border-danger-500 @enderror"
+                                            id="medical_record_issue_date">
+                                        @error('medical_record_issue_date')
+                                            <span class="text-danger-500 text-sm">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+
+                                    <div class="col-span-12">
+                                        <label for="medical_record_expiry_date" class="form-label">Expiry
+                                            Date</label>
+                                        <input type="date" wire:model="medical_record_expiry_date"
+                                            class="form-control @error('medical_record_expiry_date') !border-danger-500 @enderror"
+                                            id="medical_record_expiry_date">
+                                        @error('medical_record_expiry_date')
+                                            <span class="text-danger-500 text-sm">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+
+                                    <div class="col-span-12">
+                                        <label for="medical_record_status" class="form-label">Status</label>
+                                        <select wire:model="medical_record_status"
+                                            class="form-control @error('medical_record_status') !border-danger-500 @enderror"
+                                            id="medical_record_status">
+                                            <option value="">Select Status</option>
+                                            <option value="Not Covered">Not Covered</option>
+                                            <option value="Examination">Examination</option>
+                                            <option value="Issuing">Issuing</option>
+                                            <option value="Covered">Covered</option>
+                                            <option value="External Cover">External Cover</option>
+                                        </select>
+                                        @error('medical_record_status')
+                                            <span class="text-danger-500 text-sm">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+
+                                    <div class="col-span-12">
+                                        <label for="medical_record_insurance_number" class="form-label">Insurance
+                                            Number</label>
+                                        <input type="text" wire:model="medical_record_insurance_number"
+                                            class="form-control @error('medical_record_insurance_number') !border-danger-500 @enderror"
+                                            id="medical_record_insurance_number"
+                                            placeholder="Enter insurance number">
+                                        @error('medical_record_insurance_number')
+                                            <span class="text-danger-500 text-sm">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+
+                                    <div class="col-span-12">
+                                        <label for="medical_record_medical_card_code" class="form-label">Medical
+                                            Card Code</label>
+                                        <input type="text" wire:model="medical_record_medical_card_code"
+                                            class="form-control @error('medical_record_medical_card_code') !border-danger-500 @enderror"
+                                            id="medical_record_medical_card_code"
+                                            placeholder="Enter medical card code">
+                                        @error('medical_record_medical_card_code')
+                                            <span class="text-danger-500 text-sm">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+
+                                    <div class="col-span-12">
+                                        <label for="medical_record_medical_card_start" class="form-label">Medical
+                                            Card Start Date</label>
+                                        <input type="date" wire:model="medical_record_medical_card_start"
+                                            class="form-control @error('medical_record_medical_card_start') !border-danger-500 @enderror"
+                                            id="medical_record_medical_card_start">
+                                        @error('medical_record_medical_card_start')
+                                            <span class="text-danger-500 text-sm">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+
+                                    <div class="col-span-12">
+                                        <label for="medical_record_medical_card_expiry" class="form-label">Medical
+                                            Card Expiry Date</label>
+                                        <input type="date" wire:model="medical_record_medical_card_expiry"
+                                            class="form-control @error('medical_record_medical_card_expiry') !border-danger-500 @enderror"
+                                            id="medical_record_medical_card_expiry">
+                                        @error('medical_record_medical_card_expiry')
+                                            <span class="text-danger-500 text-sm">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Modal footer -->
+                            <div
+                                class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
+                                <button wire:click="closeEditMedicalRecordModal" type="button"
+                                    class="btn inline-flex justify-center btn-outline-dark">Cancel</button>
+                                <button wire:click="updateMedicalRecord" type="button"
+                                    wire:target='updateMedicalRecord' wire:loading.remove
+                                    class="btn inline-flex justify-center btn-dark">{{ $employee->medicalRecord ? 'Update' : 'Upload' }}</button>
+                                <button wire:loading wire:target="updateMedicalRecord" type="button"
+                                    class="btn inline-flex justify-center btn-dark">
+                                    <span class="flex items-center">
+                                        <iconify-icon icon="line-md:loading-twotone-loop" width="25"
+                                            height="25"></iconify-icon>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- External Medical Record Edit Modal -->
+    @if ($showEditExternalMedicalRecordModal)
+        <div>
+            <div id="editExternalMedicalRecordModal"
+                class="modal fade fixed top-0 left-0 show w-full h-full outline-none overflow-x-hidden overflow-y-auto"
+                tabindex="-1" aria-labelledby="editExternalMedicalRecordModalLabel" aria-hidden="true" wire:ignore.self>
+                <div class="modal-dialog relative w-auto pointer-events-none">
+                    <div
+                        class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
+                        <div class="relative bg-white rounded-lg shadow dark:bg-slate-700">
+                            <!-- Modal header -->
+                            <div
+                                class="flex items-center justify-between p-5 border-b rounded-t dark:border-slate-600 bg-black-500">
+                                <h3 class="text-xl font-medium text-white dark:text-white capitalize">
+                                    Edit External Medical Record
+                                </h3>
+                                <button wire:click="closeEditExternalMedicalRecordModal" type="button"
+                                    class="text-slate-400 bg-transparent hover:text-slate-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-slate-600 dark:hover:text-white"
+                                    data-bs-dismiss="modal">
+                                    <svg aria-hidden="true" class="w-5 h-5" fill="#ffffff" viewBox="0 0 20 20"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd"
+                                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span class="sr-only">Close modal</span>
+                                </button>
+                            </div>
+
+                            <!-- Modal body -->
+                            <div class="p-6 space-y-4">
+                                <!-- Validation Errors Summary -->
+                                @if ($errors->any())
+                                <div class="p-4 mb-4 text-sm text-danger-700 bg-danger-100 rounded-lg dark:bg-danger-200 dark:text-danger-800" role="alert">
+                                    <div class="font-medium">Please fix the following errors:</div>
+                                    <ul class="mt-1.5 list-disc list-inside">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                                @endif
+                                <div class="grid grid-cols-12 gap-4">
+                                    @if (!$keep_existing_external_medical_record)
+                                        <div class="col-span-12">
+                                            <label for="external_medical_record_file" class="form-label">External Medical Record
+                                                Document
+                                                <iconify-icon wire:loading wire:target="external_medical_record_file"
+                                                    icon="line-md:loading-twotone-loop" width="18"
+                                                    height="18"></iconify-icon>
+                                            </label>
+                                            <div
+                                                class="border-2 border-dashed border-slate-200 rounded-md p-4 text-center">
+                                                @if ($external_medical_record_file)
+                                                    <div class="flex items-center justify-center mb-3">
+                                                        @if (in_array($external_medical_record_file->getClientOriginalExtension(), ['pdf']))
+                                                            <iconify-icon icon="mingcute:file-pdf-fill"
+                                                                width="48" height="48"
+                                                                class="text-red-500"></iconify-icon>
+                                                        @else
+                                                            <img src="{{ $external_medical_record_file->temporaryUrl() }}"
+                                                                class="h-40 max-w-full rounded-md object-contain"
+                                                                alt="External Medical Record Preview">
+                                                        @endif
+                                                    </div>
+                                                    <p class="text-sm text-slate-500">
+                                                        {{ $external_medical_record_file->getClientOriginalName() }}</p>
+                                                    <button type="button" class="text-sm text-red-500 mt-2"
+                                                        wire:click="$set('external_medical_record_file', null)">
+                                                        Remove File
+                                                    </button>
+                                                @else
+                                                    @if ($employee->externalMedicalRecord)
+                                                        <div class="mb-3">
+                                                            <small class="text-muted">
+                                                                Current file: <a
+                                                                    href="{{ $employee->externalMedicalRecord->file_path }}"
+                                                                    target="_blank"
+                                                                    class="text-sm text-blue-500">View</a>
+                                                            </small>
+                                                        </div>
+                                                        @if (!$keep_existing_external_medical_record)
+                                                            <label for="external_medical_record_file_input"
+                                                                class="cursor-pointer block">
+                                                                <iconify-icon icon="mingcute:upload-line"
+                                                                    width="32" height="32"
+                                                                    class="text-slate-400 mx-auto"></iconify-icon>
+                                                                <p class="mt-2 text-sm text-slate-500">Click to upload
+                                                                </p>
+                                                                <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF
+                                                                    (Max
+                                                                    10MB)</p>
+                                                                <input id="external_medical_record_file_input"
+                                                                    type="file" class="hidden"
+                                                                    wire:model="external_medical_record_file"
+                                                                    accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
+                                                            </label>
+                                                        @endif
+                                                    @else
+                                                        <label for="external_medical_record_file_input"
+                                                            class="cursor-pointer block">
+                                                            <iconify-icon icon="mingcute:upload-line" width="32"
+                                                                height="32"
+                                                                class="text-slate-400 mx-auto"></iconify-icon>
+                                                            <p class="mt-2 text-sm text-slate-500">Click to upload or
+                                                                drag
+                                                                and drop</p>
+                                                            <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF (Max
+                                                                10MB)
+                                                            </p>
+                                                            <input id="external_medical_record_file_input" type="file"
+                                                                class="hidden" wire:model="external_medical_record_file"
+                                                                accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
+                                                        </label>
+                                                    @endif
+                                                @endif
+                                            </div>
+                                            @error('external_medical_record_file')
+                                                <span class="text-danger-500 text-sm mt-1">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    @endif
+                                    @if ($employee->externalMedicalRecord)
+                                        <div class="col-span-12">
+                                            <div class="checkbox-area">
+                                                <label class="inline-flex items-center cursor-pointer">
+                                                    <input type="checkbox" class="hidden"
+                                                        wire:model.live="keep_existing_external_medical_record">
+                                                    <span
+                                                        class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
+                                                        <img src="{{ asset('images/icon/ck-white.svg') }}"
+                                                            alt=""
+                                                            class="h-[10px] w-[10px] block m-auto opacity-0" />
+                                                    </span>
+                                                    <span
+                                                        class="text-slate-600 dark:text-slate-300 text-sm leading-6">Keep
+                                                        existing document</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    @endif
+                                    <div class="col-span-12">
+                                        <label for="external_medical_record_id_number" class="form-label">ID Number</label>
+                                        <input type="text" wire:model="external_medical_record_id_number"
+                                            class="form-control @error('external_medical_record_id_number') !border-danger-500 @enderror"
+                                            id="external_medical_record_id_number">
+                                        @error('external_medical_record_id_number')
+                                            <span class="text-danger-500 text-sm">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-span-12">
+                                        <label for="external_medical_record_issue_date" class="form-label">Issue Date</label>
+                                        <input type="date" wire:model="external_medical_record_issue_date"
+                                            class="form-control @error('external_medical_record_issue_date') !border-danger-500 @enderror"
+                                            id="external_medical_record_issue_date">
+                                        @error('external_medical_record_issue_date')
+                                            <span class="text-danger-500 text-sm">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+
+                                    <div class="col-span-12">
+                                        <label for="external_medical_record_expiry_date" class="form-label">Expiry
+                                            Date</label>
+                                        <input type="date" wire:model="external_medical_record_expiry_date"
+                                            class="form-control @error('external_medical_record_expiry_date') !border-danger-500 @enderror"
+                                            id="external_medical_record_expiry_date">
+                                        @error('external_medical_record_expiry_date')
+                                            <span class="text-danger-500 text-sm">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Modal footer -->
+                            <div
+                                class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
+                                <button wire:click="closeEditExternalMedicalRecordModal" type="button"
+                                    class="btn inline-flex justify-center btn-outline-dark">Cancel</button>
+                                <button wire:click="updateExternalMedicalRecord" type="button"
+                                    wire:target='updateExternalMedicalRecord' wire:loading.remove
+                                    class="btn inline-flex justify-center btn-dark">Update</button>
+                                <button wire:loading wire:target="updateExternalMedicalRecord" type="button"
                                     class="btn inline-flex justify-center btn-dark">
                                     <span class="flex items-center">
                                         <iconify-icon icon="line-md:loading-twotone-loop" width="25"

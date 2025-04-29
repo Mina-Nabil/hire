@@ -434,5 +434,111 @@
                 </div>
             </div>
         </div>
+
+        <!-- Medical Record Statistics Section -->
+        <div class="mb-8">
+            <h3 class="text-xl font-semibold mb-4">Medical Record Status</h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
+                <!-- Total Employees Card -->
+                <div class="bg-white rounded-lg shadow p-4">
+                    <div class="text-gray-500 text-sm">Total Employees</div>
+                    <div class="text-2xl font-bold">{{ $medicalRecordStats['total'] }}</div>
+                </div>
+
+                <!-- Valid Medical Records Card -->
+                <div class="bg-success-100 border border-success-500 rounded-lg shadow p-4">
+                    <div class="text-gray-500 text-sm">Valid Medical Records</div>
+                    <div class="text-2xl font-bold text-success-600">{{ $medicalRecordStats['valid'] }}</div>
+                </div>
+
+                <!-- Near Expiry Card -->
+                <div class="bg-warning-50 border border-warning-500 rounded-lg shadow p-4">
+                    <div class="text-warning-100 text-sm">Near Expiry</div>
+                    <div class="text-2xl font-bold text-warning-600">{{ $medicalRecordStats['near_expiry'] }}</div>
+                </div>
+
+                <!-- Expired Card -->
+                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
+                    <div class="text-danger-100 text-sm">Expired</div>
+                    <div class="text-2xl font-bold text-danger-600">{{ $medicalRecordStats['expired'] }}</div>
+                </div>
+
+                <!-- Missing Card -->
+                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
+                    <div class="text-danger-100 text-sm">Missing</div>
+                    <div class="text-2xl font-bold text-danger-600">{{ $medicalRecordStats['missing'] }}</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <!-- Not Covered Card -->
+                <div class="bg-gray-100 border border-gray-500 rounded-lg shadow p-4">
+                    <div class="text-gray-500 text-sm">Not Covered</div>
+                    <div class="text-2xl font-bold text-gray-600">{{ $medicalRecordStats['by_status']['Not Covered'] }}</div>
+                </div>
+
+                <!-- Examination Card -->
+                <div class="bg-blue-100 border border-blue-500 rounded-lg shadow p-4">
+                    <div class="text-gray-500 text-sm">Examination</div>
+                    <div class="text-2xl font-bold text-blue-600">{{ $medicalRecordStats['by_status']['Examination'] }}</div>
+                </div>
+
+                <!-- Issuing Card -->
+                <div class="bg-yellow-100 border border-yellow-500 rounded-lg shadow p-4">
+                    <div class="text-gray-500 text-sm">Issuing</div>
+                    <div class="text-2xl font-bold text-yellow-600">{{ $medicalRecordStats['by_status']['Issuing'] }}</div>
+                </div>
+
+                <!-- Covered Card -->
+                <div class="bg-green-100 border border-green-500 rounded-lg shadow p-4">
+                    <div class="text-gray-500 text-sm">Covered</div>
+                    <div class="text-2xl font-bold text-green-600">{{ $medicalRecordStats['by_status']['Covered'] }}</div>
+                </div>
+
+                <!-- External Cover Card -->
+                <div class="bg-purple-100 border border-purple-500 rounded-lg shadow p-4">
+                    <div class="text-gray-500 text-sm">External Cover</div>
+                    <div class="text-2xl font-bold text-purple-600">{{ $medicalRecordStats['by_status']['External Cover'] }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- External Medical Record Statistics Section -->
+        <div class="mb-8">
+            <h3 class="text-xl font-semibold mb-4">External Medical Record Status</h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <!-- Total Employees Card -->
+                <div class="bg-white rounded-lg shadow p-4">
+                    <div class="text-gray-500 text-sm">Total Employees</div>
+                    <div class="text-2xl font-bold">{{ $externalMedicalRecordStats['total'] }}</div>
+                </div>
+
+                <!-- Valid External Medical Records Card -->
+                <div class="bg-success-100 border border-success-500 rounded-lg shadow p-4">
+                    <div class="text-gray-500 text-sm">Valid Records</div>
+                    <div class="text-2xl font-bold text-success-600">{{ $externalMedicalRecordStats['valid'] }}</div>
+                </div>
+
+                <!-- Near Expiry Card -->
+                <div class="bg-warning-50 border border-warning-500 rounded-lg shadow p-4">
+                    <div class="text-warning-100 text-sm">Near Expiry</div>
+                    <div class="text-2xl font-bold text-warning-600">{{ $externalMedicalRecordStats['near_expiry'] }}</div>
+                </div>
+
+                <!-- Expired Card -->
+                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
+                    <div class="text-danger-100 text-sm">Expired</div>
+                    <div class="text-2xl font-bold text-danger-600">{{ $externalMedicalRecordStats['expired'] }}</div>
+                </div>
+
+                <!-- Missing Card -->
+                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
+                    <div class="text-danger-100 text-sm">Missing</div>
+                    <div class="text-2xl font-bold text-danger-600">{{ $externalMedicalRecordStats['missing'] }}</div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

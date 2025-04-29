@@ -347,6 +347,52 @@ class Employee extends Model
     }
 
     /**
+     * Set medical record for the employee
+     *
+     * @param string $file_path
+     * @param Carbon $issue_date
+     * @param Carbon $expiry_date
+     * @param string $status
+     * @param string|null $insurance_number
+     * @param string|null $medical_card_code
+     * @param Carbon|null $medical_card_start
+     * @param Carbon|null $medical_card_expiry
+     * @return bool
+     * @throws AppException
+     */
+    public function setMedicalRecord($file_path, Carbon $issue_date, Carbon $expiry_date, string $status, ?string $insurance_number = null, ?string $medical_card_code = null, ?Carbon $medical_card_start = null, ?Carbon $medical_card_expiry = null)
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('setDocs', $this)) {
+            throw new AppException('You dont have permission to set docs for this employee');
+        }
+
+        try {
+            $this->medicalRecord()->updateOrCreate(
+                [
+                    'employee_id' => $this->id,
+                ],
+                [
+                    'created_by' => $loggedInUser->id,
+                    'file_path' => $file_path,
+                    'issue_date' => $issue_date,
+                    'expiry_date' => $expiry_date,
+                    'status' => $status,
+                    'insurance_number' => $insurance_number,
+                    'medical_card_code' => $medical_card_code,
+                    'medical_card_start' => $medical_card_start,
+                    'medical_card_expiry' => $medical_card_expiry,
+                ],
+            );
+            return true;
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException('Error setting medical record: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Update employee base information
      *
      * @param string $name
@@ -478,7 +524,11 @@ class Employee extends Model
                 // 9. S2 Document
                 ->orWhereDoesntHave('employeeS2Doc')
                 // 10. S6 Document
-                ->orWhereDoesntHave('employeeS6Doc');
+                ->orWhereDoesntHave('employeeS6Doc')
+                // 11. Medical Record
+                ->orWhereDoesntHave('medicalRecord')
+                // 12. External Medical Record
+                ->orWhereDoesntHave('externalMedicalRecord');
         });
     }
 
@@ -532,6 +582,14 @@ class Employee extends Model
                 })
                 // 10. S6 Doc expired
                 ->orWhereHas('employeeS6Doc', function ($q) use ($today) {
+                    $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
+                })
+                // 11. Medical Record expired
+                ->orWhereHas('medicalRecord', function ($q) use ($today) {
+                    $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
+                })
+                // 12. External Medical Record expired
+                ->orWhereHas('externalMedicalRecord', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
                 });
         });
@@ -1041,6 +1099,55 @@ class Employee extends Model
     }
 
     /**
+     * Get medical record statistics
+     *
+     * @return array
+     */
+    public static function getMedicalRecordStatistics()
+    {
+        $total = self::count();
+        $valid = self::whereHas('medicalRecord', function ($q) {
+            $q->where('expiry_date', '>', now());
+        })->count();
+        $expired = self::whereHas('medicalRecord', function ($q) {
+            $q->where('expiry_date', '<', now());
+        })->count();
+        $missing = self::whereDoesntHave('medicalRecord')->count();
+        $nearExpiry = self::whereHas('medicalRecord', function ($q) {
+            $q->where('expiry_date', '>', now())
+                ->where('expiry_date', '<', now()->addDays(30));
+        })->count();
+
+        // Count by status
+        $byStatus = [
+            'Not Covered' => self::whereHas('medicalRecord', function ($q) {
+                $q->where('status', 'Not Covered');
+            })->count(),
+            'Examination' => self::whereHas('medicalRecord', function ($q) {
+                $q->where('status', 'Examination');
+            })->count(),
+            'Issuing' => self::whereHas('medicalRecord', function ($q) {
+                $q->where('status', 'Issuing');
+            })->count(),
+            'Covered' => self::whereHas('medicalRecord', function ($q) {
+                $q->where('status', 'Covered');
+            })->count(),
+            'External Cover' => self::whereHas('medicalRecord', function ($q) {
+                $q->where('status', 'External Cover');
+            })->count(),
+        ];
+
+        return [
+            'total' => $total,
+            'valid' => $valid,
+            'expired' => $expired,
+            'missing' => $missing,
+            'near_expiry' => $nearExpiry,
+            'by_status' => $byStatus,
+        ];
+    }
+
+    /**
      * Get missing documents for this employee
      *
      * @return array
@@ -1097,6 +1204,16 @@ class Employee extends Model
         // 10. S6 Document
         if ($this->employeeS6Doc->isEmpty()) {
             $missingDocs[] = 'S6 Document';
+        }
+
+        // 11. Medical Record
+        if (!$this->medicalRecord) {
+            $missingDocs[] = 'Medical Record';
+        }
+
+        // 12. External Medical Record
+        if (!$this->externalMedicalRecord) {
+            $missingDocs[] = 'External Medical Record';
         }
 
         return $missingDocs;
@@ -1175,6 +1292,16 @@ class Employee extends Model
                 $expiredDocs[] = 'S6 Document';
                 break;
             }
+        }
+
+        // 11. Medical Record
+        if ($this->medicalRecord && $this->medicalRecord->expiry_date && $today->gt($this->medicalRecord->expiry_date)) {
+            $expiredDocs[] = 'Medical Record';
+        }
+
+        // 12. External Medical Record
+        if ($this->externalMedicalRecord && $this->externalMedicalRecord->expiry_date && $today->gt($this->externalMedicalRecord->expiry_date)) {
+            $expiredDocs[] = 'External Medical Record';
         }
 
         return $expiredDocs;
@@ -1566,22 +1693,32 @@ class Employee extends Model
      * Check medical record status
      *
      * @param int $nearExpiryDays Days threshold for near expiry warning
-     * @return string Document status
+     * @return array Document status and details
      */
     public function checkMedicalRecordStatus($nearExpiryDays = self::NEAR_EXPIRY_DAYS)
     {
-        return $this->checkDocumentStatus($this->medicalRecord, $nearExpiryDays);
+        $status = $this->checkDocumentStatus($this->medicalRecord, $nearExpiryDays);
+        
+        return [
+            'status' => $status,
+            'details' => $status == self::DOC_STATUS_EXPIRED ? 'Medical record expired on ' . ($this->medicalRecord ? $this->medicalRecord->expiry_date : 'N/A') : ($status == self::DOC_STATUS_NEAR_EXPIRY ? 'Medical record will expire on ' . ($this->medicalRecord ? $this->medicalRecord->expiry_date : 'N/A') : ($status == self::DOC_STATUS_MISSING ? 'No medical record found' : 'Medical record is valid')),
+        ];
     }
 
     /**
      * Check external medical record status
      *
      * @param int $nearExpiryDays Days threshold for near expiry warning
-     * @return string Document status
+     * @return array Document status and details
      */
     public function checkExternalMedicalRecordStatus($nearExpiryDays = self::NEAR_EXPIRY_DAYS)
     {
-        return $this->checkDocumentStatus($this->externalMedicalRecord, $nearExpiryDays);
+        $status = $this->checkDocumentStatus($this->externalMedicalRecord, $nearExpiryDays);
+        
+        return [
+            'status' => $status,
+            'details' => $status == self::DOC_STATUS_EXPIRED ? 'External medical record expired on ' . ($this->externalMedicalRecord ? $this->externalMedicalRecord->expiry_date : 'N/A') : ($status == self::DOC_STATUS_NEAR_EXPIRY ? 'External medical record will expire on ' . ($this->externalMedicalRecord ? $this->externalMedicalRecord->expiry_date : 'N/A') : ($status == self::DOC_STATUS_MISSING ? 'No external medical record found' : 'External medical record is valid')),
+        ];
     }
 
     /**
@@ -1750,5 +1887,72 @@ class Employee extends Model
         $summary['overall_status'] = $overallStatus;
 
         return $summary;
+    }
+
+    public function setExternalMedicalRecord($file_path, Carbon $issue_date, Carbon $expiry_date, string $id_number)
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('setDocs', $this)) {
+            throw new AppException('You dont have permission to set docs for this employee');
+        }
+
+        try {
+            $this->externalMedicalRecord()->updateOrCreate(
+                [
+                    'employee_id' => $this->id,
+                ],
+                [
+                    'created_by' => $loggedInUser->id,
+                    'id_number' => $id_number,
+                    'file_path' => $file_path,
+                    'issue_date' => $issue_date,
+                    'expiry_date' => $expiry_date,
+                ],
+            );
+            return true;
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException('Error setting external medical record: ' . $e->getMessage());
+        }
+    }
+
+    public static function getExternalMedicalRecordStatistics()
+    {
+        $total = Employee::count();
+        $valid = 0;
+        $near_expiry = 0;
+        $expired = 0;
+        $missing = 0;
+
+        Employee::with('externalMedicalRecord')->chunk(100, function ($employees) use (&$valid, &$near_expiry, &$expired, &$missing) {
+            foreach ($employees as $employee) {
+                $status = $employee->checkExternalMedicalRecordStatus();
+                
+                if ($status === 'missing') {
+                    $missing++;
+                } elseif ($status === 'expired') {
+                    $expired++;
+                } elseif ($status === 'near_expiry') {
+                    $near_expiry++;
+                } elseif ($status === 'valid') {
+                    $valid++;
+                }
+            }
+        });
+
+        return [
+            'total' => $total,
+            'valid' => $valid,
+            'near_expiry' => $near_expiry,
+            'expired' => $expired,
+            'missing' => $missing
+        ];
+    }
+
+    public function includeInReportExternalMedicalRecord()
+    {
+        $status = $this->checkExternalMedicalRecordStatus();
+        return $status === 'missing' || $status === 'expired' || $status === 'near_expiry';
     }
 }

@@ -166,12 +166,6 @@
                                         href="{{ route('employees.dashboard') }}">Dashboard</a>
                                 </li>
                             @endcan
-                            {{-- @can('viewAny', App\Models\Personel\Employee::class)
-                                <li>
-                                    <a class="{{ $employeesIndex ?? '' }}"
-                                        href="{{ route('employees.index') }}">Employees</a>
-                                </li>
-                            @endcan --}}
                             @can('viewMissingDocReport', App\Models\Personel\Employee::class)
                                 <li>
                                     <a class="{{ $missingDocReport ?? '' }}"
@@ -183,7 +177,7 @@
                                     <a class="{{ $employeesIndex ?? '' }}"
                                         href="{{ route('employees') }}">Employees</a>
                                 </li>
-                            @endcan
+                            @endcan                          
                         </ul>
                     </li>
 

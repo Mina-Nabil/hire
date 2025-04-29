@@ -32,6 +32,8 @@ class MissingDocReport extends Component
         'S1 Document' => false,
         'S2 Document' => false,
         'S6 Document' => false,
+        'Medical Record' => false,
+        'External Medical Record' => false,
     ];
     
     // Separate filters for missing and expired documents
@@ -140,7 +142,7 @@ class MissingDocReport extends Component
             $query->where('name', 'like', '%' . $this->searchTerm . '%')->orWhere('email', 'like', '%' . $this->searchTerm . '%');
         }
         
-        $employees = $query->with(['idCard', 'birthCertificate', 'contracts', 'armyServicePaper', 'driverLicense', 'policeRecords', 'hrLetters', 'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'info'])->paginate(10);
+        $employees = $query->with(['idCard', 'birthCertificate', 'contracts', 'armyServicePaper', 'driverLicense', 'policeRecords', 'hrLetters', 'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'medicalRecord', 'externalMedicalRecord', 'info'])->paginate(10);
             
         // Pre-calculate missing and expired document counts for each employee
         foreach ($employees as $key => $employee) {
@@ -186,8 +188,10 @@ class MissingDocReport extends Component
             
         return view('livewire.employee.missing-doc-report', [
             'employees' => $employees,
-            'missingDocReport' => 'active',
             'anyFiltersActive' => $this->missingFilterActive || $this->expiredFilterActive,
+        ])->layout('components.layouts.app', [
+            'title' => 'Missing Documents Report',
+            'missingDocReport' => 'active'
         ]);
     }
 }

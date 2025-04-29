@@ -156,6 +156,8 @@ return new class extends Migration
             $table->date('issue_date')->nullable();
             $table->date('expiry_date')->nullable();
 
+            $table->string('insurance_number')->nullable();
+
             $table->string('medical_card_code')->nullable();
             $table->date('medical_card_start')->nullable();
             $table->date('medical_card_expiry')->nullable();

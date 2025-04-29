@@ -661,14 +661,14 @@ class EmployeeShow extends Component
             $this->validate([
                 's1_number' => 'required|string|max:50',
                 'employee_s1_doc_issue_date' => 'required|date',
-                'employee_s1_doc_expiry_date' => 'nullable|date|after:employee_s1_doc_issue_date',
+                'employee_s1_doc_expiry_date' => 'required|date|after:employee_s1_doc_issue_date',
             ]);
         } else {
             $this->validate([
                 'employee_s1_doc_file' => 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
                 's1_number' => 'required|string|max:50',
                 'employee_s1_doc_issue_date' => 'required|date',
-                'employee_s1_doc_expiry_date' => 'nullable|date|after:employee_s1_doc_issue_date',
+                'employee_s1_doc_expiry_date' => 'required|date|after:employee_s1_doc_issue_date',
             ]);
         }
 

@@ -12,6 +12,7 @@ use App\Livewire\Settings\AreasIndex;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\UsersIndex;
 use App\Http\Controllers\Hierarchy\OrganizationController;
+use App\Livewire\Employee\EmployeeDashboard;
 use App\Livewire\Employee\EmployeeShow;
 use App\Livewire\Employee\MissingDocReport;
 use App\Livewire\Recruitment\ApplicantShow;
@@ -36,6 +37,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/recruitment/applicants/success', ApplicantSuccess::class)->name('applicants.success');
     
     // Employee routes
+    Route::get('/employees/dashboard', EmployeeDashboard::class)->name('employees.dashboard');
     Route::get('/employees/reports/missing-documents', MissingDocReport::class)->name('employees.reports.missing-documents');
     Route::get('/employees/{id}', EmployeeShow::class)->name('employees.show');
     

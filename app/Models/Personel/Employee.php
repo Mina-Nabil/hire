@@ -518,6 +518,509 @@ class Employee extends Model
     }
 
     /**
+     * Get ID card statistics for dashboard
+     *
+     * @return array
+     */
+    public static function getIdCardStatistics()
+    {
+        $today = now()->format('Y-m-d');
+        $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
+
+        // Get total employees
+        $total = self::count();
+
+        // Get employees with missing ID cards
+        $missing = self::whereDoesntHave('idCard')->count();
+
+        // Get employees with expired ID cards
+        $expired = self::whereHas('idCard', function ($q) use ($today) {
+            $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
+        })->count();
+
+        // Get employees with ID cards near expiry
+        $nearExpiry = self::whereHas('idCard', function ($q) use ($today, $nearExpiryDate) {
+            $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
+        })->count();
+
+        // Get employees with valid ID cards
+        $valid = self::whereHas('idCard', function ($q) use ($today, $nearExpiryDate) {
+            $q->where(function ($q) use ($today, $nearExpiryDate) {
+                $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
+            });
+        })->count();
+
+        return [
+            'total' => $total,
+            'valid' => $valid,
+            'near_expiry' => $nearExpiry,
+            'expired' => $expired,
+            'missing' => $missing,
+        ];
+    }
+
+    /**
+     * Get birth certificate statistics for dashboard
+     *
+     * @return array
+     */
+    public static function getBirthCertificateStatistics()
+    {
+        $today = now()->format('Y-m-d');
+        $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
+
+        // Get total employees
+        $total = self::count();
+
+        // Get employees with missing birth certificates
+        $missing = self::whereDoesntHave('birthCertificate')->count();
+
+        // Get employees with expired birth certificates
+        $expired = self::whereHas('birthCertificate', function ($q) use ($today) {
+            $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
+        })->count();
+
+        // Get employees with birth certificates near expiry
+        $nearExpiry = self::whereHas('birthCertificate', function ($q) use ($today, $nearExpiryDate) {
+            $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
+        })->count();
+
+        // Get employees with valid birth certificates
+        $valid = self::whereHas('birthCertificate', function ($q) use ($today, $nearExpiryDate) {
+            $q->where(function ($q) use ($today, $nearExpiryDate) {
+                $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
+            });
+        })->count();
+
+        // Get counts by type
+        $original = self::whereHas('birthCertificate', function ($q) {
+            $q->where('type', 'Original');
+        })->count();
+
+        $verifiedCopy = self::whereHas('birthCertificate', function ($q) {
+            $q->where('type', 'Verified Copy');
+        })->count();
+
+        $copy = self::whereHas('birthCertificate', function ($q) {
+            $q->where('type', 'Copy');
+        })->count();
+
+        return [
+            'total' => $total,
+            'valid' => $valid,
+            'near_expiry' => $nearExpiry,
+            'expired' => $expired,
+            'missing' => $missing,
+            'by_type' => [
+                'original' => $original,
+                'verified_copy' => $verifiedCopy,
+                'copy' => $copy,
+            ],
+        ];
+    }
+
+    /**
+     * Get army service paper statistics for dashboard
+     *
+     * @return array
+     */
+    public static function getArmyServicePaperStatistics()
+    {
+        $today = now()->format('Y-m-d');
+        $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
+        
+        // Get total employees
+        $total = self::count();
+        
+        // Get female employees (not required to have army service paper)
+        $females = self::where('gender', 'female')->count();
+        
+        // Get male employees (required to have army service paper)
+        $males = self::where('gender', 'male')->count();
+        
+        // Get male employees with missing army service papers
+        $missing = self::where('gender', 'male')->whereDoesntHave('armyServicePaper')->count();
+        
+        // Get male employees with expired army service papers
+        $expired = self::where('gender', 'male')
+            ->whereHas('armyServicePaper', function ($q) use ($today) {
+                $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
+            })
+            ->count();
+        
+        // Get male employees with army service papers near expiry
+        $nearExpiry = self::where('gender', 'male')
+            ->whereHas('armyServicePaper', function ($q) use ($today, $nearExpiryDate) {
+                $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
+            })
+            ->count();
+        
+        // Get male employees with valid army service papers
+        $valid = self::where('gender', 'male')
+            ->whereHas('armyServicePaper', function ($q) use ($today, $nearExpiryDate) {
+                $q->where(function ($q) use ($today, $nearExpiryDate) {
+                    $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
+                });
+            })
+            ->count();
+        
+        // Get counts by type
+        $original = self::where('gender', 'male')
+            ->whereHas('armyServicePaper', function ($q) {
+                $q->where('type', 'Original');
+            })
+            ->count();
+        
+        $verifiedCopy = self::where('gender', 'male')
+            ->whereHas('armyServicePaper', function ($q) {
+                $q->where('type', 'Verified Copy');
+            })
+            ->count();
+        
+        $copy = self::where('gender', 'male')
+            ->whereHas('armyServicePaper', function ($q) {
+                $q->where('type', 'Copy');
+            })
+            ->count();
+        
+        return [
+            'total' => $total,
+            'females' => $females,
+            'males' => $males,
+            'valid' => $valid,
+            'near_expiry' => $nearExpiry,
+            'expired' => $expired,
+            'missing' => $missing,
+            'by_type' => [
+                'original' => $original,
+                'verified_copy' => $verifiedCopy,
+                'copy' => $copy,
+            ],
+        ];
+    }
+
+    /**
+     * Get employment contract statistics for dashboard
+     * 
+     * @return array
+     */
+    public static function getEmploymentContractStatistics()
+    {
+        $today = now()->format('Y-m-d');
+        $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
+        
+        // Get total employees
+        $total = self::count();
+        
+        // Get employees with missing contracts
+        $missing = self::whereDoesntHave('contracts')->count();
+        
+        // Get employees with expired contracts
+        $expired = self::whereHas('contracts', function ($q) use ($today) {
+            $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
+        })->count();
+        
+        // Get employees with contracts near expiry
+        $nearExpiry = self::whereHas('contracts', function ($q) use ($today, $nearExpiryDate) {
+            $q->whereNotNull('expiry_date')
+              ->where('expiry_date', '>', $today)
+              ->where('expiry_date', '<=', $nearExpiryDate);
+        })->count();
+        
+        // Get employees with valid contracts
+        $valid = self::whereHas('contracts', function ($q) use ($today, $nearExpiryDate) {
+            $q->where(function ($q) use ($today, $nearExpiryDate) {
+                $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
+            });
+        })->count();
+        
+        return [
+            'total' => $total,
+            'valid' => $valid,
+            'near_expiry' => $nearExpiry,
+            'expired' => $expired,
+            'missing' => $missing,
+        ];
+    }
+
+    /**
+     * Get driver license statistics for dashboard
+     * 
+     * @return array
+     */
+    public static function getDriverLicenseStatistics()
+    {
+        $today = now()->format('Y-m-d');
+        $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
+        
+        // Get total employees
+        $total = self::count();
+        
+        // Get employees who require a driver license
+        $required = self::where('license_required', true)->count();
+        
+        // Get employees who don't require a driver license
+        $notRequired = self::where('license_required', false)->count();
+        
+        // Get employees with missing driver licenses (only for those who require it)
+        $missing = self::where('license_required', true)
+            ->whereDoesntHave('driverLicense')
+            ->count();
+        
+        // Get employees with expired driver licenses (only for those who require it)
+        $expired = self::where('license_required', true)
+            ->whereHas('driverLicense', function ($q) use ($today) {
+                $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
+            })->count();
+        
+        // Get employees with driver licenses near expiry (only for those who require it)
+        $nearExpiry = self::where('license_required', true)
+            ->whereHas('driverLicense', function ($q) use ($today, $nearExpiryDate) {
+                $q->whereNotNull('expiry_date')
+                  ->where('expiry_date', '>', $today)
+                  ->where('expiry_date', '<=', $nearExpiryDate);
+            })->count();
+        
+        // Get employees with valid driver licenses (only for those who require it)
+        $valid = self::where('license_required', true)
+            ->whereHas('driverLicense', function ($q) use ($today, $nearExpiryDate) {
+                $q->where(function ($q) use ($today, $nearExpiryDate) {
+                    $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
+                });
+            })->count();
+        
+        return [
+            'total' => $total,
+            'required' => $required,
+            'not_required' => $notRequired,
+            'valid' => $valid,
+            'near_expiry' => $nearExpiry,
+            'expired' => $expired,
+            'missing' => $missing,
+        ];
+    }
+
+    /**
+     * Get police record statistics for dashboard
+     * 
+     * @return array
+     */
+    public static function getPoliceRecordStatistics()
+    {
+        $today = now()->format('Y-m-d');
+        $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
+        
+        // Get total employees
+        $total = self::count();
+        
+        // Get employees with missing police records
+        $missing = self::whereDoesntHave('policeRecords')->count();
+        
+        // Get employees with expired police records
+        $expired = self::whereHas('policeRecords', function ($q) use ($today) {
+            $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
+        })->count();
+        
+        // Get employees with police records near expiry
+        $nearExpiry = self::whereHas('policeRecords', function ($q) use ($today, $nearExpiryDate) {
+            $q->whereNotNull('expiry_date')
+              ->where('expiry_date', '>', $today)
+              ->where('expiry_date', '<=', $nearExpiryDate);
+        })->count();
+        
+        // Get employees with valid police records
+        $valid = self::whereHas('policeRecords', function ($q) use ($today, $nearExpiryDate) {
+            $q->where(function ($q) use ($today, $nearExpiryDate) {
+                $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
+            });
+        })->count();
+        
+        return [
+            'total' => $total,
+            'valid' => $valid,
+            'near_expiry' => $nearExpiry,
+            'expired' => $expired,
+            'missing' => $missing,
+        ];
+    }
+
+    /**
+     * Get HR letter statistics for dashboard
+     * 
+     * @return array
+     */
+    public static function getHrLetterStatistics()
+    {
+        $today = now()->format('Y-m-d');
+        $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
+        
+        // Get total employees
+        $total = self::count();
+        
+        // Get employees with missing HR letters
+        $missing = self::whereDoesntHave('hrLetters')->count();
+        
+        // Get employees with expired HR letters
+        $expired = self::whereHas('hrLetters', function ($q) use ($today) {
+            $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
+        })->count();
+        
+        // Get employees with HR letters near expiry
+        $nearExpiry = self::whereHas('hrLetters', function ($q) use ($today, $nearExpiryDate) {
+            $q->whereNotNull('expiry_date')
+              ->where('expiry_date', '>', $today)
+              ->where('expiry_date', '<=', $nearExpiryDate);
+        })->count();
+        
+        // Get employees with valid HR letters
+        $valid = self::whereHas('hrLetters', function ($q) use ($today, $nearExpiryDate) {
+            $q->where(function ($q) use ($today, $nearExpiryDate) {
+                $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
+            });
+        })->count();
+        
+        return [
+            'total' => $total,
+            'valid' => $valid,
+            'near_expiry' => $nearExpiry,
+            'expired' => $expired,
+            'missing' => $missing,
+        ];
+    }
+
+    /**
+     * Get S1 document statistics for dashboard
+     * 
+     * @return array
+     */
+    public static function getS1DocStatistics()
+    {
+        $today = now()->format('Y-m-d');
+        $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
+        
+        // Get total employees
+        $total = self::count();
+        
+        // Get employees with missing S1 documents
+        $missing = self::whereDoesntHave('employeeS1Doc')->count();
+        
+        // Get employees with expired S1 documents
+        $expired = self::whereHas('employeeS1Doc', function ($q) use ($today) {
+            $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
+        })->count();
+        
+        // Get employees with S1 documents near expiry
+        $nearExpiry = self::whereHas('employeeS1Doc', function ($q) use ($today, $nearExpiryDate) {
+            $q->whereNotNull('expiry_date')
+              ->where('expiry_date', '>', $today)
+              ->where('expiry_date', '<=', $nearExpiryDate);
+        })->count();
+        
+        // Get employees with valid S1 documents
+        $valid = self::whereHas('employeeS1Doc', function ($q) use ($today, $nearExpiryDate) {
+            $q->where(function ($q) use ($today, $nearExpiryDate) {
+                $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
+            });
+        })->count();
+        
+        return [
+            'total' => $total,
+            'valid' => $valid,
+            'near_expiry' => $nearExpiry,
+            'expired' => $expired,
+            'missing' => $missing,
+        ];
+    }
+
+    /**
+     * Get S2 document statistics for dashboard
+     * 
+     * @return array
+     */
+    public static function getS2DocStatistics()
+    {
+        $today = now()->format('Y-m-d');
+        $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
+        
+        // Get total employees
+        $total = self::count();
+        
+        // Get employees with missing S2 documents
+        $missing = self::whereDoesntHave('employeeS2Doc')->count();
+        
+        // Get employees with expired S2 documents
+        $expired = self::whereHas('employeeS2Doc', function ($q) use ($today) {
+            $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
+        })->count();
+        
+        // Get employees with S2 documents near expiry
+        $nearExpiry = self::whereHas('employeeS2Doc', function ($q) use ($today, $nearExpiryDate) {
+            $q->whereNotNull('expiry_date')
+              ->where('expiry_date', '>', $today)
+              ->where('expiry_date', '<=', $nearExpiryDate);
+        })->count();
+        
+        // Get employees with valid S2 documents
+        $valid = self::whereHas('employeeS2Doc', function ($q) use ($today, $nearExpiryDate) {
+            $q->where(function ($q) use ($today, $nearExpiryDate) {
+                $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
+            });
+        })->count();
+        
+        return [
+            'total' => $total,
+            'valid' => $valid,
+            'near_expiry' => $nearExpiry,
+            'expired' => $expired,
+            'missing' => $missing,
+        ];
+    }
+
+    /**
+     * Get S6 document statistics for dashboard
+     * 
+     * @return array
+     */
+    public static function getS6DocStatistics()
+    {
+        $today = now()->format('Y-m-d');
+        $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
+        
+        // Get total employees
+        $total = self::count();
+        
+        // Get employees with missing S6 documents
+        $missing = self::whereDoesntHave('employeeS6Doc')->count();
+        
+        // Get employees with expired S6 documents
+        $expired = self::whereHas('employeeS6Doc', function ($q) use ($today) {
+            $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
+        })->count();
+        
+        // Get employees with S6 documents near expiry
+        $nearExpiry = self::whereHas('employeeS6Doc', function ($q) use ($today, $nearExpiryDate) {
+            $q->whereNotNull('expiry_date')
+              ->where('expiry_date', '>', $today)
+              ->where('expiry_date', '<=', $nearExpiryDate);
+        })->count();
+        
+        // Get employees with valid S6 documents
+        $valid = self::whereHas('employeeS6Doc', function ($q) use ($today, $nearExpiryDate) {
+            $q->where(function ($q) use ($today, $nearExpiryDate) {
+                $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
+            });
+        })->count();
+        
+        return [
+            'total' => $total,
+            'valid' => $valid,
+            'near_expiry' => $nearExpiry,
+            'expired' => $expired,
+            'missing' => $missing,
+        ];
+    }
+
+    /**
      * Get missing documents for this employee
      *
      * @return array

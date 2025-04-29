@@ -160,10 +160,24 @@
                             <iconify-icon class="icon-arrow" icon="heroicons-outline:chevron-right"></iconify-icon>
                         </a>
                         <ul class="sidebar-submenu">
-                            <li>
-                                <a class="{{ $missingDocReport ?? '' }}"
-                                    href="{{ route('employees.reports.missing-documents') }}">Document Status</a>
-                            </li>
+                            @can('viewDashboard', App\Models\Personel\Employee::class)
+                                <li>
+                                    <a class="{{ $employeeDashboard ?? '' }}"
+                                        href="{{ route('employees.dashboard') }}">Dashboard</a>
+                                </li>
+                            @endcan
+                            {{-- @can('viewAny', App\Models\Personel\Employee::class)
+                                <li>
+                                    <a class="{{ $employeesIndex ?? '' }}"
+                                        href="{{ route('employees.index') }}">Employees</a>
+                                </li>
+                            @endcan --}}
+                            @can('viewMissingDocReport', App\Models\Personel\Employee::class)
+                                <li>
+                                    <a class="{{ $missingDocReport ?? '' }}"
+                                        href="{{ route('employees.reports.missing-documents') }}">Document Status</a>
+                                </li>
+                            @endcan
                         </ul>
                     </li>
 

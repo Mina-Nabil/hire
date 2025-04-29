@@ -25,6 +25,14 @@ class EmployeePolicy
     }
 
     /**
+     * Determine whether the user can view the dashboard.
+     */
+    public function viewDashboard(User $user): bool
+    {
+        return $user->is_admin || $user->is_hr;
+    }
+
+    /**
      * Determine whether the user can create models.
      */
     public function create(User $user): bool

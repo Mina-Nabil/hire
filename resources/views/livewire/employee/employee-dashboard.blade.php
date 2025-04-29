@@ -577,5 +577,79 @@
                 </div>
             </div>
         </div>
+
+        <!-- Skills Qualification Statistics Section -->
+        <div class="mb-8">
+            <h3 class="text-xl font-semibold mb-4">Skills Qualification Status</h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <!-- Total Employees Card -->
+                <div class="bg-white rounded-lg shadow p-4">
+                    <div class="text-gray-500 text-sm">Total Employees</div>
+                    <div class="text-2xl font-bold">{{ $skillsQualificationStats['total'] }}</div>
+                </div>
+
+                <!-- Valid Skills Qualifications -->
+                <div class="bg-success-100 border border-success-500 rounded-lg shadow p-4">
+                    <div class="text-gray-500 text-sm">Valid Records</div>
+                    <div class="text-2xl font-bold text-success-600">{{ $skillsQualificationStats['valid'] }}</div>
+                </div>
+
+                <!-- Near Expiry Card -->
+                <div class="bg-warning-50 border border-warning-500 rounded-lg shadow p-4">
+                    <div class="text-warning-100 text-sm">Near Expiry</div>
+                    <div class="text-2xl font-bold text-warning-600">{{ $skillsQualificationStats['near_expiry'] }}</div>
+                </div>
+
+                <!-- Expired Card -->
+                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
+                    <div class="text-danger-100 text-sm">Expired</div>
+                    <div class="text-2xl font-bold text-danger-600">{{ $skillsQualificationStats['expired'] }}</div>
+                </div>
+
+                <!-- Missing Card -->
+                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
+                    <div class="text-danger-100 text-sm">Missing</div>
+                    <div class="text-2xl font-bold text-danger-600">{{ $skillsQualificationStats['missing'] }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Syndicate Card Statistics Section -->
+        <div class="mb-8">
+            <h3 class="text-xl font-semibold mb-4">Syndicate Card Status</h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <!-- Total Employees Card -->
+                <div class="bg-white rounded-lg shadow p-4">
+                    <div class="text-gray-500 text-sm">Total Employees</div>
+                    <div class="text-2xl font-bold">{{ $syndicateCardStats['total'] }}</div>
+                </div>
+
+                <!-- Valid Syndicate Cards -->
+                <div class="bg-success-100 border border-success-500 rounded-lg shadow p-4">
+                    <div class="text-gray-500 text-sm">Valid Records</div>
+                    <div class="text-2xl font-bold text-success-600">{{ $syndicateCardStats['valid'] }}</div>
+                </div>
+
+                <!-- Near Expiry Card -->
+                <div class="bg-warning-50 border border-warning-500 rounded-lg shadow p-4">
+                    <div class="text-warning-100 text-sm">Near Expiry</div>
+                    <div class="text-2xl font-bold text-warning-600">{{ $syndicateCardStats['near_expiry'] }}</div>
+                </div>
+
+                <!-- Expired Card -->
+                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
+                    <div class="text-danger-100 text-sm">Expired</div>
+                    <div class="text-2xl font-bold text-danger-600">{{ $syndicateCardStats['expired'] }}</div>
+                </div>
+
+                <!-- Missing Card -->
+                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
+                    <div class="text-danger-100 text-sm">Missing</div>
+                    <div class="text-2xl font-bold text-danger-600">{{ $syndicateCardStats['missing'] }}</div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

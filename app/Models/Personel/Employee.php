@@ -530,7 +530,9 @@ class Employee extends Model
                 // 12. External Medical Record
                 ->orWhereDoesntHave('externalMedicalRecord')
                 // 13. Practice Card
-                ->orWhereDoesntHave('practiceCard');
+                ->orWhereDoesntHave('practiceCard')
+                // 14. Syndicate Card
+                ->orWhereDoesntHave('syndicateCard');
         });
     }
 
@@ -595,6 +597,10 @@ class Employee extends Model
                 })
                 // 13. Practice Card expired
                 ->orWhereHas('practiceCard', function ($q) use ($today) {
+                    $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
+                })
+                // 14. Syndicate Card expired
+                ->orWhereHas('syndicateCard', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
                 });
         });
@@ -1226,6 +1232,11 @@ class Employee extends Model
             $missingDocs[] = 'Practice Card';
         }
 
+        // 14. Syndicate Card
+        if (!$this->syndicateCard) {
+            $missingDocs[] = 'Syndicate Card';
+        }
+
         return $missingDocs;
     }
 
@@ -1317,6 +1328,11 @@ class Employee extends Model
         // 13. Practice Card
         if ($this->practiceCard && $this->practiceCard->expiry_date && $today->gt($this->practiceCard->expiry_date)) {
             $expiredDocs[] = 'Practice Card';
+        }
+
+        // 14. Syndicate Card
+        if ($this->syndicateCard && $this->syndicateCard->expiry_date && $today->gt($this->syndicateCard->expiry_date)) {
+            $expiredDocs[] = 'Syndicate Card';
         }
 
         return $expiredDocs;
@@ -2001,11 +2017,179 @@ class Employee extends Model
         ];
     }
 
-    
+    public static function getPracticeCardStatistics(){
+        $total = Employee::count();
+        $valid = 0;
+        $near_expiry = 0;
+        $expired = 0;
+        $missing = 0;
+
+        Employee::with('practiceCard')->chunk(100, function ($employees) use (&$valid, &$near_expiry, &$expired, &$missing) {
+            foreach ($employees as $employee) {
+                $status = $employee->checkPracticeCardStatus();
+                
+                if ($status === 'missing') {
+                    $missing++;
+                } elseif ($status === 'expired') {
+                    $expired++;
+                } elseif ($status === 'near_expiry') {
+                    $near_expiry++;
+                } elseif ($status === 'valid') {
+                    $valid++;
+                }
+            }
+        });
+
+        return [
+            'total' => $total,
+            'valid' => $valid,
+            'near_expiry' => $near_expiry,
+            'expired' => $expired,
+            'missing' => $missing
+        ];
+    }
 
     public function includeInReportExternalMedicalRecord()
     {
         $status = $this->checkExternalMedicalRecordStatus();
         return $status === 'missing' || $status === 'expired' || $status === 'near_expiry';
+    }
+
+    /**
+     * Set skills qualification for the employee
+     *
+     * @param string $file_path
+     * @param Carbon $issue_date
+     * @param Carbon $expiry_date
+     * @return bool
+     * @throws AppException
+     */
+    public function setSkillsQualification($file_path, Carbon $issue_date, Carbon $expiry_date)
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('setDocs', $this)) {
+            throw new AppException('You dont have permission to set docs for this employee');
+        }
+
+        try {
+            $this->skillsQualifications()->updateOrCreate(
+                [
+                    'employee_id' => $this->id,
+                ],
+                [
+                    'created_by' => $loggedInUser->id,
+                    'file_path' => $file_path,
+                    'issue_date' => $issue_date,
+                    'expiry_date' => $expiry_date,
+                ],
+            );
+            return true;
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException('Error setting skills qualification: ' . $e->getMessage());
+        }
+    }
+
+    public static function getSkillsQualificationStatistics()
+    {
+        $total = Employee::count();
+        $valid = 0;
+        $near_expiry = 0;
+        $expired = 0;
+        $missing = 0;
+
+        Employee::with('skillsQualifications')->chunk(100, function ($employees) use (&$valid, &$near_expiry, &$expired, &$missing) {
+            foreach ($employees as $employee) {
+                $status = $employee->checkSkillsQualificationStatus();
+                
+                if ($status === 'missing') {
+                    $missing++;
+                } elseif ($status === 'expired') {
+                    $expired++;
+                } elseif ($status === 'near_expiry') {
+                    $near_expiry++;
+                } elseif ($status === 'valid') {
+                    $valid++;
+                }
+            }
+        });
+
+        return [
+            'total' => $total,
+            'valid' => $valid,
+            'near_expiry' => $near_expiry,
+            'expired' => $expired,
+            'missing' => $missing
+        ];
+    }
+
+    /**
+     * Set syndicate card for the employee
+     *
+     * @param string $file_path
+     * @param Carbon $issue_date
+     * @param Carbon $expiry_date
+     * @return bool
+     * @throws AppException
+     */
+    public function setSyndicateCard($file_path, Carbon $issue_date, Carbon $expiry_date)
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('setDocs', $this)) {
+            throw new AppException('You dont have permission to set docs for this employee');
+        }
+
+        try {
+            $this->syndicateCard()->updateOrCreate(
+                [
+                    'employee_id' => $this->id,
+                ],
+                [
+                    'created_by' => $loggedInUser->id,
+                    'file_path' => $file_path,
+                    'issue_date' => $issue_date,
+                    'expiry_date' => $expiry_date,
+                ],
+            );
+            return true;
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException('Error setting syndicate card: ' . $e->getMessage());
+        }
+    }
+
+    public static function getSyndicateCardStatistics()
+    {
+        $total = Employee::count();
+        $valid = 0;
+        $near_expiry = 0;
+        $expired = 0;
+        $missing = 0;
+
+        Employee::with('syndicateCard')->chunk(100, function ($employees) use (&$valid, &$near_expiry, &$expired, &$missing) {
+            foreach ($employees as $employee) {
+                $status = $employee->checkSyndicateCardStatus();
+                
+                if ($status === 'missing') {
+                    $missing++;
+                } elseif ($status === 'expired') {
+                    $expired++;
+                } elseif ($status === 'near_expiry') {
+                    $near_expiry++;
+                } elseif ($status === 'valid') {
+                    $valid++;
+                }
+            }
+        });
+
+        return [
+            'total' => $total,
+            'valid' => $valid,
+            'near_expiry' => $near_expiry,
+            'expired' => $expired,
+            'missing' => $missing
+        ];
     }
 }

@@ -170,101 +170,19 @@ class EmployeeShow extends Component
     public $practice_card_expiry_date;
     public $keep_existing_practice_card = false;
 
-    // protected $rules = [
-    //     // Base Info validation rules
-    //     'name' => 'required|string|max:255',
-    //     'email' => 'required|email|max:255',
-    //     'phone' => 'required|string|max:20',
-    //     'address' => 'required|string|max:255',
-    //     'nationality' => 'required|string|max:50',
-    //     'gender' => 'required|in:Male,Female',
-    //     'birth_date' => 'required|date',
-    //     'employment_date' => 'required|date',
-
-    //     // Employee Info validation rules
-    //     'insurance_office_id' => 'required|exists:insurance_offices,id',
-    //     'insurance_number' => 'nullable|string|max:50',
-    //     'insurance_amount' => 'nullable|string|max:50',
-    //     'academic_qualification' => 'nullable|string|max:255',
-    //     'university' => 'nullable|string|max:255',
-    //     'graduation_year' => 'nullable|integer',
-    //     'military_status' => 'nullable|string|max:50',
-    //     'marital_status' => 'nullable|string|max:50',
-        
-    //     // ID Card validation rules
-    //     'id_card_file' => 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
-    //     'id_number' => 'required|string|max:50',
-    //     'id_issue_date' => 'required|date',
-    //     'id_expiry_date' => 'required|date|after:id_issue_date',
-        
-    //     // Birth Certificate validation rules
-    //     'birth_certificate_file' => 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
-    //     'birth_certificate_issue_date' => 'required|date',
-    //     'birth_certificate_expiry_date' => 'nullable|date|after:birth_certificate_issue_date',
-    //     'birth_certificate_type' => 'required|in:Original,Copy,Verified Copy',
-        
-    //     // Army Service Paper validation rules
-    //     'army_service_paper_file' => 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
-    //     'army_service_paper_issue_date' => 'required|date',
-    //     'army_service_paper_expiry_date' => 'nullable|date|after:army_service_paper_issue_date',
-    //     'army_service_paper_type' => 'required|in:Original,Exemption,Postponed',
-
-    //     // Employee S1 Doc validation rules
-    //     'employee_s1_doc_file' => 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
-    //     's1_number' => 'required|string|max:50',
-    //     'employee_s1_doc_issue_date' => 'required|date',
-    //     'employee_s1_doc_expiry_date' => 'nullable|date|after:employee_s1_doc_issue_date',
-
-    //     // Employee S2 Doc validation rules
-    //     'employee_s2_doc_file' => 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
-    //     's2_amount' => 'required|numeric|min:0',
-    //     's2_year' => 'required|integer|min:1900|max:2040',
-    //     'employee_s2_doc_issue_date' => 'required|date',
-    //     'employee_s2_doc_expiry_date' => 'nullable|date|after:employee_s2_doc_issue_date',
-
-    //     // Employee S6 Doc validation rules
-    //     'employee_s6_doc_file' => 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
-    //     's6_number' => 'required|string|max:50',
-    //     'leaving_reason' => 'required|string',
-    //     'employee_s6_doc_issue_date' => 'required|date',
-    //     'employee_s6_doc_expiry_date' => 'nullable|date|after:employee_s6_doc_issue_date',
-
-    //     // Employee Contract validation rules
-    //     'employee_contract_file' => 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
-    //     'employee_contract_issue_date' => 'required|date',
-    //     'employee_contract_expiry_date' => 'nullable|date|after:employee_contract_issue_date',
-
-    //     // Driver License Rules
-    //     'driver_license_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
-    //     'driver_license_issue_date' => 'required|date',
-    //     'driver_license_expiry_date' => 'required|date',
-
-    //     // Police Record Rules
-    //     'police_record_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
-    //     'police_record_issue_date' => 'required|date',
-    //     'police_record_expiry_date' => 'nullable|date',
-
-    //     // HR Letter Rules
-    //     'hr_letter_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
-    //     'hr_letter_issue_date' => 'required|date',
-    //     'hr_letter_expiry_date' => 'nullable|date',
-
-    //     // Medical Record validation rules
-    //     'medical_record_file' => !$this->keep_existing_medical_record ? 'required|file|mimes:pdf,jpg,jpeg,png|max:10240' : 'nullable',
-    //     'medical_record_issue_date' => 'required|date',
-    //     'medical_record_expiry_date' => 'required|date|after:medical_record_issue_date',
-    //     'medical_record_status' => 'required|in:Not Covered,Examination,Issuing,Covered,External Cover',
-    //     'medical_record_insurance_number' => 'nullable|string|max:50',
-    //     'medical_record_medical_card_code' => 'nullable|string|max:50',
-    //     'medical_record_medical_card_start' => 'nullable|date',
-    //     'medical_record_medical_card_expiry' => 'nullable|date|after:medical_record_medical_card_start',
-        
-    //     // External Medical Record validation rules
-    //     'external_medical_record_file' => !$this->keep_existing_external_medical_record ? 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif' : 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
-    //     'external_medical_record_issue_date' => 'required|date',
-    //     'external_medical_record_expiry_date' => 'required|date|after:external_medical_record_issue_date',
-    //     'external_medical_record_id_number' => 'required|string|max:50',
-    // ];
+    // Skills Qualification Properties
+    public $showEditSkillsQualificationModal = false;
+    public $skills_qualification_file;
+    public $skills_qualification_issue_date;
+    public $skills_qualification_expiry_date;
+    public $keep_existing_skills_qualification = false;
+    
+    // Syndicate Card Properties
+    public $showEditSyndicateCardModal = false;
+    public $syndicate_card_file;
+    public $syndicate_card_issue_date;
+    public $syndicate_card_expiry_date;
+    public $keep_existing_syndicate_card = false;
 
     public function mount($id)
     {
@@ -282,6 +200,8 @@ class EmployeeShow extends Component
             'medicalRecord',
             'externalMedicalRecord',
             'practiceCard',
+            'skillsQualifications',
+            'syndicateCard',
         ])->findOrFail($id);
         $this->insuranceOffices = InsuranceOffice::all();
         $this->militaryStatuses = Applicant::MILITARY_STATUS;
@@ -1832,6 +1752,208 @@ class EmployeeShow extends Component
                 return $this->employee->practiceCard->downloadFile();
             } else {
                 $this->alertError('No practice card found.');
+            }
+        } catch (\Exception $e) {
+            $this->alertError('Error downloading document: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Open the edit Skills Qualification modal
+     */
+    public function openEditSkillsQualificationModal()
+    {
+        $this->showEditSkillsQualificationModal = true;
+
+        if ($this->employee->skillsQualifications) {
+            $this->skills_qualification_issue_date = $this->employee->skillsQualifications->issue_date;
+            $this->skills_qualification_expiry_date = $this->employee->skillsQualifications->expiry_date;
+            $this->keep_existing_skills_qualification = true;
+        } else {
+            $this->resetSkillsQualificationFields();
+        }
+    }
+
+    /**
+     * Close the edit Skills Qualification modal
+     */
+    public function closeEditSkillsQualificationModal()
+    {
+        $this->showEditSkillsQualificationModal = false;
+        $this->resetSkillsQualificationFields();
+    }
+
+    /**
+     * Reset the Skills Qualification form fields
+     */
+    private function resetSkillsQualificationFields()
+    {
+        $this->skills_qualification_file = null;
+        $this->skills_qualification_issue_date = null;
+        $this->skills_qualification_expiry_date = null;
+        $this->keep_existing_skills_qualification = false;
+    }
+
+    /**
+     * Update the Skills Qualification
+     */
+    public function updateSkillsQualification()
+    {
+        $this->validate([
+            'skills_qualification_issue_date' => 'required|date',
+            'skills_qualification_expiry_date' => 'required|date|after:skills_qualification_issue_date',
+            'skills_qualification_file' => $this->keep_existing_skills_qualification ? 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif' : 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
+        ]);
+
+        try {
+            $filePath = null;
+            if (!$this->keep_existing_skills_qualification && $this->skills_qualification_file) {
+                // Delete existing skills qualification file if it exists
+                if ($this->employee->skillsQualifications && $this->employee->skillsQualifications->file_path) {
+                    $existingFilePath = str_replace('storage/', '', $this->employee->skillsQualifications->getRawOriginal('file_path'));
+                    if (Storage::disk('s3')->exists($existingFilePath)) {
+                        Storage::disk('s3')->delete($existingFilePath);
+                    }
+                }
+                // Upload new file to S3
+                $filePath = $this->skills_qualification_file->store(Employee::FILES_DIRECTORY.'/skills_qualifications', 's3');
+            } else if ($this->keep_existing_skills_qualification && $this->employee->skillsQualifications) {
+                $filePath = $this->employee->skillsQualifications->getRawOriginal('file_path');
+            }
+
+            $this->employee->setSkillsQualification(
+                $filePath,
+                Carbon::parse($this->skills_qualification_issue_date),
+                Carbon::parse($this->skills_qualification_expiry_date)
+            );
+
+            $this->closeEditSkillsQualificationModal();
+            $this->alertSuccess('Skills Qualification has been updated successfully!');
+            
+            // Refresh employee data
+            $this->employee = Employee::with([
+                'info', 'idCard', 'birthCertificate', 'armyServicePaper', 
+                'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'policeRecords', 
+                'hrLetters', 'driverLicense', 'medicalRecord', 'externalMedicalRecord',
+                'practiceCard', 'skillsQualifications'
+            ])->findOrFail($this->employee->id);
+            
+        } catch (Exception $e) {
+            $this->alertError($e->getMessage());
+        }
+    }
+
+    /**
+     * Download the Skills Qualification file
+     */
+    public function downloadSkillsQualification()
+    {
+        try {
+            if ($this->employee->skillsQualifications) {
+                return $this->employee->skillsQualifications->downloadFile();
+            } else {
+                $this->alertError('No skills qualification found.');
+            }
+        } catch (\Exception $e) {
+            $this->alertError('Error downloading document: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Open the edit Syndicate Card modal
+     */
+    public function openEditSyndicateCardModal()
+    {
+        $this->showEditSyndicateCardModal = true;
+
+        if ($this->employee->syndicateCard) {
+            $this->syndicate_card_issue_date = $this->employee->syndicateCard->issue_date;
+            $this->syndicate_card_expiry_date = $this->employee->syndicateCard->expiry_date;
+            $this->keep_existing_syndicate_card = true;
+        } else {
+            $this->resetSyndicateCardFields();
+        }
+    }
+
+    /**
+     * Close the edit Syndicate Card modal
+     */
+    public function closeEditSyndicateCardModal()
+    {
+        $this->showEditSyndicateCardModal = false;
+        $this->resetSyndicateCardFields();
+    }
+
+    /**
+     * Reset the Syndicate Card form fields
+     */
+    private function resetSyndicateCardFields()
+    {
+        $this->syndicate_card_file = null;
+        $this->syndicate_card_issue_date = null;
+        $this->syndicate_card_expiry_date = null;
+        $this->keep_existing_syndicate_card = false;
+    }
+
+    /**
+     * Update the Syndicate Card
+     */
+    public function updateSyndicateCard()
+    {
+        $this->validate([
+            'syndicate_card_issue_date' => 'required|date',
+            'syndicate_card_expiry_date' => 'required|date|after:syndicate_card_issue_date',
+            'syndicate_card_file' => $this->keep_existing_syndicate_card ? 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif' : 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
+        ]);
+
+        try {
+            $filePath = null;
+            if (!$this->keep_existing_syndicate_card && $this->syndicate_card_file) {
+                // Delete existing syndicate card file if it exists
+                if ($this->employee->syndicateCard && $this->employee->syndicateCard->file_path) {
+                    $existingFilePath = str_replace('storage/', '', $this->employee->syndicateCard->getRawOriginal('file_path'));
+                    if (Storage::disk('s3')->exists($existingFilePath)) {
+                        Storage::disk('s3')->delete($existingFilePath);
+                    }
+                }
+                // Upload new file to S3
+                $filePath = $this->syndicate_card_file->store(Employee::FILES_DIRECTORY.'/syndicate_cards', 's3');
+            } else if ($this->keep_existing_syndicate_card && $this->employee->syndicateCard) {
+                $filePath = $this->employee->syndicateCard->getRawOriginal('file_path');
+            }
+
+            $this->employee->setSyndicateCard(
+                $filePath,
+                Carbon::parse($this->syndicate_card_issue_date),
+                Carbon::parse($this->syndicate_card_expiry_date)
+            );
+
+            $this->closeEditSyndicateCardModal();
+            $this->alertSuccess('Syndicate Card has been updated successfully!');
+            
+            // Refresh employee data
+            $this->employee = Employee::with([
+                'info', 'idCard', 'birthCertificate', 'armyServicePaper', 
+                'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'policeRecords', 
+                'hrLetters', 'driverLicense', 'medicalRecord', 'externalMedicalRecord',
+                'practiceCard', 'skillsQualifications', 'syndicateCard'
+            ])->findOrFail($this->employee->id);
+            
+        } catch (Exception $e) {
+            $this->alertError($e->getMessage());
+        }
+    }
+
+    /**
+     * Download the Syndicate Card file
+     */
+    public function downloadSyndicateCard()
+    {
+        try {
+            if ($this->employee->syndicateCard) {
+                return $this->employee->syndicateCard->downloadFile();
+            } else {
+                $this->alertError('No syndicate card found.');
             }
         } catch (\Exception $e) {
             $this->alertError('Error downloading document: ' . $e->getMessage());

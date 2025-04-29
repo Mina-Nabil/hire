@@ -6,7 +6,11 @@ use App\Models\Personel\Employee;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\View\View;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 
+#[Layout('components.layouts.app')]
+#[Title('Missing Documents Report')]
 class MissingDocReport extends Component
 {
     use WithPagination;
@@ -35,6 +39,8 @@ class MissingDocReport extends Component
         'Medical Record' => false,
         'External Medical Record' => false,
         'Practice Card' => false,
+        'Skills Qualification' => false,
+        'Syndicate Card' => false,
     ];
     
     // Separate filters for missing and expired documents
@@ -143,7 +149,7 @@ class MissingDocReport extends Component
             $query->where('name', 'like', '%' . $this->searchTerm . '%')->orWhere('email', 'like', '%' . $this->searchTerm . '%');
         }
         
-        $employees = $query->with(['idCard', 'birthCertificate', 'contracts', 'armyServicePaper', 'driverLicense', 'policeRecords', 'hrLetters', 'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'medicalRecord', 'externalMedicalRecord', 'info'])->paginate(10);
+        $employees = $query->with(['idCard', 'birthCertificate', 'contracts', 'armyServicePaper', 'driverLicense', 'policeRecords', 'hrLetters', 'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'medicalRecord', 'externalMedicalRecord', 'practiceCard', 'skillsQualifications', 'syndicateCard', 'info'])->paginate(10);
             
         // Pre-calculate missing and expired document counts for each employee
         foreach ($employees as $key => $employee) {
@@ -190,9 +196,6 @@ class MissingDocReport extends Component
         return view('livewire.employee.missing-doc-report', [
             'employees' => $employees,
             'anyFiltersActive' => $this->missingFilterActive || $this->expiredFilterActive,
-        ])->layout('components.layouts.app', [
-            'title' => 'Missing Documents Report',
-            'missingDocReport' => 'active'
         ]);
     }
 }

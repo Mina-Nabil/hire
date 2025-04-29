@@ -53,6 +53,26 @@ class Employee extends Model
         'birth_date' => 'date',
     ];
 
+    /**
+     * Scope a query to search for employees by name, email, or phone
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  string  $search
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeSearch($query, $search)
+    {
+        if (empty($search)) {
+            return $query;
+        }
+        
+        return $query->where(function($q) use ($search) {
+            $q->where('name', 'like', '%' . $search . '%')
+              ->orWhere('email', 'like', '%' . $search . '%')
+              ->orWhere('phone', 'like', '%' . $search . '%');
+        });
+    }
+
     ////model functions
     public function setArmyServicePaper($file_path, Carbon $issue_date, $type = ArmyServicePaper::TYPE_ORIGINAL, ?Carbon $expiry_date)
     {

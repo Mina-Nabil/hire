@@ -16,6 +16,24 @@ class InsuranceOffice extends Model
 
     const MORPH_NAME = 'insurance_office';
 
+    /**
+     * Scope a query to search for insurance offices by name or arabic_name
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  string  $search
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeSearch($query, $search)
+    {
+        if (empty($search)) {
+            return $query;
+        }
+        
+        return $query->where(function($q) use ($search) {
+            $q->where('name', 'like', '%' . $search . '%')
+              ->orWhere('arabic_name', 'like', '%' . $search . '%');
+        });
+    }
 
     ///static methods
     public static function createInsuranceOffice($name, $arabic_name)

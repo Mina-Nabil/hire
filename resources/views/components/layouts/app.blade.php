@@ -178,6 +178,12 @@
                                         href="{{ route('employees.reports.missing-documents') }}">Document Status</a>
                                 </li>
                             @endcan
+                            @can('viewAny', App\Models\Personel\Employee::class)
+                                <li>
+                                    <a class="{{ $employeesIndex ?? '' }}"
+                                        href="{{ route('employees') }}">Employees</a>
+                                </li>
+                            @endcan
                         </ul>
                     </li>
 
@@ -199,7 +205,16 @@
                                     <a class="{{ $areasIndex ?? '' }}" href="{{ url('/settings/areas') }}">Areas</a>
                                 </li>
                             @endcan
-
+                            @can('viewAny', App\Models\Base\InsuranceOffice::class)
+                                <li>
+                                    <a class="{{ $insuranceOfficesIndex ?? '' }}" href="{{ url('/insurance-offices') }}">Insurance Offices</a>
+                                </li>
+                            @endcan
+                            @can('viewAny', App\Models\Base\Bank::class)
+                                <li>
+                                    <a class="{{ $banksIndex ?? '' }}" href="{{ url('/banks') }}">Banks</a>
+                                </li>
+                            @endcan
                         </ul>
                     </li>
 

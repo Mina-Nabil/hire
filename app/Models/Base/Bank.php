@@ -14,6 +14,24 @@ class Bank extends Model
         'arabic_name',
     ];
 
+    /**
+     * Scope a query to search for banks by name or arabic_name
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  string  $search
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeSearch($query, $search)
+    {
+        if (empty($search)) {
+            return $query;
+        }
+        
+        return $query->where(function($q) use ($search) {
+            $q->where('name', 'like', '%' . $search . '%')
+              ->orWhere('arabic_name', 'like', '%' . $search . '%');
+        });
+    }
 
     ///static methods
     public static function createBank($name, $arabic_name)

@@ -2,8 +2,11 @@
 
 namespace App\Models\Personel\Docs;
 
+use App\Exceptions\AppException;
 use App\Traits\DocumentModel;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class WorkDeclaration extends Model
 {
@@ -23,4 +26,56 @@ class WorkDeclaration extends Model
         'issue_date' => 'date',
         'expiry_date' => 'date',
     ];
+    
+    /**
+     * Update the record with new data
+     * 
+     * @param string $file_path
+     * @param Carbon $issue_date
+     * @param Carbon $expiry_date
+     * @return bool
+     */
+    public function updateRecord($file_path, Carbon $issue_date, Carbon $expiry_date)
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('setDocs', $this->employee)) {
+            throw new AppException('You dont have permission to set docs for this employee');
+        }
+
+        try {
+            $this->update([
+                'file_path' => $file_path,
+                'issue_date' => $issue_date,
+                'expiry_date' => $expiry_date,
+                'created_by' => Auth::id(), // Track who updated it
+            ]);
+            return true;
+        } catch (\Exception $e) {
+            report($e);
+            throw new AppException('Error updating work declaration');
+        }
+    }
+
+    /**
+     * Delete the record
+     * 
+     * @return bool
+     */
+    public function deleteRecord()
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('deleteDocs', $this->employee)) {
+            throw new AppException('You dont have permission to delete docs for this employee');
+        }
+
+        try {
+            $this->delete();
+            return true;
+        } catch (\Exception $e) {
+            report($e);
+            throw new AppException('Error deleting work declaration');
+        }
+    }
 }

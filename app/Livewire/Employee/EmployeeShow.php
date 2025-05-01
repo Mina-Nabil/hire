@@ -183,6 +183,14 @@ class EmployeeShow extends Component
     public $syndicate_card_issue_date;
     public $syndicate_card_expiry_date;
     public $keep_existing_syndicate_card = false;
+    
+    // Work Declaration Properties
+    public $editWorkDeclarationModal = false;
+    public $work_declaration_file;
+    public $work_declaration_issue_date;
+    public $work_declaration_expiry_date;
+    public $keep_existing_work_declaration = false;
+    public $editing_work_declaration_id = null;
 
     public function mount($id)
     {
@@ -1171,7 +1179,7 @@ class EmployeeShow extends Component
 
     // Police Record Edit Methods
 
-    protected $listeners = ['deletePoliceRecordModal', 'deleteHrLetterModal', 'deleteEmployeeS2DocModal', 'deleteEmployeeS6DocModal', 'deleteEmployeeContractModal'];
+    protected $listeners = ['deletePoliceRecordModal', 'deleteHrLetterModal', 'deleteEmployeeS2DocModal', 'deleteEmployeeS6DocModal', 'deleteEmployeeContractModal', 'deleteWorkDeclarationModal'];
     public function openEditPoliceRecordModal()
     {
         $this->resetValidation();
@@ -1957,6 +1965,174 @@ class EmployeeShow extends Component
             }
         } catch (\Exception $e) {
             $this->alertError('Error downloading document: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Open the edit Work Declaration modal
+     */
+    public function openEditWorkDeclarationModal()
+    {
+        $this->resetValidation();
+        $this->editing_work_declaration_id = null;
+        $this->work_declaration_file = null;
+        $this->work_declaration_issue_date = null;
+        $this->work_declaration_expiry_date = null;
+        $this->keep_existing_work_declaration = false;
+        
+        $this->editWorkDeclarationModal = true;
+    }
+    
+    /**
+     * Open the edit specific Work Declaration modal
+     */
+    public function openEditSpecificWorkDeclarationModal($recordId)
+    {
+        $this->resetValidation();
+        $workDeclaration = \App\Models\Personel\Docs\WorkDeclaration::findOrFail($recordId);
+        
+        $this->editing_work_declaration_id = $workDeclaration->id;
+        $this->work_declaration_issue_date = $workDeclaration->issue_date;
+        $this->work_declaration_expiry_date = $workDeclaration->expiry_date ? $workDeclaration->expiry_date : null;
+        $this->keep_existing_work_declaration = true;
+        
+        $this->editWorkDeclarationModal = true;
+    }
+    
+    /**
+     * Close the edit Work Declaration modal
+     */
+    public function closeEditWorkDeclarationModal()
+    {
+        $this->editWorkDeclarationModal = false;
+        $this->resetWorkDeclarationFields();
+    }
+    
+    /**
+     * Reset the Work Declaration form fields
+     */
+    private function resetWorkDeclarationFields()
+    {
+        $this->work_declaration_file = null;
+        $this->work_declaration_issue_date = null;
+        $this->work_declaration_expiry_date = null;
+        $this->keep_existing_work_declaration = false;
+        $this->editing_work_declaration_id = null;
+    }
+    
+    /**
+     * Update the Work Declaration
+     */
+    public function updateWorkDeclaration()
+    {
+        // Validation rules
+        if ($this->keep_existing_work_declaration && $this->editing_work_declaration_id) {
+            $this->validate([
+                'work_declaration_issue_date' => 'required|date',
+                'work_declaration_expiry_date' => 'required|date|after:work_declaration_issue_date',
+            ]);
+        } else {
+            $this->validate([
+                'work_declaration_file' => 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
+                'work_declaration_issue_date' => 'required|date',
+                'work_declaration_expiry_date' => 'required|date|after:work_declaration_issue_date',
+            ]);
+        }
+        
+        try {
+            $filePath = null;
+            
+            if ($this->editing_work_declaration_id) {
+                // Updating existing record
+                $existingRecord = \App\Models\Personel\Docs\WorkDeclaration::findOrFail($this->editing_work_declaration_id);
+                
+                if (!$this->keep_existing_work_declaration) {
+                    // Delete existing file if we're uploading a new one
+                    if ($existingRecord->file_path) {
+                        $existingFilePath = str_replace('storage/', '', $existingRecord->getRawOriginal('file_path'));
+                        if (Storage::disk('s3')->exists($existingFilePath)) {
+                            Storage::disk('s3')->delete($existingFilePath);
+                        }
+                    }
+                    
+                    // Upload new file
+                    $filePath = $this->work_declaration_file->store(Employee::FILES_DIRECTORY.'/work_declarations', 's3');
+                } else {
+                    // Keep existing file
+                    $workDeclaration = \App\Models\Personel\Docs\WorkDeclaration::findOrFail($this->editing_work_declaration_id);
+                    $filePath = $workDeclaration->getRawOriginal('file_path');
+                }
+                
+                // Update the record
+                $existingRecord->update([
+                    'issue_date' => Carbon::parse($this->work_declaration_issue_date),
+                    'expiry_date' => Carbon::parse($this->work_declaration_expiry_date),
+                    'file_path' => $filePath,
+                    'created_by' => Auth::id(),
+                ]);
+                
+                $this->alertSuccess('Work Declaration has been updated successfully!');
+            } else {
+                // Creating new record
+                $filePath = $this->work_declaration_file->store(Employee::FILES_DIRECTORY.'/work_declarations', 's3');
+                
+                // Create new record
+                $res = $this->employee->setWorkDeclaration(
+                    $filePath,
+                    Carbon::parse($this->work_declaration_issue_date),
+                    Carbon::parse($this->work_declaration_expiry_date)
+                );
+                
+                $this->alertSuccess('Work Declaration has been created successfully!');
+            }
+            
+            $this->closeEditWorkDeclarationModal();
+            $this->employee = Employee::with(['info', 'idCard', 'birthCertificate', 'armyServicePaper', 'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'policeRecords', 'hrLetters', 'driverLicense', 'medicalRecord', 'externalMedicalRecord', 'practiceCard', 'skillsQualifications', 'syndicateCard', 'workDeclarations'])->findOrFail($this->employee->id);
+        } catch (Exception $e) {
+            $this->alertError($e->getMessage());
+        }
+    }
+    
+    /**
+     * Download a Work Declaration file
+     */
+    public function downloadWorkDeclaration($docId = null)
+    {
+        try {
+            if ($docId) {
+                $workDeclaration = \App\Models\Personel\Docs\WorkDeclaration::findOrFail($docId);
+                return $workDeclaration->downloadFile();
+            }
+            
+            $this->alertError('No work declaration file found.');
+        } catch (\Exception $e) {
+            $this->alertError('Error downloading document: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Delete a Work Declaration record
+     */
+    public function deleteWorkDeclarationModal($recordId)
+    {
+        try {
+            $workDeclaration = \App\Models\Personel\Docs\WorkDeclaration::findOrFail($recordId);
+            
+            // Delete file from storage
+            if ($workDeclaration->file_path) {
+                $filePath = str_replace('storage/', '', $workDeclaration->getRawOriginal('file_path'));
+                if (Storage::disk('s3')->exists($filePath)) {
+                    Storage::disk('s3')->delete($filePath);
+                }
+            }
+            
+            // Delete record
+            $workDeclaration->deleteRecord();
+            
+            $this->alertSuccess('Work Declaration has been deleted successfully!');
+            $this->employee = Employee::with(['info', 'idCard', 'birthCertificate', 'armyServicePaper', 'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'policeRecords', 'hrLetters', 'driverLicense', 'medicalRecord', 'externalMedicalRecord', 'practiceCard', 'skillsQualifications', 'syndicateCard', 'workDeclarations'])->findOrFail($this->employee->id);
+        } catch (Exception $e) {
+            $this->alertError($e->getMessage());
         }
     }
 

@@ -41,6 +41,7 @@ class MissingDocReport extends Component
         'Practice Card' => false,
         'Skills Qualification' => false,
         'Syndicate Card' => false,
+        'Work Declaration' => false,
     ];
     
     // Separate filters for missing and expired documents

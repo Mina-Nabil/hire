@@ -525,6 +525,39 @@
                             </div>
                         </li>
 
+                        <li wire:click="changeSection('work_declaration')"
+                            class="block py-[8px] p-6  {{ $section == 'work_declaration' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
+                            <div class="flex justify-between space-x-2 rtl:space-x-reverse">
+                                Work Declaration
+                                <span>
+                                    @if ($employee->checkWorkDeclarationStatus()['status'] === 'valid')
+                                        <span
+                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                    @elseif($employee->checkWorkDeclarationStatus()['status'] === 'near_expiry')
+                                        <span
+                                            class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
+                                            Expiry</span>
+                                    @elseif($employee->checkWorkDeclarationStatus()['status'] === 'expired')
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                    @elseif($employee->checkWorkDeclarationStatus()['status'] === 'missing')
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                    @endif
+                                </span>
+
+                                @if ($section == 'work_declaration')
+                                    <div class="flex-none">
+                                        <button type="button"
+                                            class="text-xs text-slate-900 dark:text-white {{ $section == 'work_declaration' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
+                                            <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
+                                                height="25"></iconify-icon>
+                                        </button>
+                                    </div>
+                                @endif
+                            </div>
+                        </li>
+
                     </ul>
                     <!-- END: FIles Card -->
                 </div>
@@ -1501,6 +1534,111 @@
                         @endif
                     </div>
                 </div>
+                @elseif ($section === 'work_declaration')
+                <div class="card">
+                    <div class="card-header flex justify-between items-center">
+                        <h4
+                            class="font-medium lg:text-2xl text-xl capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
+                            Work Declaration Information
+                        </h4>
+
+                        <button wire:click="openEditWorkDeclarationModal" class="action-btn" type="button">
+                            <iconify-icon icon="heroicons:plus"></iconify-icon>
+                        </button>
+                    </div>
+                    <div class="card-body p-6">
+                        @if ($employee->workDeclarations && $employee->workDeclarations->count() > 0)
+                            @foreach ($employee->workDeclarations as $declaration)
+                                <div class="card border border-slate-200 dark:border-slate-700 mb-5">
+                                    <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
+                                        <h5 class="card-title text-slate-900 dark:text-white">Work Declaration - Issue Date
+                                            {{ $declaration->issue_date }}</h5>
+                                        <div class="flex space-x-3 rtl:space-x-reverse">
+                                            <button wire:click="openEditSpecificWorkDeclarationModal({{ $declaration->id }})"
+                                                class="action-btn" type="button">
+                                                <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                                            </button>
+                                            <button
+                                                wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to delete this Work Declaration?',color:'danger',callback:'deleteWorkDeclarationModal',params:{{ $declaration->id }}})"
+                                                class="action-btn" type="button">
+                                                <iconify-icon icon="heroicons:trash"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body p-4">
+                                        <div class="grid grid-cols-4 gap-4">
+                                            <!-- Document Preview -->
+                                            <div class="col-span-3 flex justify-center items-center">
+                                                @php
+                                                    $fileExt = $this->getFileExtension($declaration->file_path);
+                                                @endphp
+
+                                                @if ($fileExt == 'pdf')
+                                                    <div class="border border-slate-200 rounded-md p-2 w-full">
+                                                        <iframe src="{{ $declaration->file_path }}" width="100%"
+                                                            height="800" class="border-0"></iframe>
+                                                    </div>
+                                                @else
+                                                    <img src="{{ $declaration->file_path }}" alt="Work Declaration"
+                                                        class="max-h-32 max-w-full rounded-md shadow-sm object-contain">
+                                                @endif
+                                            </div>
+
+                                            <!-- Document Info -->
+                                            <div class="col-span-1 pl-4 space-y-2">
+                                                <div class="flex justify-between">
+                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Issue
+                                                        Date:</span>
+                                                    <span class="text-sm font-medium">{{ $declaration->issue_date }}</span>
+                                                </div>
+                                                <div class="flex justify-between">
+                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Expiry
+                                                        Date:</span>
+                                                    <span
+                                                        class="text-sm font-medium">{{ $declaration->expiry_date ?? 'N/A' }}</span>
+                                                </div>
+
+                                                <!-- Download Button -->
+                                                <div class="mt-3">
+                                                    <button wire:click="downloadWorkDeclaration({{ $declaration->id }})"
+                                                        type="button" class="btn btn-dark btn-sm">
+                                                        <span class="inline-flex items-center justify-center"
+                                                            wire:loading.remove
+                                                            wire:target="downloadWorkDeclaration({{ $declaration->id }})">
+                                                            <iconify-icon icon="fluent:arrow-download-28-filled"
+                                                                class="mr-1" width="16"
+                                                                height="16"></iconify-icon>
+                                                            Download
+                                                        </span>
+                                                        <iconify-icon wire:loading
+                                                            wire:target="downloadWorkDeclaration({{ $declaration->id }})"
+                                                            icon="line-md:loading-twotone-loop" width="16"
+                                                            height="16"></iconify-icon>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="text-center py-5">
+                                <div class="mb-5">
+                                    <iconify-icon icon="mingcute:document-line" width="60" height="60"
+                                        class="text-slate-400"></iconify-icon>
+                                </div>
+                                <h5 class="text-xl font-semibold mb-4">No Work Declarations Found</h5>
+                                <p class="text-slate-500 mb-5">Please upload a Work Declaration for this employee</p>
+                                <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                    wire:click="openEditWorkDeclarationModal">
+                                    <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                        class="mr-1"></iconify-icon>
+                                    Upload Work Declaration
+                                </button>
+                            </div>
+                        @endif
+                    </div>
+                </div>
             @elseif ($section === 'employee_s1_doc')
                 <div class="card">
                     <div class="card-header flex justify-between items-center">
@@ -2247,8 +2385,8 @@
                                             clip-rule="evenodd"></path>
                                     </svg>
                                     <span class="sr-only">Close modal</span>
-                        </button>
-                    </div>
+                                </button>
+                            </div>
 
                             <!-- Modal body -->
                             <div class="p-6 space-y-4">
@@ -2271,7 +2409,7 @@
                                                             class="h-40 max-w-full rounded-md object-contain"
                                                             alt="Driver License Preview">
                                                     @endif
-                            </div>
+                                                </div>
                                                 <p class="text-sm text-slate-500">
                                                     {{ $driver_license_file->getClientOriginalName() }}</p>
                                                 <button type="button" class="text-sm text-red-500 mt-2"
@@ -2288,7 +2426,7 @@
                                                                 target="_blank"
                                                                 class="text-sm text-blue-500">View</a>
                                                         </small>
-                                            </div>
+                                                    </div>
                                                     @if (!$keep_existing_driver_license)
                                                         <label for="driver_license_file_input"
                                                             class="cursor-pointer block">
@@ -2305,7 +2443,7 @@
                                                                 accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
                                                         </label>
                                                     @endif
-                                        @else
+                                                @else
                                                     <label for="driver_license_file_input"
                                                         class="cursor-pointer block">
                                                         <iconify-icon icon="mingcute:upload-line" width="32"
@@ -2322,8 +2460,8 @@
                                                             accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
                                                     </label>
                                                 @endif
-                                        @endif
-                                    </div>
+                                            @endif
+                                        </div>
                                         @error('driver_license_file')
                                             <span class="text-danger-500 text-sm mt-1">{{ $message }}</span>
                                         @enderror
@@ -2337,18 +2475,18 @@
                                                 <input type="checkbox" class="hidden" name="checkbox"
                                                     id="keep_existing_driver_license"
                                                     wire:model.live="keep_existing_driver_license">
-                                        <span
+                                                <span
                                                     class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
                                                     <img src="{{ asset('images/icon/ck-white.svg') }}"
                                                         alt=""
                                                         class="h-[10px] w-[10px] block m-auto opacity-0"></span>
-                                        <span
+                                                <span
                                                     class="text-slate-500 dark:text-slate-400 text-sm leading-6">Keep
                                                     existing document</span>
                                             </label>
                                         </div>
 
-                                        </div>
+                                    </div>
                                 @endif
 
                                 <div class="from-group">
@@ -2360,7 +2498,7 @@
                                         <span
                                             class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
                                     @enderror
-                                        </div>
+                                </div>
 
                                 <div class="from-group">
                                     <label for="driver_license_expiry_date" class="form-label">Expiry Date</label>
@@ -2389,7 +2527,7 @@
                     </div>
                 </div>
             </div>
-                                    @endif
+    @endif
 
     <!-- Base Information Edit Modal -->
     @if ($editBaseInfoModal)
@@ -2512,13 +2650,13 @@
                                     <span class="flex items-center">
                                         <iconify-icon icon="line-md:loading-twotone-loop" width="25"
                                             height="25"></iconify-icon>
-                                                </span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
+                                    </span>
+                                </button>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
     @endif
 
     <!-- Employee Information Edit Modal -->
@@ -2537,7 +2675,7 @@
                                 <h3 class="text-xl font-medium text-white dark:text-white capitalize">
                                     Edit Employee Information
                                 </h3>
-                                        <button type="button"
+                                <button type="button"
                                     class="text-slate-400 bg-transparent hover:text-slate-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-slate-600 dark:hover:text-white"
                                     wire:click="closeEditEmployeeInfoModal">
                                     <svg aria-hidden="true" class="w-5 h-5" fill="#ffffff" viewBox="0 0 20 20"
@@ -2655,16 +2793,16 @@
                                     class="btn inline-flex justify-center btn-dark">
                                     <span class="flex items-center">
                                         <iconify-icon icon="line-md:loading-twotone-loop" width="25"
-                                                height="25"></iconify-icon>
+                                            height="25"></iconify-icon>
                                     </span>
-                                        </button>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-                                    </div>
-                                @endif
+        </div>
+    @endif
 
     <!-- ID Card Modal -->
     @if ($editIdCardModal)
@@ -2712,18 +2850,18 @@
                                                             <iconify-icon icon="mingcute:file-pdf-fill"
                                                                 width="48" height="48"
                                                                 class="text-red-500"></iconify-icon>
-                    @else
+                                                        @else
                                                             <img src="{{ $id_card_file->temporaryUrl() }}"
                                                                 class="h-40 max-w-full rounded-md object-contain"
                                                                 alt="ID Card Preview">
                                                         @endif
-                            </div>
+                                                    </div>
                                                     <p class="text-sm text-slate-500">
                                                         {{ $id_card_file->getClientOriginalName() }}</p>
                                                     <button type="button" class="text-sm text-red-500 mt-2"
                                                         wire:click="$set('id_card_file', null)">
                                                         Remove File
-                            </button>
+                                                    </button>
                                                 @else
                                                     @if ($employee->idCard)
                                                         <div class="mb-3">
@@ -2734,7 +2872,7 @@
                                                                     target="_blank"
                                                                     class="text-sm text-blue-500">View</a>
                                                             </small>
-                        </div>
+                                                        </div>
                                                         @if (!$keep_existing_file)
                                                             <label for="id_card_file_input"
                                                                 class="cursor-pointer block">
@@ -2768,14 +2906,14 @@
                                                                 accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
                                                         </label>
                                                     @endif
-                    @endif
+                                                @endif
                                             </div>
                                             @error('id_card_file')
                                                 <span
                                                     class="font-Inter text-sm text-danger-500">{{ $message }}</span>
                                             @enderror
-                </div>
-            @endif
+                                        </div>
+                                    @endif
                                     @if ($employee->idCard)
                                         <div class="col-span-12 form-check">
                                             <div class="checkbox-area">
@@ -2793,9 +2931,9 @@
                                                         class="text-slate-500 dark:text-slate-400 text-sm leading-6">Keep
                                                         existing document</span>
                                                 </label>
-        </div>
+                                            </div>
 
-    </div>
+                                        </div>
                                     @endif
                                     <div class="col-span-12">
                                         <label for="id_number" class="form-label">ID Number</label>
@@ -4343,8 +4481,8 @@
                                     @foreach ($errors->all() as $error)
                                         <li>{{ $error }}</li>
                                     @endforeach
-                    </ul>
-                </div>
+                                </ul>
+                            </div>
                             @endif
                                 <div class="grid grid-cols-12 gap-4">
                                     @if (!$keep_existing_medical_record)
@@ -4368,7 +4506,7 @@
                                                                 class="h-40 max-w-full rounded-md object-contain"
                                                                 alt="Medical Record Preview">
                                                         @endif
-            </div>
+                                                    </div>
                                                     <p class="text-sm text-slate-500">
                                                         {{ $medical_record_file->getClientOriginalName() }}</p>
                                                     <button type="button" class="text-sm text-red-500 mt-2"
@@ -4581,7 +4719,6 @@
                                     <span class="sr-only">Close modal</span>
                                 </button>
                             </div>
-
                             <!-- Modal body -->
                             <div class="p-6 space-y-4">
                                 <!-- Validation Errors Summary -->
@@ -5218,4 +5355,177 @@
             </div>
         </div>
     @endif
+
+    <!-- Work Declaration Edit Modal -->
+    @if ($editWorkDeclarationModal)
+    <div>
+        <div id="editWorkDeclarationModal"
+            class="modal fade fixed top-0 left-0 show w-full h-full outline-none overflow-x-hidden overflow-y-auto"
+            tabindex="-1" aria-labelledby="editWorkDeclarationModalLabel" aria-hidden="true" wire:ignore.self>
+            <div class="modal-dialog relative w-auto pointer-events-none">
+                <div
+                    class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
+                    <div class="relative bg-white rounded-lg shadow dark:bg-slate-700">
+                        <!-- Modal header -->
+                        <div
+                            class="flex items-center justify-between p-5 border-b rounded-t dark:border-slate-600 bg-black-500">
+                            <h3 class="text-xl font-medium text-white dark:text-white capitalize">
+                                {{ $editing_work_declaration_id ? 'Edit' : 'Add' }} Work Declaration
+                            </h3>
+                            <button wire:click="closeEditWorkDeclarationModal" type="button"
+                                class="text-slate-400 bg-transparent hover:text-slate-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-slate-600 dark:hover:text-white"
+                                data-bs-dismiss="modal">
+                                <svg aria-hidden="true" class="w-5 h-5" fill="#ffffff" viewBox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd"
+                                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                        clip-rule="evenodd"></path>
+                                </svg>
+                                <span class="sr-only">Close modal</span>
+                            </button>
+                        </div>
+
+                        <!-- Modal body -->
+                        <div class="modal-body p-6">
+                            <div class="grid grid-cols-12 gap-4">
+                                @if (!$keep_existing_work_declaration)
+                                        <div class="col-span-12">
+                                            <label for="work_declaration_file" class="form-label">Work Declaration Document
+                                                <iconify-icon wire:loading wire:target="work_declaration_file"
+                                                    icon="line-md:loading-twotone-loop" width="18"
+                                                    height="18"></iconify-icon></label>
+                                            <div
+                                                class="border-2 border-dashed border-slate-200 rounded-md p-4 text-center">
+                                                @if ($work_declaration_file)
+                                                    <div class="flex items-center justify-center mb-3">
+                                                        @if (in_array($work_declaration_file->getClientOriginalExtension(), ['pdf']))
+                                                            <iconify-icon icon="mingcute:file-pdf-fill"
+                                                                width="48" height="48"
+                                                                class="text-red-500"></iconify-icon>
+                                                        @else
+                                                            <img src="{{ $work_declaration_file->temporaryUrl() }}"
+                                                                class="h-40 max-w-full rounded-md object-contain"
+                                                                alt="Work Declaration Preview">
+                                                        @endif
+                                                    </div>
+                                                    <p class="text-sm text-slate-500">
+                                                        {{ $work_declaration_file->getClientOriginalName() }}</p>
+                                                    <button type="button" class="text-sm text-red-500 mt-2"
+                                                        wire:click="$set('work_declaration_file', null)">
+                                                        Remove File
+                                                    </button>
+                                                @else
+                                                    @if ($editing_record_id)
+                                                        <div class="mb-3">
+                                                            <small class="text-muted">
+                                                                Current file: <a
+                                                                    href="{{ $employee->workDeclarations->find($editing_record_id)->file_path }}"
+                                                                    target="_blank"
+                                                                    class="text-sm text-blue-500">View</a>
+                                                            </small>
+                                                        </div>
+                                                        @if (!$keep_existing_work_declaration)
+                                                            <label for="work_declaration_file_input"
+                                                                class="cursor-pointer block">
+                                                                <iconify-icon icon="mingcute:upload-line"
+                                                                    width="32" height="32"
+                                                                    class="text-slate-400 mx-auto"></iconify-icon>
+                                                                <p class="mt-2 text-sm text-slate-500">Click to upload
+                                                                </p>
+                                                                <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF
+                                                                    (Max
+                                                                    2MB)</p>
+                                                                <input id="work_declaration_file_input" type="file"
+                                                                    class="hidden" wire:model="work_declaration_file"
+                                                                    accept=".pdf,.jpg,.jpeg,.png">
+                                                            </label>
+                                                        @endif
+                                                    @else
+                                                        <label for="work_declaration_file_input"
+                                                            class="cursor-pointer block">
+                                                            <iconify-icon icon="mingcute:upload-line" width="32"
+                                                                height="32"
+                                                                class="text-slate-400 mx-auto"></iconify-icon>
+                                                            <p class="mt-2 text-sm text-slate-500">Click to upload or
+                                                                drag
+                                                                and drop</p>
+                                                            <p class="text-xs text-slate-400">PDF, JPG, PNG (Max
+                                                                2MB)
+                                                            </p>
+                                                            <input id="work_declaration_file_input" type="file"
+                                                                class="hidden" wire:model="work_declaration_file"
+                                                                accept=".pdf,.jpg,.jpeg,.png">
+                                                        </label>
+                                                    @endif
+                                                @endif
+                                            </div>
+                                            @error('work_declaration_file')
+                                                <span class="text-danger-500 text-sm mt-1">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                @endif
+                                @if ($editing_work_declaration_id)
+                                        <div class="col-span-12 form-check">
+                                            <div class="checkbox-area">
+                                                <label class="inline-flex items-center cursor-pointer"
+                                                    for="keep_existing_work_declaration">
+                                                    <input type="checkbox" class="hidden" name="checkbox"
+                                                        id="keep_existing_work_declaration"
+                                                        wire:model.live="keep_existing_work_declaration">
+                                                    <span
+                                                        class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
+                                                        <img src="{{ asset('images/icon/ck-white.svg') }}"
+                                                            alt=""
+                                                            class="h-[10px] w-[10px] block m-auto opacity-0"></span>
+                                                    <span
+                                                        class="text-slate-500 dark:text-slate-400 text-sm leading-6">Keep
+                                                        existing document</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                @endif
+                                <div class="col-span-12 xl:col-span-6">
+                                    <label for="work_declaration_issue_date" class="form-label">Issue
+                                        Date</label>
+                                    <input type="date"
+                                        class="form-control @error('work_declaration_issue_date') !border-danger-500 @enderror"
+                                        wire:model="work_declaration_issue_date">
+                                    @error('work_declaration_issue_date')
+                                        <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <div class="col-span-12 xl:col-span-6">
+                                    <label for="work_declaration_expiry_date" class="form-label">Expiry Date</label>
+                                    <input type="date"
+                                        class="form-control @error('work_declaration_expiry_date') !border-danger-500 @enderror"
+                                        wire:model="work_declaration_expiry_date">
+                                    @error('work_declaration_expiry_date')
+                                        <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Modal footer -->
+                        <div
+                            class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
+                            <button wire:click="closeEditWorkDeclarationModal" type="button"
+                                class="btn inline-flex justify-center btn-outline-dark">Cancel</button>
+                            <button wire:click="updateWorkDeclaration" type="button" wire:target='updateWorkDeclaration'
+                                wire:loading.remove
+                                class="btn inline-flex justify-center btn-dark">{{ $editing_work_declaration_id ? 'Update' : 'Upload' }}</button>
+                            <button wire:loading wire:target="updateWorkDeclaration" type="button"
+                                class="btn inline-flex justify-center btn-dark">
+                                <span class="flex items-center">
+                                    <iconify-icon icon="line-md:loading-twotone-loop" width="25"
+                                        height="25"></iconify-icon>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    @endif
 </div>
+

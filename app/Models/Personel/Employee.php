@@ -532,7 +532,9 @@ class Employee extends Model
                 // 13. Practice Card
                 ->orWhereDoesntHave('practiceCard')
                 // 14. Syndicate Card
-                ->orWhereDoesntHave('syndicateCard');
+                ->orWhereDoesntHave('syndicateCard')
+                // 15. Work Declaration
+                ->orWhereDoesntHave('workDeclarations');
         });
     }
 
@@ -601,6 +603,10 @@ class Employee extends Model
                 })
                 // 14. Syndicate Card expired
                 ->orWhereHas('syndicateCard', function ($q) use ($today) {
+                    $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
+                })
+                // 15. Work Declaration expired
+                ->orWhereHas('workDeclarations', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
                 });
         });
@@ -1236,6 +1242,11 @@ class Employee extends Model
         if (!$this->syndicateCard) {
             $missingDocs[] = 'Syndicate Card';
         }
+        
+        // 15. Work Declaration
+        if ($this->workDeclarations->isEmpty()) {
+            $missingDocs[] = 'Work Declaration';
+        }
 
         return $missingDocs;
     }
@@ -1333,6 +1344,14 @@ class Employee extends Model
         // 14. Syndicate Card
         if ($this->syndicateCard && $this->syndicateCard->expiry_date && $today->gt($this->syndicateCard->expiry_date)) {
             $expiredDocs[] = 'Syndicate Card';
+        }
+        
+        // 15. Work Declaration
+        foreach ($this->workDeclarations as $declaration) {
+            if ($declaration->expiry_date && $today->gt($declaration->expiry_date)) {
+                $expiredDocs[] = 'Work Declaration';
+                break;
+            }
         }
 
         return $expiredDocs;
@@ -1840,7 +1859,7 @@ class Employee extends Model
      * @param int $nearExpiryDays Days threshold for near expiry warning
      * @return array Document status and details
      */
-    public function checkWorkDeclarationsStatus($nearExpiryDays = self::NEAR_EXPIRY_DAYS)
+    public function checkWorkDeclarationstatus($nearExpiryDays = self::NEAR_EXPIRY_DAYS)
     {
         $declarations = $this->workDeclarations;
 
@@ -2160,6 +2179,37 @@ class Employee extends Model
         }
     }
 
+    /**
+     * Set work declaration for the employee
+     *
+     * @param string $file_path
+     * @param Carbon $issue_date
+     * @param Carbon $expiry_date
+     * @return bool
+     * @throws AppException
+     */
+    public function setWorkDeclaration($file_path, Carbon $issue_date, Carbon $expiry_date)
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('setDocs', $this)) {
+            throw new AppException('You dont have permission to set docs for this employee');
+        }
+
+        try {
+            $this->workDeclarations()->create([
+                'created_by' => $loggedInUser->id,
+                'file_path' => $file_path,
+                'issue_date' => $issue_date,
+                'expiry_date' => $expiry_date,
+            ]);
+            return true;
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException('Error setting work declaration: ' . $e->getMessage());
+        }
+    }
+
     public static function getSyndicateCardStatistics()
     {
         $total = Employee::count();
@@ -2190,6 +2240,50 @@ class Employee extends Model
             'near_expiry' => $near_expiry,
             'expired' => $expired,
             'missing' => $missing
+        ];
+    }
+    
+    /**
+     * Get work declaration statistics for dashboard
+     * 
+     * @return array
+     */
+    public static function getWorkDeclarationStatistics()
+    {
+        $today = now()->format('Y-m-d');
+        $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
+        
+        // Get total employees
+        $total = self::count();
+        
+        // Get employees with missing work declarations
+        $missing = self::whereDoesntHave('workDeclarations')->count();
+        
+        // Get employees with expired work declarations
+        $expired = self::whereHas('workDeclarations', function ($q) use ($today) {
+            $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
+        })->count();
+        
+        // Get employees with work declarations near expiry
+        $nearExpiry = self::whereHas('workDeclarations', function ($q) use ($today, $nearExpiryDate) {
+            $q->whereNotNull('expiry_date')
+              ->where('expiry_date', '>', $today)
+              ->where('expiry_date', '<=', $nearExpiryDate);
+        })->count();
+        
+        // Get employees with valid work declarations
+        $valid = self::whereHas('workDeclarations', function ($q) use ($today, $nearExpiryDate) {
+            $q->where(function ($q) use ($today, $nearExpiryDate) {
+                $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
+            });
+        })->count();
+        
+        return [
+            'total' => $total,
+            'valid' => $valid,
+            'near_expiry' => $nearExpiry,
+            'expired' => $expired,
+            'missing' => $missing,
         ];
     }
 }

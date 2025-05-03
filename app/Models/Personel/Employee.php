@@ -53,25 +53,6 @@ class Employee extends Model
         'birth_date' => 'date',
     ];
 
-    /**
-     * Scope a query to search for employees by name, email, or phone
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  string  $search
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function scopeSearch($query, $search)
-    {
-        if (empty($search)) {
-            return $query;
-        }
-        
-        return $query->where(function($q) use ($search) {
-            $q->where('name', 'like', '%' . $search . '%')
-              ->orWhere('email', 'like', '%' . $search . '%')
-              ->orWhere('phone', 'like', '%' . $search . '%');
-        });
-    }
 
     ////model functions
     public function setArmyServicePaper($file_path, Carbon $issue_date, $type = ArmyServicePaper::TYPE_ORIGINAL, ?Carbon $expiry_date)
@@ -392,6 +373,174 @@ class Employee extends Model
         }
     }
 
+    
+    public function setExternalMedicalRecord($file_path, Carbon $issue_date, Carbon $expiry_date, string $id_number)
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('setDocs', $this)) {
+            throw new AppException('You dont have permission to set docs for this employee');
+        }
+
+        try {
+            $this->externalMedicalRecord()->updateOrCreate(
+                [
+                    'employee_id' => $this->id,
+                ],
+                [
+                    'created_by' => $loggedInUser->id,
+                    'id_number' => $id_number,
+                    'file_path' => $file_path,
+                    'issue_date' => $issue_date,
+                    'expiry_date' => $expiry_date,
+                ],
+            );
+            return true;
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException('Error setting external medical record: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Set practice card for the employee
+     *
+     * @param string $file_path
+     * @param Carbon $issue_date
+     * @param Carbon $expiry_date
+     * @return bool
+     * @throws AppException
+     */
+    public function setPracticeCard($file_path, Carbon $issue_date, Carbon $expiry_date)
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('setDocs', $this)) {
+            throw new AppException('You dont have permission to set docs for this employee');
+        }
+
+        try {
+            $this->practiceCard()->updateOrCreate(
+                [
+                    'employee_id' => $this->id,
+                ],
+                [
+                    'created_by' => $loggedInUser->id,
+                    'file_path' => $file_path,
+                    'issue_date' => $issue_date,
+                    'expiry_date' => $expiry_date,
+                ],
+            );
+            return true;
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException('Error setting practice card: ' . $e->getMessage());
+        }
+    }
+
+        /**
+     * Set skills qualification for the employee
+     *
+     * @param string $file_path
+     * @param Carbon $issue_date
+     * @param Carbon $expiry_date
+     * @return bool
+     * @throws AppException
+     */
+    public function setSkillsQualification($file_path, Carbon $issue_date, Carbon $expiry_date)
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('setDocs', $this)) {
+            throw new AppException('You dont have permission to set docs for this employee');
+        }
+
+        try {
+            $this->skillsQualifications()->updateOrCreate(
+                [
+                    'employee_id' => $this->id,
+                ],
+                [
+                    'created_by' => $loggedInUser->id,
+                    'file_path' => $file_path,
+                    'issue_date' => $issue_date,
+                    'expiry_date' => $expiry_date,
+                ],
+            );
+            return true;
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException('Error setting skills qualification: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Set syndicate card for the employee
+     *
+     * @param string $file_path
+     * @param Carbon $issue_date
+     * @param Carbon $expiry_date
+     * @return bool
+     * @throws AppException
+     */
+    public function setSyndicateCard($file_path, Carbon $issue_date, Carbon $expiry_date)
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('setDocs', $this)) {
+            throw new AppException('You dont have permission to set docs for this employee');
+        }
+
+        try {
+            $this->syndicateCard()->updateOrCreate(
+                [
+                    'employee_id' => $this->id,
+                ],
+                [
+                    'created_by' => $loggedInUser->id,
+                    'file_path' => $file_path,
+                    'issue_date' => $issue_date,
+                    'expiry_date' => $expiry_date,
+                ],
+            );
+            return true;
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException('Error setting syndicate card: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Set work declaration for the employee
+     *
+     * @param string $file_path
+     * @param Carbon $issue_date
+     * @param Carbon $expiry_date
+     * @return bool
+     * @throws AppException
+     */
+    public function setWorkDeclaration($file_path, Carbon $issue_date, Carbon $expiry_date)
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('setDocs', $this)) {
+            throw new AppException('You dont have permission to set docs for this employee');
+        }
+
+        try {
+            $this->workDeclarations()->create([
+                'created_by' => $loggedInUser->id,
+                'file_path' => $file_path,
+                'issue_date' => $issue_date,
+                'expiry_date' => $expiry_date,
+            ]);
+            return true;
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException('Error setting work declaration: ' . $e->getMessage());
+        }
+    }
+
     /**
      * Update employee base information
      *
@@ -550,9 +699,10 @@ class Employee extends Model
 
         return $query->where(function ($query) use ($today) {
             // 1. ID Card expired
-            $query->whereHas('idCard', function ($q) use ($today) {
-                $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
-            })
+            $query
+                ->whereHas('idCard', function ($q) use ($today) {
+                    $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
+                })
                 // 2. Birth Certificate expired
                 ->orWhereHas('birthCertificate', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
@@ -612,6 +762,404 @@ class Employee extends Model
         });
     }
 
+    /**
+     * Scope to find employees with documents near expiry
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWithNearExpiryDocuments($query)
+    {
+        $today = now()->format('Y-m-d');
+        $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
+
+        return $query->where(function ($query) use ($today, $nearExpiryDate) {
+            // 1. ID Card near expiry
+            $query
+                ->whereHas('idCard', function ($q) use ($today, $nearExpiryDate) {
+                    $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
+                })
+                // 2. Birth Certificate near expiry
+                ->orWhereHas('birthCertificate', function ($q) use ($today, $nearExpiryDate) {
+                    $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
+                })
+                // 3. Employment Contract near expiry
+                ->orWhereHas('contracts', function ($q) use ($today, $nearExpiryDate) {
+                    $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
+                })
+                // 4. Army Service Paper near expiry
+                ->orWhereHas('armyServicePaper', function ($q) use ($today, $nearExpiryDate) {
+                    $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
+                })
+                // 5. Driver License near expiry
+                ->orWhereHas('driverLicense', function ($q) use ($today, $nearExpiryDate) {
+                    $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
+                })
+                // 6. Police Record near expiry
+                ->orWhereHas('policeRecords', function ($q) use ($today, $nearExpiryDate) {
+                    $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
+                })
+                // 7. HR Letter near expiry
+                ->orWhereHas('hrLetters', function ($q) use ($today, $nearExpiryDate) {
+                    $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
+                })
+                // 8. S1 Doc near expiry
+                ->orWhereHas('employeeS1Doc', function ($q) use ($today, $nearExpiryDate) {
+                    $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
+                })
+                // 9. S2 Doc near expiry
+                ->orWhereHas('employeeS2Doc', function ($q) use ($today, $nearExpiryDate) {
+                    $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
+                })
+                // 10. S6 Doc near expiry
+                ->orWhereHas('employeeS6Doc', function ($q) use ($today, $nearExpiryDate) {
+                    $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
+                })
+                // 11. Medical Record near expiry
+                ->orWhereHas('medicalRecord', function ($q) use ($today, $nearExpiryDate) {
+                    $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
+                })
+                // 12. External Medical Record near expiry
+                ->orWhereHas('externalMedicalRecord', function ($q) use ($today, $nearExpiryDate) {
+                    $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
+                })
+                // 13. Practice Card near expiry
+                ->orWhereHas('practiceCard', function ($q) use ($today, $nearExpiryDate) {
+                    $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
+                })
+                // 14. Syndicate Card near expiry
+                ->orWhereHas('syndicateCard', function ($q) use ($today, $nearExpiryDate) {
+                    $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
+                })
+                // 15. Work Declaration near expiry
+                ->orWhereHas('workDeclarations', function ($q) use ($today, $nearExpiryDate) {
+                    $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
+                });
+        });
+    }
+
+    /**
+     * Scope a query to search for employees by name, email, or phone
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  string  $search
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeSearch($query, $search)
+    {
+        if (empty($search)) {
+            return $query;
+        }
+
+        return $query->where(function ($q) use ($search) {
+            $q->where('name', 'like', '%' . $search . '%')
+                ->orWhere('email', 'like', '%' . $search . '%')
+                ->orWhere('phone', 'like', '%' . $search . '%');
+        });
+    }
+
+
+    /**
+     * Get missing documents for this employee
+     *
+     * @return array
+     */
+    public function getMissingDocuments()
+    {
+        $missingDocs = [];
+
+        // 1. ID Card
+        if (!$this->idCard) {
+            $missingDocs[] = 'ID Card';
+        }
+
+        // 2. Birth Certificate
+        if (!$this->birthCertificate) {
+            $missingDocs[] = 'Birth Certificate';
+        }
+
+        // 3. Employment Contract
+        if ($this->contracts->isEmpty()) {
+            $missingDocs[] = 'Employment Contract';
+        }
+
+        // 4. Army Service Paper
+        if ($this->gender === Applicant::GENDER_MALE && ($this->info && in_array($this->info->military_status, [Applicant::MILITARY_STATUS_EXEMPTED, Applicant::MILITARY_STATUS_COMPLETED])) && !$this->armyServicePaper) {
+            $missingDocs[] = 'Army Service Paper';
+        }
+
+        // 5. Driver License
+        if ($this->license_required && !$this->driverLicense) {
+            $missingDocs[] = 'Driver License';
+        }
+
+        // 6. Police Record
+        if ($this->policeRecords->isEmpty()) {
+            $missingDocs[] = 'Police Record';
+        }
+
+        // 7. HR Letter
+        if ($this->hrLetters->isEmpty()) {
+            $missingDocs[] = 'HR Letter';
+        }
+
+        // 8. S1 Document
+        if (!$this->employeeS1Doc) {
+            $missingDocs[] = 'S1 Document';
+        }
+
+        // 9. S2 Document
+        if ($this->employeeS2Doc->isEmpty()) {
+            $missingDocs[] = 'S2 Document';
+        }
+
+        // 10. S6 Document
+        if ($this->employeeS6Doc->isEmpty()) {
+            $missingDocs[] = 'S6 Document';
+        }
+
+        // 11. Medical Record
+        if (!$this->medicalRecord) {
+            $missingDocs[] = 'Medical Record';
+        }
+
+        // 12. External Medical Record
+        if (!$this->externalMedicalRecord) {
+            $missingDocs[] = 'External Medical Record';
+        }
+
+        // 13. Practice Card
+        if (!$this->practiceCard) {
+            $missingDocs[] = 'Practice Card';
+        }
+
+        // 14. Syndicate Card
+        if (!$this->syndicateCard) {
+            $missingDocs[] = 'Syndicate Card';
+        }
+
+        // 15. Work Declaration
+        if ($this->workDeclarations->isEmpty()) {
+            $missingDocs[] = 'Work Declaration';
+        }
+
+        return $missingDocs;
+    }
+
+    /**
+     * Get expired documents for this employee
+     *
+     * @return array
+     */
+    public function getExpiredDocuments()
+    {
+        $expiredDocs = [];
+        $today = now();
+
+        // 1. ID Card
+        if ($this->idCard && $this->idCard->expiry_date && $today->gt($this->idCard->expiry_date)) {
+            $expiredDocs[] = 'ID Card';
+        }
+
+        // 2. Birth Certificate
+        if ($this->birthCertificate && $this->birthCertificate->expiry_date && $today->gt($this->birthCertificate->expiry_date)) {
+            $expiredDocs[] = 'Birth Certificate';
+        }
+
+        // 3. Employment Contract
+        foreach ($this->contracts as $contract) {
+            if ($contract->expiry_date && $today->gt($contract->expiry_date)) {
+                $expiredDocs[] = 'Employment Contract';
+                break;
+            }
+        }
+
+        // 4. Army Service Paper
+        if ($this->armyServicePaper && $this->armyServicePaper->expiry_date && $today->gt($this->armyServicePaper->expiry_date)) {
+            $expiredDocs[] = 'Army Service Paper';
+        }
+
+        // 5. Driver License
+        if ($this->driverLicense && $this->driverLicense->expiry_date && $today->gt($this->driverLicense->expiry_date)) {
+            $expiredDocs[] = 'Driver License';
+        }
+
+        // 6. Police Record
+        foreach ($this->policeRecords as $record) {
+            if ($record->expiry_date && $today->gt($record->expiry_date)) {
+                $expiredDocs[] = 'Police Record';
+                break;
+            }
+        }
+
+        // 7. HR Letter
+        foreach ($this->hrLetters as $letter) {
+            if ($letter->expiry_date && $today->gt($letter->expiry_date)) {
+                $expiredDocs[] = 'HR Letter';
+                break;
+            }
+        }
+
+        // 8. S1 Document
+        if ($this->employeeS1Doc && $this->employeeS1Doc->expiry_date && $today->gt($this->employeeS1Doc->expiry_date)) {
+            $expiredDocs[] = 'S1 Document';
+        }
+
+        // 9. S2 Document
+        foreach ($this->employeeS2Doc as $doc) {
+            if ($doc->expiry_date && $today->gt($doc->expiry_date)) {
+                $expiredDocs[] = 'S2 Document';
+                break;
+            }
+        }
+
+        // 10. S6 Document
+        foreach ($this->employeeS6Doc as $doc) {
+            if ($doc->expiry_date && $today->gt($doc->expiry_date)) {
+                $expiredDocs[] = 'S6 Document';
+                break;
+            }
+        }
+
+        // 11. Medical Record
+        if ($this->medicalRecord && $this->medicalRecord->expiry_date && $today->gt($this->medicalRecord->expiry_date)) {
+            $expiredDocs[] = 'Medical Record';
+        }
+
+        // 12. External Medical Record
+        if ($this->externalMedicalRecord && $this->externalMedicalRecord->expiry_date && $today->gt($this->externalMedicalRecord->expiry_date)) {
+            $expiredDocs[] = 'External Medical Record';
+        }
+
+        // 13. Practice Card
+        if ($this->practiceCard && $this->practiceCard->expiry_date && $today->gt($this->practiceCard->expiry_date)) {
+            $expiredDocs[] = 'Practice Card';
+        }
+
+        // 14. Syndicate Card
+        if ($this->syndicateCard && $this->syndicateCard->expiry_date && $today->gt($this->syndicateCard->expiry_date)) {
+            $expiredDocs[] = 'Syndicate Card';
+        }
+
+        // 15. Work Declaration
+        foreach ($this->workDeclarations as $declaration) {
+            if ($declaration->expiry_date && $today->gt($declaration->expiry_date)) {
+                $expiredDocs[] = 'Work Declaration';
+                break;
+            }
+        }
+
+        return $expiredDocs;
+    }
+
+    /**
+     * Get near expiry documents for this employee
+     *
+     * @return array
+     */
+    public function getNearExpiryDocuments()
+    {
+        $nearExpiryDocs = [];
+        $today = now();
+        $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS);
+
+        // 1. ID Card
+        if ($this->idCard && $this->idCard->expiry_date && $today->lt($this->idCard->expiry_date) && $nearExpiryDate->gte($this->idCard->expiry_date)) {
+            $nearExpiryDocs[] = 'ID Card';
+        }
+
+        // 2. Birth Certificate
+        if ($this->birthCertificate && $this->birthCertificate->expiry_date && $today->lt($this->birthCertificate->expiry_date) && $nearExpiryDate->gte($this->birthCertificate->expiry_date)) {
+            $nearExpiryDocs[] = 'Birth Certificate';
+        }
+
+        // 3. Employment Contract
+        foreach ($this->contracts as $contract) {
+            if ($contract->expiry_date && $today->lt($contract->expiry_date) && $nearExpiryDate->gte($contract->expiry_date)) {
+                $nearExpiryDocs[] = 'Employment Contract';
+                break;
+            }
+        }
+
+        // 4. Army Service Paper
+        if ($this->armyServicePaper && $this->armyServicePaper->expiry_date && $today->lt($this->armyServicePaper->expiry_date) && $nearExpiryDate->gte($this->armyServicePaper->expiry_date)) {
+            $nearExpiryDocs[] = 'Army Service Paper';
+        }
+
+        // 5. Driver License
+        if ($this->driverLicense && $this->driverLicense->expiry_date && $today->lt($this->driverLicense->expiry_date) && $nearExpiryDate->gte($this->driverLicense->expiry_date)) {
+            $nearExpiryDocs[] = 'Driver License';
+        }
+
+        // 6. Police Record
+        foreach ($this->policeRecords as $record) {
+            if ($record->expiry_date && $today->lt($record->expiry_date) && $nearExpiryDate->gte($record->expiry_date)) {
+                $nearExpiryDocs[] = 'Police Record';
+                break;
+            }
+        }
+
+        // 7. HR Letter
+        foreach ($this->hrLetters as $letter) {
+            if ($letter->expiry_date && $today->lt($letter->expiry_date) && $nearExpiryDate->gte($letter->expiry_date)) {
+                $nearExpiryDocs[] = 'HR Letter';
+                break;
+            }
+        }
+
+        // 8. S1 Document
+        if ($this->employeeS1Doc && $this->employeeS1Doc->expiry_date && $today->lt($this->employeeS1Doc->expiry_date) && $nearExpiryDate->gte($this->employeeS1Doc->expiry_date)) {
+            $nearExpiryDocs[] = 'S1 Document';
+        }
+
+        // 9. S2 Document
+        foreach ($this->employeeS2Doc as $doc) {
+            if ($doc->expiry_date && $today->lt($doc->expiry_date) && $nearExpiryDate->gte($doc->expiry_date)) {
+                $nearExpiryDocs[] = 'S2 Document';
+                break;
+            }
+        }
+
+        // 10. S6 Document
+        foreach ($this->employeeS6Doc as $doc) {
+            if ($doc->expiry_date && $today->lt($doc->expiry_date) && $nearExpiryDate->gte($doc->expiry_date)) {
+                $nearExpiryDocs[] = 'S6 Document';
+                break;
+            }
+        }
+
+        // 11. Medical Record
+        if ($this->medicalRecord && $this->medicalRecord->expiry_date && $today->lt($this->medicalRecord->expiry_date) && $nearExpiryDate->gte($this->medicalRecord->expiry_date)) {
+            $nearExpiryDocs[] = 'Medical Record';
+        }
+
+        // 12. External Medical Record
+        if ($this->externalMedicalRecord && $this->externalMedicalRecord->expiry_date && $today->lt($this->externalMedicalRecord->expiry_date) && $nearExpiryDate->gte($this->externalMedicalRecord->expiry_date)) {
+            $nearExpiryDocs[] = 'External Medical Record';
+        }
+
+        // 13. Practice Card
+        if ($this->practiceCard && $this->practiceCard->expiry_date && $today->lt($this->practiceCard->expiry_date) && $nearExpiryDate->gte($this->practiceCard->expiry_date)) {
+            $nearExpiryDocs[] = 'Practice Card';
+        }
+
+        // 14. Syndicate Card
+        if ($this->syndicateCard && $this->syndicateCard->expiry_date && $today->lt($this->syndicateCard->expiry_date) && $nearExpiryDate->gte($this->syndicateCard->expiry_date)) {
+            $nearExpiryDocs[] = 'Syndicate Card';
+        }
+
+        // 15. Work Declaration
+        foreach ($this->workDeclarations as $declaration) {
+            if ($declaration->expiry_date && $today->lt($declaration->expiry_date) && $nearExpiryDate->gte($declaration->expiry_date)) {
+                $nearExpiryDocs[] = 'Work Declaration';
+                break;
+            }
+        }
+
+        return $nearExpiryDocs;
+    }
+
+    //// Dashboard Statistics ////
     /**
      * Get ID card statistics for dashboard
      *
@@ -723,33 +1271,33 @@ class Employee extends Model
     {
         $today = now()->format('Y-m-d');
         $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
-        
+
         // Get total employees
         $total = self::count();
-        
+
         // Get female employees (not required to have army service paper)
         $females = self::where('gender', 'female')->count();
-        
+
         // Get male employees (required to have army service paper)
         $males = self::where('gender', 'male')->count();
-        
+
         // Get male employees with missing army service papers
         $missing = self::where('gender', 'male')->whereDoesntHave('armyServicePaper')->count();
-        
+
         // Get male employees with expired army service papers
         $expired = self::where('gender', 'male')
             ->whereHas('armyServicePaper', function ($q) use ($today) {
                 $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
             })
             ->count();
-        
+
         // Get male employees with army service papers near expiry
         $nearExpiry = self::where('gender', 'male')
             ->whereHas('armyServicePaper', function ($q) use ($today, $nearExpiryDate) {
                 $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
             })
             ->count();
-        
+
         // Get male employees with valid army service papers
         $valid = self::where('gender', 'male')
             ->whereHas('armyServicePaper', function ($q) use ($today, $nearExpiryDate) {
@@ -758,26 +1306,26 @@ class Employee extends Model
                 });
             })
             ->count();
-        
+
         // Get counts by type
         $original = self::where('gender', 'male')
             ->whereHas('armyServicePaper', function ($q) {
                 $q->where('type', 'Original');
             })
             ->count();
-        
+
         $verifiedCopy = self::where('gender', 'male')
             ->whereHas('armyServicePaper', function ($q) {
                 $q->where('type', 'Verified Copy');
             })
             ->count();
-        
+
         $copy = self::where('gender', 'male')
             ->whereHas('armyServicePaper', function ($q) {
                 $q->where('type', 'Copy');
             })
             ->count();
-        
+
         return [
             'total' => $total,
             'females' => $females,
@@ -796,39 +1344,37 @@ class Employee extends Model
 
     /**
      * Get employment contract statistics for dashboard
-     * 
+     *
      * @return array
      */
     public static function getEmploymentContractStatistics()
     {
         $today = now()->format('Y-m-d');
         $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
-        
+
         // Get total employees
         $total = self::count();
-        
+
         // Get employees with missing contracts
         $missing = self::whereDoesntHave('contracts')->count();
-        
+
         // Get employees with expired contracts
         $expired = self::whereHas('contracts', function ($q) use ($today) {
             $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
         })->count();
-        
+
         // Get employees with contracts near expiry
         $nearExpiry = self::whereHas('contracts', function ($q) use ($today, $nearExpiryDate) {
-            $q->whereNotNull('expiry_date')
-              ->where('expiry_date', '>', $today)
-              ->where('expiry_date', '<=', $nearExpiryDate);
+            $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
         })->count();
-        
+
         // Get employees with valid contracts
         $valid = self::whereHas('contracts', function ($q) use ($today, $nearExpiryDate) {
             $q->where(function ($q) use ($today, $nearExpiryDate) {
                 $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
             });
         })->count();
-        
+
         return [
             'total' => $total,
             'valid' => $valid,
@@ -840,50 +1386,49 @@ class Employee extends Model
 
     /**
      * Get driver license statistics for dashboard
-     * 
+     *
      * @return array
      */
     public static function getDriverLicenseStatistics()
     {
         $today = now()->format('Y-m-d');
         $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
-        
+
         // Get total employees
         $total = self::count();
-        
+
         // Get employees who require a driver license
         $required = self::where('license_required', true)->count();
-        
+
         // Get employees who don't require a driver license
         $notRequired = self::where('license_required', false)->count();
-        
+
         // Get employees with missing driver licenses (only for those who require it)
-        $missing = self::where('license_required', true)
-            ->whereDoesntHave('driverLicense')
-            ->count();
-        
+        $missing = self::where('license_required', true)->whereDoesntHave('driverLicense')->count();
+
         // Get employees with expired driver licenses (only for those who require it)
         $expired = self::where('license_required', true)
             ->whereHas('driverLicense', function ($q) use ($today) {
                 $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
-            })->count();
-        
+            })
+            ->count();
+
         // Get employees with driver licenses near expiry (only for those who require it)
         $nearExpiry = self::where('license_required', true)
             ->whereHas('driverLicense', function ($q) use ($today, $nearExpiryDate) {
-                $q->whereNotNull('expiry_date')
-                  ->where('expiry_date', '>', $today)
-                  ->where('expiry_date', '<=', $nearExpiryDate);
-            })->count();
-        
+                $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
+            })
+            ->count();
+
         // Get employees with valid driver licenses (only for those who require it)
         $valid = self::where('license_required', true)
             ->whereHas('driverLicense', function ($q) use ($today, $nearExpiryDate) {
                 $q->where(function ($q) use ($today, $nearExpiryDate) {
                     $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
                 });
-            })->count();
-        
+            })
+            ->count();
+
         return [
             'total' => $total,
             'required' => $required,
@@ -897,39 +1442,37 @@ class Employee extends Model
 
     /**
      * Get police record statistics for dashboard
-     * 
+     *
      * @return array
      */
     public static function getPoliceRecordStatistics()
     {
         $today = now()->format('Y-m-d');
         $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
-        
+
         // Get total employees
         $total = self::count();
-        
+
         // Get employees with missing police records
         $missing = self::whereDoesntHave('policeRecords')->count();
-        
+
         // Get employees with expired police records
         $expired = self::whereHas('policeRecords', function ($q) use ($today) {
             $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
         })->count();
-        
+
         // Get employees with police records near expiry
         $nearExpiry = self::whereHas('policeRecords', function ($q) use ($today, $nearExpiryDate) {
-            $q->whereNotNull('expiry_date')
-              ->where('expiry_date', '>', $today)
-              ->where('expiry_date', '<=', $nearExpiryDate);
+            $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
         })->count();
-        
+
         // Get employees with valid police records
         $valid = self::whereHas('policeRecords', function ($q) use ($today, $nearExpiryDate) {
             $q->where(function ($q) use ($today, $nearExpiryDate) {
                 $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
             });
         })->count();
-        
+
         return [
             'total' => $total,
             'valid' => $valid,
@@ -941,39 +1484,37 @@ class Employee extends Model
 
     /**
      * Get HR letter statistics for dashboard
-     * 
+     *
      * @return array
      */
     public static function getHrLetterStatistics()
     {
         $today = now()->format('Y-m-d');
         $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
-        
+
         // Get total employees
         $total = self::count();
-        
+
         // Get employees with missing HR letters
         $missing = self::whereDoesntHave('hrLetters')->count();
-        
+
         // Get employees with expired HR letters
         $expired = self::whereHas('hrLetters', function ($q) use ($today) {
             $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
         })->count();
-        
+
         // Get employees with HR letters near expiry
         $nearExpiry = self::whereHas('hrLetters', function ($q) use ($today, $nearExpiryDate) {
-            $q->whereNotNull('expiry_date')
-              ->where('expiry_date', '>', $today)
-              ->where('expiry_date', '<=', $nearExpiryDate);
+            $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
         })->count();
-        
+
         // Get employees with valid HR letters
         $valid = self::whereHas('hrLetters', function ($q) use ($today, $nearExpiryDate) {
             $q->where(function ($q) use ($today, $nearExpiryDate) {
                 $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
             });
         })->count();
-        
+
         return [
             'total' => $total,
             'valid' => $valid,
@@ -985,39 +1526,37 @@ class Employee extends Model
 
     /**
      * Get S1 document statistics for dashboard
-     * 
+     *
      * @return array
      */
     public static function getS1DocStatistics()
     {
         $today = now()->format('Y-m-d');
         $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
-        
+
         // Get total employees
         $total = self::count();
-        
+
         // Get employees with missing S1 documents
         $missing = self::whereDoesntHave('employeeS1Doc')->count();
-        
+
         // Get employees with expired S1 documents
         $expired = self::whereHas('employeeS1Doc', function ($q) use ($today) {
             $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
         })->count();
-        
+
         // Get employees with S1 documents near expiry
         $nearExpiry = self::whereHas('employeeS1Doc', function ($q) use ($today, $nearExpiryDate) {
-            $q->whereNotNull('expiry_date')
-              ->where('expiry_date', '>', $today)
-              ->where('expiry_date', '<=', $nearExpiryDate);
+            $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
         })->count();
-        
+
         // Get employees with valid S1 documents
         $valid = self::whereHas('employeeS1Doc', function ($q) use ($today, $nearExpiryDate) {
             $q->where(function ($q) use ($today, $nearExpiryDate) {
                 $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
             });
         })->count();
-        
+
         return [
             'total' => $total,
             'valid' => $valid,
@@ -1029,39 +1568,37 @@ class Employee extends Model
 
     /**
      * Get S2 document statistics for dashboard
-     * 
+     *
      * @return array
      */
     public static function getS2DocStatistics()
     {
         $today = now()->format('Y-m-d');
         $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
-        
+
         // Get total employees
         $total = self::count();
-        
+
         // Get employees with missing S2 documents
         $missing = self::whereDoesntHave('employeeS2Doc')->count();
-        
+
         // Get employees with expired S2 documents
         $expired = self::whereHas('employeeS2Doc', function ($q) use ($today) {
             $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
         })->count();
-        
+
         // Get employees with S2 documents near expiry
         $nearExpiry = self::whereHas('employeeS2Doc', function ($q) use ($today, $nearExpiryDate) {
-            $q->whereNotNull('expiry_date')
-              ->where('expiry_date', '>', $today)
-              ->where('expiry_date', '<=', $nearExpiryDate);
+            $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
         })->count();
-        
+
         // Get employees with valid S2 documents
         $valid = self::whereHas('employeeS2Doc', function ($q) use ($today, $nearExpiryDate) {
             $q->where(function ($q) use ($today, $nearExpiryDate) {
                 $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
             });
         })->count();
-        
+
         return [
             'total' => $total,
             'valid' => $valid,
@@ -1073,39 +1610,37 @@ class Employee extends Model
 
     /**
      * Get S6 document statistics for dashboard
-     * 
+     *
      * @return array
      */
     public static function getS6DocStatistics()
     {
         $today = now()->format('Y-m-d');
         $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
-        
+
         // Get total employees
         $total = self::count();
-        
+
         // Get employees with missing S6 documents
         $missing = self::whereDoesntHave('employeeS6Doc')->count();
-        
+
         // Get employees with expired S6 documents
         $expired = self::whereHas('employeeS6Doc', function ($q) use ($today) {
             $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
         })->count();
-        
+
         // Get employees with S6 documents near expiry
         $nearExpiry = self::whereHas('employeeS6Doc', function ($q) use ($today, $nearExpiryDate) {
-            $q->whereNotNull('expiry_date')
-              ->where('expiry_date', '>', $today)
-              ->where('expiry_date', '<=', $nearExpiryDate);
+            $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
         })->count();
-        
+
         // Get employees with valid S6 documents
         $valid = self::whereHas('employeeS6Doc', function ($q) use ($today, $nearExpiryDate) {
             $q->where(function ($q) use ($today, $nearExpiryDate) {
                 $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
             });
         })->count();
-        
+
         return [
             'total' => $total,
             'valid' => $valid,
@@ -1131,8 +1666,7 @@ class Employee extends Model
         })->count();
         $missing = self::whereDoesntHave('medicalRecord')->count();
         $nearExpiry = self::whereHas('medicalRecord', function ($q) {
-            $q->where('expiry_date', '>', now())
-                ->where('expiry_date', '<', now()->addDays(30));
+            $q->where('expiry_date', '>', now())->where('expiry_date', '<', now()->addDays(30));
         })->count();
 
         // Count by status
@@ -1164,200 +1698,181 @@ class Employee extends Model
         ];
     }
 
-    /**
-     * Get missing documents for this employee
-     *
-     * @return array
-     */
-    public function getMissingDocuments()
+    public static function getExternalMedicalRecordStatistics()
     {
-        $missingDocs = [];
+        $total = Employee::count();
+        $valid = 0;
+        $near_expiry = 0;
+        $expired = 0;
+        $missing = 0;
 
-        // 1. ID Card
-        if (!$this->idCard) {
-            $missingDocs[] = 'ID Card';
-        }
+        Employee::with('externalMedicalRecord')->chunk(100, function ($employees) use (&$valid, &$near_expiry, &$expired, &$missing) {
+            foreach ($employees as $employee) {
+                $status = $employee->checkExternalMedicalRecordStatus();
 
-        // 2. Birth Certificate
-        if (!$this->birthCertificate) {
-            $missingDocs[] = 'Birth Certificate';
-        }
+                if ($status === 'missing') {
+                    $missing++;
+                } elseif ($status === 'expired') {
+                    $expired++;
+                } elseif ($status === 'near_expiry') {
+                    $near_expiry++;
+                } elseif ($status === 'valid') {
+                    $valid++;
+                }
+            }
+        });
 
-        // 3. Employment Contract
-        if ($this->contracts->isEmpty()) {
-            $missingDocs[] = 'Employment Contract';
-        }
+        return [
+            'total' => $total,
+            'valid' => $valid,
+            'near_expiry' => $near_expiry,
+            'expired' => $expired,
+            'missing' => $missing,
+        ];
+    }
 
-        // 4. Army Service Paper
-        if ($this->gender === Applicant::GENDER_MALE && ($this->info && in_array($this->info->military_status, [Applicant::MILITARY_STATUS_EXEMPTED, Applicant::MILITARY_STATUS_COMPLETED])) && !$this->armyServicePaper) {
-            $missingDocs[] = 'Army Service Paper';
-        }
+    public static function getPracticeCardStatistics()
+    {
+        $total = Employee::count();
+        $valid = 0;
+        $near_expiry = 0;
+        $expired = 0;
+        $missing = 0;
 
-        // 5. Driver License
-        if ($this->license_required && !$this->driverLicense) {
-            $missingDocs[] = 'Driver License';
-        }
+        Employee::with('practiceCard')->chunk(100, function ($employees) use (&$valid, &$near_expiry, &$expired, &$missing) {
+            foreach ($employees as $employee) {
+                $status = $employee->checkPracticeCardStatus();
 
-        // 6. Police Record
-        if ($this->policeRecords->isEmpty()) {
-            $missingDocs[] = 'Police Record';
-        }
+                if ($status === 'missing') {
+                    $missing++;
+                } elseif ($status === 'expired') {
+                    $expired++;
+                } elseif ($status === 'near_expiry') {
+                    $near_expiry++;
+                } elseif ($status === 'valid') {
+                    $valid++;
+                }
+            }
+        });
 
-        // 7. HR Letter
-        if ($this->hrLetters->isEmpty()) {
-            $missingDocs[] = 'HR Letter';
-        }
+        return [
+            'total' => $total,
+            'valid' => $valid,
+            'near_expiry' => $near_expiry,
+            'expired' => $expired,
+            'missing' => $missing,
+        ];
+    }
 
-        // 8. S1 Document
-        if (!$this->employeeS1Doc) {
-            $missingDocs[] = 'S1 Document';
-        }
+    public static function getSkillsQualificationStatistics()
+    {
+        $total = Employee::count();
+        $valid = 0;
+        $near_expiry = 0;
+        $expired = 0;
+        $missing = 0;
 
-        // 9. S2 Document
-        if ($this->employeeS2Doc->isEmpty()) {
-            $missingDocs[] = 'S2 Document';
-        }
+        Employee::with('skillsQualifications')->chunk(100, function ($employees) use (&$valid, &$near_expiry, &$expired, &$missing) {
+            foreach ($employees as $employee) {
+                $status = $employee->checkSkillsQualificationStatus();
 
-        // 10. S6 Document
-        if ($this->employeeS6Doc->isEmpty()) {
-            $missingDocs[] = 'S6 Document';
-        }
+                if ($status === 'missing') {
+                    $missing++;
+                } elseif ($status === 'expired') {
+                    $expired++;
+                } elseif ($status === 'near_expiry') {
+                    $near_expiry++;
+                } elseif ($status === 'valid') {
+                    $valid++;
+                }
+            }
+        });
 
-        // 11. Medical Record
-        if (!$this->medicalRecord) {
-            $missingDocs[] = 'Medical Record';
-        }
+        return [
+            'total' => $total,
+            'valid' => $valid,
+            'near_expiry' => $near_expiry,
+            'expired' => $expired,
+            'missing' => $missing,
+        ];
+    }
 
-        // 12. External Medical Record
-        if (!$this->externalMedicalRecord) {
-            $missingDocs[] = 'External Medical Record';
-        }
-        
-        // 13. Practice Card
-        if (!$this->practiceCard) {
-            $missingDocs[] = 'Practice Card';
-        }
+    public static function getSyndicateCardStatistics()
+    {
+        $total = Employee::count();
+        $valid = 0;
+        $near_expiry = 0;
+        $expired = 0;
+        $missing = 0;
 
-        // 14. Syndicate Card
-        if (!$this->syndicateCard) {
-            $missingDocs[] = 'Syndicate Card';
-        }
-        
-        // 15. Work Declaration
-        if ($this->workDeclarations->isEmpty()) {
-            $missingDocs[] = 'Work Declaration';
-        }
+        Employee::with('syndicateCard')->chunk(100, function ($employees) use (&$valid, &$near_expiry, &$expired, &$missing) {
+            foreach ($employees as $employee) {
+                $status = $employee->checkSyndicateCardStatus();
 
-        return $missingDocs;
+                if ($status === 'missing') {
+                    $missing++;
+                } elseif ($status === 'expired') {
+                    $expired++;
+                } elseif ($status === 'near_expiry') {
+                    $near_expiry++;
+                } elseif ($status === 'valid') {
+                    $valid++;
+                }
+            }
+        });
+
+        return [
+            'total' => $total,
+            'valid' => $valid,
+            'near_expiry' => $near_expiry,
+            'expired' => $expired,
+            'missing' => $missing,
+        ];
     }
 
     /**
-     * Get expired documents for this employee
+     * Get work declaration statistics for dashboard
      *
      * @return array
      */
-    public function getExpiredDocuments()
+    public static function getWorkDeclarationStatistics()
     {
-        $expiredDocs = [];
-        $today = now();
+        $today = now()->format('Y-m-d');
+        $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
 
-        // 1. ID Card
-        if ($this->idCard && $this->idCard->expiry_date && $today->gt($this->idCard->expiry_date)) {
-            $expiredDocs[] = 'ID Card';
-        }
+        // Get total employees
+        $total = self::count();
 
-        // 2. Birth Certificate
-        if ($this->birthCertificate && $this->birthCertificate->expiry_date && $today->gt($this->birthCertificate->expiry_date)) {
-            $expiredDocs[] = 'Birth Certificate';
-        }
+        // Get employees with missing work declarations
+        $missing = self::whereDoesntHave('workDeclarations')->count();
 
-        // 3. Employment Contract
-        foreach ($this->contracts as $contract) {
-            if ($contract->expiry_date && $today->gt($contract->expiry_date)) {
-                $expiredDocs[] = 'Employment Contract';
-                break;
-            }
-        }
+        // Get employees with expired work declarations
+        $expired = self::whereHas('workDeclarations', function ($q) use ($today) {
+            $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
+        })->count();
 
-        // 4. Army Service Paper
-        if ($this->armyServicePaper && $this->armyServicePaper->expiry_date && $today->gt($this->armyServicePaper->expiry_date)) {
-            $expiredDocs[] = 'Army Service Paper';
-        }
+        // Get employees with work declarations near expiry
+        $nearExpiry = self::whereHas('workDeclarations', function ($q) use ($today, $nearExpiryDate) {
+            $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
+        })->count();
 
-        // 5. Driver License
-        if ($this->driverLicense && $this->driverLicense->expiry_date && $today->gt($this->driverLicense->expiry_date)) {
-            $expiredDocs[] = 'Driver License';
-        }
+        // Get employees with valid work declarations
+        $valid = self::whereHas('workDeclarations', function ($q) use ($today, $nearExpiryDate) {
+            $q->where(function ($q) use ($today, $nearExpiryDate) {
+                $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
+            });
+        })->count();
 
-        // 6. Police Record
-        foreach ($this->policeRecords as $record) {
-            if ($record->expiry_date && $today->gt($record->expiry_date)) {
-                $expiredDocs[] = 'Police Record';
-                break;
-            }
-        }
-
-        // 7. HR Letter
-        foreach ($this->hrLetters as $letter) {
-            if ($letter->expiry_date && $today->gt($letter->expiry_date)) {
-                $expiredDocs[] = 'HR Letter';
-                break;
-            }
-        }
-
-        // 8. S1 Document
-        if ($this->employeeS1Doc && $this->employeeS1Doc->expiry_date && $today->gt($this->employeeS1Doc->expiry_date)) {
-            $expiredDocs[] = 'S1 Document';
-        }
-
-        // 9. S2 Document
-        foreach ($this->employeeS2Doc as $doc) {
-            if ($doc->expiry_date && $today->gt($doc->expiry_date)) {
-                $expiredDocs[] = 'S2 Document';
-                break;
-            }
-        }
-
-        // 10. S6 Document
-        foreach ($this->employeeS6Doc as $doc) {
-            if ($doc->expiry_date && $today->gt($doc->expiry_date)) {
-                $expiredDocs[] = 'S6 Document';
-                break;
-            }
-        }
-
-        // 11. Medical Record
-        if ($this->medicalRecord && $this->medicalRecord->expiry_date && $today->gt($this->medicalRecord->expiry_date)) {
-            $expiredDocs[] = 'Medical Record';
-        }
-
-        // 12. External Medical Record
-        if ($this->externalMedicalRecord && $this->externalMedicalRecord->expiry_date && $today->gt($this->externalMedicalRecord->expiry_date)) {
-            $expiredDocs[] = 'External Medical Record';
-        }
-        
-        // 13. Practice Card
-        if ($this->practiceCard && $this->practiceCard->expiry_date && $today->gt($this->practiceCard->expiry_date)) {
-            $expiredDocs[] = 'Practice Card';
-        }
-
-        // 14. Syndicate Card
-        if ($this->syndicateCard && $this->syndicateCard->expiry_date && $today->gt($this->syndicateCard->expiry_date)) {
-            $expiredDocs[] = 'Syndicate Card';
-        }
-        
-        // 15. Work Declaration
-        foreach ($this->workDeclarations as $declaration) {
-            if ($declaration->expiry_date && $today->gt($declaration->expiry_date)) {
-                $expiredDocs[] = 'Work Declaration';
-                break;
-            }
-        }
-
-        return $expiredDocs;
+        return [
+            'total' => $total,
+            'valid' => $valid,
+            'near_expiry' => $nearExpiry,
+            'expired' => $expired,
+            'missing' => $missing,
+        ];
     }
 
-    ////relations
+    //// relations ////
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -1493,6 +2008,7 @@ class Employee extends Model
         return $this->belongsTo(City::class, 'birth_place_id');
     }
 
+    //// document status check ////
     /**
      * Check document validity status
      *
@@ -1500,7 +2016,7 @@ class Employee extends Model
      * @param int $nearExpiryDays Days threshold for near expiry warning
      * @return string Document status (valid, near_expiry, expired, missing)
      */
-    protected function checkDocumentStatus($document, $nearExpiryDays = self::NEAR_EXPIRY_DAYS)
+    protected function checkDocumentStatus($document, $nearExpiryDays = self::NEAR_EXPIRY_DAYS) 
     {
         if (!$document) {
             return self::DOC_STATUS_MISSING;
@@ -1748,7 +2264,7 @@ class Employee extends Model
     public function checkMedicalRecordStatus($nearExpiryDays = self::NEAR_EXPIRY_DAYS)
     {
         $status = $this->checkDocumentStatus($this->medicalRecord, $nearExpiryDays);
-        
+
         return [
             'status' => $status,
             'details' => $status == self::DOC_STATUS_EXPIRED ? 'Medical record expired on ' . ($this->medicalRecord ? $this->medicalRecord->expiry_date : 'N/A') : ($status == self::DOC_STATUS_NEAR_EXPIRY ? 'Medical record will expire on ' . ($this->medicalRecord ? $this->medicalRecord->expiry_date : 'N/A') : ($status == self::DOC_STATUS_MISSING ? 'No medical record found' : 'Medical record is valid')),
@@ -1764,7 +2280,7 @@ class Employee extends Model
     public function checkExternalMedicalRecordStatus($nearExpiryDays = self::NEAR_EXPIRY_DAYS)
     {
         $status = $this->checkDocumentStatus($this->externalMedicalRecord, $nearExpiryDays);
-        
+
         return [
             'status' => $status,
             'details' => $status == self::DOC_STATUS_EXPIRED ? 'External medical record expired on ' . ($this->externalMedicalRecord ? $this->externalMedicalRecord->expiry_date : 'N/A') : ($status == self::DOC_STATUS_NEAR_EXPIRY ? 'External medical record will expire on ' . ($this->externalMedicalRecord ? $this->externalMedicalRecord->expiry_date : 'N/A') : ($status == self::DOC_STATUS_MISSING ? 'No external medical record found' : 'External medical record is valid')),
@@ -1937,353 +2453,5 @@ class Employee extends Model
         $summary['overall_status'] = $overallStatus;
 
         return $summary;
-    }
-
-    public function setExternalMedicalRecord($file_path, Carbon $issue_date, Carbon $expiry_date, string $id_number)
-    {
-        /** @var User $loggedInUser */
-        $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this)) {
-            throw new AppException('You dont have permission to set docs for this employee');
-        }
-
-        try {
-            $this->externalMedicalRecord()->updateOrCreate(
-                [
-                    'employee_id' => $this->id,
-                ],
-                [
-                    'created_by' => $loggedInUser->id,
-                    'id_number' => $id_number,
-                    'file_path' => $file_path,
-                    'issue_date' => $issue_date,
-                    'expiry_date' => $expiry_date,
-                ],
-            );
-            return true;
-        } catch (Exception $e) {
-            report($e);
-            throw new AppException('Error setting external medical record: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Set practice card for the employee
-     *
-     * @param string $file_path
-     * @param Carbon $issue_date
-     * @param Carbon $expiry_date
-     * @return bool
-     * @throws AppException
-     */
-    public function setPracticeCard($file_path, Carbon $issue_date, Carbon $expiry_date)
-    {
-        /** @var User $loggedInUser */
-        $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this)) {
-            throw new AppException('You dont have permission to set docs for this employee');
-        }
-
-        try {
-            $this->practiceCard()->updateOrCreate(
-                [
-                    'employee_id' => $this->id,
-                ],
-                [
-                    'created_by' => $loggedInUser->id,
-                    'file_path' => $file_path,
-                    'issue_date' => $issue_date,
-                    'expiry_date' => $expiry_date,
-                ],
-            );
-            return true;
-        } catch (Exception $e) {
-            report($e);
-            throw new AppException('Error setting practice card: ' . $e->getMessage());
-        }
-    }
-
-    public static function getExternalMedicalRecordStatistics()
-    {
-        $total = Employee::count();
-        $valid = 0;
-        $near_expiry = 0;
-        $expired = 0;
-        $missing = 0;
-
-        Employee::with('externalMedicalRecord')->chunk(100, function ($employees) use (&$valid, &$near_expiry, &$expired, &$missing) {
-            foreach ($employees as $employee) {
-                $status = $employee->checkExternalMedicalRecordStatus();
-                
-                if ($status === 'missing') {
-                    $missing++;
-                } elseif ($status === 'expired') {
-                    $expired++;
-                } elseif ($status === 'near_expiry') {
-                    $near_expiry++;
-                } elseif ($status === 'valid') {
-                    $valid++;
-                }
-            }
-        });
-
-        return [
-            'total' => $total,
-            'valid' => $valid,
-            'near_expiry' => $near_expiry,
-            'expired' => $expired,
-            'missing' => $missing
-        ];
-    }
-
-    public static function getPracticeCardStatistics(){
-        $total = Employee::count();
-        $valid = 0;
-        $near_expiry = 0;
-        $expired = 0;
-        $missing = 0;
-
-        Employee::with('practiceCard')->chunk(100, function ($employees) use (&$valid, &$near_expiry, &$expired, &$missing) {
-            foreach ($employees as $employee) {
-                $status = $employee->checkPracticeCardStatus();
-                
-                if ($status === 'missing') {
-                    $missing++;
-                } elseif ($status === 'expired') {
-                    $expired++;
-                } elseif ($status === 'near_expiry') {
-                    $near_expiry++;
-                } elseif ($status === 'valid') {
-                    $valid++;
-                }
-            }
-        });
-
-        return [
-            'total' => $total,
-            'valid' => $valid,
-            'near_expiry' => $near_expiry,
-            'expired' => $expired,
-            'missing' => $missing
-        ];
-    }
-
-    public function includeInReportExternalMedicalRecord()
-    {
-        $status = $this->checkExternalMedicalRecordStatus();
-        return $status === 'missing' || $status === 'expired' || $status === 'near_expiry';
-    }
-
-    /**
-     * Set skills qualification for the employee
-     *
-     * @param string $file_path
-     * @param Carbon $issue_date
-     * @param Carbon $expiry_date
-     * @return bool
-     * @throws AppException
-     */
-    public function setSkillsQualification($file_path, Carbon $issue_date, Carbon $expiry_date)
-    {
-        /** @var User $loggedInUser */
-        $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this)) {
-            throw new AppException('You dont have permission to set docs for this employee');
-        }
-
-        try {
-            $this->skillsQualifications()->updateOrCreate(
-                [
-                    'employee_id' => $this->id,
-                ],
-                [
-                    'created_by' => $loggedInUser->id,
-                    'file_path' => $file_path,
-                    'issue_date' => $issue_date,
-                    'expiry_date' => $expiry_date,
-                ],
-            );
-            return true;
-        } catch (Exception $e) {
-            report($e);
-            throw new AppException('Error setting skills qualification: ' . $e->getMessage());
-        }
-    }
-
-    public static function getSkillsQualificationStatistics()
-    {
-        $total = Employee::count();
-        $valid = 0;
-        $near_expiry = 0;
-        $expired = 0;
-        $missing = 0;
-
-        Employee::with('skillsQualifications')->chunk(100, function ($employees) use (&$valid, &$near_expiry, &$expired, &$missing) {
-            foreach ($employees as $employee) {
-                $status = $employee->checkSkillsQualificationStatus();
-                
-                if ($status === 'missing') {
-                    $missing++;
-                } elseif ($status === 'expired') {
-                    $expired++;
-                } elseif ($status === 'near_expiry') {
-                    $near_expiry++;
-                } elseif ($status === 'valid') {
-                    $valid++;
-                }
-            }
-        });
-
-        return [
-            'total' => $total,
-            'valid' => $valid,
-            'near_expiry' => $near_expiry,
-            'expired' => $expired,
-            'missing' => $missing
-        ];
-    }
-
-    /**
-     * Set syndicate card for the employee
-     *
-     * @param string $file_path
-     * @param Carbon $issue_date
-     * @param Carbon $expiry_date
-     * @return bool
-     * @throws AppException
-     */
-    public function setSyndicateCard($file_path, Carbon $issue_date, Carbon $expiry_date)
-    {
-        /** @var User $loggedInUser */
-        $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this)) {
-            throw new AppException('You dont have permission to set docs for this employee');
-        }
-
-        try {
-            $this->syndicateCard()->updateOrCreate(
-                [
-                    'employee_id' => $this->id,
-                ],
-                [
-                    'created_by' => $loggedInUser->id,
-                    'file_path' => $file_path,
-                    'issue_date' => $issue_date,
-                    'expiry_date' => $expiry_date,
-                ],
-            );
-            return true;
-        } catch (Exception $e) {
-            report($e);
-            throw new AppException('Error setting syndicate card: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Set work declaration for the employee
-     *
-     * @param string $file_path
-     * @param Carbon $issue_date
-     * @param Carbon $expiry_date
-     * @return bool
-     * @throws AppException
-     */
-    public function setWorkDeclaration($file_path, Carbon $issue_date, Carbon $expiry_date)
-    {
-        /** @var User $loggedInUser */
-        $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this)) {
-            throw new AppException('You dont have permission to set docs for this employee');
-        }
-
-        try {
-            $this->workDeclarations()->create([
-                'created_by' => $loggedInUser->id,
-                'file_path' => $file_path,
-                'issue_date' => $issue_date,
-                'expiry_date' => $expiry_date,
-            ]);
-            return true;
-        } catch (Exception $e) {
-            report($e);
-            throw new AppException('Error setting work declaration: ' . $e->getMessage());
-        }
-    }
-
-    public static function getSyndicateCardStatistics()
-    {
-        $total = Employee::count();
-        $valid = 0;
-        $near_expiry = 0;
-        $expired = 0;
-        $missing = 0;
-
-        Employee::with('syndicateCard')->chunk(100, function ($employees) use (&$valid, &$near_expiry, &$expired, &$missing) {
-            foreach ($employees as $employee) {
-                $status = $employee->checkSyndicateCardStatus();
-                
-                if ($status === 'missing') {
-                    $missing++;
-                } elseif ($status === 'expired') {
-                    $expired++;
-                } elseif ($status === 'near_expiry') {
-                    $near_expiry++;
-                } elseif ($status === 'valid') {
-                    $valid++;
-                }
-            }
-        });
-
-        return [
-            'total' => $total,
-            'valid' => $valid,
-            'near_expiry' => $near_expiry,
-            'expired' => $expired,
-            'missing' => $missing
-        ];
-    }
-    
-    /**
-     * Get work declaration statistics for dashboard
-     * 
-     * @return array
-     */
-    public static function getWorkDeclarationStatistics()
-    {
-        $today = now()->format('Y-m-d');
-        $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
-        
-        // Get total employees
-        $total = self::count();
-        
-        // Get employees with missing work declarations
-        $missing = self::whereDoesntHave('workDeclarations')->count();
-        
-        // Get employees with expired work declarations
-        $expired = self::whereHas('workDeclarations', function ($q) use ($today) {
-            $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
-        })->count();
-        
-        // Get employees with work declarations near expiry
-        $nearExpiry = self::whereHas('workDeclarations', function ($q) use ($today, $nearExpiryDate) {
-            $q->whereNotNull('expiry_date')
-              ->where('expiry_date', '>', $today)
-              ->where('expiry_date', '<=', $nearExpiryDate);
-        })->count();
-        
-        // Get employees with valid work declarations
-        $valid = self::whereHas('workDeclarations', function ($q) use ($today, $nearExpiryDate) {
-            $q->where(function ($q) use ($today, $nearExpiryDate) {
-                $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
-            });
-        })->count();
-        
-        return [
-            'total' => $total,
-            'valid' => $valid,
-            'near_expiry' => $nearExpiry,
-            'expired' => $expired,
-            'missing' => $missing,
-        ];
     }
 }

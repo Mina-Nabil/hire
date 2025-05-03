@@ -17,6 +17,9 @@
             <button wire:click="showExpiredFilters" class="btn inline-flex justify-center btn-dark btn-sm">
                 Filter Expired
             </button>
+            <button wire:click="showNearExpiryFilters" class="btn inline-flex justify-center btn-dark btn-sm">
+                Filter Near Expiry
+            </button>
         </div>
     </div>
 
@@ -45,8 +48,17 @@
                             $activeFilters = array_keys(array_filter($expiredDocFilters));
                             $filterText = implode(', ', $activeFilters);
                         @endphp
-                        <span class="badge bg-slate-900 text-white" title="{{ $filterText }}">
+                        <span class="badge bg-slate-900 text-white mr-1" title="{{ $filterText }}">
                             Expired: ({{ $filterText }})
+                        </span>
+                    @endif
+                    @if ($nearExpiryFilterActive)
+                        @php
+                            $activeFilters = array_keys(array_filter($nearExpiryDocFilters));
+                            $filterText = implode(', ', $activeFilters);
+                        @endphp
+                        <span class="badge bg-slate-900 text-white" title="{{ $filterText }}">
+                            Near Expiry: ({{ $filterText }})
                         </span>
                     @endif
                 </div>
@@ -68,6 +80,7 @@
                                     <th scope="col" class="table-th">Phone</th>
                                     <th scope="col" class="table-th">Missing Documents</th>
                                     <th scope="col" class="table-th">Expired Documents</th>
+                                    <th scope="col" class="table-th">Near Expiry Documents</th>
                                     <th scope="col" class="table-th">Actions</th>
                                 </tr>
                             </thead>
@@ -100,6 +113,16 @@
                                                 @endif
                                             </td>
                                             <td class="table-td">
+                                                @if ($employee->near_expiry_docs_count > 0)
+                                                    <button wire:click="showNearExpiryDocuments({{ $employee->id }})"
+                                                        class="btn btn-sm inline-flex justify-center btn-outline-warning btn-sm">
+                                                        {{ $employee->near_expiry_docs_count }} Near Expiry
+                                                    </button>
+                                                @else
+                                                    <span class="badge bg-success-500 text-white">None</span>
+                                                @endif
+                                            </td>
+                                            <td class="table-td">
                                                 <a href="{{ route('employees.show', $employee->id) }}"
                                                     class="btn btn-sm inline-flex justify-center btn-dark btn-sm">
                                                     <iconify-icon icon="heroicons:eye"></iconify-icon>
@@ -110,14 +133,14 @@
                                     @endif
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="table-td text-center">No employees found with missing
-                                            or expired documents</td>
+                                        <td colspan="8" class="table-td text-center">No employees found with missing,
+                                            expired, or near-expiry documents</td>
                                     </tr>
                                 @endforelse
 
                                 @if ($employees->count() > 0 && $employees->where('hidden', false)->count() === 0)
                                     <tr>
-                                        <td colspan="7" class="table-td text-center">No employees match the current
+                                        <td colspan="8" class="table-td text-center">No employees match the current
                                             filters</td>
                                     </tr>
                                 @endif
@@ -162,9 +185,13 @@
                         <div class="p-6 space-y-4">
                             @if (count($missingDocuments) > 0)
                                 <ul class="list-group">
-                                    @foreach ($missingDocuments as $document)
-                                        <li class="list-group-item border border-slate-200 p-3 rounded mb-2">
-                                            {{ $document }}</li>
+                                    @foreach ($missingDocuments as $key => $document)
+                                        <li class="list-group-item p-1 rounded mb-1 flex items-center">
+                                            <span
+                                                class="w-5 h-5 inline-flex items-center justify-center bg-slate-900 text-white rounded-md font-Inter text-xs ltr:ml-1 rtl:mr-1">
+                                                {{ $key + 1 }}</span>
+                                            <span class="font-bold ml-2">{{ $document }}</span>
+                                        </li>
                                     @endforeach
                                 </ul>
                             @else
@@ -197,7 +224,7 @@
                     <div class="relative bg-white rounded-lg shadow dark:bg-slate-700">
                         <!-- Modal header -->
                         <div
-                            class="flex items-center justify-between p-5 border-b rounded-t dark:border-slate-600 bg-danger-500">
+                            class="flex items-center justify-between p-5 border-b rounded-t dark:border-slate-600 bg-slate-900">
                             <h3 class="text-xl font-medium text-white dark:text-white capitalize">
                                 Expired Documents for {{ $selectedEmployee->name }}
                             </h3>
@@ -217,13 +244,76 @@
                         <div class="p-6 space-y-4">
                             @if (count($expiredDocuments) > 0)
                                 <ul class="list-group">
-                                    @foreach ($expiredDocuments as $document)
-                                        <li class="list-group-item border border-slate-200 p-3 rounded mb-2">
-                                            {{ $document }}</li>
+                                    @foreach ($expiredDocuments as $key => $document)
+                                        <li class="list-group-item p-1 rounded mb-1 flex items-center">
+                                            <span
+                                                class="w-5 h-5 inline-flex items-center justify-center bg-slate-900 text-white rounded-md font-Inter text-xs ltr:ml-1 rtl:mr-1">
+                                                {{ $key + 1 }}</span>
+                                            <span class="font-bold ml-2">{{ $document }}</span>
+                                        </li>
                                     @endforeach
                                 </ul>
                             @else
                                 <p>No expired documents found.</p>
+                            @endif
+                        </div>
+                        <!-- Modal footer -->
+                        <div
+                            class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
+                            <a href="{{ route('employees.show', $selectedEmployee->id) }}"
+                                class="btn inline-flex justify-center text-white bg-slate-900">
+                                <span class="ml-2">Go to Employee</span>
+                            </a>
+                            <button type="button" class="btn inline-flex justify-center text-white bg-slate-500"
+                                wire:click="closeModal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Near Expiry Documents Modal -->
+    @if ($showNearExpiryDocModal && $selectedEmployee)
+        <div class="modal fade fixed top-0 left-0 hidden w-full h-full outline-none overflow-x-hidden overflow-y-auto show"
+            tabindex="-1" aria-modal="true" role="dialog" style="display: block;">
+            <div class="modal-dialog relative w-auto pointer-events-none">
+                <div
+                    class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
+                    <div class="relative bg-white rounded-lg shadow dark:bg-slate-700">
+                        <!-- Modal header -->
+                        <div
+                            class="flex items-center justify-between p-5 border-b rounded-t dark:border-slate-600 bg-slate-900">
+                            <h3 class="text-xl font-medium text-white dark:text-white capitalize">
+                                Near Expiry Documents for {{ $selectedEmployee->name }}
+                            </h3>
+                            <button wire:click="closeModal" type="button"
+                                class="text-slate-400 bg-transparent hover:text-slate-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-slate-600 dark:hover:text-white"
+                                data-bs-dismiss="modal">
+                                <svg aria-hidden="true" class="w-5 h-5" fill="#ffffff" viewBox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd"
+                                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                        clip-rule="evenodd"></path>
+                                </svg>
+                                <span class="sr-only">Close modal</span>
+                            </button>
+                        </div>
+                        <!-- Modal body -->
+                        <div class="p-6 space-y-4">
+                            @if (count($nearExpiryDocuments) > 0)
+                                <ul class="list-group">
+                                    @foreach ($nearExpiryDocuments as $key => $document)
+                                        <li class="list-group-item p-1 rounded mb-1 flex items-center">
+                                            <span
+                                                class="w-5 h-5 inline-flex items-center justify-center bg-slate-900 text-white rounded-md font-Inter text-xs ltr:ml-1 rtl:mr-1">
+                                                {{ $key + 1 }}</span>
+                                            <span class="font-bold ml-2">{{ $document }}</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                <p>No near expiry documents found.</p>
                             @endif
                         </div>
                         <!-- Modal footer -->
@@ -363,4 +453,66 @@
             </div>
         </div>
     @endif
+
+    <!-- Filter Near Expiry Documents Modal -->
+    @if ($showFilterNearExpiryModal)
+        <div class="modal fade fixed top-0 left-0 hidden w-full h-full outline-none overflow-x-hidden overflow-y-auto show"
+            tabindex="-1" aria-modal="true" role="dialog" style="display: block;">
+            <div class="modal-dialog relative w-auto pointer-events-none">
+                <div
+                    class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
+                    <div class="relative bg-white rounded-lg shadow dark:bg-slate-700">
+                        <!-- Modal header -->
+                        <div
+                            class="flex items-center justify-between p-5 border-b rounded-t dark:border-slate-600 bg-slate-900">
+                            <h3 class="text-xl font-medium text-white dark:text-white capitalize">
+                                Filter by Near Expiry Documents
+                            </h3>
+                            <button wire:click="closeModal" type="button"
+                                class="text-slate-400 bg-transparent hover:text-slate-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-slate-600 dark:hover:text-white"
+                                data-bs-dismiss="modal">
+                                <svg aria-hidden="true" class="w-5 h-5" fill="#ffffff" viewBox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd"
+                                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                        clip-rule="evenodd"></path>
+                                </svg>
+                                <span class="sr-only">Close modal</span>
+                            </button>
+                        </div>
+                        <!-- Modal body -->
+                        <div class="p-6 space-y-4">
+                            <p class="text-slate-700 dark:text-slate-300 mb-4">Select document types to filter:</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                @foreach ($documentTypes as $docType => $value)
+                                    <div class="checkbox-area">
+                                        <label class="inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" class="hidden"
+                                                wire:model.live="nearExpiryDocFilters.{{ $docType }}">
+                                            <span
+                                                class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
+                                                <img src="{{ asset('images/icon/ck-white.svg') }}" alt=""
+                                                    class="h-[10px] w-[10px] block m-auto opacity-0" />
+                                            </span>
+                                            <span
+                                                class="text-slate-600 dark:text-slate-300 text-sm leading-6">{{ $docType }}</span>
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        <!-- Modal footer -->
+                        <div
+                            class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
+                            <button type="button" class="btn inline-flex justify-center text-white bg-slate-900"
+                                wire:click="applyNearExpiryFilters">Apply Filters</button>
+                            <button type="button" class="btn inline-flex justify-center text-white bg-slate-500"
+                                wire:click="closeModal">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
 </div>

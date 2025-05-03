@@ -8,6 +8,7 @@ use Livewire\WithPagination;
 use Illuminate\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 
 #[Layout('components.layouts.app')]
 #[Title('Missing Documents Report')]
@@ -15,7 +16,9 @@ class MissingDocReport extends Component
 {
     use WithPagination;
 
+    #[Url]
     public $searchTerm = '';
+    
     public $showMissingDocModal = false;
     public $showExpiredDocModal = false;
     public $showNearExpiryDocModal = false;
@@ -48,8 +51,13 @@ class MissingDocReport extends Component
     ];
     
     // Separate filters for missing, expired, and near expiry documents
+    #[Url(as: 'missing')]
     public $missingDocFilters = [];
+    
+    #[Url(as: 'expired')]
     public $expiredDocFilters = [];
+    
+    #[Url(as: 'nearExpiry')]
     public $nearExpiryDocFilters = [];
     
     // Filter active states
@@ -61,6 +69,48 @@ class MissingDocReport extends Component
     {
         // Initialize filters with all document types
         $this->resetFilters();
+        
+        // Get URL query parameters
+        $request = request();
+        
+        // Handle missing documents filter
+        if ($request->has('missing')) {
+            $missingParams = $request->get('missing');
+            if (is_array($missingParams)) {
+                foreach ($missingParams as $docType => $value) {
+                    if (array_key_exists($docType, $this->missingDocFilters)) {
+                        $this->missingDocFilters[$docType] = true;
+                    }
+                }
+                $this->missingFilterActive = true;
+            }
+        }
+        
+        // Handle expired documents filter
+        if ($request->has('expired')) {
+            $expiredParams = $request->get('expired');
+            if (is_array($expiredParams)) {
+                foreach ($expiredParams as $docType => $value) {
+                    if (array_key_exists($docType, $this->expiredDocFilters)) {
+                        $this->expiredDocFilters[$docType] = true;
+                    }
+                }
+                $this->expiredFilterActive = true;
+            }
+        }
+        
+        // Handle near expiry documents filter
+        if ($request->has('nearExpiry')) {
+            $nearExpiryParams = $request->get('nearExpiry');
+            if (is_array($nearExpiryParams)) {
+                foreach ($nearExpiryParams as $docType => $value) {
+                    if (array_key_exists($docType, $this->nearExpiryDocFilters)) {
+                        $this->nearExpiryDocFilters[$docType] = true;
+                    }
+                }
+                $this->nearExpiryFilterActive = true;
+            }
+        }
     }
     
     /**

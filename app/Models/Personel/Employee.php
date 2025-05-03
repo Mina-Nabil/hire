@@ -1282,12 +1282,20 @@ class Employee extends Model
         $males = self::where('gender', 'male')->count();
 
         // Get male employees with missing army service papers
-        $missing = self::where('gender', 'male')->whereDoesntHave('armyServicePaper')->count();
+        $missing = self::where('gender', 'male')
+            ->whereDoesntHave('armyServicePaper')
+            ->whereHas('info', function ($q) {
+                $q->whereIn('military_status', ['exempt', 'completed']);
+            })
+            ->count();
 
         // Get male employees with expired army service papers
         $expired = self::where('gender', 'male')
             ->whereHas('armyServicePaper', function ($q) use ($today) {
                 $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
+            })
+            ->whereHas('info', function ($q) {
+                $q->whereIn('military_status', ['exempt', 'completed']);
             })
             ->count();
 
@@ -1295,6 +1303,9 @@ class Employee extends Model
         $nearExpiry = self::where('gender', 'male')
             ->whereHas('armyServicePaper', function ($q) use ($today, $nearExpiryDate) {
                 $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
+            })
+            ->whereHas('info', function ($q) {
+                $q->whereIn('military_status', ['exempt', 'completed']);
             })
             ->count();
 
@@ -1305,6 +1316,9 @@ class Employee extends Model
                     $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
                 });
             })
+            ->whereHas('info', function ($q) {
+                $q->whereIn('military_status', ['exempt', 'completed']);
+            })
             ->count();
 
         // Get counts by type
@@ -1312,17 +1326,26 @@ class Employee extends Model
             ->whereHas('armyServicePaper', function ($q) {
                 $q->where('type', 'Original');
             })
+            ->whereHas('info', function ($q) {
+                $q->whereIn('military_status', ['exempt', 'completed']);
+            })
             ->count();
 
         $verifiedCopy = self::where('gender', 'male')
             ->whereHas('armyServicePaper', function ($q) {
                 $q->where('type', 'Verified Copy');
             })
+            ->whereHas('info', function ($q) {
+                $q->whereIn('military_status', ['exempt', 'completed']);
+            })
             ->count();
 
         $copy = self::where('gender', 'male')
             ->whereHas('armyServicePaper', function ($q) {
                 $q->where('type', 'Copy');
+            })
+            ->whereHas('info', function ($q) {
+                $q->whereIn('military_status', ['exempt', 'completed']);
             })
             ->count();
 
@@ -1666,7 +1689,7 @@ class Employee extends Model
         })->count();
         $missing = self::whereDoesntHave('medicalRecord')->count();
         $nearExpiry = self::whereHas('medicalRecord', function ($q) {
-            $q->where('expiry_date', '>', now())->where('expiry_date', '<', now()->addDays(30));
+            $q->where('expiry_date', '>', now())->where('expiry_date', '<', now()->addDays(self::NEAR_EXPIRY_DAYS));
         })->count();
 
         // Count by status
@@ -1698,133 +1721,129 @@ class Employee extends Model
         ];
     }
 
+    /**
+     * Get external medical record statistics
+     *
+     * @return array
+     */
     public static function getExternalMedicalRecordStatistics()
     {
-        $total = Employee::count();
-        $valid = 0;
-        $near_expiry = 0;
-        $expired = 0;
-        $missing = 0;
-
-        Employee::with('externalMedicalRecord')->chunk(100, function ($employees) use (&$valid, &$near_expiry, &$expired, &$missing) {
-            foreach ($employees as $employee) {
-                $status = $employee->checkExternalMedicalRecordStatus();
-
-                if ($status === 'missing') {
-                    $missing++;
-                } elseif ($status === 'expired') {
-                    $expired++;
-                } elseif ($status === 'near_expiry') {
-                    $near_expiry++;
-                } elseif ($status === 'valid') {
-                    $valid++;
-                }
-            }
-        });
+        $total = self::count();
+        $valid = self::whereHas('externalMedicalRecord', function ($q) {
+            $q->where(function ($q) {
+                $q->whereNull('expiry_date')->orWhere('expiry_date', '>', now());
+            });
+        })->count();
+        $expired = self::whereHas('externalMedicalRecord', function ($q) {
+            $q->whereNotNull('expiry_date')->where('expiry_date', '<', now());
+        })->count();
+        $missing = self::whereDoesntHave('externalMedicalRecord')->count();
+        $nearExpiry = self::whereHas('externalMedicalRecord', function ($q) {
+            $q->whereNotNull('expiry_date')
+              ->where('expiry_date', '>', now())
+              ->where('expiry_date', '<', now()->addDays(self::NEAR_EXPIRY_DAYS));
+        })->count();
 
         return [
             'total' => $total,
             'valid' => $valid,
-            'near_expiry' => $near_expiry,
+            'near_expiry' => $nearExpiry,
             'expired' => $expired,
             'missing' => $missing,
         ];
     }
 
+    /**
+     * Get practice card statistics
+     *
+     * @return array
+     */
     public static function getPracticeCardStatistics()
     {
-        $total = Employee::count();
-        $valid = 0;
-        $near_expiry = 0;
-        $expired = 0;
-        $missing = 0;
-
-        Employee::with('practiceCard')->chunk(100, function ($employees) use (&$valid, &$near_expiry, &$expired, &$missing) {
-            foreach ($employees as $employee) {
-                $status = $employee->checkPracticeCardStatus();
-
-                if ($status === 'missing') {
-                    $missing++;
-                } elseif ($status === 'expired') {
-                    $expired++;
-                } elseif ($status === 'near_expiry') {
-                    $near_expiry++;
-                } elseif ($status === 'valid') {
-                    $valid++;
-                }
-            }
-        });
+        $total = self::count();
+        $valid = self::whereHas('practiceCard', function ($q) {
+            $q->where(function ($q) {
+                $q->whereNull('expiry_date')->orWhere('expiry_date', '>', now());
+            });
+        })->count();
+        $expired = self::whereHas('practiceCard', function ($q) {
+            $q->whereNotNull('expiry_date')->where('expiry_date', '<', now());
+        })->count();
+        $missing = self::whereDoesntHave('practiceCard')->count();
+        $nearExpiry = self::whereHas('practiceCard', function ($q) {
+            $q->whereNotNull('expiry_date')
+              ->where('expiry_date', '>', now())
+              ->where('expiry_date', '<', now()->addDays(self::NEAR_EXPIRY_DAYS));
+        })->count();
 
         return [
             'total' => $total,
             'valid' => $valid,
-            'near_expiry' => $near_expiry,
+            'near_expiry' => $nearExpiry,
             'expired' => $expired,
             'missing' => $missing,
         ];
     }
 
+    /**
+     * Get skills qualification statistics
+     *
+     * @return array
+     */
     public static function getSkillsQualificationStatistics()
     {
-        $total = Employee::count();
-        $valid = 0;
-        $near_expiry = 0;
-        $expired = 0;
-        $missing = 0;
-
-        Employee::with('skillsQualifications')->chunk(100, function ($employees) use (&$valid, &$near_expiry, &$expired, &$missing) {
-            foreach ($employees as $employee) {
-                $status = $employee->checkSkillsQualificationStatus();
-
-                if ($status === 'missing') {
-                    $missing++;
-                } elseif ($status === 'expired') {
-                    $expired++;
-                } elseif ($status === 'near_expiry') {
-                    $near_expiry++;
-                } elseif ($status === 'valid') {
-                    $valid++;
-                }
-            }
-        });
+        $total = self::count();
+        $valid = self::whereHas('skillsQualifications', function ($q) {
+            $q->where(function ($q) {
+                $q->whereNull('expiry_date')->orWhere('expiry_date', '>', now());
+            });
+        })->count();
+        $expired = self::whereHas('skillsQualifications', function ($q) {
+            $q->whereNotNull('expiry_date')->where('expiry_date', '<', now());
+        })->count();
+        $missing = self::whereDoesntHave('skillsQualifications')->count();
+        $nearExpiry = self::whereHas('skillsQualifications', function ($q) {
+            $q->whereNotNull('expiry_date')
+              ->where('expiry_date', '>', now())
+              ->where('expiry_date', '<', now()->addDays(self::NEAR_EXPIRY_DAYS));
+        })->count();
 
         return [
             'total' => $total,
             'valid' => $valid,
-            'near_expiry' => $near_expiry,
+            'near_expiry' => $nearExpiry,
             'expired' => $expired,
             'missing' => $missing,
         ];
     }
 
+    /**
+     * Get syndicate card statistics
+     *
+     * @return array
+     */
     public static function getSyndicateCardStatistics()
     {
-        $total = Employee::count();
-        $valid = 0;
-        $near_expiry = 0;
-        $expired = 0;
-        $missing = 0;
-
-        Employee::with('syndicateCard')->chunk(100, function ($employees) use (&$valid, &$near_expiry, &$expired, &$missing) {
-            foreach ($employees as $employee) {
-                $status = $employee->checkSyndicateCardStatus();
-
-                if ($status === 'missing') {
-                    $missing++;
-                } elseif ($status === 'expired') {
-                    $expired++;
-                } elseif ($status === 'near_expiry') {
-                    $near_expiry++;
-                } elseif ($status === 'valid') {
-                    $valid++;
-                }
-            }
-        });
+        $total = self::count();
+        $valid = self::whereHas('syndicateCard', function ($q) {
+            $q->where(function ($q) {
+                $q->whereNull('expiry_date')->orWhere('expiry_date', '>', now());
+            });
+        })->count();
+        $expired = self::whereHas('syndicateCard', function ($q) {
+            $q->whereNotNull('expiry_date')->where('expiry_date', '<', now());
+        })->count();
+        $missing = self::whereDoesntHave('syndicateCard')->count();
+        $nearExpiry = self::whereHas('syndicateCard', function ($q) {
+            $q->whereNotNull('expiry_date')
+              ->where('expiry_date', '>', now())
+              ->where('expiry_date', '<', now()->addDays(self::NEAR_EXPIRY_DAYS));
+        })->count();
 
         return [
             'total' => $total,
             'valid' => $valid,
-            'near_expiry' => $near_expiry,
+            'near_expiry' => $nearExpiry,
             'expired' => $expired,
             'missing' => $missing,
         ];

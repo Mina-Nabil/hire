@@ -2,689 +2,617 @@
     <div class="container mx-auto px-4 py-6">
         <h2 class="text-2xl font-bold mb-6">Employee Dashboard</h2>
 
-        <!-- ID Card Statistics Section -->
+        <!-- Document Status Table -->
         <div class="mb-8">
-            <h3 class="text-xl font-semibold mb-4">ID Card Status</h3>
+            <h3 class="text-xl font-semibold mb-4">Document Status Overview</h3>
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+                    <thead class="bg-slate-900 border-b border-gray-200">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-white">Document Type</th>
+                            <th class="px-4 py-3 text-center text-sm font-semibold text-white">Total</th>
+                            <th class="px-4 py-3 text-center text-sm font-semibold text-white">Valid</th>
+                            <th class="px-4 py-3 text-center text-sm font-semibold text-white">Near Expiry</th>
+                            <th class="px-4 py-3 text-center text-sm font-semibold text-white">Expired</th>
+                            <th class="px-4 py-3 text-center text-sm font-semibold text-white">Missing</th>
+                            <th class="px-4 py-3 text-center text-sm font-semibold text-white">Additional Info</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <!-- ID Card -->
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">ID Card</td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $idCardStats['total'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $idCardStats['valid'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
+                                @if($idCardStats['near_expiry'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') }}?nearExpiry[ID%20Card]=1" class="hover:underline">
+                                        {{ $idCardStats['near_expiry'] }}
+                                    </a>
+                                @else
+                                    {{ $idCardStats['near_expiry'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($idCardStats['expired'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') }}?expired[ID%20Card]=1" class="hover:underline">
+                                        {{ $idCardStats['expired'] }}
+                                    </a>
+                                @else
+                                    {{ $idCardStats['expired'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($idCardStats['missing'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') }}?missing[ID%20Card]=1" class="hover:underline">
+                                        {{ $idCardStats['missing'] }}
+                                    </a>
+                                @else
+                                    {{ $idCardStats['missing'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center">-</td>
+                        </tr>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                <!-- Total Employees Card -->
-                <div class="bg-white rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Total Employees</div>
-                    <div class="text-2xl font-bold">{{ $idCardStats['total'] }}</div>
-                </div>
+                        <!-- Birth Certificate -->
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">Birth Certificate</td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $birthCertificateStats['total'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $birthCertificateStats['valid'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
+                                @if($birthCertificateStats['near_expiry'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?nearExpiry[Birth%20Certificate]=1' }}" class="hover:underline">
+                                        {{ $birthCertificateStats['near_expiry'] }}
+                                    </a>
+                                @else
+                                    {{ $birthCertificateStats['near_expiry'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($birthCertificateStats['expired'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?expired[Birth%20Certificate]=1' }}" class="hover:underline">
+                                        {{ $birthCertificateStats['expired'] }}
+                                    </a>
+                                @else
+                                    {{ $birthCertificateStats['expired'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($birthCertificateStats['missing'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?missing[Birth%20Certificate]=1' }}" class="hover:underline">
+                                        {{ $birthCertificateStats['missing'] }}
+                                    </a>
+                                @else
+                                    {{ $birthCertificateStats['missing'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center">
+                                Original: {{ $birthCertificateStats['by_type']['original'] }} | 
+                                Verified: {{ $birthCertificateStats['by_type']['verified_copy'] }} | 
+                                Copy: {{ $birthCertificateStats['by_type']['copy'] }}
+                            </td>
+                        </tr>
 
-                <!-- Valid ID Cards Card -->
-                <div class="bg-success-100 border border-success-500 rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Valid ID Cards</div>
-                    <div class="text-2xl font-bold text-success-600">{{ $idCardStats['valid'] }}</div>
-                </div>
+                        <!-- Army Service Paper -->
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">Army Service Paper</td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $armyServicePaperStats['total'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $armyServicePaperStats['valid'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
+                                @if($armyServicePaperStats['near_expiry'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?nearExpiry[Army%20Service%20Paper]=1' }}" class="hover:underline">
+                                        {{ $armyServicePaperStats['near_expiry'] }}
+                                    </a>
+                                @else
+                                    {{ $armyServicePaperStats['near_expiry'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($armyServicePaperStats['expired'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?expired[Army%20Service%20Paper]=1' }}" class="hover:underline">
+                                        {{ $armyServicePaperStats['expired'] }}
+                                    </a>
+                                @else
+                                    {{ $armyServicePaperStats['expired'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($armyServicePaperStats['missing'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?missing[Army%20Service%20Paper]=1' }}" class="hover:underline">
+                                        {{ $armyServicePaperStats['missing'] }}
+                                    </a>
+                                @else
+                                    {{ $armyServicePaperStats['missing'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center">
+                                Males: {{ $armyServicePaperStats['males'] }} | 
+                                Females: {{ $armyServicePaperStats['females'] }}
+                            </td>
+                        </tr>
 
-                <!-- Near Expiry Card -->
-                <div class="bg-warning-50 border border-warning-500 rounded-lg shadow p-4">
-                    <div class="text-warning-100 text-sm">Near Expiry</div>
-                    <div class="text-2xl font-bold text-warning-600">{{ $idCardStats['near_expiry'] }}</div>
-                </div>
+                        <!-- Employment Contract -->
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">Employment Contract</td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $employmentContractStats['total'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $employmentContractStats['valid'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
+                                @if($employmentContractStats['near_expiry'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?nearExpiry[Employment%20Contract]=1' }}" class="hover:underline">
+                                        {{ $employmentContractStats['near_expiry'] }}
+                                    </a>
+                                @else
+                                    {{ $employmentContractStats['near_expiry'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($employmentContractStats['expired'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?expired[Employment%20Contract]=1' }}" class="hover:underline">
+                                        {{ $employmentContractStats['expired'] }}
+                                    </a>
+                                @else
+                                    {{ $employmentContractStats['expired'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($employmentContractStats['missing'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?missing[Employment%20Contract]=1' }}" class="hover:underline">
+                                        {{ $employmentContractStats['missing'] }}
+                                    </a>
+                                @else
+                                    {{ $employmentContractStats['missing'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center">-</td>
+                        </tr>
 
-                <!-- Expired Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Expired</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $idCardStats['expired'] }}</div>
-                </div>
+                        <!-- Driver License -->
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">Driver License</td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $driverLicenseStats['total'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $driverLicenseStats['valid'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
+                                @if($driverLicenseStats['near_expiry'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') }}?nearExpiry[Driver%20License]=1" class="hover:underline">
+                                        {{ $driverLicenseStats['near_expiry'] }}
+                                    </a>
+                                @else
+                                    {{ $driverLicenseStats['near_expiry'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($driverLicenseStats['expired'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?expired[Driver%20License]=1' }}" class="hover:underline">
+                                        {{ $driverLicenseStats['expired'] }}
+                                    </a>
+                                @else
+                                    {{ $driverLicenseStats['expired'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($driverLicenseStats['missing'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?missing[Driver%20License]=1' }}" class="hover:underline">
+                                        {{ $driverLicenseStats['missing'] }}
+                                    </a>
+                                @else
+                                    {{ $driverLicenseStats['missing'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center">
+                                Required: {{ $driverLicenseStats['required'] }} | 
+                                Not Required: {{ $driverLicenseStats['not_required'] }}
+                            </td>
+                        </tr>
 
-                <!-- Missing Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Missing</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $idCardStats['missing'] }}</div>
-                </div>
+                        <!-- Police Record -->
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">Police Record</td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $policeRecordStats['total'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $policeRecordStats['valid'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
+                                @if($policeRecordStats['near_expiry'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?nearExpiry[Police%20Record]=1' }}" class="hover:underline">
+                                        {{ $policeRecordStats['near_expiry'] }}
+                                    </a>
+                                @else
+                                    {{ $policeRecordStats['near_expiry'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($policeRecordStats['expired'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?expired[Police%20Record]=1' }}" class="hover:underline">
+                                        {{ $policeRecordStats['expired'] }}
+                                    </a>
+                                @else
+                                    {{ $policeRecordStats['expired'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($policeRecordStats['missing'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?missing[Police%20Record]=1' }}" class="hover:underline">
+                                        {{ $policeRecordStats['missing'] }}
+                                    </a>
+                                @else
+                                    {{ $policeRecordStats['missing'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center">-</td>
+                        </tr>
+
+                        <!-- HR Letter -->
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">HR Letter</td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $hrLetterStats['total'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $hrLetterStats['valid'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
+                                @if($hrLetterStats['near_expiry'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?nearExpiry[HR%20Letter]=1' }}" class="hover:underline">
+                                        {{ $hrLetterStats['near_expiry'] }}
+                                    </a>
+                                @else
+                                    {{ $hrLetterStats['near_expiry'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($hrLetterStats['expired'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?expired[HR%20Letter]=1' }}" class="hover:underline">
+                                        {{ $hrLetterStats['expired'] }}
+                                    </a>
+                                @else
+                                    {{ $hrLetterStats['expired'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($hrLetterStats['missing'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?missing[HR%20Letter]=1' }}" class="hover:underline">
+                                        {{ $hrLetterStats['missing'] }}
+                                    </a>
+                                @else
+                                    {{ $hrLetterStats['missing'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center">-</td>
+                        </tr>
+
+                        <!-- S1 Document -->
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">S1 Document</td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $s1DocStats['total'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $s1DocStats['valid'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
+                                @if($s1DocStats['near_expiry'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?nearExpiry[S1%20Document]=1' }}" class="hover:underline">
+                                        {{ $s1DocStats['near_expiry'] }}
+                                    </a>
+                                @else
+                                    {{ $s1DocStats['near_expiry'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($s1DocStats['expired'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?expired[S1%20Document]=1' }}" class="hover:underline">
+                                        {{ $s1DocStats['expired'] }}
+                                    </a>
+                                @else
+                                    {{ $s1DocStats['expired'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($s1DocStats['missing'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?missing[S1%20Document]=1' }}" class="hover:underline">
+                                        {{ $s1DocStats['missing'] }}
+                                    </a>
+                                @else
+                                    {{ $s1DocStats['missing'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center">-</td>
+                        </tr>
+
+                        <!-- S2 Document -->
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">S2 Document</td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $s2DocStats['total'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $s2DocStats['valid'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
+                                @if($s2DocStats['near_expiry'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?nearExpiry[S2%20Document]=1' }}" class="hover:underline">
+                                        {{ $s2DocStats['near_expiry'] }}
+                                    </a>
+                                @else
+                                    {{ $s2DocStats['near_expiry'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($s2DocStats['expired'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?expired[S2%20Document]=1' }}" class="hover:underline">
+                                        {{ $s2DocStats['expired'] }}
+                                    </a>
+                                @else
+                                    {{ $s2DocStats['expired'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($s2DocStats['missing'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?missing[S2%20Document]=1' }}" class="hover:underline">
+                                        {{ $s2DocStats['missing'] }}
+                                    </a>
+                                @else
+                                    {{ $s2DocStats['missing'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center">-</td>
+                        </tr>
+
+                        <!-- S6 Document -->
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">S6 Document</td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $s6DocStats['total'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $s6DocStats['valid'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
+                                @if($s6DocStats['near_expiry'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?nearExpiry[S6%20Document]=1' }}" class="hover:underline">
+                                        {{ $s6DocStats['near_expiry'] }}
+                                    </a>
+                                @else
+                                    {{ $s6DocStats['near_expiry'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($s6DocStats['expired'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?expired[S6%20Document]=1' }}" class="hover:underline">
+                                        {{ $s6DocStats['expired'] }}
+                                    </a>
+                                @else
+                                    {{ $s6DocStats['expired'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($s6DocStats['missing'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?missing[S6%20Document]=1' }}" class="hover:underline">
+                                        {{ $s6DocStats['missing'] }}
+                                    </a>
+                                @else
+                                    {{ $s6DocStats['missing'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center">-</td>
+                        </tr>
+
+                        <!-- Medical Record -->
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">Medical Record</td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $medicalRecordStats['total'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $medicalRecordStats['valid'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
+                                @if($medicalRecordStats['near_expiry'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?nearExpiry[Medical%20Record]=1' }}" class="hover:underline">
+                                        {{ $medicalRecordStats['near_expiry'] }}
+                                    </a>
+                                @else
+                                    {{ $medicalRecordStats['near_expiry'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($medicalRecordStats['expired'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?expired[Medical%20Record]=1' }}" class="hover:underline">
+                                        {{ $medicalRecordStats['expired'] }}
+                                    </a>
+                                @else
+                                    {{ $medicalRecordStats['expired'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($medicalRecordStats['missing'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?missing[Medical%20Record]=1' }}" class="hover:underline">
+                                        {{ $medicalRecordStats['missing'] }}
+                                    </a>
+                                @else
+                                    {{ $medicalRecordStats['missing'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center">
+                                Not Covered: {{ $medicalRecordStats['by_status']['Not Covered'] }} | 
+                                Examination: {{ $medicalRecordStats['by_status']['Examination'] }} | 
+                                Issuing: {{ $medicalRecordStats['by_status']['Issuing'] }} | 
+                                Covered: {{ $medicalRecordStats['by_status']['Covered'] }} | 
+                                External: {{ $medicalRecordStats['by_status']['External Cover'] }}
+                            </td>
+                        </tr>
+
+                        <!-- External Medical Record -->
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">External Medical Record</td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $externalMedicalRecordStats['total'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $externalMedicalRecordStats['valid'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
+                                @if($externalMedicalRecordStats['near_expiry'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?nearExpiry[External%20Medical%20Record]=1' }}" class="hover:underline">
+                                        {{ $externalMedicalRecordStats['near_expiry'] }}
+                                    </a>
+                                @else
+                                    {{ $externalMedicalRecordStats['near_expiry'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($externalMedicalRecordStats['expired'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?expired[External%20Medical%20Record]=1' }}" class="hover:underline">
+                                        {{ $externalMedicalRecordStats['expired'] }}
+                                    </a>
+                                @else
+                                    {{ $externalMedicalRecordStats['expired'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($externalMedicalRecordStats['missing'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?missing[External%20Medical%20Record]=1' }}" class="hover:underline">
+                                        {{ $externalMedicalRecordStats['missing'] }}
+                                    </a>
+                                @else
+                                    {{ $externalMedicalRecordStats['missing'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center">-</td>
+                        </tr>
+
+                        <!-- Practice Card -->
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">Practice Card</td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $practiceCardStats['total'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $practiceCardStats['valid'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
+                                @if($practiceCardStats['near_expiry'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?nearExpiry[Practice%20Card]=1' }}" class="hover:underline">
+                                        {{ $practiceCardStats['near_expiry'] }}
+                                    </a>
+                                @else
+                                    {{ $practiceCardStats['near_expiry'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($practiceCardStats['expired'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?expired[Practice%20Card]=1' }}" class="hover:underline">
+                                        {{ $practiceCardStats['expired'] }}
+                                    </a>
+                                @else
+                                    {{ $practiceCardStats['expired'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($practiceCardStats['missing'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?missing[Practice%20Card]=1' }}" class="hover:underline">
+                                        {{ $practiceCardStats['missing'] }}
+                                    </a>
+                                @else
+                                    {{ $practiceCardStats['missing'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center">-</td>
+                        </tr>
+
+                        <!-- Skills Qualification -->
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">Skills Qualification</td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $skillsQualificationStats['total'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $skillsQualificationStats['valid'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
+                                @if($skillsQualificationStats['near_expiry'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?nearExpiry[Skills%20Qualification]=1' }}" class="hover:underline">
+                                        {{ $skillsQualificationStats['near_expiry'] }}
+                                    </a>
+                                @else
+                                    {{ $skillsQualificationStats['near_expiry'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($skillsQualificationStats['expired'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?expired[Skills%20Qualification]=1' }}" class="hover:underline">
+                                        {{ $skillsQualificationStats['expired'] }}
+                                    </a>
+                                @else
+                                    {{ $skillsQualificationStats['expired'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($skillsQualificationStats['missing'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?missing[Skills%20Qualification]=1' }}" class="hover:underline">
+                                        {{ $skillsQualificationStats['missing'] }}
+                                    </a>
+                                @else
+                                    {{ $skillsQualificationStats['missing'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center">-</td>
+                        </tr>
+
+                        <!-- Syndicate Card -->
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">Syndicate Card</td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $syndicateCardStats['total'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $syndicateCardStats['valid'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
+                                @if($syndicateCardStats['near_expiry'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?nearExpiry[Syndicate%20Card]=1' }}" class="hover:underline">
+                                        {{ $syndicateCardStats['near_expiry'] }}
+                                    </a>
+                                @else
+                                    {{ $syndicateCardStats['near_expiry'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($syndicateCardStats['expired'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?expired[Syndicate%20Card]=1' }}" class="hover:underline">
+                                        {{ $syndicateCardStats['expired'] }}
+                                    </a>
+                                @else
+                                    {{ $syndicateCardStats['expired'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($syndicateCardStats['missing'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?missing[Syndicate%20Card]=1' }}" class="hover:underline">
+                                        {{ $syndicateCardStats['missing'] }}
+                                    </a>
+                                @else
+                                    {{ $syndicateCardStats['missing'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center">-</td>
+                        </tr>
+
+                        <!-- Work Declaration -->
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">Work Declaration</td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $workDeclarationStats['total'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $workDeclarationStats['valid'] }}</td>
+                            <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
+                                @if($workDeclarationStats['near_expiry'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?nearExpiry[Work%20Declaration]=1' }}" class="hover:underline">
+                                        {{ $workDeclarationStats['near_expiry'] }}
+                                    </a>
+                                @else
+                                    {{ $workDeclarationStats['near_expiry'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($workDeclarationStats['expired'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?expired[Work%20Declaration]=1' }}" class="hover:underline">
+                                        {{ $workDeclarationStats['expired'] }}
+                                    </a>
+                                @else
+                                    {{ $workDeclarationStats['expired'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-danger-600 font-semibold">
+                                @if($workDeclarationStats['missing'] > 0)
+                                    <a href="{{ route('employees.reports.missing-documents') . '?missing[Work%20Declaration]=1' }}" class="hover:underline">
+                                        {{ $workDeclarationStats['missing'] }}
+                                    </a>
+                                @else
+                                    {{ $workDeclarationStats['missing'] }}
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center">-</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-        </div>
-
-        <!-- Birth Certificate Statistics Section -->
-        <div class="mb-8">
-            <h3 class="text-xl font-semibold mb-4">Birth Certificate Status</h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
-                <!-- Total Employees Card -->
-                <div class="bg-white rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Total Employees</div>
-                    <div class="text-2xl font-bold">{{ $birthCertificateStats['total'] }}</div>
-                </div>
-                
-                <!-- Valid Birth Certificates Card -->
-                <div class="bg-success-100 border border-success-500 rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Valid Birth Certificates</div>
-                    <div class="text-2xl font-bold text-success-600">{{ $birthCertificateStats['valid'] }}</div>
-                </div>
-
-                <!-- Near Expiry Card -->
-                <div class="bg-warning-50 border border-warning-500 rounded-lg shadow p-4">
-                    <div class="text-warning-100 text-sm">Near Expiry</div>
-                    <div class="text-2xl font-bold text-warning-600">{{ $birthCertificateStats['near_expiry'] }}</div>
-                </div>
-                
-                <!-- Expired Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Expired</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $birthCertificateStats['expired'] }}</div>
-                </div>
-
-                <!-- Missing Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Missing</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $birthCertificateStats['missing'] }}</div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <!-- Original Card -->
-                <div class="bg-blue-100 border border-info-500 rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Original</div>
-                    <div class="text-2xl font-bold text-info-600">{{ $birthCertificateStats['by_type']['original'] }}</div>
-                </div>
-                
-                <!-- Verified Copy Card -->
-                <div class="bg-purple-100 border border-info-500 rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Verified Copy</div>
-                    <div class="text-2xl font-bold text-info-600">{{ $birthCertificateStats['by_type']['verified_copy'] }}</div>
-                </div>
-
-                <!-- Copy Card -->
-                <div class="bg-indigo-100 border border-info-500 rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Copy</div>
-                    <div class="text-2xl font-bold text-info-600">{{ $birthCertificateStats['by_type']['copy'] }}</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Army Service Paper Statistics Section -->
-        <div class="mb-8">
-            <h3 class="text-xl font-semibold mb-4">Army Service Paper Status</h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
-                <!-- Total Employees Card -->
-                <div class="bg-white rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Total Employees</div>
-                    <div class="text-2xl font-bold">{{ $armyServicePaperStats['total'] }}</div>
-                </div>
-                
-                <!-- Female Employees Card (Not Required) -->
-                <div class="bg-gray-100 border border-gray-500 rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Female Employees (Not Required)</div>
-                    <div class="text-2xl font-bold text-gray-600">{{ $armyServicePaperStats['females'] }}</div>
-                </div>
-                
-                <!-- Male Employees Card (Required) -->
-                <div class="bg-primary-100 border border-primary-500 rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Male Employees (Required)</div>
-                    <div class="text-2xl font-bold text-primary-600">{{ $armyServicePaperStats['males'] }}</div>
-                </div>
-                
-                <!-- Valid Army Service Papers Card -->
-                <div class="bg-success-100 border border-success-500 rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Valid Army Service Papers</div>
-                    <div class="text-2xl font-bold text-success-600">{{ $armyServicePaperStats['valid'] }}</div>
-                </div>
-                
-                <!-- Near Expiry Card -->
-                <div class="bg-warning-50 border border-warning-500 rounded-lg shadow p-4">
-                    <div class="text-warning-100 text-sm">Near Expiry</div>
-                    <div class="text-2xl font-bold text-warning-600">{{ $armyServicePaperStats['near_expiry'] }}</div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-                <!-- Expired Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Expired</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $armyServicePaperStats['expired'] }}</div>
-                </div>
-                
-                <!-- Missing Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Missing (Male Only)</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $armyServicePaperStats['missing'] }}</div>
-                </div>
-
-                <div class="bg-blue-100 border border-info-500 rounded-lg shadow p-4 grid grid-cols-3 divide-x divide-info-500">
-                    <div class="pr-2">
-                        <div class="text-gray-500 text-sm">Original</div>
-                        <div class="text-2xl font-bold text-info-600">{{ $armyServicePaperStats['by_type']['original'] }}</div>
+            
+            <div class="mt-4 flex justify-end">
+                <div class="text-sm text-gray-600 flex items-center space-x-4">
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-success-600 rounded-full mr-1"></div>
+                        <span>Valid</span>
                     </div>
-                    <div class="px-2 border-l border-info-500">
-                        <div class="text-gray-500 text-sm">Verified Copy</div>
-                        <div class="text-2xl font-bold text-info-600">{{ $armyServicePaperStats['by_type']['verified_copy'] }}</div>
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-warning-600 rounded-full mr-1"></div>
+                        <span>Near Expiry</span>
                     </div>
-                    <div class="pl-2 border-l border-info-500">
-                        <div class="text-gray-500 text-sm">Copy</div>
-                        <div class="text-2xl font-bold text-info-600">{{ $armyServicePaperStats['by_type']['copy'] }}</div>
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-danger-600 rounded-full mr-1"></div>
+                        <span>Expired/Missing</span>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Employment Contract Statistics Section -->
-        <div class="mb-8">
-            <h3 class="text-xl font-semibold mb-4">Employment Contract Status</h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                <!-- Total Employees Card -->
-                <div class="bg-white rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Total Employees</div>
-                    <div class="text-2xl font-bold">{{ $employmentContractStats['total'] }}</div>
-                </div>
-
-                <!-- Valid Contracts Card -->
-                <div class="bg-success-100 border border-success-500 rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Valid Contracts</div>
-                    <div class="text-2xl font-bold text-success-600">{{ $employmentContractStats['valid'] }}</div>
-                </div>
-
-                <!-- Near Expiry Card -->
-                <div class="bg-warning-50 border border-warning-500 rounded-lg shadow p-4">
-                    <div class="text-warning-100 text-sm">Near Expiry</div>
-                    <div class="text-2xl font-bold text-warning-600">{{ $employmentContractStats['near_expiry'] }}</div>
-                </div>
-
-                <!-- Expired Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Expired</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $employmentContractStats['expired'] }}</div>
-                </div>
-
-                <!-- Missing Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Missing</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $employmentContractStats['missing'] }}</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Driver License Statistics Section -->
-        <div class="mb-8">
-            <h3 class="text-xl font-semibold mb-4">Driver License Status</h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
-                <!-- Total Employees Card -->
-                <div class="bg-white rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Total Employees</div>
-                    <div class="text-2xl font-bold">{{ $driverLicenseStats['total'] }}</div>
-                </div>
-                
-                <!-- Required Card -->
-                <div class="bg-primary-100 border border-primary-500 rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Required</div>
-                    <div class="text-2xl font-bold text-primary-600">{{ $driverLicenseStats['required'] }}</div>
-                </div>
-                
-                <!-- Not Required Card -->
-                <div class="bg-gray-100 border border-gray-500 rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Not Required</div>
-                    <div class="text-2xl font-bold text-gray-600">{{ $driverLicenseStats['not_required'] }}</div>
-                </div>
-                
-                <!-- Valid Driver Licenses Card -->
-                <div class="bg-success-100 border border-success-500 rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Valid Driver Licenses</div>
-                    <div class="text-2xl font-bold text-success-600">{{ $driverLicenseStats['valid'] }}</div>
-                </div>
-                
-                <!-- Near Expiry Card -->
-                <div class="bg-warning-50 border border-warning-500 rounded-lg shadow p-4">
-                    <div class="text-warning-100 text-sm">Near Expiry</div>
-                    <div class="text-2xl font-bold text-warning-600">{{ $driverLicenseStats['near_expiry'] }}</div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Expired Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Expired</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $driverLicenseStats['expired'] }}</div>
-                </div>
-                
-                <!-- Missing Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Missing (Required Only)</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $driverLicenseStats['missing'] }}</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Police Record Statistics Section -->
-        <div class="mb-8">
-            <h3 class="text-xl font-semibold mb-4">Police Record Status</h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                <!-- Total Employees Card -->
-                <div class="bg-white rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Total Employees</div>
-                    <div class="text-2xl font-bold">{{ $policeRecordStats['total'] }}</div>
-                </div>
-
-                <!-- Valid Police Records Card -->
-                <div class="bg-success-100 border border-success-500 rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Valid Police Records</div>
-                    <div class="text-2xl font-bold text-success-600">{{ $policeRecordStats['valid'] }}</div>
-                </div>
-
-                <!-- Near Expiry Card -->
-                <div class="bg-warning-50 border border-warning-500 rounded-lg shadow p-4">
-                    <div class="text-warning-100 text-sm">Near Expiry</div>
-                    <div class="text-2xl font-bold text-warning-600">{{ $policeRecordStats['near_expiry'] }}</div>
-                </div>
-
-                <!-- Expired Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Expired</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $policeRecordStats['expired'] }}</div>
-                </div>
-
-                <!-- Missing Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Missing</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $policeRecordStats['missing'] }}</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- HR Letter Statistics Section -->
-        <div class="mb-8">
-            <h3 class="text-xl font-semibold mb-4">HR Letter Status</h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                <!-- Total Employees Card -->
-                <div class="bg-white rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Total Employees</div>
-                    <div class="text-2xl font-bold">{{ $hrLetterStats['total'] }}</div>
-                </div>
-
-                <!-- Valid HR Letters Card -->
-                <div class="bg-success-100 border border-success-500 rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Valid HR Letters</div>
-                    <div class="text-2xl font-bold text-success-600">{{ $hrLetterStats['valid'] }}</div>
-                </div>
-
-                <!-- Near Expiry Card -->
-                <div class="bg-warning-50 border border-warning-500 rounded-lg shadow p-4">
-                    <div class="text-warning-100 text-sm">Near Expiry</div>
-                    <div class="text-2xl font-bold text-warning-600">{{ $hrLetterStats['near_expiry'] }}</div>
-                </div>
-
-                <!-- Expired Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Expired</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $hrLetterStats['expired'] }}</div>
-                </div>
-
-                <!-- Missing Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Missing</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $hrLetterStats['missing'] }}</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- S1 Document Statistics Section -->
-        <div class="mb-8">
-            <h3 class="text-xl font-semibold mb-4">S1 Document Status</h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                <!-- Total Employees Card -->
-                <div class="bg-white rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Total Employees</div>
-                    <div class="text-2xl font-bold">{{ $s1DocStats['total'] }}</div>
-                </div>
-
-                <!-- Valid S1 Documents Card -->
-                <div class="bg-success-100 border border-success-500 rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Valid S1 Documents</div>
-                    <div class="text-2xl font-bold text-success-600">{{ $s1DocStats['valid'] }}</div>
-                </div>
-
-                <!-- Near Expiry Card -->
-                <div class="bg-warning-50 border border-warning-500 rounded-lg shadow p-4">
-                    <div class="text-warning-100 text-sm">Near Expiry</div>
-                    <div class="text-2xl font-bold text-warning-600">{{ $s1DocStats['near_expiry'] }}</div>
-                </div>
-
-                <!-- Expired Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Expired</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $s1DocStats['expired'] }}</div>
-                </div>
-
-                <!-- Missing Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Missing</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $s1DocStats['missing'] }}</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- S2 Document Statistics Section -->
-        <div class="mb-8">
-            <h3 class="text-xl font-semibold mb-4">S2 Document Status</h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                <!-- Total Employees Card -->
-                <div class="bg-white rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Total Employees</div>
-                    <div class="text-2xl font-bold">{{ $s2DocStats['total'] }}</div>
-                </div>
-
-                <!-- Valid S2 Documents Card -->
-                <div class="bg-success-100 border border-success-500 rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Valid S2 Documents</div>
-                    <div class="text-2xl font-bold text-success-600">{{ $s2DocStats['valid'] }}</div>
-                </div>
-
-                <!-- Near Expiry Card -->
-                <div class="bg-warning-50 border border-warning-500 rounded-lg shadow p-4">
-                    <div class="text-warning-100 text-sm">Near Expiry</div>
-                    <div class="text-2xl font-bold text-warning-600">{{ $s2DocStats['near_expiry'] }}</div>
-                </div>
-
-                <!-- Expired Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Expired</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $s2DocStats['expired'] }}</div>
-                </div>
-
-                <!-- Missing Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Missing</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $s2DocStats['missing'] }}</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- S6 Document Statistics Section -->
-        <div class="mb-8">
-            <h3 class="text-xl font-semibold mb-4">S6 Document Status</h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                <!-- Total Employees Card -->
-                <div class="bg-white rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Total Employees</div>
-                    <div class="text-2xl font-bold">{{ $s6DocStats['total'] }}</div>
-                </div>
-
-                <!-- Valid S6 Documents Card -->
-                <div class="bg-success-100 border border-success-500 rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Valid S6 Documents</div>
-                    <div class="text-2xl font-bold text-success-600">{{ $s6DocStats['valid'] }}</div>
-                </div>
-
-                <!-- Near Expiry Card -->
-                <div class="bg-warning-50 border border-warning-500 rounded-lg shadow p-4">
-                    <div class="text-warning-100 text-sm">Near Expiry</div>
-                    <div class="text-2xl font-bold text-warning-600">{{ $s6DocStats['near_expiry'] }}</div>
-                </div>
-
-                <!-- Expired Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Expired</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $s6DocStats['expired'] }}</div>
-                </div>
-
-                <!-- Missing Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Missing</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $s6DocStats['missing'] }}</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Medical Record Statistics Section -->
-        <div class="mb-8">
-            <h3 class="text-xl font-semibold mb-4">Medical Record Status</h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
-                <!-- Total Employees Card -->
-                <div class="bg-white rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Total Employees</div>
-                    <div class="text-2xl font-bold">{{ $medicalRecordStats['total'] }}</div>
-                </div>
-
-                <!-- Valid Medical Records Card -->
-                <div class="bg-success-100 border border-success-500 rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Valid Medical Records</div>
-                    <div class="text-2xl font-bold text-success-600">{{ $medicalRecordStats['valid'] }}</div>
-                </div>
-
-                <!-- Near Expiry Card -->
-                <div class="bg-warning-50 border border-warning-500 rounded-lg shadow p-4">
-                    <div class="text-warning-100 text-sm">Near Expiry</div>
-                    <div class="text-2xl font-bold text-warning-600">{{ $medicalRecordStats['near_expiry'] }}</div>
-                </div>
-
-                <!-- Expired Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Expired</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $medicalRecordStats['expired'] }}</div>
-                </div>
-
-                <!-- Missing Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Missing</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $medicalRecordStats['missing'] }}</div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                <!-- Not Covered Card -->
-                <div class="bg-gray-100 border border-gray-500 rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Not Covered</div>
-                    <div class="text-2xl font-bold text-gray-600">{{ $medicalRecordStats['by_status']['Not Covered'] }}</div>
-                </div>
-
-                <!-- Examination Card -->
-                <div class="bg-blue-100 border border-blue-500 rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Examination</div>
-                    <div class="text-2xl font-bold text-blue-600">{{ $medicalRecordStats['by_status']['Examination'] }}</div>
-                </div>
-
-                <!-- Issuing Card -->
-                <div class="bg-yellow-100 border border-yellow-500 rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Issuing</div>
-                    <div class="text-2xl font-bold text-yellow-600">{{ $medicalRecordStats['by_status']['Issuing'] }}</div>
-                </div>
-
-                <!-- Covered Card -->
-                <div class="bg-green-100 border border-green-500 rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Covered</div>
-                    <div class="text-2xl font-bold text-green-600">{{ $medicalRecordStats['by_status']['Covered'] }}</div>
-                </div>
-
-                <!-- External Cover Card -->
-                <div class="bg-purple-100 border border-purple-500 rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">External Cover</div>
-                    <div class="text-2xl font-bold text-purple-600">{{ $medicalRecordStats['by_status']['External Cover'] }}</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- External Medical Record Statistics Section -->
-        <div class="mb-8">
-            <h3 class="text-xl font-semibold mb-4">External Medical Record Status</h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                <!-- Total Employees Card -->
-                <div class="bg-white rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Total Employees</div>
-                    <div class="text-2xl font-bold">{{ $externalMedicalRecordStats['total'] }}</div>
-                </div>
-
-                <!-- Valid External Medical Records Card -->
-                <div class="bg-success-100 border border-success-500 rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Valid Records</div>
-                    <div class="text-2xl font-bold text-success-600">{{ $externalMedicalRecordStats['valid'] }}</div>
-                </div>
-
-                <!-- Near Expiry Card -->
-                <div class="bg-warning-50 border border-warning-500 rounded-lg shadow p-4">
-                    <div class="text-warning-100 text-sm">Near Expiry</div>
-                    <div class="text-2xl font-bold text-warning-600">{{ $externalMedicalRecordStats['near_expiry'] }}</div>
-                </div>
-
-                <!-- Expired Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Expired</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $externalMedicalRecordStats['expired'] }}</div>
-                </div>
-
-                <!-- Missing Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Missing</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $externalMedicalRecordStats['missing'] }}</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Practice Card Statistics Section -->
-        <div class="mb-8">
-            <h3 class="text-xl font-semibold mb-4">Practice Card Status</h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                <!-- Total Employees Card -->
-                <div class="bg-white rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Total Employees</div>
-                    <div class="text-2xl font-bold">{{ $practiceCardStats['total'] }}</div>
-                </div>
-
-                <!-- Valid Practice Cards -->
-                <div class="bg-success-100 border border-success-500 rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Valid Records</div>
-                    <div class="text-2xl font-bold text-success-600">{{ $practiceCardStats['valid'] }}</div>
-                </div>
-
-                <!-- Near Expiry Card -->
-                <div class="bg-warning-50 border border-warning-500 rounded-lg shadow p-4">
-                    <div class="text-warning-100 text-sm">Near Expiry</div>
-                    <div class="text-2xl font-bold text-warning-600">{{ $practiceCardStats['near_expiry'] }}</div>
-                </div>
-
-                <!-- Expired Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Expired</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $practiceCardStats['expired'] }}</div>
-                </div>
-
-                <!-- Missing Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Missing</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $practiceCardStats['missing'] }}</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Skills Qualification Statistics Section -->
-        <div class="mb-8">
-            <h3 class="text-xl font-semibold mb-4">Skills Qualification Status</h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                <!-- Total Employees Card -->
-                <div class="bg-white rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Total Employees</div>
-                    <div class="text-2xl font-bold">{{ $skillsQualificationStats['total'] }}</div>
-                </div>
-
-                <!-- Valid Skills Qualifications -->
-                <div class="bg-success-100 border border-success-500 rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Valid Records</div>
-                    <div class="text-2xl font-bold text-success-600">{{ $skillsQualificationStats['valid'] }}</div>
-                </div>
-
-                <!-- Near Expiry Card -->
-                <div class="bg-warning-50 border border-warning-500 rounded-lg shadow p-4">
-                    <div class="text-warning-100 text-sm">Near Expiry</div>
-                    <div class="text-2xl font-bold text-warning-600">{{ $skillsQualificationStats['near_expiry'] }}</div>
-                </div>
-
-                <!-- Expired Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Expired</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $skillsQualificationStats['expired'] }}</div>
-                </div>
-
-                <!-- Missing Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Missing</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $skillsQualificationStats['missing'] }}</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Syndicate Card Statistics Section -->
-        <div class="mb-8">
-            <h3 class="text-xl font-semibold mb-4">Syndicate Card Status</h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                <!-- Total Employees Card -->
-                <div class="bg-white rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Total Employees</div>
-                    <div class="text-2xl font-bold">{{ $syndicateCardStats['total'] }}</div>
-                </div>
-
-                <!-- Valid Syndicate Cards -->
-                <div class="bg-success-100 border border-success-500 rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Valid Records</div>
-                    <div class="text-2xl font-bold text-success-600">{{ $syndicateCardStats['valid'] }}</div>
-                </div>
-
-                <!-- Near Expiry Card -->
-                <div class="bg-warning-50 border border-warning-500 rounded-lg shadow p-4">
-                    <div class="text-warning-100 text-sm">Near Expiry</div>
-                    <div class="text-2xl font-bold text-warning-600">{{ $syndicateCardStats['near_expiry'] }}</div>
-                </div>
-
-                <!-- Expired Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Expired</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $syndicateCardStats['expired'] }}</div>
-                </div>
-
-                <!-- Missing Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Missing</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $syndicateCardStats['missing'] }}</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Work Declaration Statistics Section -->
-        <div class="mb-8">
-            <h3 class="text-xl font-semibold mb-4">Work Declaration Status</h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                <!-- Total Employees Card -->
-                <div class="bg-white rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Total Employees</div>
-                    <div class="text-2xl font-bold">{{ $workDeclarationStats['total'] }}</div>
-                </div>
-
-                <!-- Valid Work Declarations -->
-                <div class="bg-success-100 border border-success-500 rounded-lg shadow p-4">
-                    <div class="text-gray-500 text-sm">Valid Records</div>
-                    <div class="text-2xl font-bold text-success-600">{{ $workDeclarationStats['valid'] }}</div>
-                </div>
-
-                <!-- Near Expiry Card -->
-                <div class="bg-warning-50 border border-warning-500 rounded-lg shadow p-4">
-                    <div class="text-warning-100 text-sm">Near Expiry</div>
-                    <div class="text-2xl font-bold text-warning-600">{{ $workDeclarationStats['near_expiry'] }}</div>
-                </div>
-
-                <!-- Expired Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Expired</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $workDeclarationStats['expired'] }}</div>
-                </div>
-
-                <!-- Missing Card -->
-                <div class="bg-danger-100 border border-danger-500 rounded-lg shadow p-4">
-                    <div class="text-danger-100 text-sm">Missing</div>
-                    <div class="text-2xl font-bold text-danger-600">{{ $workDeclarationStats['missing'] }}</div>
                 </div>
             </div>
         </div>

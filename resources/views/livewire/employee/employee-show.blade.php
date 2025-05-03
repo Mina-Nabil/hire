@@ -3602,12 +3602,7 @@
                                                         existing document</span>
                                                 </label>
                                             </div>
-
-                                    </div>
-                                    </div>
-                                        
                                         </div>
-                                        
                                     @endif
                                     @if (!$keep_existing_employee_s2_doc)
                                         <div class="col-span-12">

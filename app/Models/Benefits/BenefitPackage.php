@@ -32,6 +32,11 @@ class BenefitPackage extends Model
         return $this->hasMany(VacationBenefit::class);
     }
 
+    public function employeeInfo()
+    {
+        return $this->hasMany(EmployeeInfo::class);
+    }
+
     ///static functions
 
     /**
@@ -135,6 +140,26 @@ class BenefitPackage extends Model
         } catch (Exception $e) {
             report($e);
             throw new AppException('Failed to edit benefit package');
+        }
+    }
+
+
+    public function deletePackage()
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('delete', $this)) {
+            throw new AppException('Unauthorized');
+        }
+
+        if ($this->employeeInfo()->exists()) {
+            throw new AppException('Cannot delete package linked to an employee');
+        }
+        try {
+            $this->delete();
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException('Failed to delete benefit package');
         }
     }
 }

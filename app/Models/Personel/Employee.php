@@ -46,7 +46,7 @@ class Employee extends Model
     // Default days threshold for near expiry warning (7 days)
     const NEAR_EXPIRY_DAYS = 7;
 
-    protected $fillable = ['name', 'email', 'phone', 'address', 'nationality', 'gender', 'birth_date', 'image_url', 'birth_place_id', 'license_required', 'employment_date'];
+    protected $fillable = ['user_id', 'created_by', 'name', 'email', 'phone', 'address', 'nationality', 'gender', 'birth_date', 'image_url', 'birth_place_id', 'license_required', 'employment_date','applicant_id'];
 
     protected $casts = [
         'employment_date' => 'date',
@@ -2472,5 +2472,76 @@ class Employee extends Model
         $summary['overall_status'] = $overallStatus;
 
         return $summary;
+    }
+
+    /**
+     * Create a new employee with basic information and optional employee info
+     *
+     * @param int $user_id
+     * @param string $name
+     * @param string $email
+     * @param string $phone
+     * @param string $address
+     * @param string $nationality
+     * @param string $gender
+     * @param string|Carbon $birth_date
+     * @param int|null $birth_place_id
+     * @param bool $license_required
+     * @param string|Carbon $employment_date
+     * @param array $employeeInfoData Optional employee info data
+     * @return Employee
+     * @throws AppException
+     */
+    public static function createEmployee(
+        int $user_id, 
+        string $name, 
+        string $email, 
+        string $phone, 
+        string $address, 
+        string $nationality, 
+        string $gender, 
+        $birth_date, 
+        ?int $birth_place_id, 
+        bool $license_required, 
+        $employment_date,
+        array $employeeInfoData = [],
+        ?int $applicant_id = null
+    ) {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('create', Employee::class)) {
+            throw new AppException('You do not have permission to create employees');
+        }
+
+        try {
+            $employee = self::create([
+                'user_id' => $user_id,
+                'created_by' => $loggedInUser->id,
+                'name' => $name,
+                'email' => $email,
+                'phone' => $phone,
+                'address' => $address,
+                'nationality' => $nationality,
+                'gender' => $gender,
+                'birth_date' => $birth_date,
+                'birth_place_id' => $birth_place_id,
+                'license_required' => $license_required,
+                'employment_date' => $employment_date,
+                'applicant_id' => $applicant_id,
+            ]);
+
+            // Create employee info if data is provided
+            if (!empty($employeeInfoData) && isset($employeeInfoData['insurance_office_id'])) {
+                $employee->info()->create(array_merge(
+                    $employeeInfoData,
+                    ['gender' => $gender] // Copy gender from employee
+                ));
+            }
+
+            return $employee;
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException('Error creating employee: ' . $e->getMessage());
+        }
     }
 }

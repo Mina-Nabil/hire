@@ -17,6 +17,7 @@ use App\Livewire\Base\InsuranceOfficeIndex;
 use App\Livewire\Employee\EmployeeDashboard;
 use App\Livewire\Employee\EmployeeIndex;
 use App\Livewire\Employee\EmployeeShow;
+use App\Livewire\Employee\EmployeeCreate;
 use App\Livewire\Employee\MissingDocReport;
 use App\Livewire\Recruitment\ApplicantShow;
 use App\Livewire\Recruitment\ChannelIndex;
@@ -44,6 +45,8 @@ Route::group(['middleware' => 'auth'], function () {
 
     // Employee routes
     Route::get('/employees', EmployeeIndex::class)->name('employees');
+    Route::get('/employees/create', EmployeeCreate::class)->name('employees.create');
+    Route::get('/employees/create/from-applicant/{applicant_id}', EmployeeCreate::class)->name('employees.create.from-applicant');
     Route::get('/employees/dashboard', EmployeeDashboard::class)->name('employees.dashboard');
     Route::get('/employees/reports/missing-documents', MissingDocReport::class)->name('employees.reports.missing-documents');
     Route::get('/employees/{id}', EmployeeShow::class)->name('employees.show');

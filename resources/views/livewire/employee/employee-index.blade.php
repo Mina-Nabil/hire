@@ -5,6 +5,15 @@
                 {{ __('Employees Management') }}
             </h4>
         </div>
+        
+        @can('create', App\Models\Personel\Employee::class)
+        <div class="md:mb-6 mb-4">
+            <a href="{{ route('employees.create') }}" class="btn inline-flex justify-center btn-primary">
+                <iconify-icon icon="heroicons-outline:plus"></iconify-icon>
+                <span class="ml-2">{{ __('Create Employee') }}</span>
+            </a>
+        </div>
+        @endcan
     </div>
     <div class="card">
         <header class="card-header cust-card-header noborder">
@@ -31,6 +40,9 @@
                                     <th scope="col" class=" table-th ">
                                         {{ __('Phone') }}
                                     </th>
+                                    <th scope="col" class=" table-th ">
+                                        {{ __('Actions') }}
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
@@ -45,10 +57,16 @@
                                         <td class="table-td">
                                             {{ $employee->phone }}
                                         </td>
+                                        <td class="table-td">
+                                            <a href="{{ route('employees.show', $employee->id) }}" class="btn btn-sm inline-flex justify-center btn-dark">
+                                                <iconify-icon icon="heroicons:eye"></iconify-icon>
+                                                <span class="ml-2">View</span>
+                                            </a>
+                                        </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="3" class="table-td text-center">
+                                        <td colspan="4" class="table-td text-center">
                                             {{ __('No employees found') }}
                                         </td>
                                     </tr>

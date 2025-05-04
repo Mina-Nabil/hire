@@ -5,6 +5,7 @@ namespace App\Models\Recruitment\Applicants;
 use App\Exceptions\AppException;
 use App\Models\Base\Area;
 use App\Models\Recruitment\Interviews\Interview;
+use App\Models\Recruitment\JobOffers\JobOffer;
 use App\Models\Users\Document;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
@@ -614,5 +615,40 @@ class Applicant extends Model
         return $query->whereHas('applications', function ($q) use ($vacancyId) {
             $q->where('vacancy_id', $vacancyId);
         });
+    }
+
+    /**
+     * Scope to get applicants with accepted offers who are not yet hired
+     */
+    public function scopeWithAcceptedOffersNotHired($query)
+    {
+        return $query->whereHas('applications', function ($q) {
+            $q->whereHas('jobOffer', function($offerQuery) {
+                $today = now()->format('Y-m-d');
+                $offerQuery
+                        ->whereDate('expiry_date', '>=', $today)
+                        ->where('status', JobOffer::STATUS_ACCEPTED);
+            })
+            ->where('is_hired', false);
+        });
+    }
+
+    /**
+     * Check if applicant has an accepted offer and is not hired
+     * 
+     * @return bool
+     */
+    public function hasAcceptedOfferNotHired()
+    {
+
+        return $this->applications()
+            ->whereHas('jobOffer', function($offerQuery) {
+                $today = now()->format('Y-m-d');
+                $offerQuery
+                        ->whereDate('expiry_date', '>=', $today)
+                        ->where('status', JobOffer::STATUS_ACCEPTED);
+            })
+            ->where('status', Application::STATUS_OFFER)
+            ->exists() && !$this->is_hired;
     }
 }

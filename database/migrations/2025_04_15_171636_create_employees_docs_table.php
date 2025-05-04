@@ -33,7 +33,7 @@ return new class extends Migration
             $table->string('university')->nullable();
             $table->string('graduation_year')->nullable();
 
-            $table->enum('military_status', Applicant::MILITARY_STATUS);
+            $table->enum('military_status', Applicant::MILITARY_STATUS)->nullable();
             $table->enum('gender', Applicant::GENDER);
             $table->enum('marital_status', Applicant::MARITAL_STATUS);
 

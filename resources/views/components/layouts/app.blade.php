@@ -177,7 +177,13 @@
                                     <a class="{{ $employeesIndex ?? '' }}"
                                         href="{{ route('employees') }}">Employees</a>
                                 </li>
-                            @endcan                          
+                            @endcan  
+                            @can('create', App\Models\Personel\Employee::class)
+                                <li>
+                                    <a class="{{ $employeeCreate ?? '' }}"
+                                        href="{{ route('employees.create') }}">Create Employee</a>
+                                </li>
+                            @endcan                        
                         </ul>
                     </li>
 

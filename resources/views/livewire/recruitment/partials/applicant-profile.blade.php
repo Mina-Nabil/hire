@@ -30,6 +30,20 @@
                             </a>
                         @endif
                     </div>
+                    
+                    @can('create', App\Models\Personel\Employee::class)
+                        @if($applicant->hasAcceptedOfferNotHired())
+                            <div class="mt-3">
+                                <a href="{{ route('employees.create.from-applicant', $applicant->id) }}" class="btn btn-sm btn-success">
+                                    <i class="fas fa-user-plus mr-1"></i> Create Employee
+                                </a>
+                            </div>
+                        @elseif($applicant->is_hired)
+                            <div class="mt-3">
+                                <span class="badge bg-success text-white">Hired</span>
+                            </div>
+                        @endif
+                    @endcan
                 </div>
             </div>
 

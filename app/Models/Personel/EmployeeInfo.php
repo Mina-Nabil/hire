@@ -20,6 +20,7 @@ class EmployeeInfo extends Model
         'military_status',
         'gender',
         'marital_status',
+        'benefit_package_id',
     ];
 
 
@@ -33,5 +34,4 @@ class EmployeeInfo extends Model
     {
         return $this->belongsTo(Employee::class);
     }
-
 }

@@ -5,6 +5,12 @@ namespace App\Models\Personel;
 use App\Exceptions\AppException;
 use App\Models\Base\City;
 use App\Models\Base\InsuranceOffice;
+use App\Models\Benefits\AppliedVacation;
+use App\Models\Benefits\BaseBenefit;
+use App\Models\Benefits\GainedVacation;
+use App\Models\Benefits\Loan;
+use App\Models\Benefits\Purchase;
+use App\Models\Benefits\VacationBenefit;
 use App\Models\Hierarchy\Position;
 use App\Models\Personel\Docs\ArmyServicePaper;
 use App\Models\Personel\Docs\BankAccount;
@@ -30,6 +36,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class Employee extends Model
 {
@@ -54,7 +61,37 @@ class Employee extends Model
     ];
 
 
-    ////model functions
+    ////model benefit functions
+    public function applyForVacation($days)
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('applyForVacation', $this)) {
+            throw new AppException('You dont have permission to apply for vacation');
+        }
+
+        $currentBalance = $this->vacationBenefit->balance;
+
+        if($currentBalance < $days) {
+            throw new AppException('You dont have enough vacation days');
+        }
+        try {
+            DB::transaction(function () use ($days, $currentBalance) {
+                $this->vacationBenefit()->create([
+                    'days' => $days,
+                    'new_balance' => $currentBalance - $days,
+                ]);
+                $this->vacationBenefit()->update([
+                    'balance' => $currentBalance - $days,
+                ]);
+            });
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException('Error applying for vacation');
+        }
+    }
+
+    ////model document functions
     public function setArmyServicePaper($file_path, Carbon $issue_date, $type = ArmyServicePaper::TYPE_ORIGINAL, ?Carbon $expiry_date)
     {
         /** @var User $loggedInUser */
@@ -596,7 +633,7 @@ class Employee extends Model
      * @return EmployeeInfo
      * @throws AppException
      */
-    public function updateEmployeeInfo(int $insurance_office_id, ?string $insurance_number = null, ?string $insurance_amount = null, ?string $academic_qualification = null, ?string $university = null, ?int $graduation_year = null, ?string $military_status = null, ?string $marital_status = null)
+    public function updateEmployeeInfo(int $insurance_office_id, ?string $insurance_number = null, ?string $insurance_amount = null, ?string $academic_qualification = null, ?string $university = null, ?int $graduation_year = null, ?string $military_status = null, ?string $marital_status = null, ?int $benefit_package_id = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -613,10 +650,11 @@ class Employee extends Model
                     'insurance_amount' => $insurance_amount,
                     'academic_qualification' => $academic_qualification,
                     'university' => $university,
-                    'graduation_year' => $graduation_year,
+                'graduation_year' => $graduation_year,
                     'military_status' => $military_status,
                     'marital_status' => $marital_status,
                     'gender' => $this->gender, // Copy from employee
+                    'benefit_package_id' => $benefit_package_id,
                 ],
             );
 
@@ -626,6 +664,7 @@ class Employee extends Model
             throw new AppException('Error updating employee information: ' . $e->getMessage());
         }
     }
+
 
     //scopes
     public function scopeCurrent($query)
@@ -2026,6 +2065,38 @@ class Employee extends Model
     {
         return $this->belongsTo(City::class, 'birth_place_id');
     }
+
+    //// benefit relations ////
+    public function vacationBenefit()
+    {
+        return $this->hasMany(VacationBenefit::class);
+    }
+
+    public function appliedVacations()
+    {
+        return $this->hasMany(AppliedVacation::class);
+    }
+
+    public function gainedVacations()
+    {
+        return $this->hasMany(GainedVacation::class);
+    }
+
+    public function loans()
+    {
+        return $this->hasMany(Loan::class);
+    }
+
+    public function purchases()
+    {
+        return $this->hasMany(Purchase::class);
+    }
+
+    public function baseBenefits()
+    {
+        return $this->hasMany(BaseBenefit::class);
+    }
+    
 
     //// document status check ////
     /**

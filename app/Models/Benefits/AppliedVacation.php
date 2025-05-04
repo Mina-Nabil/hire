@@ -1,0 +1,77 @@
+<?php
+
+namespace App\Models\Benefits;
+
+use App\Exceptions\AppException;
+use App\Models\Personel\Employee;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
+
+class AppliedVacation extends Model
+{
+    protected $table = 'applied_vacation';
+    protected $fillable = [
+        'employee_id',
+        'vacation_benefit_id',
+        'payroll_id',
+        'status',
+        'days',
+        'new_balance',
+    ];
+    const STATUS_PENDING = 'pending';
+    const STATUS_APPROVED = 'approved';
+    const STATUS_REJECTED = 'rejected';
+    const STATUS_LIST = [
+        self::STATUS_PENDING,
+        self::STATUS_APPROVED,
+        self::STATUS_REJECTED,
+    ];
+
+
+    //model functions
+    public function approve()
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        if(!$user->can('approveVacation', $this->employee)) {
+            throw new AppException('You dont have permission to approve vacation');
+        }
+
+        $this->status = self::STATUS_APPROVED;
+        $this->save();
+    }
+
+
+    public function reject()
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        if(!$user->can('rejectVacation', $this->employee)) {
+            throw new AppException('You dont have permission to reject vacation');
+        }
+
+        $this->status = self::STATUS_REJECTED;
+        $this->save();
+    }
+    
+    
+
+
+    ///relations
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class);
+    }
+
+    public function vacationBenefit()
+    {
+        return $this->belongsTo(VacationBenefit::class);
+    }
+
+    public function payroll()
+    {
+        return $this->belongsTo(Payroll::class);
+    }
+    
+    
+}

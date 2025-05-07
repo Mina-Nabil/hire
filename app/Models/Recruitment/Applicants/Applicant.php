@@ -88,12 +88,12 @@ class Applicant extends Model
         return $this->first_name . ' ' . ($this->middle_name ? $this->middle_name . ' ' : '') . $this->last_name;
     }
 
-    public function getFullCvUrlAttribute(): string
+    public function getFullCvUrlAttribute(): string|null
     {
         return $this->cv_url ? Storage::disk('s3')->url($this->cv_url) : null;
     }
 
-    public function getFullImageUrlAttribute(): string
+    public function getFullImageUrlAttribute(): string|null
     {
         return $this->image_url ? Storage::disk('s3')->url($this->image_url) : null;
     }

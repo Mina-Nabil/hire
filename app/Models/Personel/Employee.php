@@ -41,6 +41,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class Employee extends Model
 {
@@ -57,12 +58,23 @@ class Employee extends Model
     // Default days threshold for near expiry warning (7 days)
     const NEAR_EXPIRY_DAYS = 7;
 
-    protected $fillable = ['user_id', 'created_by', 'name', 'email', 'phone', 'address', 'nationality', 'gender', 'birth_date', 'image_url', 'birth_place_id', 'license_required', 'employment_date', 'applicant_id'];
+    protected $fillable = ['user_id', 'created_by', 'name', 'email', 'phone', 'address', 'nationality', 'gender', 'birth_date', 'image_url', 'birth_place_id', 'license_required', 'employment_date', 'applicant_id', 'termination_date'];
 
     protected $casts = [
         'employment_date' => 'date',
         'birth_date' => 'date',
     ];
+
+    ////attributes
+    public function getFullNameAttribute(): string
+    {
+        return $this->name;
+    }
+
+    public function getFullImageUrlAttribute(): string|null
+    {
+        return $this->image_url ? Storage::disk('s3')->url($this->image_url) : null;
+    }
 
 
     ////model benefit functions
@@ -1085,17 +1097,33 @@ class Employee extends Model
      * @param  string  $search
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeSearch($query, $search)
+    public function scopeSearch($query, ?string $search = null, ?Carbon $startDate = null, ?Carbon $endDate = null, ?string $packageId = null, ?string $departmentId = null)
     {
-        if (empty($search)) {
-            return $query;
-        }
 
-        return $query->where(function ($q) use ($search) {
-            $q->where('name', 'like', '%' . $search . '%')
-                ->orWhere('email', 'like', '%' . $search . '%')
-                ->orWhere('phone', 'like', '%' . $search . '%');
+        $query->when($startDate, function ($query) use ($startDate) {
+            $query->where('employees.created_at', '>=', $startDate);
+        })->when($endDate, function ($query) use ($endDate) {
+            $query->where('employees.created_at', '<=', $endDate);
+        })->when($packageId, function ($query) use ($packageId) {
+            $query->whereHas('benefitConfiguration', function ($q) use ($packageId) {
+                $q->where('package_id', $packageId);
+            });
+        })->when($departmentId, function ($query) use ($departmentId) {
+            $query->whereHas('positions', function ($q) use ($departmentId) {
+                $q->where('department_id', $departmentId);
+            });
+        })->when($search, function ($query) use ($search) {
+            $splittedSearch = explode(' ', $search);
+            $query->where(function ($q) use ($splittedSearch) {
+                foreach ($splittedSearch as $search) {
+                    $q->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('email', 'like', '%' . $search . '%')
+                        ->orWhere('phone', 'like', '%' . $search . '%');
+                }
+            });
         });
+
+        return $query;
     }
 
 

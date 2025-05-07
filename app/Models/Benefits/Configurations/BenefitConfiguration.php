@@ -19,7 +19,7 @@ class BenefitConfiguration extends Model
         self::ATTENDANCE_CALCULATION_FIXED,
     ];
 
-    protected $table = 'employee_benefits';
+    protected $table = 'benefit_configurations';
     protected $fillable = [
         'employee_id',
         'benefit_package_id',

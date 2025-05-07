@@ -323,7 +323,22 @@
                         <!-- Modal body -->
                         <div class="p-6 space-y-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="from-group col-span-2">
+                                <div class="from-group">
+                                    <label for="employeeId" class="form-label">Employee</label>
+                                    <select id="employeeId"
+                                        class="form-control @error('employeeId') !border-danger-500 @enderror"
+                                        wire:model="employeeId">
+                                        <option value="">Select an employee</option>
+                                        @foreach ($employees as $employee)
+                                            <option value="{{ $employee->id }}">{{ $employee->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('employeeId')
+                                        <span
+                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <div class="from-group">
                                     <label for="code" class="form-label">Code</label>
                                     <input id="code" type="text"
                                         class="form-control @error('code') !border-danger-500 @enderror"
@@ -472,12 +487,27 @@
                         </div>
                         <!-- Modal body -->
                         <div class="p-6 space-y-4">
-                            <div class="from-group col-span-2">
+                            <div class="from-group">
                                 <label for="code" class="form-label">Code</label>
                                 <input id="code" type="text"
                                     class="form-control @error('code') !border-danger-500 @enderror"
                                     wire:model="code">
                                 @error('code')
+                                    <span
+                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="from-group">
+                                <label for="employeeId" class="form-label">Employee</label>
+                                <select id="employeeId"
+                                    class="form-control @error('employeeId') !border-danger-500 @enderror"
+                                    wire:model="employeeId">
+                                    <option value="">Select an employee</option>
+                                    @foreach ($employees as $employee)
+                                        <option value="{{ $employee->id }}">{{ $employee->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('employeeId')
                                     <span
                                         class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
                                 @enderror

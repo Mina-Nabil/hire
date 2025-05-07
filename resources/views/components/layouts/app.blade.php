@@ -49,10 +49,8 @@
                 class="w-screen h-screen fixed top-0 bg-slate-900 bg-opacity-50 backdrop-blur-sm z-10 hidden"></div>
             <div class="logo-segment">
                 <a class="flex items-center" href="{{ url('/') }}">
-                    <img src="{{ asset('images/logo/hire-logo-wide.png') }}" class="black_logo"
-                        alt="logo">
-                    <img src="{{ asset('images/logo/hire-logo-wide-white.png') }}" class="white_logo"
-                        alt="logo">
+                    <img src="{{ asset('images/logo/hire-logo-wide.png') }}" class="black_logo" alt="logo">
+                    <img src="{{ asset('images/logo/hire-logo-wide-white.png') }}" class="white_logo" alt="logo">
                     {{-- <span
                         class="ltr:ml-3 rtl:mr-3 text-xl font-Inter font-bold text-slate-900 dark:text-white">Wise
                         Ins.</span> --}}
@@ -93,8 +91,14 @@
                         <ul class="sidebar-submenu">
                             @can('viewAny', App\Models\Benefits\Configurations\BenefitPackage::class)
                                 <li>
-                                    <a class="{{ $packagesIndex ?? '' }}"
-                                        href="{{ url('/benefits/packages') }}">Salary Grades</a>
+                                    <a class="{{ $configurationsIndex ?? '' }}"
+                                        href="{{ url('/benefits/configurations') }}">Configurations</a>
+                                </li>
+                            @endcan
+                            @can('viewAny', App\Models\Benefits\Configurations\BenefitPackage::class)
+                                <li>
+                                    <a class="{{ $packagesIndex ?? '' }}" href="{{ url('/benefits/packages') }}">
+                                        Salary Grades</a>
                                 </li>
                             @endcan
 
@@ -170,7 +174,7 @@
 
                         </ul>
                     </li>
-                    
+
                     <li class="">
                         <a href="javascript:void(0)" class="navItem">
                             <span class="flex items-center">
@@ -193,16 +197,15 @@
                             @endcan
                             @can('viewAny', App\Models\Personel\Employee::class)
                                 <li>
-                                    <a class="{{ $employeesIndex ?? '' }}"
-                                        href="{{ route('employees') }}">Employees</a>
+                                    <a class="{{ $employeesIndex ?? '' }}" href="{{ route('employees') }}">Employees</a>
                                 </li>
-                            @endcan  
+                            @endcan
                             @can('create', App\Models\Personel\Employee::class)
                                 <li>
-                                    <a class="{{ $employeeCreate ?? '' }}"
-                                        href="{{ route('employees.create') }}">Create Employee</a>
+                                    <a class="{{ $employeeCreate ?? '' }}" href="{{ route('employees.create') }}">Create
+                                        Employee</a>
                                 </li>
-                            @endcan                        
+                            @endcan
                         </ul>
                     </li>
 
@@ -226,7 +229,8 @@
                             @endcan
                             @can('viewAny', App\Models\Base\InsuranceOffice::class)
                                 <li>
-                                    <a class="{{ $insuranceOfficesIndex ?? '' }}" href="{{ url('/insurance-offices') }}">Insurance Offices</a>
+                                    <a class="{{ $insuranceOfficesIndex ?? '' }}"
+                                        href="{{ url('/insurance-offices') }}">Insurance Offices</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Base\Bank::class)
@@ -255,10 +259,10 @@
                             <div
                                 class="flex items-center md:space-x-4 space-x-2 xl:space-x-0 rtl:space-x-reverse vertical-box">
                                 <a href="{{ url('/') }}" class="mobile-logo xl:hidden inline-block">
-                                    <img src="{{ asset('images/logo/hire-icon.png') }}"
-                                        class="black_logo" alt="logo">
-                                    <img src="{{ asset('images/logo/hire-icon-white.png') }}"
-                                        class="white_logo" alt="logoo">
+                                    <img src="{{ asset('images/logo/hire-icon.png') }}" class="black_logo"
+                                        alt="logo">
+                                    <img src="{{ asset('images/logo/hire-icon-white.png') }}" class="white_logo"
+                                        alt="logoo">
                                 </a>
 
 

@@ -5,6 +5,7 @@ namespace App\Livewire\Organization;
 use App\Exceptions\AppException;
 use App\Models\Hierarchy\Department;
 use App\Models\Hierarchy\Position;
+use App\Models\Personel\Employee;
 use App\Traits\AlertFrontEnd;
 use Exception;
 use Livewire\Component;
@@ -16,6 +17,9 @@ class PositionIndex extends Component
 
     // Search
     public $search = '';
+
+    // form data
+    public $employees = [];
 
     // Department section
     public $newDepartmentModal = false;
@@ -41,6 +45,7 @@ class PositionIndex extends Component
     public $jobBenefits;
     public $arabicJobBenefits;
     public $parentId;
+    public $employeeId;
     public $code;
     public $sapCode;
 
@@ -190,7 +195,7 @@ class PositionIndex extends Component
                 $this->jobBenefits,
                 $this->arabicJobBenefits,
                 $this->code,
-                $this->sapCode
+                $this->employeeId
             );
 
             $this->closeNewPositionSec();
@@ -220,7 +225,7 @@ class PositionIndex extends Component
         $this->arabicJobBenefits = $position->arabic_job_benefits;
         $this->parentId = $position->parent_id;
         $this->code = $position->code;
-        $this->sapCode = $position->sap_code;
+        $this->employeeId = $position->employee_id;
         $this->editPositionModal = true;
     }
 
@@ -269,7 +274,7 @@ class PositionIndex extends Component
                 $this->jobBenefits,
                 $this->arabicJobBenefits,
                 $this->code,
-                $this->sapCode
+                $this->employeeId
             );
 
             $this->closeEditPositionSec();
@@ -344,6 +349,12 @@ class PositionIndex extends Component
         $this->jobBenefits = '';
         $this->arabicJobBenefits = '';
         $this->parentId = null;
+        $this->employeeId = null;
+    }
+
+    public function mount()
+    {
+        $this->employees = Employee::current()->get();
     }
 
     public function render()

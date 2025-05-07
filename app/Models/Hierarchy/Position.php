@@ -101,6 +101,7 @@ class Position extends Model
         ?string $jobBenefits,
         ?string $arabicJobBenefits,
         ?string $code,
+        ?string $employeeId,
     ): Position {
         /** @var User $loggerInUser */
         $loggerInUser = Auth::user();
@@ -123,7 +124,7 @@ class Position extends Model
                 'arabic_job_benefits' => $arabicJobBenefits,
                 'parent_id' => $parentId,
                 'code' => $code,
-                // 'sap_code' => $sapCode,
+                'employee_id' => $employeeId,
             ]);
             return $newPosition;
         } catch (Exception $e) {
@@ -149,6 +150,7 @@ class Position extends Model
         ?string $jobBenefits,
         ?string $arabicJobBenefits,
         ?string $code,
+        ?string $employeeId,
     ): bool {
         try {
             /** @var User $loggerInUser */
@@ -172,6 +174,7 @@ class Position extends Model
                 'arabic_job_benefits' => $arabicJobBenefits,
                 'parent_id' => $parentId,
                 'code' => $code,
+                'employee_id' => $employeeId,
             ]);
         } catch (Exception $e) {
             report($e);

@@ -1,12 +1,14 @@
 <?php
 
-namespace App\Models\Benefits;
+namespace App\Models\Benefits\Payrolls;
 
+use App\Models\Benefits\Configurations\BaseBenefit;
 use App\Models\Personel\Employee;
 use Illuminate\Database\Eloquent\Model;
 
 class BenefitPayment extends Model
 {
+    const MORPH_NAME = 'benefit_payment';
     protected $table = 'benefit_payments';
     protected $fillable = [
         'employee_id',

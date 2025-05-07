@@ -267,11 +267,11 @@ class Interview extends Model
      */
     public function addNote(string $title, ?string $note = null): InterviewNote
     {
-        /** @var User $loggedInUser */
-        $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('update', $this)) {
-            throw new AppException(__('misc.not_authorized'));
-        }
+        // /** @var User $loggedInUser */
+        // $loggedInUser = Auth::user();
+        // if (!$loggedInUser->can('update', $this)) {
+        //     throw new AppException(__('misc.not_authorized'));
+        // }
 
         try {
             return $this->notes()->create([

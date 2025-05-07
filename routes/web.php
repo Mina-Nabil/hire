@@ -14,6 +14,7 @@ use App\Livewire\Settings\UsersIndex;
 use App\Http\Controllers\Hierarchy\OrganizationController;
 use App\Livewire\Base\BankIndex;
 use App\Livewire\Base\InsuranceOfficeIndex;
+use App\Livewire\Benefits\PackageIndex;
 use App\Livewire\Employee\EmployeeDashboard;
 use App\Livewire\Employee\EmployeeIndex;
 use App\Livewire\Employee\EmployeeShow;
@@ -27,6 +28,9 @@ use Illuminate\Support\Facades\Auth;
 
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/', Dashboard::class)->name('home');
+
+    //benefits routes
+    Route::get('/benefits/packages', PackageIndex::class)->name('benefits.packages');
 
 
     Route::get('/hierarchy/tree', [OrganizationController::class, 'index']);

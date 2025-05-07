@@ -20,7 +20,6 @@ class EmployeeInfo extends Model
         'military_status',
         'gender',
         'marital_status',
-        'benefit_package_id',
     ];
 
 

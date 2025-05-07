@@ -240,8 +240,6 @@
         @endif
     </div>
 
-
-
     <!-- Main Information Modal -->
     <x-modal wire:model="showMainInfoModal">
         <x-slot name="title">Edit Personal Information</x-slot>

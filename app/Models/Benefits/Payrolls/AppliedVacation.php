@@ -1,15 +1,19 @@
 <?php
 
-namespace App\Models\Benefits;
+namespace App\Models\Benefits\Payrolls;
 
 use App\Exceptions\AppException;
 use App\Models\Personel\Employee;
+use App\Models\Benefits\Vacations\VacationBenefit;
+use App\Models\Benefits\Payrolls\Payroll;
+use App\Models\Benefits\Vacations\VacationDay;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
 class AppliedVacation extends Model
 {
-    protected $table = 'applied_vacation';
+    const MORPH_NAME = 'applied_vacation';
+    protected $table = 'applied_vacations';
     protected $fillable = [
         'employee_id',
         'vacation_benefit_id',
@@ -72,6 +76,10 @@ class AppliedVacation extends Model
     {
         return $this->belongsTo(Payroll::class);
     }
-    
+
+    public function vacationDays()
+    {
+        return $this->hasMany(VacationDay::class);
+    }
     
 }

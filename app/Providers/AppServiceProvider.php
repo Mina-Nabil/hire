@@ -5,6 +5,23 @@ namespace App\Providers;
 use App\Models\Base\Area;
 use App\Models\Base\City;
 use App\Models\Base\InsuranceOffice;
+use App\Models\Benefits\Configurations\BaseBenefit;
+use App\Models\Benefits\Configurations\BenefitConfiguration;
+use App\Models\Benefits\Configurations\BenefitPackage;
+use App\Models\Benefits\Configurations\PackageDetail;
+use App\Models\Benefits\Configurations\WorkingDay;
+use App\Models\Benefits\Extras\Loan;
+use App\Models\Benefits\Extras\Purchase;
+use App\Models\Benefits\Payrolls\AppliedVacation;
+use App\Models\Benefits\Payrolls\BenefitPayment;
+use App\Models\Benefits\Payrolls\ExtraPayment;
+use App\Models\Benefits\Payrolls\Payroll;
+use App\Models\Benefits\Payrolls\PayrollEmployee;
+use App\Models\Benefits\Vacations\GainedVacation;
+use App\Models\Benefits\Vacations\VacationBenefit;
+use App\Models\Benefits\Vacations\VacationDay;
+use App\Models\Benefits\Vacations\VacationDetail;
+use App\Models\Benefits\Vacations\VacationPayment;
 use App\Models\Hierarchy\Department;
 use App\Models\Hierarchy\OrganizationalChart;
 use App\Models\Hierarchy\Position;
@@ -105,6 +122,24 @@ class AppServiceProvider extends ServiceProvider
             PoliceRecord::MORPH_NAME => PoliceRecord::class,
             SkillsQualification::MORPH_NAME => SkillsQualification::class,
             InsuranceOffice::MORPH_NAME => InsuranceOffice::class,
+            BenefitPackage::MORPH_NAME => BenefitPackage::class,
+            BaseBenefit::MORPH_NAME => BaseBenefit::class,
+            BenefitConfiguration::MORPH_NAME => BenefitConfiguration::class,
+            PackageDetail::MORPH_NAME => PackageDetail::class,
+            WorkingDay::MORPH_NAME => WorkingDay::class,
+            Loan::MORPH_NAME => Loan::class,
+            Purchase::MORPH_NAME => Purchase::class,
+            AppliedVacation::MORPH_NAME => AppliedVacation::class,
+            VacationBenefit::MORPH_NAME => VacationBenefit::class,
+            Payroll::MORPH_NAME => Payroll::class,
+            PayrollEmployee::MORPH_NAME => PayrollEmployee::class,
+            VacationDay::MORPH_NAME => VacationDay::class,
+            VacationDetail::MORPH_NAME => VacationDetail::class,
+            VacationPayment::MORPH_NAME => VacationPayment::class,
+            GainedVacation::MORPH_NAME => GainedVacation::class,
+            PackageDetail::MORPH_NAME => PackageDetail::class,
+            BenefitPayment::MORPH_NAME => BenefitPayment::class,
+            ExtraPayment::MORPH_NAME => ExtraPayment::class,
         ]);
     }
 }

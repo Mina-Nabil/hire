@@ -5,12 +5,16 @@ namespace App\Models\Personel;
 use App\Exceptions\AppException;
 use App\Models\Base\City;
 use App\Models\Base\InsuranceOffice;
-use App\Models\Benefits\AppliedVacation;
-use App\Models\Benefits\BaseBenefit;
-use App\Models\Benefits\GainedVacation;
-use App\Models\Benefits\Loan;
-use App\Models\Benefits\Purchase;
-use App\Models\Benefits\VacationBenefit;
+use App\Models\Benefits\Payrolls\AppliedVacation;
+use App\Models\Benefits\Configurations\BaseBenefit;
+use App\Models\Benefits\Configurations\BenefitPackage;
+use App\Models\Benefits\Vacations\GainedVacation;
+use App\Models\Benefits\Extras\Loan;
+use App\Models\Benefits\Configurations\PackageDetail;
+use App\Models\Benefits\Extras\Purchase;
+use App\Models\Benefits\Vacations\VacationBenefit;
+use App\Models\Benefits\Vacations\VacationDetail;
+use App\Models\Benefits\Configurations\BenefitConfiguration;
 use App\Models\Hierarchy\Position;
 use App\Models\Personel\Docs\ArmyServicePaper;
 use App\Models\Personel\Docs\BankAccount;
@@ -53,7 +57,7 @@ class Employee extends Model
     // Default days threshold for near expiry warning (7 days)
     const NEAR_EXPIRY_DAYS = 7;
 
-    protected $fillable = ['user_id', 'created_by', 'name', 'email', 'phone', 'address', 'nationality', 'gender', 'birth_date', 'image_url', 'birth_place_id', 'license_required', 'employment_date','applicant_id'];
+    protected $fillable = ['user_id', 'created_by', 'name', 'email', 'phone', 'address', 'nationality', 'gender', 'birth_date', 'image_url', 'birth_place_id', 'license_required', 'employment_date', 'applicant_id'];
 
     protected $casts = [
         'employment_date' => 'date',
@@ -62,7 +66,204 @@ class Employee extends Model
 
 
     ////model benefit functions
-    public function applyForVacation($days)
+    /**
+     * Apply for benefit package
+     * @param BenefitPackage $benefitPackage
+     * @param array $package_details
+     * [
+     *  [
+     *      'package_detail_id' => 1,
+     *      'amount' => 1000,
+     *      'receiver' => 'employee',
+     *      'type' => 'fixed',
+     *      'is_net' => true,
+     *      'is_gross' => true,
+     *      'is_grand_gross' => true,
+     *      'is_hidden' => true,
+     *      'start_date' => '2025-01-01',
+     *      'end_date' => '2025-12-31' //optional
+     *  ],
+     * ]
+     * @param array $vacation_benefits
+     * [
+     *  [
+     *      'vacation_detail_id' => 1,
+     *      'start_date' => '2025-01-01',
+     *      'end_date' => '2025-12-31' //optional
+     *      'inc_rate' => 100,
+     *      'max_balance' => 100,
+     *      'hour_price' => 100,
+     *  ],
+     * ]
+     * @return void
+     */
+    public function applyBenefitsPackage(BenefitPackage $benefitPackage, $package_details, $vacation_benefits, $attendace_calculation, $working_day_start_min, $working_day_start_max, $working_day_end_min, $working_day_end_max, $daily_working_hours, $overtime_rate)
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('updateEmployeeBenefits', $this)) {
+            throw new AppException('You dont have permission to apply benefits package');
+        }
+
+        foreach ($package_details as $applied_package_detail) {
+            $package_detail = PackageDetail::find($applied_package_detail['package_detail_id']);
+            if (!($applied_package_detail['amount'] >= $package_detail->amount_min
+                && $applied_package_detail['amount'] <= $package_detail->amount_max)) {
+                throw new AppException('Amount is not in the range of the package detail');
+            }
+            $applied_package_detail['type'] = $package_detail->type;
+        }
+
+        foreach ($vacation_benefits as $applied_vacation_benefit) {
+            $vacation_benefit = VacationDetail::find($applied_vacation_benefit['vacation_detail_id']);
+            if (!($applied_vacation_benefit['inc_rate'] >= $vacation_benefit->inc_rate_min
+                && $applied_vacation_benefit['inc_rate'] <= $vacation_benefit->inc_rate_max)) {
+                throw new AppException('Increase rate is not in the range of the vacation detail');
+            }
+            if (!($applied_vacation_benefit['max_balance'] >= $vacation_benefit->max_balance_min
+                && $applied_vacation_benefit['max_balance'] <= $vacation_benefit->max_balance_max)) {
+                throw new AppException('Maximum balance is not in the range of the vacation detail');
+            }
+            if (!($applied_vacation_benefit['hour_price'] >= $vacation_benefit->hour_price_min
+                && $applied_vacation_benefit['hour_price'] <= $vacation_benefit->hour_price_max)) {
+                throw new AppException('Hour price is not in the range of the vacation detail');
+            }
+            $applied_vacation_benefit['type'] = $vacation_benefit->type;
+        }
+
+        if ($attendace_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_FIXED) {
+            if ($working_day_start_min !== $working_day_start_max) {
+                throw new AppException('Working day start min and max must be the same for fixed attendance calculation');
+            }
+            if ($working_day_end_min !== $working_day_end_max) {
+                throw new AppException('Working day end min and max must be the same for fixed attendance calculation');
+            }
+        }
+
+        if ($attendace_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_SEMI_FLEXIBLE) {
+            if ($working_day_start_min == $working_day_start_max) {
+                throw new AppException('Working day start min and max must be different for semi-flexible attendance calculation');
+            }
+            if ($working_day_end_min == $working_day_end_max) {
+                throw new AppException('Working day end min and max must be different for semi-flexible attendance calculation');
+            }
+        }
+
+        try {
+            DB::transaction(function () use ($package_details, $vacation_benefits, $benefitPackage, $attendace_calculation, $working_day_start_min, $working_day_start_max, $working_day_end_min, $working_day_end_max, $daily_working_hours, $overtime_rate) {
+                $this->baseBenefits()->createMany($package_details);
+                $this->vacationBenefits()->createMany($vacation_benefits);
+                $this->benefitConfiguration()->updateOrCreate([
+                    'employee_id' => $this->id,
+                ], [
+                    'benefit_package_id' => $benefitPackage->id,
+                    'attendace_calculation' => $attendace_calculation,
+                    'working_day_start_min' => $working_day_start_min,
+                    'working_day_start_max' => $working_day_start_max,
+                    'working_day_end_min' => $working_day_end_min,
+                    'working_day_end_max' => $working_day_end_max,
+                    'daily_working_hours' => $daily_working_hours,
+                    'overtime_rate' => $overtime_rate,
+                    'creator_id' => Auth::user()->id,
+                ]);
+            });
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException('Error applying benefits package');
+        }
+    }
+
+
+    /**
+     * Set a base benefit either from a package or a custom one
+     * @param float $amount
+     * @param string $type
+     * @param Carbon $start_date
+     * @param Carbon|null $end_date
+     * @param int|null $package_detail_id - if null, the benefit is custom
+     * @param string|null $name - if not null, the benefit is custom
+     */
+    public function addCustomBaseBenefit(string $name, float $amount, string $type, Carbon $start_date)
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('updateEmployeeBenefits', $this)) {
+            throw new AppException('You dont have permission to set base benefit');
+        }
+        try {
+            DB::transaction(function () use ($name, $amount, $type, $start_date) {
+                $this->baseBenefits()->create([
+                    'name' => $name,
+                    'amount' => $amount,
+                    'type' => $type,
+                    'start_date' => $start_date,
+                ]);
+            });
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException('Error adding custom base benefit');
+        }
+    }
+
+    /**
+     * Add a custom vacation benefit
+     * @param string $name
+     * @param float $inc_rate
+     * @param float $hour_price
+     * @param float $max_balance
+     * @param Carbon $start_date
+     * @param Carbon|null $end_date
+     * @return void
+     */
+    public function addCustomVacationBenefit(
+        string $name,
+        float $inc_rate,
+        float $hour_price,
+        float $current_balance,
+        float $max_balance,
+        string $type,
+        Carbon $start_date
+    ) {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('updateEmployeeBenefits', $this)) {
+            throw new AppException('You dont have permission to set vacation benefit');
+        }
+        try {
+
+            $this->vacationBenefits()->create([
+                'name' => $name,
+                'inc_rate' => $inc_rate,
+                'hour_price' => $hour_price,
+                'current_balance' => $current_balance,
+                'max_balance' => $max_balance,
+                'type' => $type,
+                'start_date' => $start_date
+            ]);
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException('Error adding custom vacation benefit');
+        }
+    }
+
+    /**
+     * Apply for vacation
+     * @param VacationBenefit $vacationBenefit
+     * @param float $hours_count
+     * @param array $days
+     * [
+     *  [
+     *      'vacation_date' => '2025-01-01',
+     *      'hours' => 8,
+     *  ],
+     *  [
+     *      'vacation_date' => '2025-01-02',
+     *      'hours' => 8,
+     *  ],
+     * ]
+     * @return void
+     */
+    public function applyForVacation(VacationBenefit $vacationBenefit, float $hours_count, array $days)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -70,19 +271,20 @@ class Employee extends Model
             throw new AppException('You dont have permission to apply for vacation');
         }
 
-        $currentBalance = $this->vacationBenefit->balance;
+        $currentBalance = $vacationBenefit->balance;
 
-        if($currentBalance < $days) {
+        if ($currentBalance < $days) {
             throw new AppException('You dont have enough vacation days');
         }
         try {
-            DB::transaction(function () use ($days, $currentBalance) {
-                $this->vacationBenefit()->create([
+            DB::transaction(function () use ($hours_count, $days, $currentBalance, $vacationBenefit) {
+                $appliedVacation = $this->appliedVacations()->create([
                     'days' => $days,
-                    'new_balance' => $currentBalance - $days,
+                    'new_balance' => $currentBalance - $hours_count,
                 ]);
-                $this->vacationBenefit()->update([
-                    'balance' => $currentBalance - $days,
+                $appliedVacation->vacationDays()->createMany($days);
+                $vacationBenefit->update([
+                    'balance' => $currentBalance - $hours_count,
                 ]);
             });
         } catch (Exception $e) {
@@ -410,7 +612,7 @@ class Employee extends Model
         }
     }
 
-    
+
     public function setExternalMedicalRecord($file_path, Carbon $issue_date, Carbon $expiry_date, string $id_number)
     {
         /** @var User $loggedInUser */
@@ -475,7 +677,7 @@ class Employee extends Model
         }
     }
 
-        /**
+    /**
      * Set skills qualification for the employee
      *
      * @param string $file_path
@@ -650,11 +852,10 @@ class Employee extends Model
                     'insurance_amount' => $insurance_amount,
                     'academic_qualification' => $academic_qualification,
                     'university' => $university,
-                'graduation_year' => $graduation_year,
+                    'graduation_year' => $graduation_year,
                     'military_status' => $military_status,
                     'marital_status' => $marital_status,
                     'gender' => $this->gender, // Copy from employee
-                    'benefit_package_id' => $benefit_package_id,
                 ],
             );
 
@@ -1779,8 +1980,8 @@ class Employee extends Model
         $missing = self::whereDoesntHave('externalMedicalRecord')->count();
         $nearExpiry = self::whereHas('externalMedicalRecord', function ($q) {
             $q->whereNotNull('expiry_date')
-              ->where('expiry_date', '>', now())
-              ->where('expiry_date', '<', now()->addDays(self::NEAR_EXPIRY_DAYS));
+                ->where('expiry_date', '>', now())
+                ->where('expiry_date', '<', now()->addDays(self::NEAR_EXPIRY_DAYS));
         })->count();
 
         return [
@@ -1811,8 +2012,8 @@ class Employee extends Model
         $missing = self::whereDoesntHave('practiceCard')->count();
         $nearExpiry = self::whereHas('practiceCard', function ($q) {
             $q->whereNotNull('expiry_date')
-              ->where('expiry_date', '>', now())
-              ->where('expiry_date', '<', now()->addDays(self::NEAR_EXPIRY_DAYS));
+                ->where('expiry_date', '>', now())
+                ->where('expiry_date', '<', now()->addDays(self::NEAR_EXPIRY_DAYS));
         })->count();
 
         return [
@@ -1843,8 +2044,8 @@ class Employee extends Model
         $missing = self::whereDoesntHave('skillsQualifications')->count();
         $nearExpiry = self::whereHas('skillsQualifications', function ($q) {
             $q->whereNotNull('expiry_date')
-              ->where('expiry_date', '>', now())
-              ->where('expiry_date', '<', now()->addDays(self::NEAR_EXPIRY_DAYS));
+                ->where('expiry_date', '>', now())
+                ->where('expiry_date', '<', now()->addDays(self::NEAR_EXPIRY_DAYS));
         })->count();
 
         return [
@@ -1875,8 +2076,8 @@ class Employee extends Model
         $missing = self::whereDoesntHave('syndicateCard')->count();
         $nearExpiry = self::whereHas('syndicateCard', function ($q) {
             $q->whereNotNull('expiry_date')
-              ->where('expiry_date', '>', now())
-              ->where('expiry_date', '<', now()->addDays(self::NEAR_EXPIRY_DAYS));
+                ->where('expiry_date', '>', now())
+                ->where('expiry_date', '<', now()->addDays(self::NEAR_EXPIRY_DAYS));
         })->count();
 
         return [
@@ -1949,6 +2150,11 @@ class Employee extends Model
     public function info()
     {
         return $this->hasOne(EmployeeInfo::class);
+    }
+
+    public function benefitConfiguration()
+    {
+        return $this->hasOne(BenefitConfiguration::class);
     }
 
     public function contracts()
@@ -2067,7 +2273,7 @@ class Employee extends Model
     }
 
     //// benefit relations ////
-    public function vacationBenefit()
+    public function vacationBenefits()
     {
         return $this->hasMany(VacationBenefit::class);
     }
@@ -2096,7 +2302,7 @@ class Employee extends Model
     {
         return $this->hasMany(BaseBenefit::class);
     }
-    
+
 
     //// document status check ////
     /**
@@ -2106,7 +2312,7 @@ class Employee extends Model
      * @param int $nearExpiryDays Days threshold for near expiry warning
      * @return string Document status (valid, near_expiry, expired, missing)
      */
-    protected function checkDocumentStatus($document, $nearExpiryDays = self::NEAR_EXPIRY_DAYS) 
+    protected function checkDocumentStatus($document, $nearExpiryDays = self::NEAR_EXPIRY_DAYS)
     {
         if (!$document) {
             return self::DOC_STATUS_MISSING;
@@ -2564,16 +2770,16 @@ class Employee extends Model
      * @throws AppException
      */
     public static function createEmployee(
-        int $user_id, 
-        string $name, 
-        string $email, 
-        string $phone, 
-        string $address, 
-        string $nationality, 
-        string $gender, 
-        $birth_date, 
-        ?int $birth_place_id, 
-        bool $license_required, 
+        int $user_id,
+        string $name,
+        string $email,
+        string $phone,
+        string $address,
+        string $nationality,
+        string $gender,
+        $birth_date,
+        ?int $birth_place_id,
+        bool $license_required,
         $employment_date,
         array $employeeInfoData = [],
         ?int $applicant_id = null

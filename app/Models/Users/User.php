@@ -39,6 +39,7 @@ class User extends Authenticatable
         'username',
         'password',
         'type',
+        'is_active',
         'default_language',
         'image_url'
     ];

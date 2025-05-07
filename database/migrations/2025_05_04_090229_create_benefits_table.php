@@ -1,11 +1,15 @@
 <?php
 
-use App\Models\Benefits\AppliedVacation;
-use App\Models\Benefits\BaseBenefit;
-use App\Models\Benefits\BenefitPackage;
-use App\Models\Benefits\BenefitPayment;
-use App\Models\Benefits\Payroll;
-use App\Models\Benefits\VacationBenefit;
+use App\Models\Benefits\Payrolls\AppliedVacation;
+use App\Models\Benefits\Configurations\BaseBenefit;
+use App\Models\Benefits\Configurations\BenefitConfiguration;
+use App\Models\Benefits\Configurations\BenefitPackage;
+use App\Models\Benefits\Payrolls\BenefitPayment;
+use App\Models\Benefits\Configurations\PackageDetail;
+use App\Models\Benefits\Payrolls\Payroll;
+use App\Models\Benefits\Vacations\VacationBenefit;
+use App\Models\Benefits\Vacations\VacationDetail;
+use App\Models\Benefits\Configurations\WorkingDay;
 use App\Models\Personel\Employee;
 use App\Models\Users\User;
 use Illuminate\Database\Migrations\Migration;
@@ -29,10 +33,15 @@ return new class extends Migration
         Schema::create('package_details', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(BenefitPackage::class)->constrained()->cascadeOnDelete();
-            $table->string('name'); //monthly salary - medical insurance
+            $table->enum('receiver', PackageDetail::RECEIVER_LIST); //monthly salary - medical insurance
+            $table->string('name')->nullable(); //monthly salary - medical insurance
             $table->enum('type', BaseBenefit::TYPE_LIST);
             $table->float('amount_min'); //5000
             $table->float('amount_max'); //10000
+            $table->boolean('is_net')->default(false);
+            $table->boolean('is_gross')->default(false);
+            $table->boolean('is_grand_gross')->default(false);
+            $table->boolean('is_hidden')->default(false);
             $table->timestamps();
         });
 
@@ -40,25 +49,56 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(BenefitPackage::class)->constrained()->cascadeOnDelete();
             $table->string('name'); //annual vacation or sick leave or ezn
-            $table->float('daily_inc_rate')->default(0); //21 / 12
-            $table->float('monthly_inc_rate')->default(0); //21 / 12
-            $table->float('yearly_inc_rate')->default(0); //21
-            $table->float('max_balance'); //42 - max hours balance 
-            $table->float('hour_price')->default(0); //100
+            $table->enum('type', VacationDetail::TYPE_LIST);
+            $table->float('inc_rate_min'); //min 2 hours per type
+            $table->float('inc_rate_max'); //max 12 hours per type
+            $table->float('hour_price_min'); //100
+            $table->float('hour_price_max'); //150
+            $table->float('max_balance_min'); //42 - max hours balance 
+            $table->float('max_balance_max'); //56 - max hours balance 
             $table->timestamps();
         });
 
-        Schema::table('employee_info', function (Blueprint $table) {
+        Schema::create('benefit_configurations', function (Blueprint $table) {
+            //main benefits configuration for an employee
+            $table->id();
+            $table->foreignIdFor(User::class, 'creator_id')->constrained('users')->restrictOnDelete();
+            $table->foreignIdFor(Employee::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(BenefitPackage::class)->nullable()->constrained()->nullOnDelete();
+            $table->enum('attendace_calculation', BenefitConfiguration::ATTENDANCE_CALCULATION_LIST);
+            $table->float('daily_working_hours');
+            $table->float('overtime_rate')->default(1);
+            $table->float('working_day_start_min')->nullable();
+            $table->float('working_day_start_max')->nullable();
+            $table->float('working_day_end_min')->nullable();
+            $table->float('working_day_end_max')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('working_days', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(Employee::class)->constrained()->cascadeOnDelete();
+            $table->enum('type', WorkingDay::DAYS_LIST);
+            $table->timestamps();
         });
 
         Schema::create('base_benefits', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(BenefitPackage::class)->nullable()->constrained()->nullOnDelete();
             $table->foreignIdFor(Employee::class)->constrained()->cascadeOnDelete();
-            $table->string('name');
+
+            //either package detail from a package or a custom one
+            $table->foreignIdFor(PackageDetail::class)->nullable()->constrained()->nullOnDelete();
+            $table->string('name')->nullable();
+            $table->enum('receiver', PackageDetail::RECEIVER_LIST);
+
+            //benefit calculation details
             $table->float('amount');
             $table->enum('type', BaseBenefit::TYPE_LIST);
+            $table->boolean('is_net')->default(false);
+            $table->boolean('is_gross')->default(false);
+            $table->boolean('is_grand_gross')->default(false);
+            $table->boolean('is_hidden')->default(false);
+
             $table->date('start_date');
             $table->date('end_date')->nullable(); //active benefit
             $table->timestamps();
@@ -66,10 +106,21 @@ return new class extends Migration
 
         Schema::create('vacation_benefits', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(BenefitPackage::class)->nullable()->constrained()->nullOnDelete();
             $table->foreignIdFor(Employee::class)->constrained()->cascadeOnDelete();
-            $table->string('name');
-            $table->float('balance');
+
+            //either vacation detail from a package or a custom one
+            $table->foreignIdFor(VacationDetail::class)->nullable()->constrained()->nullOnDelete();
+            $table->string('name')->nullable(); //custom name
+
+            //vacation calculation details
+            $table->enum('type', VacationDetail::TYPE_LIST);
+            $table->float('inc_rate');
+            $table->float('hour_price'); //100
+
+            //starting and maximum balance
+            $table->float('max_balance'); //in hours
+            $table->float('current_balance'); //in hours
+
             $table->date('start_date');
             $table->date('end_date')->nullable(); //active benefit
             $table->timestamps();
@@ -124,7 +175,8 @@ return new class extends Migration
         Schema::create('extra_payments', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Employee::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(Payroll::class)->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(User::class, 'creator_id')->constrained('users')->restrictOnDelete();
+            $table->foreignIdFor(Payroll::class)->nullable()->constrained()->nullOnDelete();
             $table->string('name');
             $table->float('amount');
             $table->date('due_date');
@@ -134,19 +186,26 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('applied_vacation', function (Blueprint $table) {
+        Schema::create('applied_vacations', function (Blueprint $table) {
             //remove from vacation balance
             $table->id();
             $table->foreignIdFor(Employee::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(VacationBenefit::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Payroll::class)->nullable()->constrained()->cascadeOnDelete();
             $table->enum('status', AppliedVacation::STATUS_LIST)->default(AppliedVacation::STATUS_PENDING);
-            $table->float('days');
+            $table->unsignedInteger('hours');
             $table->float('new_balance');
             $table->timestamps();
         });
 
-        Schema::create('gained_vacation', function (Blueprint $table) {
+        Schema::create('vacation_days', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(AppliedVacation::class)->constrained()->cascadeOnDelete();
+            $table->date('vacation_date');
+            $table->float('hours');
+        });
+
+        Schema::create('gained_vacations', function (Blueprint $table) {
             //add to vacation balance
             $table->id();
             $table->foreignIdFor(Employee::class)->constrained()->cascadeOnDelete();

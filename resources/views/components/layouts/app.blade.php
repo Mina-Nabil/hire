@@ -83,6 +83,25 @@
                 id="sidebar_menus">
                 <ul class="sidebar-menu">
 
+                    <li class="">
+                        <a href="javascript:void(0)" class="navItem">
+                            <span class="flex items-center">
+                                <span>Benefits</span>
+                            </span>
+                            <iconify-icon class="icon-arrow" icon="heroicons-outline:chevron-right"></iconify-icon>
+                        </a>
+                        <ul class="sidebar-submenu">
+                            @can('viewAny', App\Models\Benefits\Configurations\BenefitPackage::class)
+                                <li>
+                                    <a class="{{ $packagesIndex ?? '' }}"
+                                        href="{{ url('/benefits/packages') }}">Salary Grades</a>
+                                </li>
+                            @endcan
+
+                        </ul>
+                    </li>
+
+
 
                     <li class="">
                         <a href="javascript:void(0)" class="navItem">

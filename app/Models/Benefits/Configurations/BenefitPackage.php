@@ -1,9 +1,14 @@
 <?php
 
-namespace App\Models\Benefits;
+namespace App\Models\Benefits\Configurations;
 
 use App\Exceptions\AppException;
+use App\Models\Personel\Employee;
 use App\Models\Users\User;
+use App\Models\Benefits\Configurations\PackageDetail;
+use App\Models\Benefits\Configurations\BaseBenefit;
+use App\Models\Benefits\Configurations\BenefitConfiguration;
+use App\Models\Benefits\Vacations\VacationDetail;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -11,6 +16,8 @@ use Illuminate\Support\Facades\DB;
 
 class BenefitPackage extends Model
 {
+    const MORPH_NAME = 'benefit_package';
+
     protected $table = 'benefit_packages';
     protected $fillable = [
         'name',
@@ -27,14 +34,19 @@ class BenefitPackage extends Model
         return $this->hasMany(BaseBenefit::class);
     }
 
-    public function vacationBenefits()
+    public function vacationDetails()
     {
-        return $this->hasMany(VacationBenefit::class);
+        return $this->hasMany(VacationDetail::class);
     }
 
-    public function employeeInfo()
+    public function benefitConfigurations()
     {
-        return $this->hasMany(EmployeeInfo::class);
+        return $this->hasMany(BenefitConfiguration::class);
+    }
+
+    public function employees()
+    {
+        return $this->hasManyThrough(Employee::class, BenefitConfiguration::class);
     }
 
     ///static functions
@@ -46,18 +58,24 @@ class BenefitPackage extends Model
      * [
      *  [
      *      'name' => 'name',
+     *      'receiver' => 'receiver',
      *      'type' => 'type',
      *      'amount_min' => 'amount_min',
      *      'amount_max' => 'amount_max',
+     *      'is_net' => 'is_net',
+     *      'is_gross' => 'is_gross',
+     *      'is_grand_gross' => 'is_grand_gross',
+     *      'is_hidden' => 'is_hidden',
      *  ]
      * ]
      * @param array $vacationDetails
      * [
      *  [
      *      'name' => 'name',
-     *      'monthly_inc_rate' => 'monthly_inc_rate',
-     *      'yearly_inc_rate' => 'yearly_inc_rate',
-     *      'max_days' => 'max_days',
+     *      'type' => 'type',
+     *      'inc_rate_min' => 'inc_rate_min',
+     *      'inc_rate_max' => 'inc_rate_max',
+     *      'max_balance' => 'max_balance',
      *      'hour_price' => 'hour_price',
      *  ]
      * ]
@@ -103,6 +121,11 @@ class BenefitPackage extends Model
      *      'type' => 'type',
      *      'amount_min' => 'amount_min',
      *      'amount_max' => 'amount_max',
+     *      'receiver' => 'receiver',
+     *      'is_net' => 'is_net',
+     *      'is_gross' => 'is_gross',
+     *      'is_grand_gross' => 'is_grand_gross',
+     *      'is_hidden' => 'is_hidden',
      *  ]
      * ]
      * @param array $vacationDetails
@@ -110,10 +133,14 @@ class BenefitPackage extends Model
      *  [
      *      'id' => 'id',
      *      'name' => 'name',
-     *      'monthly_inc_rate' => 'monthly_inc_rate',
-     *      'yearly_inc_rate' => 'yearly_inc_rate',
-     *      'max_days' => 'max_days',
-     *      'hour_price' => 'hour_price',
+     *      'type' => 'type',
+     *      'receiver' => 'receiver',
+     *      'inc_rate_min' => 'inc_rate_min',
+     *      'inc_rate_max' => 'inc_rate_max',
+     *      'max_balance_min' => 'max_balance_min',
+     *      'max_balance_max' => 'max_balance_max',
+     *      'hour_price_min' => 'hour_price_min',
+     *      'hour_price_max' => 'hour_price_max',
      *  ]
      * ]
      * @return void

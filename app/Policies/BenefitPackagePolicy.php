@@ -2,7 +2,7 @@
 
 namespace App\Policies;
 
-use App\Models\Benefits\BenefitPackage;
+use App\Models\Benefits\Configurations\BenefitPackage;
 use App\Models\Users\User;
 use Illuminate\Auth\Access\Response;
 

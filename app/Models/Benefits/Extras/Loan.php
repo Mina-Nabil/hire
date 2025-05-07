@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Models\Benefits;
+namespace App\Models\Benefits\Extras;
 
 use App\Exceptions\AppException;
 use App\Models\Personel\Employee;
+use App\Models\Benefits\Payrolls\ExtraPayment;
+use App\Models\Benefits\Payrolls\BenefitPayment;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;

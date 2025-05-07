@@ -1,27 +1,25 @@
 <?php
 
-namespace App\Models\Benefits;
+namespace App\Models\Benefits\Vacations;
 
-use App\Models\Personel\Employee;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Benefits\Configurations\BenefitPackage;
 
-class BaseBenefit extends Model
+class VacationDetail extends Model
 {
-    protected $table = 'base_benefits';
+    const MORPH_NAME = 'vacation_detail';
+    protected $table = 'vacation_details';
     protected $fillable = [
-        'employee_id',
         'name',
-        'amount',
         'type',
-        'start_date',
-        'end_date',
-        'benefit_package_id',
+        'inc_rate_min',
+        'inc_rate_max',
+        'max_balance_min',
+        'max_balance_max',
+        'hour_price_min',
+        'hour_price_max',
     ];
 
-    protected $casts = [
-        'start_date' => 'date',
-        'end_date' => 'date',
-    ];
 
     const TYPE_MONTHLY = 'monthly';
     const TYPE_WEEKLY = 'weekly';
@@ -37,21 +35,9 @@ class BaseBenefit extends Model
         self::TYPE_DAILY,
     ];
 
-    
-    ///relations
-    public function employee()
-    {
-        return $this->belongsTo(Employee::class);
-    }
 
     public function benefitPackage()
     {
         return $this->belongsTo(BenefitPackage::class);
     }
-
-    public function benefitPayments()
-    {
-        return $this->hasMany(BenefitPayment::class);
-    }
-    
 }

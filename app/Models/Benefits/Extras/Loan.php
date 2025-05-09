@@ -21,6 +21,7 @@ class Loan extends Model
         'employee_id',
         'amount',
         'desc',
+        'creator_id',
     ];
 
     public function employee()
@@ -63,7 +64,7 @@ class Loan extends Model
                 $loan = new Loan([
                     'employee_id' => $employee->id,
                     'amount' => $amount,
-                    'desc' => $desc,
+                'desc' => $desc,
                 ]);
                 $loan->save();
                 $i = 1;
@@ -75,6 +76,7 @@ class Loan extends Model
                         'due_date' => $payment['due_date'],
                         'desc' => $payment['desc'],
                         'status' => BenefitPayment::STATUS_APPROVED,
+                        'creator_id' => Auth::id(),
                     ]);
                     $extraPayment->payable()->associate($loan);
                     $extraPayment->save();

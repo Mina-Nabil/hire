@@ -305,7 +305,7 @@ class Employee extends Model
 
         $currentBalance = $vacationBenefit->balance;
 
-        if ($currentBalance < $days) {
+        if ($currentBalance < $hours_count) {
             throw new AppException('You dont have enough vacation days');
         }
         try {

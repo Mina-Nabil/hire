@@ -11,12 +11,23 @@ class ExtraPayment extends Model
     protected $table = 'extra_payments';
     protected $fillable = [
         'employee_id',
-        'extra_payment_date',
-        'extra_payment_amount',
+        'creator_id',
+        'name',
+        'amount',
+        'due_date',
+        'desc',
+        'status',
+        'payable_id',
+        'payable_type',
     ];
 
     public function employee()
     {
         return $this->belongsTo(Employee::class);
+    }
+
+    public function payable()
+    {
+        return $this->morphTo();
     }
 }

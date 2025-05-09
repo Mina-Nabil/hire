@@ -16,7 +16,12 @@ class EmployeePolicy
 
     public function createLoan(User $user, Employee $employee): bool
     {
-        return $user->is_admin || $user->is_hr || $user->id === $employee->user_id;
+        return $user->is_admin || $user->is_hr;
+    }
+
+    public function createPurchase(User $user, Employee $employee): bool
+    {
+        return $user->is_admin || $user->is_hr;
     }
 
     public function applyForVacation(User $user, Employee $employee): bool

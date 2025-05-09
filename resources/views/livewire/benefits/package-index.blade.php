@@ -78,7 +78,7 @@
                     <x-input-label>Salary Grade Name</x-input-label>
                     <x-text-input type="text" class="w-full" wire:model.defer="name" />
                 </div>
-                <div>
+<div>
                     <x-input-label>Description</x-input-label>
                     <x-textarea class="w-full" wire:model.defer="desc"></x-textarea>
                 </div>
@@ -104,7 +104,7 @@
                         <hr class="w-full mt-5">
                         <div class="flex flex-wrap justify-between gap-2 mb-1 w-full mt-2">
                             <div class="flex flex-col">
-                                <span class="font-semibold mb-2">Compensation / Benefit Detail {{ $i + 1 }}</span>
+                                <span class="font-semibold mb-2">Compensation / Benefit Detail #{{ $i + 1 }}</span>
                                 <div class="flex gap-5">
                                     <x-select class="w-20" label="Paid to"
                                         wire:model.defer="packageDetails.{{ $i }}.receiver">
@@ -128,17 +128,25 @@
                                         wire:model.defer="packageDetails.{{ $i }}.amount_max" />
                                 </div>
                                 <div class="flex gap-5 mt-2">
-                                    <label class="flex items-center space-x-1 text-md"><input type="checkbox"
-                                            wire:model.defer="packageDetails.{{ $i }}.is_net">
+                                    <label class="flex items-center space-x-1 text-md">
+                                        <input type="radio" name="salary_type{{$i}}"
+                                            value="net"
+                                            wire:model="packageDetails.{{ $i }}.is_net">
                                         <span>Net</span></label>
-                                    <label class="flex items-center space-x-1 text-md"><input type="checkbox"
-                                            wire:model.defer="packageDetails.{{ $i }}.is_gross">
+                                    <label class="flex items-center space-x-1 text-md">
+                                        <input type="radio" name="salary_type{{$i}}"
+                                            value="gross"
+                                            wire:model="packageDetails.{{ $i }}.is_gross">
                                         <span>Gross</span></label>
-                                    <label class="flex items-center space-x-1 text-md"><input type="checkbox"
-                                            wire:model.defer="packageDetails.{{ $i }}.is_grand_gross">
+                                    <label class="flex items-center space-x-1 text-md">
+                                        <input type="radio" name="salary_type{{$i}}"
+                                            value="grand_gross"
+                                            wire:model="packageDetails.{{ $i }}.is_grand_gross">
                                         <span>Grand Gross</span></label>
-                                    <label class="flex items-center space-x-1 text-md"><input type="checkbox"
-                                            wire:model.defer="packageDetails.{{ $i }}.is_hidden">
+                                    <label class="flex items-center space-x-1 text-md">
+                                        <input type="checkbox"
+                                            wire:model="packageDetails.{{ $i }}.is_hidden"
+                                            @checked($detail['is_hidden'])>
                                         <span>Hidden</span></label>
                                 </div>
                             </div>

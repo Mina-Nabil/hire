@@ -68,10 +68,10 @@ return new class extends Migration
             $table->enum('attendace_calculation', BenefitConfiguration::ATTENDANCE_CALCULATION_LIST);
             $table->float('daily_working_hours');
             $table->float('overtime_rate')->default(1);
-            $table->float('working_day_start_min')->nullable();
-            $table->float('working_day_start_max')->nullable();
-            $table->float('working_day_end_min')->nullable();
-            $table->float('working_day_end_max')->nullable();
+            $table->time('working_day_start_min')->nullable();
+            $table->time('working_day_start_max')->nullable();
+            $table->time('working_day_end_min')->nullable();
+            $table->time('working_day_end_max')->nullable();
             $table->timestamps();
         });
 

@@ -11,6 +11,7 @@ use App\Models\Benefits\Configurations\PackageDetail;
 use App\Models\Benefits\Vacations\VacationDetail as VacationDetailModel;
 use App\Traits\AlertFrontEnd;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 class PackageIndex extends Component
 {
@@ -62,9 +63,9 @@ class PackageIndex extends Component
                 'amount_min' => $detail->amount_min,
                 'amount_max' => $detail->amount_max,
                 'receiver' => $detail->receiver,
-                'is_net' => $detail->is_net,
-                'is_gross' => $detail->is_gross,
-                'is_grand_gross' => $detail->is_grand_gross,
+                'is_net' => $detail->is_net ? 'net' : '',
+                'is_gross' => $detail->is_gross ? 'gross' : '',
+                'is_grand_gross' => $detail->is_grand_gross ? 'grand_gross' : '',
                 'is_hidden' => $detail->is_hidden,
             ];
         })->toArray();
@@ -94,9 +95,9 @@ class PackageIndex extends Component
             'amount_min' => '',
             'amount_max' => '',
             'receiver' => '',
-            'is_net' => false,
-            'is_gross' => false,
-            'is_grand_gross' => false,
+            'is_net' => 'net',
+            'is_gross' => '',
+            'is_grand_gross' => '',
             'is_hidden' => false,
         ];
     }
@@ -148,21 +149,42 @@ class PackageIndex extends Component
             'vacationDetails.*.hour_price_min' => 'required|numeric|min:0',
             'vacationDetails.*.hour_price_max' => 'required|numeric|min:0',
         ], [
-            'packageDetails.*.receiver.required' => 'Receiver is required',
-            'packageDetails.*.receiver.in' => 'Invalid receiver',
-            'packageDetails.*.name.required' => 'Name is required',
-            'packageDetails.*.type.required' => 'Type is required',
-            'packageDetails.*.amount_min.required' => 'Amount minimum is required',
-            'packageDetails.*.amount_max.required' => 'Amount maximum is required',
-            'vacationDetails.*.name.required' => 'Name is required',
-            'vacationDetails.*.type.required' => 'Type is required',
-            'vacationDetails.*.inc_rate_min.required' => 'Increase rate minimum is required',
-            'vacationDetails.*.inc_rate_max.required' => 'Increase rate maximum is required',
-            'vacationDetails.*.max_balance_min.required' => 'Max balance minimum is required',
-            'vacationDetails.*.max_balance_max.required' => 'Max balance maximum is required',
-            'vacationDetails.*.hour_price_min.required' => 'Hour price minimum is required',
-            'vacationDetails.*.hour_price_max.required' => 'Hour price maximum is required',
+            'packageDetails.*.receiver.required' => 'Receiver#:position is required',
+            'packageDetails.*.receiver.in' => 'Invalid receiver in row#:position',
+            'packageDetails.*.name.required' => 'Name#:position is required',
+            'packageDetails.*.type.required' => 'Type#:position is required',
+            'packageDetails.*.amount_min.required' => 'Amount minimum#:position is required',
+            'packageDetails.*.amount_max.required' => 'Amount maximum#:position is required',
+            'vacationDetails.*.name.required' => 'Name#:position is required',
+            'vacationDetails.*.type.required' => 'Type#:position is required',
+            'vacationDetails.*.inc_rate_min.required' => 'Increase rate minimum#:position is required',
+            'vacationDetails.*.inc_rate_max.required' => 'Increase rate maximum#:position is required',
+            'vacationDetails.*.max_balance_min.required' => 'Max balance minimum#:position is required',
+            'vacationDetails.*.max_balance_max.required' => 'Max balance maximum#:position is required',
+            'vacationDetails.*.hour_price_min.required' => 'Hour price minimum#:position is required',
+            'vacationDetails.*.hour_price_max.required' => 'Hour price maximum#:position is required',
         ]);
+
+        foreach ($this->packageDetails as $index => $detail) {
+            if($detail['is_net'] == 'net') {
+                $this->packageDetails[$index]['is_net'] = 1;
+                $this->packageDetails[$index]['is_gross'] = 0;
+                $this->packageDetails[$index]['is_grand_gross'] = 0;
+            }
+            if($detail['is_gross'] == 'gross') {
+                $this->packageDetails[$index]['is_net'] = 0;
+                $this->packageDetails[$index]['is_gross'] = 1;
+                $this->packageDetails[$index]['is_grand_gross'] = 0;
+            }
+            if($detail['is_grand_gross'] == 'grand_gross') {
+                $this->packageDetails[$index]['is_net'] = 0;
+                $this->packageDetails[$index]['is_gross'] = 0;
+                $this->packageDetails[$index]['is_grand_gross'] = 1;
+            }
+            
+            
+            
+        }
 
         try {
             if ($this->isEditing) {

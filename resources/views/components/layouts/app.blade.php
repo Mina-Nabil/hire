@@ -92,7 +92,7 @@
                             @can('viewAny', App\Models\Benefits\Configurations\BenefitPackage::class)
                                 <li>
                                     <a class="{{ $configurationsIndex ?? '' }}"
-                                        href="{{ url('/benefits/configurations') }}">Configurations</a>
+                                        href="{{ url('/benefits/configurations') }}">Employees</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Benefits\Configurations\BenefitPackage::class)

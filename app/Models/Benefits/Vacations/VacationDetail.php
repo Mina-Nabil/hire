@@ -10,6 +10,7 @@ class VacationDetail extends Model
     const MORPH_NAME = 'vacation_detail';
     protected $table = 'vacation_details';
     protected $fillable = [
+        'benefit_package_id',
         'name',
         'type',
         'inc_rate_min',

@@ -1,0 +1,493 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Benefits\Configurations\BenefitPackage;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
+class BenefitPackageSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        // Entry Level Package
+        BenefitPackage::createPackage(
+            'Entry Level',
+            'Basic package for entry-level positions',
+            [
+                [
+                    'name' => 'Basic Salary',
+                    'receiver' => 'employee',
+                    'type' => 'monthly',
+                    'amount_min' => 2000,
+                    'amount_max' => 3000,
+                    'is_net' => false,
+                    'is_gross' => true,
+                    'is_grand_gross' => false,
+                    'is_hidden' => false,
+                ],
+                [
+                    'name' => 'Transportation Allowance',
+                    'receiver' => 'employee',
+                    'type' => 'monthly',
+                    'amount_min' => 200,
+                    'amount_max' => 300,
+                    'is_net' => true,
+                    'is_gross' => false,
+                    'is_grand_gross' => false,
+                    'is_hidden' => false,
+                ],
+                [
+                    'name' => 'Social Insurance',
+                    'receiver' => 'insurance',
+                    'type' => 'monthly',
+                    'amount_min' => 11,
+                    'amount_max' => 11,
+                    'is_net' => false,
+                    'is_gross' => false,
+                    'is_grand_gross' => true,
+                    'is_hidden' => false,
+                ],
+            ],
+            [
+                [
+                    'name' => 'Annual Leave',
+                    'type' => 'yearly',
+                    'inc_rate_min' => 8,
+                    'inc_rate_max' => 8,
+                    'max_balance_min' => 168,
+                    'max_balance_max' => 168,
+                    'hour_price_min' => 20,
+                    'hour_price_max' => 25,
+                ],
+                [
+                    'name' => 'Sick Leave',
+                    'type' => 'yearly',
+                    'inc_rate_min' => 4,
+                    'inc_rate_max' => 4,
+                    'max_balance_min' => 112,
+                    'max_balance_max' => 112,
+                    'hour_price_min' => 15,
+                    'hour_price_max' => 20,
+                ],
+            ]
+        );
+
+        // Junior Level Package
+        BenefitPackage::createPackage(
+            'Junior Level',
+            'Package for junior positions with 2-3 years experience',
+            [
+                [
+                    'name' => 'Basic Salary',
+                    'receiver' => 'employee',
+                    'type' => 'monthly',
+                    'amount_min' => 3000,
+                    'amount_max' => 4500,
+                    'is_net' => false,
+                    'is_gross' => true,
+                    'is_grand_gross' => false,
+                    'is_hidden' => false,
+                ],
+                [
+                    'name' => 'Transportation Allowance',
+                    'receiver' => 'employee',
+                    'type' => 'monthly',
+                    'amount_min' => 300,
+                    'amount_max' => 400,
+                    'is_net' => true,
+                    'is_gross' => false,
+                    'is_grand_gross' => false,
+                    'is_hidden' => false,
+                ],
+                [
+                    'name' => 'Housing Allowance',
+                    'receiver' => 'employee',
+                    'type' => 'monthly',
+                    'amount_min' => 10,
+                    'amount_max' => 15,
+                    'is_net' => true,
+                    'is_gross' => false,
+                    'is_grand_gross' => false,
+                    'is_hidden' => false,
+                ],
+                [
+                    'name' => 'Social Insurance',
+                    'receiver' => 'insurance',
+                    'type' => 'monthly',
+                    'amount_min' => 11,
+                    'amount_max' => 11,
+                    'is_net' => false,
+                    'is_gross' => false,
+                    'is_grand_gross' => true,
+                    'is_hidden' => false,
+                ],
+            ],
+            [
+                [
+                    'name' => 'Annual Leave',
+                    'type' => 'yearly',
+                    'inc_rate_min' => 8,
+                    'inc_rate_max' => 8,
+                    'max_balance_min' => 168,
+                    'max_balance_max' => 168,
+                    'hour_price_min' => 25,
+                    'hour_price_max' => 30,
+                ],
+                [
+                    'name' => 'Sick Leave',
+                    'type' => 'yearly',
+                    'inc_rate_min' => 4,
+                    'inc_rate_max' => 4,
+                    'max_balance_min' => 112,
+                    'max_balance_max' => 112,
+                    'hour_price_min' => 20,
+                    'hour_price_max' => 25,
+                ],
+            ]
+        );
+
+        // Mid Level Package
+        BenefitPackage::createPackage(
+            'Mid Level',
+            'Package for mid-level positions with 4-6 years experience',
+            [
+                [
+                    'name' => 'Basic Salary',
+                    'receiver' => 'employee',
+                    'type' => 'monthly',
+                    'amount_min' => 4500,
+                    'amount_max' => 7000,
+                    'is_net' => false,
+                    'is_gross' => true,
+                    'is_grand_gross' => false,
+                    'is_hidden' => false,
+                ],
+                [
+                    'name' => 'Transportation Allowance',
+                    'receiver' => 'employee',
+                    'type' => 'monthly',
+                    'amount_min' => 400,
+                    'amount_max' => 500,
+                    'is_net' => true,
+                    'is_gross' => false,
+                    'is_grand_gross' => false,
+                    'is_hidden' => false,
+                ],
+                [
+                    'name' => 'Housing Allowance',
+                    'receiver' => 'employee',
+                    'type' => 'monthly',
+                    'amount_min' => 15,
+                    'amount_max' => 20,
+                    'is_net' => true,
+                    'is_gross' => false,
+                    'is_grand_gross' => false,
+                    'is_hidden' => false,
+                ],
+                [
+                    'name' => 'Performance Bonus',
+                    'receiver' => 'employee',
+                    'type' => 'monthly',
+                    'amount_min' => 5,
+                    'amount_max' => 10,
+                    'is_net' => true,
+                    'is_gross' => false,
+                    'is_grand_gross' => false,
+                    'is_hidden' => false,
+                ],
+                [
+                    'name' => 'Social Insurance',
+                    'receiver' => 'insurance',
+                    'type' => 'monthly',
+                    'amount_min' => 11,
+                    'amount_max' => 11,
+                    'is_net' => false,
+                    'is_gross' => false,
+                    'is_grand_gross' => true,
+                    'is_hidden' => false,
+                ],
+            ],
+            [
+                [
+                    'name' => 'Annual Leave',
+                    'type' => 'yearly',
+                    'inc_rate_min' => 8,
+                    'inc_rate_max' => 8,
+                    'max_balance_min' => 168,
+                    'max_balance_max' => 168,
+                    'hour_price_min' => 30,
+                    'hour_price_max' => 35,
+                ],
+                [
+                    'name' => 'Sick Leave',
+                    'type' => 'yearly',
+                    'inc_rate_min' => 4,
+                    'inc_rate_max' => 4,
+                    'max_balance_min' => 112,
+                    'max_balance_max' => 112,
+                    'hour_price_min' => 25,
+                    'hour_price_max' => 30,
+                ],
+            ]
+        );
+
+        // Senior Level Package
+        BenefitPackage::createPackage(
+            'Senior Level',
+            'Package for senior positions with 7-10 years experience',
+            [
+                [
+                    'name' => 'Basic Salary',
+                    'receiver' => 'employee',
+                    'type' => 'monthly',
+                    'amount_min' => 7000,
+                    'amount_max' => 10000,
+                    'is_net' => false,
+                    'is_gross' => true,
+                    'is_grand_gross' => false,
+                    'is_hidden' => false,
+                ],
+                [
+                    'name' => 'Transportation Allowance',
+                    'receiver' => 'employee',
+                    'type' => 'monthly',
+                    'amount_min' => 500,
+                    'amount_max' => 600,
+                    'is_net' => true,
+                    'is_gross' => false,
+                    'is_grand_gross' => false,
+                    'is_hidden' => false,
+                ],
+                [
+                    'name' => 'Housing Allowance',
+                    'receiver' => 'employee',
+                    'type' => 'monthly',
+                    'amount_min' => 20,
+                    'amount_max' => 25,
+                    'is_net' => true,
+                    'is_gross' => false,
+                    'is_grand_gross' => false,
+                    'is_hidden' => false,
+                ],
+                [
+                    'name' => 'Performance Bonus',
+                    'receiver' => 'employee',
+                    'type' => 'monthly',
+                    'amount_min' => 10,
+                    'amount_max' => 15,
+                    'is_net' => true,
+                    'is_gross' => false,
+                    'is_grand_gross' => false,
+                    'is_hidden' => false,
+                ],
+                [
+                    'name' => 'Social Insurance',
+                    'receiver' => 'insurance',
+                    'type' => 'monthly',
+                    'amount_min' => 11,
+                    'amount_max' => 11,
+                    'is_net' => false,
+                    'is_gross' => false,
+                    'is_grand_gross' => true,
+                    'is_hidden' => false,
+                ],
+            ],
+            [
+                [
+                    'name' => 'Annual Leave',
+                    'type' => 'yearly',
+                    'inc_rate_min' => 8,
+                    'inc_rate_max' => 8,
+                    'max_balance_min' => 168,
+                    'max_balance_max' => 168,
+                    'hour_price_min' => 35,
+                    'hour_price_max' => 40,
+                ],
+                [
+                    'name' => 'Sick Leave',
+                    'type' => 'yearly',
+                    'inc_rate_min' => 4,
+                    'inc_rate_max' => 4,
+                    'max_balance_min' => 112,
+                    'max_balance_max' => 112,
+                    'hour_price_min' => 30,
+                    'hour_price_max' => 35,
+                ],
+            ]
+        );
+
+        // Manager Level Package
+        BenefitPackage::createPackage(
+            'Manager Level',
+            'Package for managerial positions with 10+ years experience',
+            [
+                [
+                    'name' => 'Basic Salary',
+                    'receiver' => 'employee',
+                    'type' => 'monthly',
+                    'amount_min' => 10000,
+                    'amount_max' => 15000,
+                    'is_net' => false,
+                    'is_gross' => true,
+                    'is_grand_gross' => false,
+                    'is_hidden' => false,
+                ],
+                [
+                    'name' => 'Transportation Allowance',
+                    'receiver' => 'employee',
+                    'type' => 'monthly',
+                    'amount_min' => 600,
+                    'amount_max' => 800,
+                    'is_net' => true,
+                    'is_gross' => false,
+                    'is_grand_gross' => false,
+                    'is_hidden' => false,
+                ],
+                [
+                    'name' => 'Housing Allowance',
+                    'receiver' => 'employee',
+                    'type' => 'monthly',
+                    'amount_min' => 25,
+                    'amount_max' => 30,
+                    'is_net' => true,
+                    'is_gross' => false,
+                    'is_grand_gross' => false,
+                    'is_hidden' => false,
+                ],
+                [
+                    'name' => 'Performance Bonus',
+                    'receiver' => 'employee',
+                    'type' => 'monthly',
+                    'amount_min' => 15,
+                    'amount_max' => 20,
+                    'is_net' => true,
+                    'is_gross' => false,
+                    'is_grand_gross' => false,
+                    'is_hidden' => false,
+                ],
+                [
+                    'name' => 'Social Insurance',
+                    'receiver' => 'insurance',
+                    'type' => 'monthly',
+                    'amount_min' => 11,
+                    'amount_max' => 11,
+                    'is_net' => false,
+                    'is_gross' => false,
+                    'is_grand_gross' => true,
+                    'is_hidden' => false,
+                ],
+            ],
+            [
+                [
+                    'name' => 'Annual Leave',
+                    'type' => 'yearly',
+                    'inc_rate_min' => 8,
+                    'inc_rate_max' => 8,
+                    'max_balance_min' => 168,
+                    'max_balance_max' => 168,
+                    'hour_price_min' => 40,
+                    'hour_price_max' => 45,
+                ],
+                [
+                    'name' => 'Sick Leave',
+                    'type' => 'yearly',
+                    'inc_rate_min' => 4,
+                    'inc_rate_max' => 4,
+                    'max_balance_min' => 112,
+                    'max_balance_max' => 112,
+                    'hour_price_min' => 35,
+                    'hour_price_max' => 40,
+                ],
+            ]
+        );
+
+        // Executive Level Package
+        BenefitPackage::createPackage(
+            'Executive Level',
+            'Package for executive positions with 15+ years experience',
+            [
+                [
+                    'name' => 'Basic Salary',
+                    'receiver' => 'employee',
+                    'type' => 'monthly',
+                    'amount_min' => 15000,
+                    'amount_max' => 25000,
+                    'is_net' => false,
+                    'is_gross' => true,
+                    'is_grand_gross' => false,
+                    'is_hidden' => false,
+                ],
+                [
+                    'name' => 'Transportation Allowance',
+                    'receiver' => 'employee',
+                    'type' => 'monthly',
+                    'amount_min' => 800,
+                    'amount_max' => 1000,
+                    'is_net' => true,
+                    'is_gross' => false,
+                    'is_grand_gross' => false,
+                    'is_hidden' => false,
+                ],
+                [
+                    'name' => 'Housing Allowance',
+                    'receiver' => 'employee',
+                    'type' => 'monthly',
+                    'amount_min' => 30,
+                    'amount_max' => 35,
+                    'is_net' => true,
+                    'is_gross' => false,
+                    'is_grand_gross' => false,
+                    'is_hidden' => false,
+                ],
+                [
+                    'name' => 'Performance Bonus',
+                    'receiver' => 'employee',
+                    'type' => 'monthly',
+                    'amount_min' => 20,
+                    'amount_max' => 25,
+                    'is_net' => true,
+                    'is_gross' => false,
+                    'is_grand_gross' => false,
+                    'is_hidden' => false,
+                ],
+                [
+                    'name' => 'Social Insurance',
+                    'receiver' => 'insurance',
+                    'type' => 'monthly',
+                    'amount_min' => 11,
+                    'amount_max' => 11,
+                    'is_net' => false,
+                    'is_gross' => false,
+                    'is_grand_gross' => true,
+                    'is_hidden' => false,
+                ],
+            ],
+            [
+                [
+                    'name' => 'Annual Leave',
+                    'type' => 'yearly',
+                    'inc_rate_min' => 8,
+                    'inc_rate_max' => 8,
+                    'max_balance_min' => 168,
+                    'max_balance_max' => 168,
+                    'hour_price_min' => 45,
+                    'hour_price_max' => 50,
+                ],
+                [
+                    'name' => 'Sick Leave',
+                    'type' => 'yearly',
+                    'inc_rate_min' => 4,
+                    'inc_rate_max' => 4,
+                    'max_balance_min' => 112,
+                    'max_balance_max' => 112,
+                    'hour_price_min' => 40,
+                    'hour_price_max' => 45,
+                ],
+            ]
+        );
+    }
+}

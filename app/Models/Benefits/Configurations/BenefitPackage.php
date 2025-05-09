@@ -85,7 +85,7 @@ class BenefitPackage extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('create', BenefitPackage::class)) {
+        if ($loggedInUser && !$loggedInUser->can('create', BenefitPackage::class)) {
             throw new AppException('Unauthorized');
         }
         try {
@@ -179,7 +179,7 @@ class BenefitPackage extends Model
             throw new AppException('Unauthorized');
         }
 
-        if ($this->employeeInfo()->exists()) {
+        if ($this->benefitConfigurations()->exists()) {
             throw new AppException('Cannot delete package linked to an employee');
         }
         try {

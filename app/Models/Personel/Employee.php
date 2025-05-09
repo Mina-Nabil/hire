@@ -107,6 +107,13 @@ class Employee extends Model
      *      'hour_price' => 100,
      *  ],
      * ]
+     * @param int $attendace_calculation
+     * @param int $working_day_start_min
+     * @param int $working_day_start_max
+     * @param int $working_day_end_min
+     * @param int $working_day_end_max
+     * @param int $daily_working_hours
+     * @param int $overtime_rate
      * @return void
      */
     public function applyBenefitsPackage(BenefitPackage $benefitPackage, $package_details, $vacation_benefits, $attendace_calculation, $working_day_start_min, $working_day_start_max, $working_day_end_min, $working_day_end_max, $daily_working_hours, $overtime_rate)
@@ -161,8 +168,22 @@ class Employee extends Model
             }
         }
 
+        $min_duration_diff = Carbon::parse($working_day_start_min)->diffInHours($working_day_end_min);
+        $max_duration_diff = Carbon::parse($working_day_start_max)->diffInHours($working_day_end_max);
+
+        if($min_duration_diff != $max_duration_diff) {
+            throw new AppException('Working day date range is not valid, must be the same between min and max');
+        }
+
+        if($min_duration_diff != $daily_working_hours) {
+            throw new AppException('Working day duration is not valid, must be the same as the daily working hours difference');
+        }
+        
+
         try {
             DB::transaction(function () use ($package_details, $vacation_benefits, $benefitPackage, $attendace_calculation, $working_day_start_min, $working_day_start_max, $working_day_end_min, $working_day_end_max, $daily_working_hours, $overtime_rate) {
+                $this->baseBenefits()->delete();
+                $this->vacationBenefits()->delete();
                 $this->baseBenefits()->createMany($package_details);
                 $this->vacationBenefits()->createMany($vacation_benefits);
                 $this->benefitConfiguration()->updateOrCreate([
@@ -180,7 +201,6 @@ class Employee extends Model
                 ]);
             });
         } catch (Exception $e) {
-            report($e);
             throw new AppException('Error applying benefits package');
         }
     }

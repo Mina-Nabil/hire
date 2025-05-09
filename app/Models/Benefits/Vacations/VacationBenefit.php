@@ -18,6 +18,7 @@ class VacationBenefit extends Model
     const MORPH_NAME = 'vacation_benefit';
     protected $table = 'vacation_benefits';
     protected $fillable = [
+        'vacation_detail_id',
         'name',
         'inc_rate',
         'type',
@@ -164,5 +165,14 @@ class VacationBenefit extends Model
             report($e);
             throw new AppException('Failed to delete benefit');
         }
+    }
+
+
+    ///scopes
+    public function scopeByPackage($query, $package_id)
+    {
+        return $query
+        ->join('vacation_details', 'vacation_benefits.vacation_detail_id', '=', 'vacation_details.id')
+        ->where('vacation_details.benefit_package_id', $package_id);
     }
 }

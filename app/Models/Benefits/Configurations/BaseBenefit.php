@@ -22,7 +22,7 @@ class BaseBenefit extends Model
         'type',
         'start_date',
         'end_date',
-        'benefit_package_id',
+        'package_detail_id',
         'is_net',
         'is_gross',
         'is_grand_gross',
@@ -136,5 +136,13 @@ class BaseBenefit extends Model
             report($e);
             throw new AppException('Failed to delete benefit');
         }
+    }
+
+    ///scopes
+    public function scopeByPackage($query, $package_id)
+    {
+        return $query
+            ->join('package_details', 'base_benefits.package_detail_id', '=', 'package_details.id')
+            ->where('package_details.benefit_package_id', $package_id);
     }
 }

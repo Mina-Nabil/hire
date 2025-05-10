@@ -34,26 +34,13 @@
                     </h5>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <!-- Associated User -->
+                        <!-- Employee Name -->
                         <div class="input-area">
-                            <label for="user_id" class="form-label">User Account</label>
-                            <select id="user_id" class="form-control @error('user_id') !border-danger-500 @enderror"
-                                wire:model="user_id">
-                                <option value="">Select User</option>
-                                @foreach ($users as $user)
-                                    <option value="{{ $user->id }}">{{ $user->username }}</option>
-                                @endforeach
-                            </select>
-                            @error('user_id')
-                                <span class="text-danger-500 text-xs">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <!-- Name -->
-                        <div class="input-area">
-                            <label for="name" class="form-label">Full Name</label>
+                            <label for="name" class="form-label">Employee Name</label>
                             <input id="name" type="text"
-                                class="form-control @error('name') !border-danger-500 @enderror" wire:model="name">
+                                class="form-control @error('name') !border-danger-500 @enderror"
+                                wire:model.live="name"
+                                wire:input="previewUsername">
                             @error('name')
                                 <span class="text-danger-500 text-xs">{{ $message }}</span>
                             @enderror
@@ -62,94 +49,81 @@
                         <!-- Email -->
                         <div class="input-area">
                             <label for="email" class="form-label">Email</label>
-                            <input id="email" type="email"
-                                class="form-control @error('email') !border-danger-500 @enderror" wire:model="email">
+                            <input id="email" type="email" class="form-control" wire:model="email">
                             @error('email')
-                                <span class="text-danger-500 text-xs">{{ $message }}</span>
+                                <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
 
                         <!-- Phone -->
                         <div class="input-area">
                             <label for="phone" class="form-label">Phone</label>
-                            <input id="phone" type="text"
-                                class="form-control @error('phone') !border-danger-500 @enderror" wire:model="phone">
+                            <input id="phone" type="text" class="form-control" wire:model="phone">
                             @error('phone')
-                                <span class="text-danger-500 text-xs">{{ $message }}</span>
+                                <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
 
                         <!-- Address -->
                         <div class="input-area">
                             <label for="address" class="form-label">Address</label>
-                            <input id="address" type="text"
-                                class="form-control @error('address') !border-danger-500 @enderror"
-                                wire:model="address">
+                            <input id="address" type="text" class="form-control" wire:model="address">
                             @error('address')
-                                <span class="text-danger-500 text-xs">{{ $message }}</span>
+                                <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
 
                         <!-- Nationality -->
                         <div class="input-area">
                             <label for="nationality" class="form-label">Nationality</label>
-                            <input id="nationality" type="text"
-                                class="form-control @error('nationality') !border-danger-500 @enderror"
-                                wire:model="nationality">
+                            <input id="nationality" type="text" class="form-control" wire:model="nationality">
                             @error('nationality')
-                                <span class="text-danger-500 text-xs">{{ $message }}</span>
+                                <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
 
                         <!-- Gender -->
                         <div class="input-area">
                             <label for="gender" class="form-label">Gender</label>
-                            <select id="gender" class="form-control @error('gender') !border-danger-500 @enderror"
-                                wire:model="gender">
+                            <select id="gender" class="form-control" wire:model="gender">
                                 <option value="">Select Gender</option>
-                                @foreach ($genders as $gender)
-                                    <option value="{{ $gender }}">{{ $gender }}</option>
+                                @foreach ($genders as $option)
+                                    <option value="{{ $option }}">{{ $option }}</option>
                                 @endforeach
                             </select>
                             @error('gender')
-                                <span class="text-danger-500 text-xs">{{ $message }}</span>
+                                <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
 
                         <!-- Birth Date -->
                         <div class="input-area">
                             <label for="birth_date" class="form-label">Birth Date</label>
-                            <input id="birth_date" type="date"
-                                class="form-control @error('birth_date') !border-danger-500 @enderror"
-                                wire:model="birth_date">
+                            <input id="birth_date" type="date" class="form-control" wire:model="birth_date">
                             @error('birth_date')
-                                <span class="text-danger-500 text-xs">{{ $message }}</span>
+                                <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
 
                         <!-- Birth Place -->
                         <div class="input-area">
                             <label for="birth_place_id" class="form-label">Birth Place</label>
-                            <select id="birth_place_id"
-                                class="form-control @error('birth_place_id') !border-danger-500 @enderror"
-                                wire:model="birth_place_id">
+                            <select id="birth_place_id" class="form-control" wire:model="birth_place_id">
                                 <option value="">Select City</option>
                                 @foreach ($cities as $city)
                                     <option value="{{ $city->id }}">{{ $city->name }}</option>
                                 @endforeach
                             </select>
                             @error('birth_place_id')
-                                <span class="text-danger-500 text-xs">{{ $message }}</span>
+                                <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
 
                         <!-- License Required -->
                         <div class="input-area">
-                            <label for="license_required" class="form-label">License Required</label>
                             <div class="checkbox-area">
                                 <label class="inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" class="hidden" name="checkbox"
-                                        wire:model="license_required">
+                                    <input type="checkbox" class="hidden" name="checkbox" wire:model="license_required">
                                     <span
                                         class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
                                         <img src="{{ asset('images/icon/ck-white.svg') }}" alt=""
@@ -160,22 +134,23 @@
                                 </label>
                             </div>
                             @error('license_required')
-                                <span class="text-danger-500 text-xs">{{ $message }}</span>
+                                <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
 
                         <!-- Employment Date -->
                         <div class="input-area">
                             <label for="employment_date" class="form-label">Employment Date</label>
-                            <input id="employment_date" type="date"
-                                class="form-control @error('employment_date') !border-danger-500 @enderror"
+                            <input id="employment_date" type="date" class="form-control"
                                 wire:model="employment_date">
                             @error('employment_date')
-                                <span class="text-danger-500 text-xs">{{ $message }}</span>
+                                <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
                     </div>
                 </div>
+
+
 
                 <!-- Employee Additional Information Section -->
                 <div class="bg-slate-50 dark:bg-slate-900 p-5 rounded-md">
@@ -285,6 +260,33 @@
                             @enderror
                         </div>
                     </div>
+                </div>
+
+                <!-- User Account Information Section -->
+                <div class="bg-slate-50 dark:bg-slate-900 p-5 rounded-md col-span-2 ">
+                    <h5 class="font-medium text-xl text-slate-900 dark:text-white mb-5">
+                        User Account Information
+                    </h5>
+
+                    @if(!empty($previewedUsername))
+                    <div class="mt-4 bg-white dark:bg-slate-800 p-4 rounded-md border border-slate-200 dark:border-slate-700">
+                        <h6 class="text-sm font-medium text-slate-900 dark:text-white mb-2">Username Preview</h6>
+                        <div class="flex items-center">
+                            <span class="text-sm text-info-600 dark:text-info-400 font-medium">{{ $previewedUsername }}</span>
+                            <span class="ml-2 text-xs text-slate-500">(Generated from the employee name)</span>
+                        </div>
+                        <div class="mt-2 text-xs text-amber-600 dark:text-amber-400">
+                            The password is: {{ $password }}
+                        </div>
+                        @if($usernameHasSuffix)
+                        <div class="mt-2 text-xs text-amber-600 dark:text-amber-400">
+                            <iconify-icon icon="material-symbols:info-outline" class="inline-block mr-1"></iconify-icon>
+                            The base username "{{ $baseUsername }}" is already taken, so a number has been added.
+                        </div>
+                        <div class="mt-2 text-xs text-amber-600 dark:text-amber-400">
+                        @endif
+                    </div>
+                    @endif
                 </div>
             </div>
 

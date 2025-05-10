@@ -22,7 +22,6 @@ class EmployeeCreate extends Component
     public $applicant_id;
     
     // Basic Employee Info
-    public $user_id;
     public $name;
     public $email;
     public $phone;
@@ -44,8 +43,12 @@ class EmployeeCreate extends Component
     public $military_status;
     public $marital_status;
     
+    // Username preview
+    public $previewedUsername = '';
+    public $usernameHasSuffix = false;
+    public $baseUsername = '';
+    
     // Data for selects
-    public $users = [];
     public $cities = [];
     public $insuranceOffices = [];
     public $genders = [];
@@ -56,10 +59,9 @@ class EmployeeCreate extends Component
     public $showApplicantModal = false;
     public $applicantSearch = '';
     public $applicantsWithOffers = [];
-
+    public $password;
     protected $rules = [
         // Basic employee info validation
-        'user_id' => 'required|exists:users,id',
         'name' => 'required|string|max:255',
         'email' => 'required|email|max:255',
         'phone' => 'required|string|max:20',
@@ -85,7 +87,6 @@ class EmployeeCreate extends Component
     public function mount($applicant_id = null)
     {
         // Load data for select inputs
-        $this->users = User::whereNull('employee_id')->get();
         $this->cities = City::orderBy('name')->get();
         $this->insuranceOffices = InsuranceOffice::orderBy('name')->get();
         $this->genders = Applicant::GENDER;
@@ -104,15 +105,13 @@ class EmployeeCreate extends Component
             $this->insurance_office_id = $this->insuranceOffices[0]->id;
         }
         
-        if (count($this->users) > 0) {
-            $this->user_id = $this->users[0]->id;
-        }
-        
         // If applicant_id is provided, load applicant data
         if ($applicant_id) {
             $this->applicant_id = $applicant_id;
             $this->loadApplicantData();
         }
+
+        $this->password = $this->generatePassword();
     }
     
     /**
@@ -165,16 +164,119 @@ class EmployeeCreate extends Component
             }
         }
         
+        // Generate username preview
+        $this->previewUsername();
+        
         $this->alert('success', 'Applicant data loaded successfully');
+    }
+
+    /**
+     * Generate a standardized username based on the employee's name
+     * 
+     * @param string $name Full name of the employee
+     * @return string Generated username
+     */
+    public function generateUsername($name)
+    {
+        // Extract first and last name from full name
+        $nameParts = explode(' ', $name);
+        $firstName = isset($nameParts[0]) ? $nameParts[0] : '';
+        $lastName = isset($nameParts[count($nameParts) - 1]) ? $nameParts[count($nameParts) - 1] : '';
+        
+        // Convert to lowercase and remove non-alphanumeric characters
+        $firstName = preg_replace('/[^a-z0-9]/', '', strtolower($firstName));
+        $lastName = preg_replace('/[^a-z0-9]/', '', strtolower($lastName));
+        
+        // Generate base username
+        $baseUsername = $firstName . $lastName;
+        
+        // Ensure username is not empty
+        if (empty($baseUsername)) {
+            $baseUsername = 'employee' . rand(100, 999);
+        }
+        
+        // Check if username exists and append numbers if needed
+        $username = $baseUsername;
+        $count = 1;
+        while (User::where('username', $username)->exists()) {
+            $username = $baseUsername . $count;
+            $count++;
+        }
+        
+        return $username;
+    }
+    
+    /**
+     * Preview the username that will be generated
+     */
+    public function previewUsername()
+    {
+        if (!empty($this->name)) {
+            // Extract first and last name from full name
+            $nameParts = explode(' ', $this->name);
+            $firstName = isset($nameParts[0]) ? $nameParts[0] : '';
+            $lastName = isset($nameParts[count($nameParts) - 1]) ? $nameParts[count($nameParts) - 1] : '';
+            
+            // Convert to lowercase and remove non-alphanumeric characters
+            $firstName = preg_replace('/[^a-z0-9]/', '', strtolower($firstName));
+            $lastName = preg_replace('/[^a-z0-9]/', '', strtolower($lastName));
+            
+            // Generate base username
+            $this->baseUsername = $firstName . $lastName;
+            
+            // Ensure username is not empty
+            if (empty($this->baseUsername)) {
+                $this->baseUsername = 'employee' . rand(100, 999);
+            }
+            
+            // Check if username exists and append numbers if needed
+            $username = $this->baseUsername;
+            $count = 1;
+            $this->usernameHasSuffix = false;
+            
+            while (User::where('username', $username)->exists()) {
+                $username = $this->baseUsername . $count;
+                $this->usernameHasSuffix = true;
+                $count++;
+            }
+            
+            $this->previewedUsername = $username;
+        } else {
+            $this->previewedUsername = '';
+            $this->usernameHasSuffix = false;
+            $this->baseUsername = '';
+        }
+    }
+    
+    /**
+     * Generate a standard password
+     * 
+     * @return string Generated password
+     */
+    protected function generatePassword()
+    {
+        $password = '12345678';
+        return $password;
     }
 
     public function createEmployee()
     {
         $this->validate();
         
-        // dd($this->applicant_id);
         try {
             DB::beginTransaction();
+            
+            // Make sure we have the latest username preview
+            $this->previewUsername();
+            $username = $this->previewedUsername;
+            
+            // Create a new user with type 'employee'
+            $user = User::createUser(
+                $this->name,
+                $username,
+                $this->password,
+                User::TYPE_EMPLOYEE
+            );
             
             // Create employee info data array
             $employeeInfoData = [
@@ -188,9 +290,9 @@ class EmployeeCreate extends Component
                 'marital_status' => $this->marital_status,
             ];
             
-            // Create employee with info
+            // Create employee with info using the newly created user
             $employee = Employee::createEmployee(
-                $this->user_id,
+                $user->id,
                 $this->name,
                 $this->email,
                 $this->phone,
@@ -205,6 +307,10 @@ class EmployeeCreate extends Component
                 $this->applicant_id
             );
             
+            // Update the user with employee_id
+            $user->employee_id = $employee->id;
+            $user->save();
+            
             // If this employee was created from an applicant, mark the applicant as hired
             if ($this->applicant_id) {
                 $applicant = Applicant::find($this->applicant_id);
@@ -213,10 +319,10 @@ class EmployeeCreate extends Component
                     $applicant->hire();
                 }
             }
-            
+        
             DB::commit();
             
-            $this->alert('success', 'Employee created successfully!');
+            $this->alert('success', 'Employee created successfully! Login credentials have been generated.');
             return redirect()->route('employees.show', $employee->id);
             
         } catch (AppException $e) {
@@ -269,7 +375,7 @@ class EmployeeCreate extends Component
     }
     
     /**
-     * Select an applicant from the modal and load their data
+     * Select an applicant to fill the form with their data
      */
     public function selectApplicant($applicantId)
     {
@@ -310,10 +416,6 @@ class EmployeeCreate extends Component
         
         if (count($this->insuranceOffices) > 0) {
             $this->insurance_office_id = $this->insuranceOffices[0]->id;
-        }
-        
-        if (count($this->users) > 0) {
-            $this->user_id = $this->users[0]->id;
         }
         
         $this->alert('info', 'Form has been reset');

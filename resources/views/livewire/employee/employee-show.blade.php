@@ -1,4 +1,5 @@
 <div>
+    @can('setDocs',$employee)
     <div class="flex justify-between flex-wrap items-center">
         <div class="md:mb-6 mb-4 flex space-x-3 rtl:space-x-reverse">
             <div>
@@ -9,7 +10,7 @@
             </div>
         </div>
     </div>
-
+    @endcan
     <div class="grid grid-cols-12 gap-5">
 
         <div class="xl:col-span-3 lg:col-span-4 col-span-12">
@@ -573,12 +574,14 @@
                             Base Information
                         </h4>
 
-                        @if (!$employee->idCard)
+                        @can('setDocs',$employee)
+                            @if (!$employee->idCard)
                             <button type="button" class="text-slate-900 dark:text-white"
                                 wire:click="openEditBaseInfoModal">
                                 <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
                             </button>
-                        @endif
+                            @endif
+                        @endcan
                     </div>
                     <div class="card-body p-6">
                         <div class="grid grid-cols-12 gap-5">
@@ -635,10 +638,12 @@
                             Employee Information
                         </h4>
 
-                        <button type="button" class="text-slate-900 dark:text-white"
-                            wire:click="openEditEmployeeInfoModal">
-                            <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
-                        </button>
+                        @can('setDocs',$employee)
+                            <button type="button" class="text-slate-900 dark:text-white"
+                                wire:click="openEditEmployeeInfoModal">
+                                <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
+                            </button>
+                        @endcan
                     </div>
                     <div class="card-body p-6">
                         <div class="grid grid-cols-12 gap-5">
@@ -698,10 +703,12 @@
                             ID Card Information
                         </h4>
 
+                        @can('setDocs',$employee)
                         <button type="button" class="text-slate-900 dark:text-white"
                             wire:click="openEditIdCardModal">
                             <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
-                        </button>
+                            </button>
+                        @endcan
                     </div>
                     <div class="card-body p-6">
                         @if ($employee->idCard)
@@ -775,12 +782,14 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No ID Card Document Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload an ID card document for this employee</p>
+                                @can('setDocs',$employee)
                                 <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                     wire:click="openEditIdCardModal">
                                     <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
                                         class="mr-1"></iconify-icon>
-                                    Upload ID Card
-                                </button>
+                                        Upload ID Card
+                                    </button>
+                                @endcan
                             </div>
                         @endif
                     </div>
@@ -793,10 +802,12 @@
                             Birth Certificate Information
                         </h4>
 
+                        @can('setDocs',$employee)
                         <button type="button" class="text-slate-900 dark:text-white"
                             wire:click="openEditBirthCertificateModal">
                             <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
                         </button>
+                        @endcan
                     </div>
                     <div class="card-body p-6">
                         @if ($employee->birthCertificate)
@@ -881,12 +892,14 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No Birth Certificate Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload a birth certificate for this employee</p>
+                                @can('setDocs',$employee)
                                 <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                     wire:click="openEditBirthCertificateModal">
                                     <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
                                         class="mr-1"></iconify-icon>
-                                    Upload Birth Certificate
-                                </button>
+                                        Upload Birth Certificate
+                                    </button>
+                                @endcan
                             </div>
                         @endif
                     </div>
@@ -899,10 +912,12 @@
                             Army Service Paper Information
                         </h4>
 
+                        @can('setDocs',$employee)
                         <button type="button" class="text-slate-900 dark:text-white"
                             wire:click="openEditArmyServicePaperModal">
                             <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
                         </button>
+                        @endcan
                     </div>
                     <div class="card-body p-6">
                         @if ($employee->armyServicePaper)
@@ -983,12 +998,14 @@
                                 <h5 class="text-xl font-semibold mb-4">No Army Service Paper Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload an army service paper for this employee
                                 </p>
+                                @can('setDocs',$employee)
                                 <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                     wire:click="openEditArmyServicePaperModal">
                                     <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
                                         class="mr-1"></iconify-icon>
-                                    Upload Army Service Paper
-                                </button>
+                                        Upload Army Service Paper
+                                    </button>
+                                @endcan
                             </div>
                         @endif
                     </div>
@@ -1001,10 +1018,12 @@
                             Driver License Information
                         </h4>
 
+                        @can('setDocs',$employee)
                         <button type="button" class="text-slate-900 dark:text-white"
                             wire:click="openEditDriverLicenseModal">
                             <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
                         </button>
+                        @endcan
                     </div>
                     <div class="card-body p-6">
                         @if ($employee->driverLicense)
@@ -1075,12 +1094,14 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No Driver License Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload a driver license for this employee</p>
+                                @can('setDocs',$employee)
                                 <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                     wire:click="openEditDriverLicenseModal">
                                     <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
                                         class="mr-1"></iconify-icon>
-                                    Upload Driver License
-                                </button>
+                                        Upload Driver License
+                                    </button>
+                                @endcan
                             </div>
                         @endif
                     </div>
@@ -1093,9 +1114,11 @@
                             Employee Contract Information
                         </h4>
 
+                        @can('setDocs',$employee)
                         <button wire:click="openEditEmployeeContractModal" class="action-btn" type="button">
                             <iconify-icon icon="heroicons:plus"></iconify-icon>
                         </button>
+                        @endcan
                     </div>
                     <div class="card-body p-6">
                         @if ($employee->contracts && count($employee->contracts) > 0)
@@ -1104,6 +1127,7 @@
                                     <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
                                         <h5 class="card-title text-slate-900 dark:text-white">Contract - Issue Date
                                             {{ $contract->issue_date }}</h5>
+                                        @can('setDocs',$employee)
                                         <div class="flex space-x-3 rtl:space-x-reverse">
                                             <button wire:click="openEditSpecificContractModal({{ $contract->id }})"
                                                 class="action-btn" type="button">
@@ -1115,6 +1139,7 @@
                                                 <iconify-icon icon="heroicons:trash"></iconify-icon>
                                             </button>
                                         </div>
+                                        @endcan
                                     </div>
                                     <div class="card-body p-4">
                                         <div class="grid grid-cols-4 gap-4">
@@ -1181,12 +1206,14 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No Employee Contracts Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload a contract for this employee</p>
+                                @can('setDocs',$employee)
                                 <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                     wire:click="openEditEmployeeContractModal">
                                     <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
                                         class="mr-1"></iconify-icon>
-                                    Upload Contract
-                                </button>
+                                        Upload Contract
+                                    </button>
+                                @endcan
                             </div>
                         @endif
                     </div>
@@ -1199,10 +1226,12 @@
                             Employee S6 Doc Information
                         </h4>
 
+                        @can('setDocs',$employee)
                         <button type="button" class="text-slate-900 dark:text-white"
                             wire:click="openEditEmployeeS6DocModal">
                             <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
                         </button>
+                        @endcan
                     </div>
                     <div class="card-body p-6">
                         @if ($employee->employeeS6Doc && count($employee->employeeS6Doc) > 0)
@@ -1210,13 +1239,15 @@
                                 <div class="card mb-5">
                                     <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
                                         <h5 class="card-title text-slate-900 dark:text-white">S6 Document</h5>
-                                        <div class="flex space-x-3 rtl:space-x-reverse">
-                                            <button type="button" class="text-slate-900 dark:text-white"
-                                                wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to delete this S6 document?',color:'danger',callback:'deleteEmployeeS6DocModal',params:{{ $s6Doc->id }}})">
-                                                <iconify-icon icon="mingcute:delete-line" width="20"
-                                                    height="20"></iconify-icon>
-                                            </button>
-                                        </div>
+                                        @can('setDocs',$employee)
+                                            <div class="flex space-x-3 rtl:space-x-reverse">
+                                                <button type="button" class="text-slate-900 dark:text-white"
+                                                    wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to delete this S6 document?',color:'danger',callback:'deleteEmployeeS6DocModal',params:{{ $s6Doc->id }}})">
+                                                    <iconify-icon icon="mingcute:delete-line" width="20"
+                                                        height="20"></iconify-icon>
+                                                </button>
+                                            </div>
+                                        @endcan
                                     </div>
                                     <div class="card-body p-4">
                                         <div class="grid grid-cols-12 gap-5 pb-5">
@@ -1312,12 +1343,14 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No S6 Documents Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload an S6 document for this employee</p>
+                                @can('setDocs',$employee)
                                 <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                     wire:click="openEditEmployeeS6DocModal">
                                     <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
                                         class="mr-1"></iconify-icon>
-                                    Upload S6 Document
-                                </button>
+                                        Upload S6 Document
+                                    </button>
+                                @endcan
                             </div>
                         @endif
                     </div>
@@ -1330,9 +1363,11 @@
                             Police Record Information
                         </h4>
 
+                        @can('setDocs',$employee)
                         <button wire:click="openEditPoliceRecordModal" class="action-btn" type="button">
                             <iconify-icon icon="heroicons:plus"></iconify-icon>
                         </button>
+                        @endcan
                     </div>
                     <div class="card-body p-6">
                         @if ($employee->policeRecords && $employee->policeRecords->count() > 0)
@@ -1342,6 +1377,7 @@
                                         <h5 class="card-title text-slate-900 dark:text-white">Police Record - Issue
                                             Date
                                             {{ $record->issue_date }}</h5>
+                                        @can('setDocs',$employee)
                                         <div class="flex space-x-3 rtl:space-x-reverse">
                                             <button
                                                 wire:click="openEditSpecificPoliceRecordModal({{ $record->id }})"
@@ -1354,6 +1390,7 @@
                                                 <iconify-icon icon="heroicons:trash"></iconify-icon>
                                             </button>
                                         </div>
+                                        @endcan
                                     </div>
                                     <div class="card-body p-4">
                                         <div class="grid grid-cols-4 gap-4">
@@ -1419,12 +1456,14 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No Police Records Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload a police record for this employee</p>
+                                @can('setDocs',$employee)
                                 <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                     wire:click="openEditPoliceRecordModal">
                                     <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
                                         class="mr-1"></iconify-icon>
                                     Upload Police Record
                                 </button>
+                                @endcan
                             </div>
                         @endif
                     </div>
@@ -1437,9 +1476,11 @@
                             HR Letter Information
                         </h4>
 
+                        @can('setDocs',$employee)
                         <button wire:click="openEditHrLetterModal" class="action-btn" type="button">
                             <iconify-icon icon="heroicons:plus"></iconify-icon>
                         </button>
+                        @endcan
                     </div>
                     <div class="card-body p-6">
                         @if ($employee->hrLetters && $employee->hrLetters->count() > 0)
@@ -1448,17 +1489,19 @@
                                     <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
                                         <h5 class="card-title text-slate-900 dark:text-white">HR Letter - Issue Date
                                             {{ $letter->issue_date }}</h5>
-                                        <div class="flex space-x-3 rtl:space-x-reverse">
-                                            <button wire:click="openEditSpecificHrLetterModal({{ $letter->id }})"
-                                                class="action-btn" type="button">
-                                                <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
-                                            </button>
-                                            <button
-                                                wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to delete this HR letter?',color:'danger',callback:'deleteHrLetterModal',params:{{ $letter->id }}})"
-                                                class="action-btn" type="button">
-                                                <iconify-icon icon="heroicons:trash"></iconify-icon>
-                                            </button>
-                                        </div>
+                                        @can('setDocs',$employee)
+                                            <div class="flex space-x-3 rtl:space-x-reverse">
+                                                <button wire:click="openEditSpecificHrLetterModal({{ $letter->id }})"
+                                                    class="action-btn" type="button">
+                                                    <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                                                </button>
+                                                <button
+                                                    wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to delete this HR letter?',color:'danger',callback:'deleteHrLetterModal',params:{{ $letter->id }}})"
+                                                    class="action-btn" type="button">
+                                                    <iconify-icon icon="heroicons:trash"></iconify-icon>
+                                                </button>
+                                            </div>
+                                        @endcan
                                     </div>
                                     <div class="card-body p-4">
                                         <div class="grid grid-cols-4 gap-4">
@@ -1524,12 +1567,14 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No HR Letters Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload an HR letter for this employee</p>
+                                @can('setDocs',$employee)
                                 <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                     wire:click="openEditHrLetterModal">
                                     <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
                                         class="mr-1"></iconify-icon>
                                     Upload HR Letter
                                 </button>
+                                @endcan
                             </div>
                         @endif
                     </div>
@@ -1542,9 +1587,11 @@
                             Work Declaration Information
                         </h4>
 
+                        @can('setDocs',$employee)
                         <button wire:click="openEditWorkDeclarationModal" class="action-btn" type="button">
                             <iconify-icon icon="heroicons:plus"></iconify-icon>
                         </button>
+                        @endcan
                     </div>
                     <div class="card-body p-6">
                         @if ($employee->workDeclarations && $employee->workDeclarations->count() > 0)
@@ -1553,6 +1600,7 @@
                                     <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
                                         <h5 class="card-title text-slate-900 dark:text-white">Work Declaration - Issue Date
                                             {{ $declaration->issue_date }}</h5>
+                                        @can('setDocs',$employee)
                                         <div class="flex space-x-3 rtl:space-x-reverse">
                                             <button wire:click="openEditSpecificWorkDeclarationModal({{ $declaration->id }})"
                                                 class="action-btn" type="button">
@@ -1564,6 +1612,7 @@
                                                 <iconify-icon icon="heroicons:trash"></iconify-icon>
                                             </button>
                                         </div>
+                                        @endcan
                                     </div>
                                     <div class="card-body p-4">
                                         <div class="grid grid-cols-4 gap-4">
@@ -1629,12 +1678,14 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No Work Declarations Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload a Work Declaration for this employee</p>
+                                @can('setDocs',$employee)
                                 <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                     wire:click="openEditWorkDeclarationModal">
                                     <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
                                         class="mr-1"></iconify-icon>
                                     Upload Work Declaration
                                 </button>
+                                @endcan
                             </div>
                         @endif
                     </div>
@@ -1647,10 +1698,12 @@
                             Employee S1 Doc Information
                         </h4>
 
+                        @can('setDocs',$employee)
                         <button type="button" class="text-slate-900 dark:text-white"
                             wire:click="openEditEmployeeS1DocModal">
                             <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
                         </button>
+                        @endcan
                     </div>
                     <div class="card-body p-6">
                         @if ($employee->employeeS1Doc)
@@ -1727,12 +1780,14 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No Employee S1 Doc Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload an S1 document for this employee</p>
+                                @can('setDocs',$employee)
                                 <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                     wire:click="openEditEmployeeS1DocModal">
                                     <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
                                         class="mr-1"></iconify-icon>
                                     Upload S1 Document
                                 </button>
+                                @endcan
                             </div>
                         @endif
                     </div>
@@ -1745,9 +1800,11 @@
                             Employee S2 Doc Information
                         </h4>
 
+                        @can('setDocs',$employee)
                         <button wire:click="openEditEmployeeS2DocModal" class="action-btn" type="button">
                             <iconify-icon icon="heroicons:plus"></iconify-icon>
                         </button>
+                        @endcan
                     </div>
                     <div class="card-body p-6">
                         @if ($employee->employeeS2Doc && count($employee->employeeS2Doc) > 0)
@@ -1769,6 +1826,7 @@
                                     <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
                                         <h5 class="card-title text-slate-900 dark:text-white">S2 Doc - Year
                                             {{ $s2Doc->year }}</h5>
+                                        @can('setDocs',$employee)
                                         <div class="flex space-x-3 rtl:space-x-reverse">
                                             <button wire:click="openEditSpecificS2DocModal({{ $s2Doc->id }})"
                                                 class="action-btn" type="button">
@@ -1780,6 +1838,7 @@
                                                 <iconify-icon icon="heroicons:trash"></iconify-icon>
                                             </button>
                                         </div>
+                                        @endcan
                                     </div>
                                     <div class="card-body p-4">
                                         <div class="grid grid-cols-4 gap-4">
@@ -1855,12 +1914,14 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No Employee S2 Docs Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload an S2 document for this employee</p>
+                                @can('setDocs',$employee)
                                 <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                     wire:click="openEditEmployeeS2DocModal">
                                     <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
                                         class="mr-1"></iconify-icon>
                                     Upload S2 Document
                                 </button>
+                                @endcan
                             </div>
                         @endif
                     </div>
@@ -1873,9 +1934,11 @@
                             Medical Record Information
                         </h4>
 
+                        @can('setDocs',$employee)
                         <button wire:click="openEditMedicalRecordModal" class="action-btn" type="button">
                             <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
                         </button>
+                        @endcan
                     </div>
                     <div class="card-body p-6">
                         @if ($employee->medicalRecord)
@@ -1984,12 +2047,14 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No Medical Record Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload a medical record for this employee</p>
+                                @can('setDocs',$employee)
                                 <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                     wire:click="openEditMedicalRecordModal">
                                     <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
                                         class="mr-1"></iconify-icon>
                                     Upload Medical Record
                                 </button>
+                                @endcan
                             </div>
                         @endif
 
@@ -2005,9 +2070,11 @@
                         External Medical Record
                         </h4>
 
+                        @can('setDocs',$employee)
                         <button wire:click="openEditExternalMedicalRecordModal" class="action-btn" type="button">
                             <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
                         </button>
+                        @endcan
                     </div>
 
                     @if ($employee->externalMedicalRecord)
@@ -2079,12 +2146,14 @@
                             </div>
                             <h5 class="text-xl font-semibold mb-4">No External Medical Record Found</h5>
                             <p class="text-slate-500 mb-5">Please upload an external medical record for this employee</p>
+                            @can('setDocs',$employee)
                             <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                 wire:click="openEditExternalMedicalRecordModal">
                                 <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
                                     class="mr-1"></iconify-icon>
                                 Upload External Medical Record
                             </button>
+                            @endcan
                         </div>
                     @endif
                 </div>
@@ -2097,9 +2166,11 @@
                         Practice Card
                         </h4>
 
+                        @can('setDocs',$employee)
                         <button wire:click="openEditPracticeCardModal" class="action-btn" type="button">
                             <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
                         </button>
+                        @endcan
                     </div>
 
                     @if ($employee->practiceCard)
@@ -2167,12 +2238,14 @@
                             </div>
                             <h5 class="text-xl font-semibold mb-4">No Practice Card Found</h5>
                             <p class="text-slate-500 mb-5">Please upload a practice card for this employee</p>
+                            @can('setDocs',$employee)
                             <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                 wire:click="openEditPracticeCardModal">
                                 <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
                                     class="mr-1"></iconify-icon>
                                 Upload Practice Card
                             </button>
+                            @endcan
                         </div>
                     @endif
                 </div>
@@ -2185,9 +2258,11 @@
                         Skills Qualification
                         </h4>
 
+                        @can('setDocs',$employee)
                         <button wire:click="openEditSkillsQualificationModal" class="action-btn" type="button">
                             <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
                         </button>
+                        @endcan
                     </div>
 
                     @if ($employee->skillsQualifications)
@@ -2255,12 +2330,14 @@
                             </div>
                             <h5 class="text-xl font-semibold mb-4">No Skills Qualification Found</h5>
                             <p class="text-slate-500 mb-5">Please upload a skills qualification for this employee</p>
+                            @can('setDocs',$employee)
                             <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                 wire:click="openEditSkillsQualificationModal">
                                 <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
                                     class="mr-1"></iconify-icon>
                                 Upload Skills Qualification
                             </button>
+                            @endcan
                         </div>
                     @endif
                 </div>
@@ -2273,9 +2350,11 @@
                         Syndicate Card
                         </h4>
 
+                        @can('setDocs',$employee)
                         <button wire:click="openEditSyndicateCardModal" class="action-btn" type="button">
                             <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
                         </button>
+                        @endcan
                     </div>
 
                     @if ($employee->syndicateCard)
@@ -2343,12 +2422,14 @@
                             </div>
                             <h5 class="text-xl font-semibold mb-4">No Syndicate Card Found</h5>
                             <p class="text-slate-500 mb-5">Please upload a syndicate card for this employee</p>
+                            @can('setDocs',$employee)
                             <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                 wire:click="openEditSyndicateCardModal">
                                 <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
                                     class="mr-1"></iconify-icon>
                                 Upload Syndicate Card
                             </button>
+                            @endcan
                         </div>
                     @endif
                 </div>

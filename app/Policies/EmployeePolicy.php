@@ -85,7 +85,7 @@ class EmployeePolicy
      */
     public function setDocs(User $user, Employee $employee): bool
     {
-        return $user->is_admin || $user->is_hr || $user->id === $employee->user_id;
+        return $user->is_admin || $user->is_hr;
     }
 
     /**

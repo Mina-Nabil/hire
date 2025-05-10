@@ -303,7 +303,7 @@ class Employee extends Model
             throw new AppException('You dont have permission to apply for vacation');
         }
 
-        $currentBalance = $vacationBenefit->balance;
+        $currentBalance = $vacationBenefit->current_balance;
 
         if ($currentBalance < $hours_count) {
             throw new AppException('You dont have enough vacation days');
@@ -311,9 +311,11 @@ class Employee extends Model
         try {
             DB::transaction(function () use ($hours_count, $days, $currentBalance, $vacationBenefit) {
                 $appliedVacation = $this->appliedVacations()->create([
-                    'days' => $days,
+                    'vacation_benefit_id' => $vacationBenefit->id,
+                    'hours' => $hours_count,
                     'new_balance' => $currentBalance - $hours_count,
                 ]);
+                // dd($days);
                 $appliedVacation->vacationDays()->createMany($days);
                 $vacationBenefit->update([
                     'balance' => $currentBalance - $hours_count,

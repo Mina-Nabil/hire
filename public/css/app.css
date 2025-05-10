@@ -3344,8 +3344,13 @@ textarea.form-control.is-invalid {
     .modal-fullscreen-sm-down .modal-footer {
         border-radius: 0;
     }
+    .sm\:w-full {
+        width: 100%;
+    }
+
 }
 @media (max-width: 767.98px) {
+    
     .modal-fullscreen-md-down {
         width: 100vw;
         max-width: none;
@@ -16457,6 +16462,7 @@ ul.custom-list ul {
         padding-right: 15px;
         padding-left: 15px;
     }
+
     .sm\:mb-0 {
         margin-bottom: 0;
     }

@@ -1,46 +1,15 @@
 <div class="space-y-5 profile-page mx-auto">
+    <div class="flex justify-end mb-4">
+        <a href="{{ route('employee.apply-for-vacation') }}" class="btn btn-primary">
+            <iconify-icon icon="heroicons-outline:calendar" class="text-lg mr-1"></iconify-icon>
+            Apply for Vacation
+        </a>
+    </div>
     <div class="flex justify-between">
         <div class="flex gap-5">
             <h4>
                 <b>{{ $employee->name }}</b>
             </h4>
-            <div class="dropdown relative">
-                <button class="btn inline-flex justify-center btn-dark items-center btn-sm" type="button"
-                    id="darkDropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                    Actions
-                    <iconify-icon class="text-xl ltr:ml-2 rtl:mr-2" icon="ic:round-keyboard-arrow-down"></iconify-icon>
-                </button>
-                <ul
-                    class="dropdown-menu min-w-max absolute text-sm text-slate-700 dark:text-white hidden bg-white dark:bg-slate-700 shadow
-                                z-[2] float-left overflow-hidden list-none text-left rounded-lg mt-1 m-0 bg-clip-padding border-none">
-                    <li wire:click="editConfiguration()"
-                        class="text-slate-600 dark:text-white block font-Inter font-normal px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-600
-                                                dark:hover:text-white cursor-pointer">
-                        Edit Main Package
-                    </li>
-                    <li wire:click="addCustomBaseBenefit()"
-                        class="text-slate-600 dark:text-white block font-Inter font-normal px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-600
-                                                dark:hover:text-white cursor-pointer">
-                        Add Custom Base Compensation or Benefit
-                    </li>
-                    <li wire:click="addCustomVacationBenefit()"
-                        class="text-slate-600 dark:text-white block font-Inter font-normal px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-600
-                                                dark:hover:text-white cursor-pointer">
-                        Add Custom Vacation Rule
-                    </li>
-                    <li wire:click="addLoan()"
-                        class="text-slate-600 dark:text-white block font-Inter font-normal px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-600
-                                                dark:hover:text-white cursor-pointer">
-                        Add Loan
-                    </li>
-                    <li wire:click="addPurchase()"
-                        class="text-slate-600 dark:text-white block font-Inter font-normal px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-600
-                                                dark:hover:text-white cursor-pointer">
-                        Add Purchase
-                    </li>
-
-                </ul>
-            </div>
         </div>
     </div>
 
@@ -190,12 +159,9 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
 
                 <div>
-
-
                     <!-- Benefit Configuration Card -->
                     <div class="col-md-6">
                         <div class="card">
@@ -246,7 +212,6 @@
                             </div>
                         </div>
                     </div>
-
 
                     <!-- Vacation Benefits Card -->
                     <div class="col-md-6 mt-5">
@@ -299,7 +264,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
 
         <!-- Payments Tab -->
@@ -548,319 +512,4 @@
             </div>
         </div>
     </div>
-
-
-    <livewire:benefits.partials.apply-package-modal />
-
-    <!-- Custom Base Benefit Modal -->
-    <div>
-        @if ($showAddCustomBaseBenefitModal)
-            <x-modal wire:model="showAddCustomBaseBenefitModal">
-                <x-slot name="title">Add Custom Base Benefit</x-slot>
-
-                <div class="space-y-6">
-                    @if ($errors->any())
-                        <div class="alert alert-warning mb-4">
-                            <div class="flex items-center">
-                                <i class="fas fa-info-circle mr-2"></i>
-                                <div>
-                                    <p class="font-medium">Please fix the following errors:</p>
-                                    <ul>
-                                        @foreach ($errors->all() as $error)
-                                            <li>{{ $error }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-
-                    <div class="grid grid-cols-1 gap-4">
-
-                        <x-select wire:model="baseBenefit.receiver" label="Paid to*"
-                            errorMessage="{{ $errors->first('baseBenefit.receiver') }}">
-                            <option value="" disabled selected>-- Select Receiver --</option>
-                            @foreach ($benefitReceivers as $receiver)
-                                <option value="{{ $receiver }}">{{ $receiver }}</option>
-                            @endforeach
-                        </x-select>
-
-
-                        <x-text-input label="Name*" type="text" wire:model="baseBenefit.name"
-                            errorMessage="{{ $errors->first('baseBenefit.name') }}" />
-
-                        <x-text-input label="Amount*" type="number" step="0.01" wire:model="baseBenefit.amount"
-                            errorMessage="{{ $errors->first('baseBenefit.amount') }}" />
-
-
-                        <x-select wire:model="baseBenefit.type" label="Increment Type*"
-                            errorMessage="{{ $errors->first('baseBenefit.type') }}">
-                            <option value="" disabled selected>-- Select Type --</option>
-                            @foreach ($benefitIncrementTypes as $type)
-                                <option value="{{ $type }}">{{ $type }}</option>
-                            @endforeach
-                        </x-select>
-
-
-
-
-                        <x-text-input label="Start Date*" type="date" wire:model="baseBenefit.start_date"
-                            errorMessage="{{ $errors->first('baseBenefit.start_date') }}" />
-                    </div>
-                </div>
-
-                <x-slot name="footer">
-                    <div class="mt-4 flex justify-end gap-3">
-                        <x-secondary-button wire:click="closeAddCustomBaseBenefitModal">Cancel</x-secondary-button>
-                        <x-primary-button wire:click.prevent="saveCustomBaseBenefit"
-                            loadingFunction="saveCustomBaseBenefit">
-                            Save
-                        </x-primary-button>
-                    </div>
-                </x-slot>
-            </x-modal>
-        @endif
-    </div>
-
-    <!-- Custom Vacation Benefit Modal -->
-    <div>
-        @if ($showAddCustomVacationBenefitModal)
-            <x-modal wire:model="showAddCustomVacationBenefitModal">
-                <x-slot name="title">Add Custom Vacation Benefit</x-slot>
-
-                <div class="space-y-6">
-                    @if ($errors->any())
-                        <div class="alert alert-warning mb-4">
-                            <div class="flex items-center">
-                                <i class="fas fa-info-circle mr-2"></i>
-                                <div>
-                                    <p class="font-medium">Please fix the following errors:</p>
-                                    <ul>
-                                        @foreach ($errors->all() as $error)
-                                            <li>{{ $error }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-
-                    <div class="grid grid-cols-1 gap-4">
-                        <x-text-input label="Name*" type="text" wire:model="vacationBenefit.name"
-                            errorMessage="{{ $errors->first('vacationBenefit.name') }}" />
-
-                        <x-select wire:model="vacationBenefit.type" label="Increment Type*"
-                            errorMessage="{{ $errors->first('vacationBenefit.type') }}">
-                            <option value="" disabled selected>-- Select Type --</option>
-                            @foreach ($vacationBenefitTypes as $type)
-                                <option value="{{ $type }}">{{ $type }}</option>
-                            @endforeach
-
-                        </x-select>
-
-                        <x-text-input label="Increment Rate*" type="number" step="0.01"
-                            wire:model="vacationBenefit.inc_rate"
-                            errorMessage="{{ $errors->first('vacationBenefit.inc_rate') }}" />
-
-                        <x-text-input label="Hour Price*" type="number" step="0.01"
-                            wire:model="vacationBenefit.hour_price"
-                            errorMessage="{{ $errors->first('vacationBenefit.hour_price') }}" />
-
-                        <x-text-input label="Current Balance*" type="number" step="0.01"
-                            wire:model="vacationBenefit.current_balance"
-                            errorMessage="{{ $errors->first('vacationBenefit.current_balance') }}" />
-
-                        <x-text-input label="Max Balance*" type="number" step="0.01"
-                            wire:model="vacationBenefit.max_balance"
-                            errorMessage="{{ $errors->first('vacationBenefit.max_balance') }}" />
-
-
-
-                        <x-text-input label="Start Date*" type="date" wire:model="vacationBenefit.start_date"
-                            errorMessage="{{ $errors->first('vacationBenefit.start_date') }}" />
-                    </div>
-                </div>
-
-                <x-slot name="footer">
-                    <div class="mt-4 flex justify-end gap-3">
-                        <x-secondary-button wire:click="closeAddCustomVacationBenefitModal">Cancel</x-secondary-button>
-                        <x-primary-button wire:click.prevent="saveCustomVacationBenefit"
-                            loadingFunction="saveCustomVacationBenefit">
-                            Save
-                        </x-primary-button>
-                    </div>
-                </x-slot>
-            </x-modal>
-        @endif
-    </div>
-
-    <!-- Loan Modal -->
-    <div>
-        @if ($showAddLoanModal)
-            <x-modal wire:model="showAddLoanModal">
-                <x-slot name="title">Add Loan</x-slot>
-
-                <div class="space-y-6">
-                    @if ($errors->any())
-                        <div class="alert alert-warning mb-4">
-                            <div class="flex items-center">
-                                <i class="fas fa-info-circle mr-2"></i>
-                                <div>
-                                    <p class="font-medium">Please fix the following errors:</p>
-                                    <ul>
-                                        @foreach ($errors->all() as $error)
-                                            <li>{{ $error }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-
-                    <div class="grid grid-cols-1 gap-4">
-                        <x-text-input label="Total Amount*" type="number" step="0.01" wire:model="loan.amount"
-                            wire:change="updateRemainingAmount" errorMessage="{{ $errors->first('loan.amount') }}" />
-
-                        <x-textarea label="Description" wire:model="loan.desc"
-                            errorMessage="{{ $errors->first('loan.desc') }}" />
-
-                        <div class="border-t pt-4">
-                            <div class="flex justify-between items-center mb-3">
-                                <h3 class="font-medium">Payment Plan</h3>
-                                <div>
-                                    <span class="text-sm mr-3">Remaining: {{ $loanRemainingAmount }}</span>
-                                    <x-secondary-button wire:click="addLoanPayment" size="sm">
-                                        <iconify-icon icon="mdi:plus"></iconify-icon> Add Payment
-                                    </x-secondary-button>
-                                </div>
-                            </div>
-
-                            @foreach ($loanPayments as $index => $payment)
-                                <div class="border rounded-lg p-3 mb-3">
-                                    <div class="flex justify-between items-center mb-2">
-                                        <h4 class="font-medium">Payment {{ $index + 1 }}</h4>
-                                        <button type="button" class="text-red-500"
-                                            wire:click="removeLoanPayment({{ $index }})">
-                                            <iconify-icon icon="mdi:delete"></iconify-icon>
-                                        </button>
-                                    </div>
-                                    <div class="grid grid-cols-2 gap-3">
-                                        <x-text-input label="Amount*" type="number" step="0.01"
-                                            wire:model="loanPayments.{{ $index }}.amount"
-                                            wire:change="updateRemainingAmount"
-                                            errorMessage="{{ $errors->first('loanPayments.' . $index . '.amount') }}" />
-
-                                        <x-text-input label="Due Date*" type="date"
-                                            wire:model="loanPayments.{{ $index }}.due_date"
-                                            errorMessage="{{ $errors->first('loanPayments.' . $index . '.due_date') }}" />
-
-                                        <div class="col-span-2">
-                                            <x-textarea label="Description"
-                                                wire:model="loanPayments.{{ $index }}.desc"
-                                                errorMessage="{{ $errors->first('loanPayments.' . $index . '.desc') }}" />
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-
-                <x-slot name="footer">
-                    <div class="mt-4 flex justify-end gap-3">
-                        <x-secondary-button wire:click="closeAddLoanModal">Cancel</x-secondary-button>
-                        <x-primary-button wire:click.prevent="saveLoan" loadingFunction="saveLoan" :disabled="$loanRemainingAmount != 0">
-                            Save
-                        </x-primary-button>
-                    </div>
-                </x-slot>
-            </x-modal>
-        @endif
-    </div>
-
-    <!-- Purchase Modal -->
-    <div>
-        @if ($showAddPurchaseModal)
-            <x-modal wire:model="showAddPurchaseModal">
-                <x-slot name="title">Add Purchase</x-slot>
-
-                <div class="space-y-6">
-                    @if ($errors->any())
-                        <div class="alert alert-warning mb-4">
-                            <div class="flex items-center">
-                                <i class="fas fa-info-circle mr-2"></i>
-                                <div>
-                                    <p class="font-medium">Please fix the following errors:</p>
-                                    <ul>
-                                        @foreach ($errors->all() as $error)
-                                            <li>{{ $error }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-
-                    <div class="grid grid-cols-1 gap-4">
-                        <x-text-input label="Total Amount*" type="number" step="0.01"
-                            wire:model="purchase.amount" wire:change="updateRemainingPurchaseAmount"
-                            errorMessage="{{ $errors->first('purchase.amount') }}" />
-
-                        <x-textarea label="Description" wire:model="purchase.desc"
-                            errorMessage="{{ $errors->first('purchase.desc') }}" />
-
-                        <div class="border-t pt-4">
-                            <div class="flex justify-between items-center mb-3">
-                                <h3 class="font-medium">Payment Plan</h3>
-                                <div>
-                                    <span class="text-sm mr-3">Remaining: {{ $purchaseRemainingAmount }}</span>
-                                    <x-secondary-button wire:click="addPurchasePayment" size="sm">
-                                        <iconify-icon icon="mdi:plus"></iconify-icon> Add Payment
-                                    </x-secondary-button>
-                                </div>
-                            </div>
-
-                            @foreach ($purchasePayments as $index => $payment)
-                                <div class="border rounded-lg p-3 mb-3">
-                                    <div class="flex justify-between items-center mb-2">
-                                        <h4 class="font-medium">Payment {{ $index + 1 }}</h4>
-                                        <button type="button" class="text-red-500"
-                                            wire:click="removePurchasePayment({{ $index }})">
-                                            <iconify-icon icon="mdi:delete"></iconify-icon>
-                                        </button>
-                                    </div>
-                                    <div class="grid grid-cols-2 gap-3">
-                                        <x-text-input label="Amount*" type="number" step="0.01"
-                                            wire:model="purchasePayments.{{ $index }}.amount"
-                                            wire:change="updateRemainingPurchaseAmount"
-                                            errorMessage="{{ $errors->first('purchasePayments.' . $index . '.amount') }}" />
-
-                                        <x-text-input label="Due Date*" type="date"
-                                            wire:model="purchasePayments.{{ $index }}.due_date"
-                                            errorMessage="{{ $errors->first('purchasePayments.' . $index . '.due_date') }}" />
-
-                                        <div class="col-span-2">
-                                            <x-textarea label="Description"
-                                                wire:model="purchasePayments.{{ $index }}.desc"
-                                                errorMessage="{{ $errors->first('purchasePayments.' . $index . '.desc') }}" />
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-
-                <x-slot name="footer">
-                    <div class="mt-4 flex justify-end gap-3">
-                        <x-secondary-button wire:click="closeAddPurchaseModal">Cancel</x-secondary-button>
-                        <x-primary-button wire:click.prevent="savePurchase" loadingFunction="savePurchase"
-                            :disabled="$purchaseRemainingAmount != 0">
-                            Save
-                        </x-primary-button>
-                    </div>
-                </x-slot>
-            </x-modal>
-        @endif
-    </div>
-</div>
+</div> 

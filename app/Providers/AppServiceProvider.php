@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Gate;
 use App\Models\Base\Area;
 use App\Models\Base\City;
 use App\Models\Base\InsuranceOffice;

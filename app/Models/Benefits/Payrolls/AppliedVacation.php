@@ -20,6 +20,7 @@ class AppliedVacation extends Model
         'payroll_id',
         'status',
         'days',
+        'hours',
         'new_balance',
     ];
     const STATUS_PENDING = 'pending';
@@ -31,6 +32,7 @@ class AppliedVacation extends Model
         self::STATUS_REJECTED,
     ];
 
+    public $timestamps = false;
 
     //model functions
     public function approve()

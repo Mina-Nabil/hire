@@ -13,6 +13,8 @@ class VacationDay extends Model
         'vacation_date',
         'hours',
     ];
+    public $timestamps = false;
+
 
     public function appliedVacation()
     {

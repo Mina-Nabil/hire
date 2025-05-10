@@ -23,9 +23,13 @@ class Login extends Component
         ]);
 
         try {
-            User::login($this->username, $this->password);
+            $user = User::login($this->username, $this->password);
             $this->alertSuccess('Login successful');
-            return redirect('/');
+            if ($user->is_admin || $user->is_hr) {
+                return redirect('/');
+            } else {
+                return redirect('/employee/benefits');
+            }
         } catch(AppException $e) {
             $this->alertError($e->getMessage());
         } 

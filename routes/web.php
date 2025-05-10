@@ -17,6 +17,7 @@ use App\Livewire\Base\InsuranceOfficeIndex;
 use App\Livewire\Benefits\ConfigurationIndex;
 use App\Livewire\Benefits\EmployeeConfiguration;
 use App\Livewire\Benefits\PackageIndex;
+use App\Livewire\Employee\EmployeeBenefitsView;
 use App\Livewire\Employee\EmployeeDashboard;
 use App\Livewire\Employee\EmployeeIndex;
 use App\Livewire\Employee\EmployeeShow;
@@ -27,6 +28,8 @@ use App\Livewire\Recruitment\ChannelIndex;
 use App\Livewire\Recruitment\ApplicantsIndex;
 use App\Livewire\Recruitment\VacancyShow;
 use Illuminate\Support\Facades\Auth;
+use App\Livewire\Employee\ApplyForVacation;
+use App\Livewire\Employee\EmployeeDocumentView;
 
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/', Dashboard::class)->name('home');
@@ -57,6 +60,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/employees/dashboard', EmployeeDashboard::class)->name('employees.dashboard');
     Route::get('/employees/reports/missing-documents', MissingDocReport::class)->name('employees.reports.missing-documents');
     Route::get('/employees/{id}', EmployeeShow::class)->name('employees.show');
+    Route::get('/employee/benefits', EmployeeBenefitsView::class)->name('employee.benefits');
+    Route::get('/employee/apply-for-vacation', ApplyForVacation::class)->name('employee.apply-for-vacation');
+    Route::get('/employee/documents', EmployeeDocumentView::class)->name('employee.documents');
     
     Route::get('/settings/users', UsersIndex::class);
     Route::get('/settings/areas', AreasIndex::class);

@@ -1,0 +1,189 @@
+<?php
+
+namespace App\Livewire\Employee;
+
+use App\Models\Personel\Employee;
+use App\Models\Benefits\Vacations\VacationBenefit;
+use App\Traits\AlertFrontEnd;
+use Carbon\Carbon;
+use Livewire\Component;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
+use Illuminate\Support\Facades\Auth;
+
+#[Layout('components.layouts.employee')]
+#[Title('Apply for Vacation')]
+class ApplyForVacation extends Component
+{
+    use AlertFrontEnd;
+
+    public $employee;
+    public $vacationBenefits = [];
+    public $selectedBenefitId;
+    public $totalHours = 0;
+    public $days = [];
+    public $fromDate;
+    public $toDate;
+    public $description;
+    public $showConfirmModal = false;
+    public $selectedBenefit = null;
+
+    public function mount()
+    {
+        $this->employee = Employee::where('user_id', Auth::id())->first();
+        
+        if ($this->employee) {
+            $this->loadVacationBenefits();
+        }
+
+    }
+
+    public function loadVacationBenefits()
+    {
+        $this->vacationBenefits = $this->employee->vacationBenefits()
+            ->whereNull('end_date')
+            ->where('current_balance', '>', 0)
+            ->get();
+    }
+
+    public function updatedFromDate()
+    {
+        $this->resetDays();
+    }
+
+    public function updatedToDate()
+    {
+        $this->generateDays();
+    }
+
+    public function resetDays()
+    {
+        $this->days = [];
+        $this->totalHours = 0;
+    }
+
+    public function generateDays()
+    {
+        if (empty($this->fromDate) || empty($this->toDate)) {
+            return;
+        }
+
+        $this->resetDays();
+        
+        $startDate = Carbon::parse($this->fromDate);
+        $endDate = Carbon::parse($this->toDate);
+        
+        if ($startDate->gt($endDate)) {
+            $this->alertError('Start date cannot be after end date');
+            return;
+        }
+        
+        $currentDate = $startDate->copy();
+        
+        while ($currentDate->lte($endDate)) {
+            // Skip weekends (modify as needed based on your business logic)
+            if (!$currentDate->isWeekend()) {
+                $this->days[] = [
+                    'vacation_date' => $currentDate->format('Y-m-d'),
+                    'hours' => 8, // Default to 8 hours per day
+                ];
+                $this->totalHours += 8;
+            }
+            
+            $currentDate->addDay();
+        }
+    }
+
+    public function updateHours($index, $hours)
+    {
+        $oldHours = $this->days[$index]['hours'] ?? 0;
+        $this->days[$index]['hours'] = $hours;
+        $this->totalHours = $this->totalHours - $oldHours + $hours;
+    }
+
+    public function removeDay($index)
+    {
+        $hours = $this->days[$index]['hours'] ?? 0;
+        $this->totalHours -= $hours;
+        unset($this->days[$index]);
+        $this->days = array_values($this->days);
+    }
+    
+    public function openConfirmModal()
+    {
+        $this->validate([
+            'selectedBenefitId' => 'required',
+            'days' => 'required|array|min:1',
+            'days.*.vacation_date' => 'required|date',
+            'days.*.hours' => 'required|numeric|min:1|max:24',
+            'description' => 'nullable|string|max:255',
+        ]);
+
+        if (empty($this->days)) {
+            $this->alertError('You must add at least one day for vacation');
+            return;
+        }
+
+        try {
+            $this->selectedBenefit = VacationBenefit::findOrFail($this->selectedBenefitId);
+            
+            if ($this->selectedBenefit->current_balance < $this->totalHours) {
+                $this->alertError('You don\'t have enough balance for this vacation request');
+                return;
+            }
+            
+            $this->showConfirmModal = true;
+            
+        } catch (\Exception $e) {
+            $this->alertError('Error: ' . $e->getMessage());
+        }
+    }
+    
+    public function closeConfirmModal()
+    {
+        $this->showConfirmModal = false;
+    }
+
+    public function submit()
+    {
+        if (empty($this->days)) {
+            $this->alertError('You must add at least one day for vacation');
+            return;
+        }
+
+        try {
+            $vacationBenefit = VacationBenefit::findOrFail($this->selectedBenefitId);
+            
+            if ($vacationBenefit->current_balance < $this->totalHours) {
+                $this->alertError('You don\'t have enough balance for this vacation request');
+                return;
+            }
+            
+            $this->employee->applyForVacation($vacationBenefit, $this->totalHours, $this->days);
+            
+            $this->showConfirmModal = false;
+            $this->alertSuccess('Vacation request submitted successfully');
+            $this->resetForm();
+            $this->loadVacationBenefits();
+        } catch (\Exception $e) {
+            $this->alertError('Error: ' . $e->getMessage());
+        }
+    }
+
+    private function resetForm()
+    {
+        $this->selectedBenefitId = null;
+        $this->fromDate = null;
+        $this->toDate = null;
+        $this->days = [];
+        $this->totalHours = 0;
+        $this->description = null;
+    }
+
+    public function render()
+    {
+        return view('livewire.employee.apply-for-vacation', [
+            'benefits' => 'active'
+        ]);
+    }
+} 

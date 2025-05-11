@@ -62,8 +62,7 @@
                     <h4 class="text-xl font-medium mb-5">Personal Information</h4>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
                         <!-- First Name -->
-                        <div class="w-full">
-                            <div class="form-group">
+                            <div class="form-group sm:col-span-3">
                                 <label for="firstName" class="form-label">First Name <span
                                         class="text-danger-500">*</span></label>
                                 <input type="text" id="firstName" wire:model="firstName"
@@ -73,10 +72,8 @@
                                         class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
                                 @enderror
                             </div>
-                        </div>
                         <!-- Middle Name -->
-                        <div class="w-full">
-                            <div class="form-group">
+                            <div class="form-group sm:col-span-3">
                                 <label for="middleName" class="form-label">Middle Name</label>
                                 <input type="text" id="middleName" wire:model="middleName"
                                     class="form-control @error('middleName') !border-danger-500 @enderror">
@@ -85,10 +82,8 @@
                                         class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
                                 @enderror
                             </div>
-                        </div>
                         <!-- Last Name -->
-                        <div class="w-full">
-                            <div class="form-group">
+                            <div class="form-group sm:col-span-3">
                                 <label for="lastName" class="form-label">Last Name <span
                                         class="text-danger-500">*</span></label>
                                 <input type="text" id="lastName" wire:model="lastName"
@@ -98,10 +93,9 @@
                                         class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
                                 @enderror
                             </div>
-                        </div>
 
                         <!-- Email -->
-                        <div class="form-group w-full">
+                        <div class="form-group sm:col-span-3">
                             <label for="email" class="form-label">Email <span
                                     class="text-danger-500">*</span></label>
                             <input type="email" id="email" wire:model="email"
@@ -113,7 +107,7 @@
                         </div>
 
                         <!-- Phone -->
-                        <div class="form-group w-full">
+                        <div class="form-group sm:col-span-3">
                             <label for="phone" class="form-label">Phone <span
                                     class="text-danger-500">*</span></label>
                             <input type="text" id="phone" wire:model="phone"
@@ -125,7 +119,7 @@
                         </div>
 
                         <!-- Home Phone -->
-                        <div class="form-group w-full">
+                        <div class="form-group sm:col-span-3">
                             <label for="homePhone" class="form-label">Home Phone</label>
                             <input type="text" id="homePhone" wire:model="homePhone"
                                 class="form-control @error('homePhone') !border-danger-500 @enderror">
@@ -136,7 +130,7 @@
                         </div>
 
                         <!-- Area -->
-                        <div class="form-group w-full">
+                        <div class="form-group sm:col-span-3">
                             <label for="cityId" class="form-label">City <span class="text-danger-500">*</span></label>
                             <select id="cityId" wire:model.live="cityId"
                                 class="form-control @error('cityId') !border-danger-500 @enderror">
@@ -151,7 +145,7 @@
                             @enderror
                         </div>
 
-                        <div class="form-group w-full">
+                        <div class="form-group sm:col-span-3">
                             <label for="areaId" class="form-label">Area <span class="text-danger-500">*</span></label>
                             <select id="areaId" wire:model="areaId"
                                 class="form-control @error('areaId') !border-danger-500 @enderror">
@@ -173,7 +167,7 @@
                         </div>
 
                         <!-- Nationality -->
-                        <div class="form-group w-full">
+                        <div class="form-group sm:col-span-3">
                             <label for="nationality" class="form-label">Nationality</label>
                             <input type="text" id="nationality" wire:model="nationality"
                                 class="form-control @error('nationality') !border-danger-500 @enderror">
@@ -184,7 +178,7 @@
                         </div>
 
                         <!-- Address -->
-                        <div class="form-group col-span-3 w-full">
+                        <div class="form-group sm:col-span-3">
                             <label for="address" class="form-label">Address</label>
                             <textarea id="address" wire:model="address" class="form-control @error('address') !border-danger-500 @enderror"
                                 rows="2"></textarea>
@@ -195,7 +189,7 @@
                         </div>
 
                         <!-- Birth Date -->
-                        <div class="form-group w-full">
+                        <div class="form-group sm:col-span-3">
                             <label for="birthDate" class="form-label">Birth Date</label>
                             <input type="date" id="birthDate" wire:model="birthDate"
                                 class="form-control @error('birthDate') !border-danger-500 @enderror">
@@ -206,7 +200,7 @@
                         </div>
 
                         <!-- Gender -->
-                        <div class="form-group w-full">
+                        <div class="form-group sm:col-span-3">
                             <label for="gender" class="form-label">Gender</label>
                             <select id="gender" wire:model="gender"
                                 class="form-control @error('gender') !border-danger-500 @enderror">
@@ -222,7 +216,7 @@
                         </div>
 
                         <!-- Marital Status -->
-                        <div class="form-group w-full">
+                        <div class="form-group sm:col-span-3">
                             <label for="maritalStatus" class="form-label">Marital Status</label>
                             <select id="maritalStatus" wire:model="maritalStatus"
                                 class="form-control @error('maritalStatus') !border-danger-500 @enderror">
@@ -238,7 +232,7 @@
                         </div>
 
                         <!-- Military Status -->
-                        <div class="form-group w-full">
+                        <div class="form-group sm:col-span-3">
                             <label for="militaryStatus" class="form-label">Military Status</label>
                             <select id="militaryStatus" wire:model="militaryStatus"
                                 class="form-control @error('militaryStatus') !border-danger-500 @enderror">
@@ -254,7 +248,7 @@
                         </div>
 
                         <!-- Social Number -->
-                        <div class="form-group">
+                        <div class="form-group sm:col-span-3">
                             <label for="socialNumber" class="form-label  w-full">Social Number <span
                                     class="text-danger-500">*</span>
                             </label>
@@ -267,7 +261,7 @@
                         </div>
 
                         <!-- Channel -->
-                        <div class="form-group w-full">
+                        <div class="form-group sm:col-span-3">
                             <label for="channelId" class="form-label">Application Channel</label>
                             <select id="channelId" wire:model="channelId"
                                 class="form-control @error('channelId') !border-danger-500 @enderror">

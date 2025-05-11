@@ -2,7 +2,7 @@
     <div class="flex justify-between flex-wrap items-center">
         <div class="md:mb-6 mb-4 flex space-x-3 rtl:space-x-reverse">
             <h4 class="font-medium lg:text-2xl text-xl capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
-                {{ __('Public Holidays Management') }}
+                Public Holidays Management
             </h4>
         </div>
         <div class="flex sm:space-x-4 space-x-2 sm:justify-end items-center md:mb-6 mb-4 rtl:space-x-reverse">
@@ -10,7 +10,7 @@
                 <button wire:click="openNewHolidaySec"
                     class="btn inline-flex justify-center btn-dark dark:bg-slate-700 dark:text-slate-300 m-1">
                     <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2" icon="ph:plus-bold"></iconify-icon>
-                    {{ __('Create Holiday') }}
+                    Create Holiday
                 </button>
             @endcan
         </div>
@@ -19,7 +19,7 @@
         <header class="card-header cust-card-header noborder">
             <iconify-icon wire:loading wire:target="search" class="loading-icon text-lg"
                 icon="line-md:loading-twotone-loop"></iconify-icon>
-            <input type="text" class="form-control !pl-9 mr-1 basis-1/4" placeholder="{{ __('Search holidays') }}"
+            <input type="text" class="form-control !pl-9 mr-1 basis-1/4" placeholder="Search holidays"
                 wire:model.live.debounce.500ms="search">
         </header>
 
@@ -67,14 +67,14 @@
                                                         <span
                                                             class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300  last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize  rtl:space-x-reverse">
                                                             <iconify-icon icon="lucide:edit"></iconify-icon>
-                                                            <span>{{ __('Edit') }}</span></span>
+                                                            <span>Edit</span></span>
                                                     </li>
 
                                                     <li wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to delete this holiday?',color:'danger',callback:'deletePublicHoliday',params:{{ $holiday->id }}})">
                                                         <span
                                                             class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300  last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize  rtl:space-x-reverse">
                                                             <iconify-icon icon="lucide:trash-2"></iconify-icon>
-                                                            <span>{{ __('Delete') }}</span></span>
+                                                            <span>Delete</span></span>
                                                     </li>
                                                 </ul>
                                             </div>
@@ -90,11 +90,11 @@
                                 <div class="card-body rounded-md bg-white dark:bg-slate-800">
                                     <div class="items-center text-center p-5">
                                         <h2><iconify-icon icon="icon-park-outline:search"></iconify-icon></h2>
-                                        <h2 class="card-title text-slate-900 dark:text-white mb-3">{{ __('No holidays found') }}</h2>
-                                        <p class="card-text">{{ __('Try changing your search criteria') }}
+                                        <h2 class="card-title text-slate-900 dark:text-white mb-3">No holidays found</h2>
+                                        <p class="card-text">Try changing your search criteria
                                         </p>
                                         <a href="{{ route('public-holidays.index') }}"
-                                            class="btn inline-flex justify-center mx-2 mt-3 btn-primary active btn-sm">{{ __('View all holidays') }}</a>
+                                            class="btn inline-flex justify-center mx-2 mt-3 btn-primary active btn-sm">View all holidays</a>
                                     </div>
                                 </div>
                             </div>
@@ -122,7 +122,7 @@
                             <div
                                 class="flex items-center justify-between p-5 border-b rounded-t dark:border-slate-600 bg-black-500">
                                 <h3 class="text-xl font-medium text-white dark:text-white capitalize">
-                                    {{ $setHolidaySec === true ? __('Create New Holiday') : __('Edit Holiday') }}
+                                    {{ $setHolidaySec === true ? 'Create New Holiday' : 'Edit Holiday' }}
                                 </h3>
                                 <button wire:click="closeSetHolidaySec" type="button"
                                     class="text-slate-400 bg-transparent hover:text-slate-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-slate-600 dark:hover:text-white"
@@ -133,14 +133,14 @@
                                             d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
                                             clip-rule="evenodd"></path>
                                     </svg>
-                                    <span class="sr-only">{{ __('Close') }}</span>
+                                    <span class="sr-only">Close</span>
                                 </button>
                             </div>
                             <!-- Modal body -->
                             <div class="p-6 space-y-4">
                                 <div class="from-group">
                                     <div class="input-area">
-                                        <label for="name" class="form-label">{{ __('Name') }}</label>
+                                        <label for="name" class="form-label">Name</label>
                                         <input id="name" type="text"
                                             class="form-control @error('name') !border-danger-500 @enderror"
                                             wire:model="name" autocomplete="off">
@@ -152,7 +152,7 @@
                                 </div>
                                 <div class="from-group">
                                     <div class="input-area">
-                                        <label for="date" class="form-label">{{ __('Date') }}</label>
+                                        <label for="date" class="form-label">Date</label>
                                         <input type="date"
                                             class="form-control @error('date') !border-danger-500 @enderror"
                                             wire:model="date" autocomplete="off">
@@ -168,13 +168,13 @@
                                 class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
                                 <button wire:click="closeSetHolidaySec" data-bs-dismiss="modal"
                                     class="btn inline-flex justify-center text-white bg-black-500">
-                                    {{ __('Close') }}
+                                    Close
                                 </button>
                                 <button
                                     @if ($setHolidaySec === true) wire:click="addNewHoliday" @else wire:click="editHoliday" @endif
                                     data-bs-dismiss="modal"
                                     class="btn inline-flex justify-center text-white bg-black-500">
-                                    <span wire:loading.remove wire:target="addNewHoliday,editHoliday">{{ __('Submit') }}</span>
+                                    <span wire:loading.remove wire:target="addNewHoliday,editHoliday">Submit</span>
                                     <iconify-icon class="text-xl spin-slow ltr:mr-2 rtl:ml-2 relative top-[1px]"
                                         wire:loading wire:target="addNewHoliday,editHoliday"
                                         icon="line-md:loading-twotone-loop"></iconify-icon>

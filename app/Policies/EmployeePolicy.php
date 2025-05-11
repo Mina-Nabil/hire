@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Models\Attendance\Overtime;
 use App\Models\Personel\Employee;
 use App\Models\Personel\Docs\EmployeeHrLetterRequest;
 use App\Models\Users\User;
@@ -84,6 +85,11 @@ class EmployeePolicy
     }
 
     public function updateHrLetterRequest(User $user, Employee $employee): bool
+    {
+        return $user->is_admin || $user->is_hr;
+    }
+
+    public function updateOvertime(User $user, Employee $employee): bool
     {
         return $user->is_admin || $user->is_hr;
     }

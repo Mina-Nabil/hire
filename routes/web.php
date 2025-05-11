@@ -32,6 +32,8 @@ use App\Livewire\Employee\ApplyForVacation;
 use App\Livewire\Employee\EmployeeDocumentView;
 use App\Livewire\Employee\RequestHrLetter;
 use App\Livewire\Employee\HrLetterRequests;
+use App\Livewire\Employee\OvertimeRequests;
+use App\Livewire\Employee\EmployeeOvertimeRequests;
 
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/', Dashboard::class)->name('home');
@@ -66,6 +68,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/employee/apply-for-vacation', ApplyForVacation::class)->name('employee.apply-for-vacation');
     Route::get('/employee/request-hr-letter', RequestHrLetter::class)->name('employee.request-hr-letter');
     Route::get('/employee/documents', EmployeeDocumentView::class)->name('employee.documents');
+    Route::get('/employee/overtime-requests', EmployeeOvertimeRequests::class)->name('employee.overtime-requests');
     
     Route::get('/settings/users', UsersIndex::class);
     Route::get('/settings/areas', AreasIndex::class);
@@ -78,6 +81,7 @@ Route::group(['middleware' => 'auth'], function () {
     });
 
     Route::get('employees/requests/hr-letters', HrLetterRequests::class)->name('employees.requests.hr-letters.index');
+    Route::get('employees/requests/overtime', OvertimeRequests::class)->name('employees.requests.overtime.index');
 });
 
 Route::group(['middleware' => 'guest'], function () {

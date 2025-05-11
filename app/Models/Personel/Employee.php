@@ -3,6 +3,7 @@
 namespace App\Models\Personel;
 
 use App\Exceptions\AppException;
+use App\Models\Attendance\Overtime;
 use App\Models\Base\City;
 use App\Models\Base\InsuranceOffice;
 use App\Models\Benefits\Payrolls\AppliedVacation;
@@ -2402,6 +2403,11 @@ class Employee extends Model
     public function baseBenefits()
     {
         return $this->hasMany(BaseBenefit::class);
+    }
+
+    public function overtimes()
+    {
+        return $this->hasMany(Overtime::class);
     }
 
 

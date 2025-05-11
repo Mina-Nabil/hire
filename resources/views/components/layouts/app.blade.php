@@ -254,6 +254,15 @@
                                     </span>
                                 </a>
                             </li>
+                            <li>
+                                <a href="{{ route('employees.requests.overtime.index') }}" 
+                                   class="navItem {{ request()->routeIs('employees.requests.overtime.index') ? 'active' : '' }}">
+                                    <span class="flex items-center">
+                                        <iconify-icon class="nav-icon" icon="heroicons-outline:clock"></iconify-icon>
+                                        <span>Overtime Requests</span>
+                                    </span>
+                                </a>
+                            </li>
                         </ul>
                     </li>
 

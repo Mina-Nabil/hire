@@ -32,6 +32,8 @@ return new class extends Migration
             $table->time('end_time');
             $table->float('hours');
             $table->enum('status', ['pending', 'approved', 'rejected']);
+            $table->timestamp('approved_at')->nullable();
+            $table->text('admin_note')->nullable();
             $table->timestamps();
         });
 
@@ -48,5 +50,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('attendance');
+        Schema::dropIfExists('overtimes');
+        Schema::dropIfExists('public_holidays');
     }
 };

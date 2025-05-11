@@ -84,6 +84,36 @@
                     <li class="">
                         <a href="javascript:void(0)" class="navItem">
                             <span class="flex items-center">
+                                <span>Payroll</span>
+                            </span>
+                            <iconify-icon class="icon-arrow" icon="heroicons-outline:chevron-right"></iconify-icon>
+                        </a>
+                        <ul class="sidebar-submenu">
+                            @can('viewAny', App\Models\Payroll\Payroll::class)
+                                <li>
+                                    <a class="{{ $payrollsIndex ?? '' }}"
+                                        href="{{ url('/payrolls') }}">Payrolls</a>
+                                </li>
+                            @endcan
+                            @can('viewAny', App\Models\Payroll\Payroll::class)
+                                <li>
+                                    <a class="{{ $payrollTypesIndex ?? '' }}" href="{{ url('/payrolls/create') }}">
+                                        Create Payroll</a>
+                                </li>
+                            @endcan
+                            @can('viewAny', App\Models\Payroll\Payroll::class)
+                                <li>
+                                    <a class="{{ $submitAttendanceIndex ?? '' }}" href="{{ url('/payrolls/submit-attendance') }}">
+                                        Submit Attendance</a>
+                                </li>
+                            @endcan
+
+                        </ul>
+                    </li>
+
+                    <li class="">
+                        <a href="javascript:void(0)" class="navItem">
+                            <span class="flex items-center">
                                 <span>Benefits</span>
                             </span>
                             <iconify-icon class="icon-arrow" icon="heroicons-outline:chevron-right"></iconify-icon>
@@ -104,8 +134,6 @@
 
                         </ul>
                     </li>
-
-
 
                     <li class="">
                         <a href="javascript:void(0)" class="navItem">

@@ -171,14 +171,14 @@ class Employee extends Model
         $min_duration_diff = Carbon::parse($working_day_start_min)->diffInHours($working_day_end_min);
         $max_duration_diff = Carbon::parse($working_day_start_max)->diffInHours($working_day_end_max);
 
-        if($min_duration_diff != $max_duration_diff) {
+        if ($min_duration_diff != $max_duration_diff) {
             throw new AppException('Working day date range is not valid, must be the same between min and max');
         }
 
-        if($min_duration_diff != $daily_working_hours) {
+        if ($min_duration_diff != $daily_working_hours) {
             throw new AppException('Working day duration is not valid, must be the same as the daily working hours difference');
         }
-        
+
 
         try {
             DB::transaction(function () use ($package_details, $vacation_benefits, $benefitPackage, $attendace_calculation, $working_day_start_min, $working_day_start_max, $working_day_end_min, $working_day_end_max, $daily_working_hours, $overtime_rate) {
@@ -275,6 +275,30 @@ class Employee extends Model
         } catch (Exception $e) {
             report($e);
             throw new AppException('Error adding custom vacation benefit');
+        }
+    }
+
+    public function addOvertime(Carbon $start_date, Carbon $end_date)
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('addOvertime', $this)) {
+            throw new AppException('You dont have permission to add overtime');
+        }
+        $day = $start_date->copy()->startOfDay();
+        $hours = $start_date->diffInHours($end_date);
+        try {
+            $this->overtimes()->create([
+                'date' => $day,
+                'start_time' => $start_date->format('H:i'),
+                'end_time' => $end_date->format('H:i'),
+                'hours' => $hours,
+                'status' => 'pending',
+                'creator_id' => $loggedInUser->id,
+            ]);
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException('Error adding overtime');
         }
     }
 

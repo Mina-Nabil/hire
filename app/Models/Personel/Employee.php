@@ -42,6 +42,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Personel\Docs\EmployeeHrLetterRequest;
 
 class Employee extends Model
 {
@@ -2870,5 +2871,23 @@ class Employee extends Model
             report($e);
             throw new AppException('Error creating employee: ' . $e->getMessage());
         }
+    }
+
+    public function hrLetterRequests()
+    {
+        return $this->hasMany(EmployeeHrLetterRequest::class);
+    }
+
+    public function createHrLetterRequest(
+        int $requested_by,
+        string $purpose,
+        ?string $employee_note = null
+    ): EmployeeHrLetterRequest {
+        return $this->hrLetterRequests()->create([
+            'requested_by' => $requested_by,
+            'purpose' => $purpose,
+            'employee_note' => $employee_note,
+            'status' => EmployeeHrLetterRequest::STATUS_PENDING
+        ]);
     }
 }

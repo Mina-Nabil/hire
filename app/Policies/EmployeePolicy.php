@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Models\Personel\Employee;
+use App\Models\Personel\Docs\EmployeeHrLetterRequest;
 use App\Models\Users\User;
 use Illuminate\Auth\Access\Response;
 
@@ -68,6 +69,16 @@ class EmployeePolicy
      * Determine whether the user can view the missing document report.
      */
     public function viewMissingDocReport(User $user): bool
+    {
+        return $user->is_admin || $user->is_hr;
+    }
+
+    public function createHrLetterRequest(User $user, Employee $employee): bool
+    {
+        return $user->is_admin || $user->is_hr || $user->id === $employee->user_id;
+    }
+
+    public function updateHrLetterRequest(User $user, Employee $employee): bool
     {
         return $user->is_admin || $user->is_hr;
     }

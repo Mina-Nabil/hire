@@ -73,6 +73,8 @@ Route::group(['middleware' => 'auth'], function () {
         Auth::logout();
         return redirect()->route('login');
     });
+
+    Route::get('/public-holidays', App\Livewire\Attendance\PublicHolidayIndex::class)->name('public-holidays.index');
 });
 
 Route::group(['middleware' => 'guest'], function () {

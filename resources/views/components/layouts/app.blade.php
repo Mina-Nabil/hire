@@ -266,6 +266,11 @@
                                     <a class="{{ $banksIndex ?? '' }}" href="{{ url('/banks') }}">Banks</a>
                                 </li>
                             @endcan
+                            @can('viewAny', App\Models\Attendance\PublicHoliday::class)
+                                <li>
+                                    <a class="{{ $publicHolidaysIndex ?? '' }}" href="{{ route('public-holidays.index') }}">Public Holidays</a>
+                                </li>
+                            @endcan
                         </ul>
                     </li>
 

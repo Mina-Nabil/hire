@@ -32,8 +32,6 @@ class AppliedVacation extends Model
         self::STATUS_REJECTED,
     ];
 
-    public $timestamps = false;
-
     //model functions
     public function approve()
     {

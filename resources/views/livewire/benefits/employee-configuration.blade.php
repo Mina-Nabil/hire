@@ -305,55 +305,125 @@
         <!-- Payments Tab -->
         <div class="tab-pane fade @if ($activeTab === 'payments') show active @endif" id="tabs-payments"
             role="tabpanel" aria-labelledby="tabs-payments-tab">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">Employee Payments</h4>
-                </div>
-                <div class="card-body px-6 pb-6">
-                    @if (count($employeePayments) > 0)
-                        <div class="overflow-x-auto -mx-6">
-                            <div class="inline-block min-w-full align-middle">
-                                <div class="overflow-hidden">
-                                    <table class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
-                                        <thead class="bg-slate-200 dark:bg-slate-700">
-                                            <tr>
-                                                <th scope="col" class="table-th">Date</th>
-                                                <th scope="col" class="table-th">Benefit</th>
-                                                <th scope="col" class="table-th">Amount</th>
-                                                <th scope="col" class="table-th">Status</th>
-                                                <th scope="col" class="table-th">Description</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
-                                            @foreach ($employeePayments as $payment)
-                                                <tr>
-                                                    <td class="table-td">{{ $payment->created_at->format('d/m/Y') }}</td>
-                                                    <td class="table-td">{{ $payment->baseBenefit->name ?? '-' }}</td>
-                                                    <td class="table-td">{{ $payment->amount }}</td>
-                                                    <td class="table-td">
-                                                        @if ($payment->status == 'pending')
-                                                            <span class="badge bg-warning">Pending</span>
-                                                        @elseif($payment->status == 'approved')
-                                                            <span class="badge bg-info">Approved</span>
-                                                        @elseif($payment->status == 'paid')
-                                                            <span class="badge bg-success">Paid</span>
-                                                        @elseif($payment->status == 'rejected')
-                                                            <span class="badge bg-danger">Rejected</span>
-                                                        @endif
-                                                    </td>
-                                                    <td class="table-td">{{ $payment->desc ?? '-' }}</td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Employee Payments</h4>
+                        </div>
+                        <div class="card-body px-6 pb-6">
+                            @if ($employeePayments->count() > 0)
+                                <div class="overflow-x-auto -mx-6">
+                                    <div class="inline-block min-w-full align-middle">
+                                        <div class="overflow-hidden">
+                                            <table
+                                                class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
+                                                <thead class="bg-slate-200 dark:bg-slate-700">
+                                                    <tr>
+                                                        <th scope="col" class="table-th">Date</th>
+                                                        <th scope="col" class="table-th">Benefit</th>
+                                                        <th scope="col" class="table-th">Amount</th>
+                                                        <th scope="col" class="table-th">Status</th>
+                                                        <th scope="col" class="table-th">Description</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody
+                                                    class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
+                                                    @foreach ($employeePayments as $payment)
+                                                        <tr>
+                                                            <td class="table-td">
+                                                                {{ $payment->created_at->format('d/m/Y') }}</td>
+                                                            <td class="table-td">
+                                                                {{ $payment->baseBenefit->name ?? '-' }}</td>
+                                                            <td class="table-td">{{ $payment->amount }}</td>
+                                                            <td class="table-td">
+                                                                @if ($payment->status == 'pending')
+                                                                    <span class="badge bg-warning">Pending</span>
+                                                                @elseif($payment->status == 'approved')
+                                                                    <span class="badge bg-info">Approved</span>
+                                                                @elseif($payment->status == 'paid')
+                                                                    <span class="badge bg-success">Paid</span>
+                                                                @elseif($payment->status == 'rejected')
+                                                                    <span class="badge bg-danger">Rejected</span>
+                                                                @endif
+                                                            </td>
+                                                            <td class="table-td">{{ $payment->desc ?? '-' }}</td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                            <div class="mt-6">
+                                                {{ $employeePayments->links('vendor.livewire.simple-bootstrap') }}
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                            @else
+                                <div class="alert alert-info mt-5">
+                                    No payments found for this employee.
+                                </div>
+                            @endif
                         </div>
-                    @else
-                        <div class="alert alert-info">
-                            No payments found for this employee.
+                    </div>
+                </div>
+                <div class="col-md-6 mt-5">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Extra Payments</h4>
                         </div>
-                    @endif
+                        <div class="card-body px-6 pb-6">
+                            @if ($extraPayments->count() > 0)
+                                <div class="overflow-x-auto -mx-6">
+                                    <div class="inline-block min-w-full align-middle">
+                                        <div class="overflow-hidden">
+                                            <table
+                                                class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
+                                                <thead class="bg-slate-200 dark:bg-slate-700">
+                                                    <tr>
+                                                        <th scope="col" class="table-th">Date</th>
+                                                        <th scope="col" class="table-th">Amount</th>
+                                                        <th scope="col" class="table-th">For</th>
+                                                        <th scope="col" class="table-th">Status</th>
+                                                        <th scope="col" class="table-th">Description</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody
+                                                    class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
+                                                    @foreach ($extraPayments as $payment)
+                                                        <tr>
+                                                            <td class="table-td">
+                                                                {{ $payment->created_at->format('d/m/Y') }}</td>
+                                                                <td class="table-td">{{ $payment->amount }}</td>
+                                                                <td class="table-td"> @if($payment->payable_id) {{ $payment->payable_type }} @else - @endif</td>
+                                                                <td class="table-td">
+                                                                    @if ($payment->status == 'pending')
+                                                                    <span class="badge bg-warning">Pending</span>
+                                                                    @elseif($payment->status == 'approved')
+                                                                    <span class="badge bg-info">Approved</span>
+                                                                    @elseif($payment->status == 'paid')
+                                                                    <span class="badge bg-success">Paid</span>
+                                                                    @elseif($payment->status == 'rejected')
+                                                                    <span class="badge bg-danger">Rejected</span>
+                                                                    @endif
+                                                                </td>
+                                                                <td class="table-td">{{ $payment->desc ?? '-' }}</td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                            <div class="mt-6">
+                                                {{ $extraPayments->links('vendor.livewire.simple-bootstrap') }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @else
+                                <div class="alert alert-info mt-5">
+                                    No payments found for this employee.
+                                </div>
+                            @endif
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -369,11 +439,12 @@
                             <h4 class="card-title">Applied Vacations</h4>
                         </div>
                         <div class="card-body px-6 pb-6">
-                            @if (count($appliedVacations) > 0)
+                            @if ($appliedVacations->count() > 0)
                                 <div class="overflow-x-auto -mx-6">
                                     <div class="inline-block min-w-full align-middle">
                                         <div class="overflow-hidden">
-                                            <table class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
+                                            <table
+                                                class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
                                                 <thead class="bg-slate-200 dark:bg-slate-700">
                                                     <tr>
                                                         {{-- <th scope="col" class="table-th">Date</th> --}}
@@ -383,11 +454,13 @@
                                                         <th scope="col" class="table-th">New Balance</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
+                                                <tbody
+                                                    class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
                                                     @foreach ($appliedVacations as $vacation)
                                                         <tr>
                                                             {{-- <td class="table-td">{{ $vacation->created_at->format('d/m/Y') }}</td> --}}
-                                                            <td class="table-td">{{ $vacation->vacationBenefit->name ?? '-' }}</td>
+                                                            <td class="table-td">
+                                                                {{ $vacation->vacationBenefit->name ?? '-' }}</td>
                                                             <td class="table-td">{{ $vacation->hours }}</td>
                                                             <td class="table-td">
                                                                 @if ($vacation->status == 'pending')
@@ -403,6 +476,9 @@
                                                     @endforeach
                                                 </tbody>
                                             </table>
+                                            <div class="mt-6">
+                                                {{ $appliedVacations->links('vendor.livewire.simple-bootstrap') }}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -422,11 +498,12 @@
                             <h4 class="card-title">Gained Vacations</h4>
                         </div>
                         <div class="card-body px-6 pb-6">
-                            @if (count($gainedVacations) > 0)
+                            @if ($gainedVacations->count() > 0)
                                 <div class="overflow-x-auto -mx-6">
                                     <div class="inline-block min-w-full align-middle">
                                         <div class="overflow-hidden">
-                                            <table class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
+                                            <table
+                                                class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
                                                 <thead class="bg-slate-200 dark:bg-slate-700">
                                                     <tr>
                                                         <th scope="col" class="table-th">Date</th>
@@ -435,17 +512,23 @@
                                                         <th scope="col" class="table-th">New Balance</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
+                                                <tbody
+                                                    class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
                                                     @foreach ($gainedVacations as $vacation)
                                                         <tr>
-                                                            <td class="table-td">{{ $vacation->created_at->format('d/m/Y') }}</td>
-                                                            <td class="table-td">{{ $vacation->vacationBenefit->name ?? '-' }}</td>
+                                                            <td class="table-td">
+                                                                {{ $vacation->created_at->format('d/m/Y') }}</td>
+                                                            <td class="table-td">
+                                                                {{ $vacation->vacationBenefit->name ?? '-' }}</td>
                                                             <td class="table-td">{{ $vacation->days }}</td>
                                                             <td class="table-td">{{ $vacation->new_balance }}</td>
                                                         </tr>
                                                     @endforeach
                                                 </tbody>
                                             </table>
+                                            <div class="mt-6">
+                                                {{ $gainedVacations->links('vendor.livewire.simple-bootstrap') }}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -471,11 +554,12 @@
                             <h4 class="card-title">Loans</h4>
                         </div>
                         <div class="card-body px-6 pb-6">
-                            @if (count($loans) > 0)
+                            @if ($loans->count() > 0)
                                 <div class="overflow-x-auto -mx-6">
                                     <div class="inline-block min-w-full align-middle">
                                         <div class="overflow-hidden">
-                                            <table class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
+                                            <table
+                                                class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
                                                 <thead class="bg-slate-200 dark:bg-slate-700">
                                                     <tr>
                                                         <th scope="col" class="table-th">Date</th>
@@ -483,21 +567,26 @@
                                                         <th scope="col" class="table-th">Description</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
+                                                <tbody
+                                                    class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
                                                     @foreach ($loans as $loan)
                                                         <tr>
-                                                            <td class="table-td">{{ $loan->created_at->format('d/m/Y') }}</td>
+                                                            <td class="table-td">
+                                                                {{ $loan->created_at->format('d/m/Y') }}</td>
                                                             <td class="table-td">{{ $loan->amount }}</td>
                                                             <td class="table-td">{{ $loan->desc ?? '-' }}</td>
                                                         </tr>
                                                     @endforeach
                                                 </tbody>
                                             </table>
+                                            <div class="mt-6">
+                                                {{ $loans->links('vendor.livewire.simple-bootstrap') }}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             @else
-                                <div class="alert alert-info">
+                                <div class="alert alert-info mt-5">
                                     No loans found for this employee.
                                 </div>
                             @endif
@@ -506,17 +595,18 @@
                 </div>
 
                 <!-- Purchases -->
-                <div class="col-md-6">
+                <div class="col-md-6 mt-5">
                     <div class="card">
                         <div class="card-header">
                             <h4 class="card-title">Purchases</h4>
                         </div>
                         <div class="card-body px-6 pb-6">
-                            @if (count($purchases) > 0)
+                            @if ($purchases->count() > 0)
                                 <div class="overflow-x-auto -mx-6">
                                     <div class="inline-block min-w-full align-middle">
                                         <div class="overflow-hidden">
-                                            <table class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
+                                            <table
+                                                class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
                                                 <thead class="bg-slate-200 dark:bg-slate-700">
                                                     <tr>
                                                         <th scope="col" class="table-th">Date</th>
@@ -524,21 +614,26 @@
                                                         <th scope="col" class="table-th">Description</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
+                                                <tbody
+                                                    class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
                                                     @foreach ($purchases as $purchase)
                                                         <tr>
-                                                            <td class="table-td">{{ $purchase->created_at->format('d/m/Y') }}</td>
+                                                            <td class="table-td">
+                                                                {{ $purchase->created_at->format('d/m/Y') }}</td>
                                                             <td class="table-td">{{ $purchase->amount }}</td>
                                                             <td class="table-td">{{ $purchase->desc ?? '-' }}</td>
                                                         </tr>
                                                     @endforeach
                                                 </tbody>
                                             </table>
+                                            <div class="mt-6">
+                                                {{ $purchases->links('vendor.livewire.simple-bootstrap') }}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             @else
-                                <div class="alert alert-info">
+                                <div class="alert alert-info mt-5">
                                     No purchases found for this employee.
                                 </div>
                             @endif

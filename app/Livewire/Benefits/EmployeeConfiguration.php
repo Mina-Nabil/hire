@@ -12,26 +12,20 @@ use App\Models\Benefits\Payrolls\BenefitPayment;
 use App\Models\Benefits\Vacations\GainedVacation;
 use App\Models\Benefits\Extras\Loan;
 use App\Models\Benefits\Extras\Purchase;
+use App\Models\Benefits\Payrolls\ExtraPayment;
 use App\Models\Benefits\Vacations\VacationDetail;
 use App\Traits\AlertFrontEnd;
 use Livewire\Component;
 use Carbon\Carbon;
 use Exception;
+use Livewire\WithPagination;
 
 class EmployeeConfiguration extends Component
 {
-    use AlertFrontEnd;
+    use AlertFrontEnd, WithPagination;
     
     public Employee $employee;
     public $activeTab = 'info';
-    
-    public $employeeBenefits = [];
-    public $employeeVacations = [];
-    public $employeePayments = [];
-    public $loans = [];
-    public $purchases = [];
-    public $appliedVacations = [];
-    public $gainedVacations = [];
 
     public $benefitIncrementTypes = BaseBenefit::TYPE_LIST;
     public $vacationBenefitTypes = VacationDetail::TYPE_LIST;
@@ -88,45 +82,6 @@ class EmployeeConfiguration extends Component
         $this->activeTab = $tab;
 
         // Reload data when switching tabs to ensure data is fresh
-        $this->loadEmployeeData();
-    }
-
-    protected function loadEmployeeData()
-    {
-        // Load base benefits
-        $this->employeeBenefits = BaseBenefit::where('employee_id', $this->employee->id)
-            ->whereNull('end_date')
-            ->get();
-
-        // Load vacation benefits - using VacationBenefit instead of VacationDetail
-        $this->employeeVacations = VacationBenefit::where('employee_id', $this->employee->id)
-            ->whereNull('end_date')
-            ->get();
-
-        // Load payments
-        $this->employeePayments = BenefitPayment::where('employee_id', $this->employee->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        // Load loans
-        $this->loans = Loan::where('employee_id', $this->employee->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        // Load purchases
-        $this->purchases = Purchase::where('employee_id', $this->employee->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        // Load applied vacations
-        $this->appliedVacations = AppliedVacation::where('employee_id', $this->employee->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        // Load gained vacations
-        $this->gainedVacations = GainedVacation::where('employee_id', $this->employee->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
     }
 
     public function getBenefitTypeLabel($type)
@@ -169,7 +124,6 @@ class EmployeeConfiguration extends Component
     public function mount(Employee $employee)
     {
         $this->employee = $employee;
-        $this->loadEmployeeData();
         
         // Initialize date fields with current date
         $this->baseBenefit['start_date'] = now()->format('Y-m-d');
@@ -178,7 +132,54 @@ class EmployeeConfiguration extends Component
 
     public function render()
     {
-        return view('livewire.benefits.employee-configuration');
+          // Load base benefits
+          $employeeBenefits = BaseBenefit::where('employee_id', $this->employee->id)
+          ->whereNull('end_date')
+          ->get();
+
+      // Load vacation benefits - using VacationBenefit instead of VacationDetail
+      $employeeVacations = VacationBenefit::where('employee_id', $this->employee->id)
+          ->whereNull('end_date')
+          ->get();
+
+      // Load payments
+      $employeePayments = BenefitPayment::where('employee_id', $this->employee->id)
+          ->orderBy('created_at', 'desc')
+          ->paginate(10);
+
+      $extraPayments = ExtraPayment::where('employee_id', $this->employee->id)
+          ->orderBy('created_at', 'desc')
+          ->paginate(10);
+
+      // Load loans
+      $loans = Loan::where('employee_id', $this->employee->id)
+          ->orderBy('created_at', 'desc')
+          ->paginate(10);
+
+      // Load purchases
+      $purchases = Purchase::where('employee_id', $this->employee->id)
+          ->orderBy('created_at', 'desc')
+          ->paginate(10);
+
+      // Load applied vacations
+      $appliedVacations = AppliedVacation::where('employee_id', $this->employee->id)
+          ->orderBy('created_at', 'desc')
+          ->paginate(10);
+
+      // Load gained vacations
+      $gainedVacations = GainedVacation::where('employee_id', $this->employee->id)
+          ->orderBy('created_at', 'desc')
+          ->paginate(10);
+        return view('livewire.benefits.employee-configuration', [
+            'employeeBenefits' => $employeeBenefits,
+            'employeeVacations' => $employeeVacations,
+            'employeePayments' => $employeePayments,
+            'extraPayments' => $extraPayments,
+            'loans' => $loans,
+            'purchases' => $purchases,
+            'appliedVacations' => $appliedVacations,
+            'gainedVacations' => $gainedVacations,
+        ]);
     }
 
     // --------- Custom Base Benefit Functions ---------
@@ -228,7 +229,6 @@ class EmployeeConfiguration extends Component
                 Carbon::parse($this->baseBenefit['start_date'])
             );
 
-            $this->loadEmployeeData();
             $this->closeAddCustomBaseBenefitModal();
             $this->alertSuccess('Custom base benefit added successfully.');
         } catch (Exception $e) {
@@ -290,7 +290,6 @@ class EmployeeConfiguration extends Component
                 Carbon::parse($this->vacationBenefit['start_date'])
             );
 
-            $this->loadEmployeeData();
             $this->closeAddCustomVacationBenefitModal();
             $this->alertSuccess('Custom vacation benefit added successfully.');
         } catch (Exception $e) {
@@ -371,7 +370,6 @@ class EmployeeConfiguration extends Component
                 $this->loanPayments
             );
 
-            $this->loadEmployeeData();
             $this->closeAddLoanModal();
             $this->alertSuccess('Loan added successfully.');
         } catch (\Exception $e) {
@@ -452,7 +450,6 @@ class EmployeeConfiguration extends Component
                 $this->purchasePayments
             );
 
-            $this->loadEmployeeData();
             $this->closeAddPurchaseModal();
             $this->alertSuccess('Purchase added successfully.');
         } catch (Exception $e) {

@@ -68,11 +68,22 @@ class Loan extends Model
                 ]);
                 $loan->save();
                 $i = 1;
+                $extraPayment = ExtraPayment::create([
+                    'name' => 'Loan Payment to employee ' . $employee->name,
+                    'employee_id' => $employee->id,
+                    'amount' => $amount,
+                    'due_date' => now(),
+                    'desc' => "Actual loan payment to employee balance",
+                    'status' => BenefitPayment::STATUS_APPROVED,
+                    'creator_id' => Auth::id(),
+                ]);
+                $extraPayment->payable()->associate($loan);
+                $extraPayment->save();
                 foreach ($payment_plan as $payment) {
                     $extraPayment = ExtraPayment::create([
                         'name' => 'Loan Payment ' . $i++,
                         'employee_id' => $employee->id,
-                        'amount' => $payment['amount'],
+                        'amount' => -1 * $payment['amount'],
                         'due_date' => $payment['due_date'],
                         'desc' => $payment['desc'],
                         'status' => BenefitPayment::STATUS_APPROVED,

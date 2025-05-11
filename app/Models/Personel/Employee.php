@@ -318,7 +318,7 @@ class Employee extends Model
                 // dd($days);
                 $appliedVacation->vacationDays()->createMany($days);
                 $vacationBenefit->update([
-                    'balance' => $currentBalance - $hours_count,
+                    'current_balance' => $currentBalance - $hours_count,
                 ]);
             });
         } catch (Exception $e) {

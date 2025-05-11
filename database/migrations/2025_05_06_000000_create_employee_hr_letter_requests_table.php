@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignIdFor(Employee::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(User::class, 'requested_by')->constrained('users')->cascadeOnDelete();
             $table->foreignIdFor(User::class, 'approved_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->string('purpose');
+            $table->string('directed_to');
             $table->text('employee_note')->nullable();
             $table->text('admin_note')->nullable();
             $table->enum('status', EmployeeHrLetterRequest::STATUS_LIST)->default(EmployeeHrLetterRequest::STATUS_PENDING);

@@ -352,6 +352,32 @@ class Employee extends Model
         }
     }
 
+    public function createHrLetterRequest(
+        int $requested_by,
+        string $directed_to,
+        ?string $employee_note = null
+    ): EmployeeHrLetterRequest {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('createHrLetterRequest', $this)) {
+            throw new AppException('You dont have permission to create HR letter request');
+        }
+
+        try {
+            return DB::transaction(function () use ($requested_by, $directed_to, $employee_note) {
+                return $this->hrLetterRequests()->create([
+                    'requested_by' => $requested_by,
+                    'directed_to' => $directed_to,
+                    'employee_note' => $employee_note,
+                    'status' => EmployeeHrLetterRequest::STATUS_PENDING
+                ]);
+            });
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException('Error creating HR letter request: ' . $e->getMessage());
+        }
+    }
+
     ////model document functions
     public function setArmyServicePaper($file_path, Carbon $issue_date, $type = ArmyServicePaper::TYPE_ORIGINAL, ?Carbon $expiry_date)
     {
@@ -2902,16 +2928,5 @@ class Employee extends Model
         return $this->hasMany(EmployeeHrLetterRequest::class);
     }
 
-    public function createHrLetterRequest(
-        int $requested_by,
-        string $purpose,
-        ?string $employee_note = null
-    ): EmployeeHrLetterRequest {
-        return $this->hrLetterRequests()->create([
-            'requested_by' => $requested_by,
-            'purpose' => $purpose,
-            'employee_note' => $employee_note,
-            'status' => EmployeeHrLetterRequest::STATUS_PENDING
-        ]);
-    }
+
 }

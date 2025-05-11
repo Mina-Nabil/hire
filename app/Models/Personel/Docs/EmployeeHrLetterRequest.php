@@ -6,6 +6,8 @@ use App\Models\Personel\Employee;
 use App\Models\Users\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class EmployeeHrLetterRequest extends Model
 {
@@ -13,7 +15,7 @@ class EmployeeHrLetterRequest extends Model
         'employee_id',
         'requested_by',
         'approved_by',
-        'purpose',
+        'directed_to',
         'employee_note',
         'admin_note',
         'status',
@@ -50,9 +52,18 @@ class EmployeeHrLetterRequest extends Model
         return $this->belongsTo(User::class, 'approved_by');
     }
 
-    public function setStatus(string $status, ?int $approved_by = null, ?string $admin_note = null): bool
+    /**
+     * Set the status of the HR letter request
+     * 
+     * @param string $status The new status
+     * @param int|null $approved_by User ID of the person approving the request
+     * @param string|null $admin_note Optional note from admin
+     * @param string|null $file_path Path to the generated HR letter file (required for approval)
+     * @return bool
+     * @throws \InvalidArgumentException
+     */
+    public function setStatus(string $status, ?int $approved_by = null, ?string $admin_note = null, ?string $file_path = null): bool
     {
-        
         if (!in_array($status, self::STATUS_LIST)) {
             throw new \InvalidArgumentException('Invalid status provided');
         }
@@ -68,6 +79,33 @@ class EmployeeHrLetterRequest extends Model
 
         if ($admin_note) {
             $data['admin_note'] = $admin_note;
+        }
+
+        // When approving a request, automatically generate an HR letter
+        if ($status === self::STATUS_APPROVED && $file_path) {
+            try {
+                return DB::transaction(function () use ($data, $file_path) {
+                    // First update the request status
+                    $this->update($data);
+                    
+                    // Then generate the HR letter document
+                    $result = $this->employee->setHrLetter(
+                        $file_path, 
+                        Carbon::now(), 
+                        null // No expiry date for HR letters
+                    );
+
+                    // If HR letter was successfully created, update status to completed
+                    if ($result) {
+                        return $this->update(['status' => self::STATUS_COMPLETED]);
+                    }
+                    
+                    return true;
+                });
+            } catch (\Exception $e) {
+                report($e);
+                throw new \RuntimeException('Failed to generate HR letter: ' . $e->getMessage());
+            }
         }
 
         return $this->update($data);

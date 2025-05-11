@@ -37,7 +37,9 @@ Route::group(['middleware' => 'auth'], function () {
     // Payroll & Attendance routes
     Route::get('/attendance/public-holidays', App\Livewire\Attendance\PublicHolidayIndex::class)->name('public-holidays.index');
     Route::get('/payrolls/submit-attendance', App\Livewire\Attendance\AddSheet::class)->name('submit-attendance');
-
+    Route::get('/attendance', App\Livewire\Attendance\ShowAttendance::class)->name('attendance.index');
+    Route::get('/attendance/overtime', App\Livewire\Attendance\ShowOvertime::class)->name('overtime.index');
+    
     //benefits routes
     Route::get('/benefits/packages', PackageIndex::class)->name('benefits.packages');
     Route::get('/benefits/configurations', ConfigurationIndex::class)->name('benefits.configurations');

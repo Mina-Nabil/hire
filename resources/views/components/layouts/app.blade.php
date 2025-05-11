@@ -107,6 +107,18 @@
                                         Submit Attendance</a>
                                 </li>
                             @endcan
+                            @can('viewAny', App\Models\Attendance\Attendance::class)
+                                <li>
+                                    <a class="{{ $attendanceIndex ?? '' }}" href="{{ url('/attendance') }}">
+                                        Attendance Records</a>
+                                </li>
+                            @endcan
+                            @can('viewAny', App\Models\Attendance\Attendance::class)
+                                <li>
+                                    <a class="{{ $overtimeIndex ?? '' }}" href="{{ url('/attendance/overtime') }}">
+                                        Overtime Records</a>
+                                </li>
+                            @endcan
 
                         </ul>
                     </li>

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Attendance\Overtime;
 use App\Models\Personel\Employee;
 use App\Models\Users\User;
 use Illuminate\Database\Migrations\Migration;
@@ -20,6 +21,7 @@ return new class extends Migration
             $table->date('date');
             $table->time('start_time');
             $table->time('end_time');
+            $table->float('hours');
             $table->timestamps();
         });
 
@@ -31,7 +33,7 @@ return new class extends Migration
             $table->time('start_time');
             $table->time('end_time');
             $table->float('hours');
-            $table->enum('status', ['pending', 'approved', 'rejected']);
+            $table->enum('status', Overtime::STATUS_LIST);
             $table->timestamps();
         });
 

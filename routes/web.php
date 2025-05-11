@@ -34,6 +34,10 @@ use App\Livewire\Employee\EmployeeDocumentView;
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/', Dashboard::class)->name('home');
 
+    // Payroll & Attendance routes
+    Route::get('/attendance/public-holidays', App\Livewire\Attendance\PublicHolidayIndex::class)->name('public-holidays.index');
+    Route::get('/payrolls/submit-attendance', App\Livewire\Attendance\AddSheet::class)->name('submit-attendance');
+
     //benefits routes
     Route::get('/benefits/packages', PackageIndex::class)->name('benefits.packages');
     Route::get('/benefits/configurations', ConfigurationIndex::class)->name('benefits.configurations');
@@ -74,7 +78,6 @@ Route::group(['middleware' => 'auth'], function () {
         return redirect()->route('login');
     });
 
-    Route::get('/public-holidays', App\Livewire\Attendance\PublicHolidayIndex::class)->name('public-holidays.index');
 });
 
 Route::group(['middleware' => 'guest'], function () {

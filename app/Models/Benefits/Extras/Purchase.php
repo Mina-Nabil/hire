@@ -64,11 +64,21 @@ class Purchase extends Model
                 ]);
                 $purchase->save();
                 $i = 1;
+
+                $extraPayment = ExtraPayment::create([
+                    'name' => 'Purchase Payment to employee ' . $employee->name,
+                    'employee_id' => $employee->id,
+                    'amount' => $amount,
+                    'due_date' => now(),
+                    'desc' => "Actual purchase payment to employee balance",
+                ]);
+                $extraPayment->payable()->associate($purchase);
+                $extraPayment->save();
                 foreach ($payment_plan as $payment) {
                     $extraPayment = ExtraPayment::create([
                         'name' => 'Purchase Payment ' . $i++,
                         'employee_id' => $employee->id,
-                        'amount' => $payment['amount'],
+                        'amount' => -1 * $payment['amount'],
                         'due_date' => $payment['due_date'],
                         'desc' => $payment['desc'],
                         'status' => BenefitPayment::STATUS_APPROVED,

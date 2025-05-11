@@ -15,6 +15,11 @@ class EmployeePolicy
         return $user->is_admin || $user->is_hr || $user->id === $employee->user_id;
     }
 
+    public function addOvertime(User $user, Employee $employee): bool
+    {
+        return $user->is_admin || $user->is_hr || $user->id === $employee->user_id;
+    }
+
     public function createLoan(User $user, Employee $employee): bool
     {
         return $user->is_admin || $user->is_hr;

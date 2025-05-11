@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('attendance', function (Blueprint $table) {
+        Schema::create('attendances', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Employee::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(User::class, 'creator_id')->constrained('users')->restrictOnDelete();
@@ -23,7 +23,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('overtime', function (Blueprint $table) {
+        Schema::create('overtimes', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Employee::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(User::class, 'creator_id')->constrained('users')->restrictOnDelete();
@@ -31,6 +31,7 @@ return new class extends Migration
             $table->time('start_time');
             $table->time('end_time');
             $table->float('hours');
+            $table->enum('status', ['pending', 'approved', 'rejected']);
             $table->timestamps();
         });
 

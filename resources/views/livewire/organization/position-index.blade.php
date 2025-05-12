@@ -324,16 +324,16 @@
                         <div class="p-6 space-y-4">
                             <div class="grid grid-cols-1">
                                 <div class="from-group">
-                                    <label for="locationId" class="form-label">Location</label>
-                                    <select id="locationId"
-                                        class="form-control @error('employeeId') !border-danger-500 @enderror"
-                                        wire:model="employeeId">
+                                    <label for="selectedLocationId" class="form-label">Location</label>
+                                    <select id="selectedLocationId"
+                                        class="form-control @error('selectedLocationId') !border-danger-500 @enderror"
+                                        wire:model="selectedLocationId">
                                         <option value="">Select the location</option>
                                         @foreach ($locations as $location)
                                             <option value="{{ $location->id }}">{{ $location->name }}</option>
                                         @endforeach
                                     </select>
-                                    @error('employeeId')
+                                    @error('selectedLocationId')
                                         <span
                                             class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
                                     @enderror

@@ -182,7 +182,7 @@ class UsersIndex extends Component
             $imageUrl = $this->userImage->store('users', 's3');
         }
 
-        $res = User::createUser($this->username, $this->name, $this->password, $this->type, $imageUrl ?? $this->userImageUrl);
+        $res = User::createUser($this->name ,$this->username, $this->password, $this->type, $imageUrl ?? $this->userImageUrl);
 
         if ($res) {
             $this->closeSetUserSec();

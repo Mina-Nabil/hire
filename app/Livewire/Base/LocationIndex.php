@@ -6,6 +6,7 @@ use App\Models\Hierarchy\Location;
 use App\Traits\AlertFrontEnd;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\Validate;
 
 class LocationIndex extends Component
 {
@@ -14,13 +15,11 @@ class LocationIndex extends Component
     public $search = '';
     public $showModal = false;
     public $locationId;
-    public $name;
+    
+    #[Validate('required|min:3')]
+    public $name = '';
 
     protected $listeners = ['deleteLocation'];
-
-    protected $rules = [
-        'name' => 'required|min:3',
-    ];
 
     public function render()
     {
@@ -45,13 +44,13 @@ class LocationIndex extends Component
     public function closeModal()
     {
         $this->resetForm();
+        $this->resetValidation();
         $this->showModal = false;
     }
 
     public function resetForm()
     {
-        $this->locationId = null;
-        $this->name = '';
+        $this->reset(['locationId', 'name']);
     }
 
     public function save()
@@ -67,6 +66,8 @@ class LocationIndex extends Component
                 Location::createLocation($this->name);
                 $this->alertSuccess('Location created successfully!');
             }
+            
+            $this->resetValidation();
             $this->closeModal();
         } catch (\Exception $e) {
             $this->alertError($e->getMessage());

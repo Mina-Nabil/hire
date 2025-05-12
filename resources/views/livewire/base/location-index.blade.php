@@ -19,14 +19,12 @@
 
     <div class="card">
         <header class="card-header noborder">
-            <div class="justify-end flex flex-wrap items-center w-full">
-                <div class="flex items-center space-x-3 rtl:space-x-reverse">
-                    <div class="relative">
-                        <input type="text" class="form-control !pl-9 min-w-[200px]" placeholder="Search..."
-                            wire:model.live.debounce.300ms="search">
-                        <iconify-icon class="absolute left-2 top-1/2 -translate-y-1/2 text-base text-slate-500"
-                            icon="heroicons-solid:search"></iconify-icon>
-                    </div>
+            <div class="w-full">
+                <div class="relative">
+                    <input type="text" class="form-control !pl-9 w-full" placeholder="Search..."
+                        wire:model.live.debounce.300ms="search">
+                    <iconify-icon class="absolute left-2 top-1/2 -translate-y-1/2 text-base text-slate-500" style="transform: translate(5px, -13px);"
+                        icon="heroicons-solid:search"></iconify-icon>
                 </div>
             </div>
         </header>
@@ -86,16 +84,19 @@
         </div>
     </div>
 
-    <x-modal wire:model="showModal">
+    <x-modal wire:model.live="showModal">
         <x-slot name="title">
             {{ $locationId ? 'Edit Location' : 'Add Location' }}
         </x-slot>
 
-        <x-slot name="content">
-            <div class="space-y-4">
-                <x-text-input wire:model="name" label="Name" placeholder="Enter location name" />
+        <div class="space-y-4">
+            <div>
+                <x-text-input class="" wire:model.live="name" label="Name" placeholder="Enter location name" />
+                @error('name')
+                    <span class="font-Inter text-sm text-danger-500 inline-block">{{ $message }}</span>
+                @enderror
             </div>
-        </x-slot>
+        </div>
 
         <x-slot name="footer">
             <div class="flex justify-end space-x-2">

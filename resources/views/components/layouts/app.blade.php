@@ -317,6 +317,11 @@
                                     <a class="{{ $publicHolidaysIndex ?? '' }}" href="{{ route('public-holidays.index') }}">Public Holidays</a>
                                 </li>
                             @endcan
+                            @if(Auth::user()->is_admin)
+                                <li>
+                                    <a class="{{ $importData ?? '' }}" href="{{ route('import-data') }}">Import Data</a>
+                                </li>
+                            @endif
                         </ul>
                     </li>
 

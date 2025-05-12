@@ -13,6 +13,7 @@ use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\UsersIndex;
 use App\Http\Controllers\Hierarchy\OrganizationController;
 use App\Livewire\Base\BankIndex;
+use App\Livewire\Base\ImportData;
 use App\Livewire\Base\InsuranceOfficeIndex;
 use App\Livewire\Base\LocationIndex;
 use App\Livewire\Benefits\ConfigurationIndex;
@@ -90,6 +91,8 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('employees/requests/hr-letters', HrLetterRequests::class)->name('employees.requests.hr-letters.index');
     Route::get('employees/requests/overtime', OvertimeRequests::class)->name('employees.requests.overtime.index');
+
+    Route::get('/import-data', ImportData::class)->name('import-data');
 });
 
 Route::group(['middleware' => 'guest'], function () {

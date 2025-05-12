@@ -322,6 +322,23 @@
                         </div>
                         <!-- Modal body -->
                         <div class="p-6 space-y-4">
+                            <div class="grid grid-cols-1">
+                                <div class="from-group">
+                                    <label for="locationId" class="form-label">Location</label>
+                                    <select id="locationId"
+                                        class="form-control @error('employeeId') !border-danger-500 @enderror"
+                                        wire:model="employeeId">
+                                        <option value="">Select the location</option>
+                                        @foreach ($locations as $location)
+                                            <option value="{{ $location->id }}">{{ $location->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('employeeId')
+                                        <span
+                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div class="from-group">
                                     <label for="employeeId" class="form-label">Employee</label>
@@ -369,8 +386,7 @@
                                             class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
                                     @enderror
                                 </div>
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
                                 <div class="from-group">
                                     <label for="selectedDepartmentId" class="form-label">Department</label>
                                     <select id="selectedDepartmentId"
@@ -488,31 +504,46 @@
                         <!-- Modal body -->
                         <div class="p-6 space-y-4">
                             <div class="from-group">
-                                <label for="code" class="form-label">Code</label>
-                                <input id="code" type="text"
-                                    class="form-control @error('code') !border-danger-500 @enderror"
-                                    wire:model="code">
-                                @error('code')
-                                    <span
-                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
-                                @enderror
-                            </div>
-                            <div class="from-group">
-                                <label for="employeeId" class="form-label">Employee</label>
-                                <select id="employeeId"
-                                    class="form-control @error('employeeId') !border-danger-500 @enderror"
-                                    wire:model="employeeId">
-                                    <option value="">Select an employee</option>
-                                    @foreach ($employees as $employee)
-                                        <option value="{{ $employee->id }}">{{ $employee->name }}</option>
+                                <label for="selectedLocationId" class="form-label">Location</label>
+                                <select id="selectedLocationId"
+                                    class="form-control @error('selectedLocationId') !border-danger-500 @enderror"
+                                    wire:model="selectedLocationId">
+                                    <option value="">Select a location</option>
+                                    @foreach ($locations as $location)
+                                        <option value="{{ $location->id }}">{{ $location->name }}</option>
                                     @endforeach
                                 </select>
-                                @error('employeeId')
+                                @error('selectedLocationId')
                                     <span
                                         class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
                                 @enderror
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="from-group">
+                                    <label for="code" class="form-label">Code</label>
+                                    <input id="code" type="text"
+                                        class="form-control @error('code') !border-danger-500 @enderror"
+                                        wire:model="code">
+                                    @error('code')
+                                        <span
+                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <div class="from-group">
+                                    <label for="employeeId" class="form-label">Employee</label>
+                                    <select id="employeeId"
+                                        class="form-control @error('employeeId') !border-danger-500 @enderror"
+                                        wire:model="employeeId">
+                                        <option value="">Select an employee</option>
+                                        @foreach ($employees as $employee)
+                                            <option value="{{ $employee->id }}">{{ $employee->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('employeeId')
+                                        <span
+                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                    @enderror
+                                </div>
                                 <div class="from-group">
                                     <label for="positionName" class="form-label">Position Name (English)</label>
                                     <input id="positionName" type="text"

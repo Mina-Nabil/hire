@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Hierarchy\Department;
+use App\Models\Hierarchy\Location;
 use App\Models\Hierarchy\Position;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -18,26 +19,47 @@ class OrganizationSeeder extends Seeder
         // Clear existing data
         Position::query()->delete();
         Department::query()->delete();
-        
+        Location::query()->delete();
+
         // Create departments
         $departments = $this->createDepartments();
-        
+        // Create locations
+        $locations = $this->createLocations();
+
         // Create CEO position
         $ceo = $this->createCEO();
-        
+
         // Create executive team (C-suite, reporting to CEO)
-        $executiveTeam = $this->createExecutiveTeam($departments, $ceo);
-        
+        $executiveTeam = $this->createExecutiveTeam($departments, $ceo, $locations);
+
         // Create middle management (25-40 positions reporting to executives)
-        $middleManagement = $this->createMiddleManagement($departments, $executiveTeam);
-        
+        $middleManagement = $this->createMiddleManagement($departments, $executiveTeam, $locations);
+
         // Create staff positions (5 positions under each middle manager)
-        $this->createStaffPositions($departments, $middleManagement);
-        
+        $this->createStaffPositions($departments, $middleManagement, $locations);
+
         // Display summary
         $this->displaySummary();
     }
-    
+
+    /**
+     * Create locations
+     * 
+     * @return Collection
+     */
+    private function createLocations(): Collection
+    {
+        $locations = collect();
+        for ($i = 0; $i < 5; $i++) {
+            $location = Location::create([
+                'name' => "Location $i",
+            ]);
+            $locations->push($location);
+        }
+
+        return $locations;
+    }
+
     /**
      * Create departments
      * 
@@ -85,10 +107,10 @@ class OrganizationSeeder extends Seeder
                 'desc' => 'Department responsible for legal matters and compliance.'
             ])->create()
         ]);
-        
+
         return $departments;
     }
-    
+
     /**
      * Create CEO position
      * 
@@ -97,8 +119,9 @@ class OrganizationSeeder extends Seeder
     private function createCEO(): Position
     {
         $executiveDept = Department::where('prefix_code', 'EXE')->first();
-        
+        $location = Location::all()->first();
         $ceo = Position::factory()
+            ->withLocation($location)
             ->for($executiveDept)
             ->state([
                 'name' => 'Chief Executive Officer',
@@ -109,12 +132,12 @@ class OrganizationSeeder extends Seeder
                 'code' => 'CEO'
             ])
             ->create();
-            
+
         $this->command->info("Created CEO position");
-        
+
         return $ceo;
     }
-    
+
     /**
      * Create executive team (C-suite)
      * 
@@ -122,10 +145,10 @@ class OrganizationSeeder extends Seeder
      * @param Position $ceo
      * @return Collection
      */
-    private function createExecutiveTeam(Collection $departments, Position $ceo): Collection
+    private function createExecutiveTeam(Collection $departments, Position $ceo, Collection $locations): Collection
     {
         $executiveTeam = collect();
-        
+
         // Create C-suite positions (reporting to CEO)
         $cSuiteRoles = [
             ['dept' => 'Finance', 'title' => 'Chief Financial Officer', 'arabic' => 'المدير المالي', 'code' => 'CFO'],
@@ -134,14 +157,15 @@ class OrganizationSeeder extends Seeder
             ['dept' => 'Human Resources', 'title' => 'Chief People Officer', 'arabic' => 'مدير الموارد البشرية', 'code' => 'CPO'],
             ['dept' => 'Marketing', 'title' => 'Chief Marketing Officer', 'arabic' => 'مدير التسويق', 'code' => 'CMO']
         ];
-        
+
         foreach ($cSuiteRoles as $role) {
-            $department = $departments->where('name', $role['dept'])->first() ?? 
-                          $departments->where('name', 'like', '%' . $role['dept'] . '%')->first() ??
-                          $departments->first();
-            
+            $department = $departments->where('name', $role['dept'])->first() ??
+                $departments->where('name', 'like', '%' . $role['dept'] . '%')->first() ??
+                $departments->first();
+
             $executive = Position::factory()
                 ->for($department)
+                ->withLocation($locations->random())
                 ->state([
                     'name' => $role['title'],
                     'arabic_name' => $role['arabic'],
@@ -151,15 +175,15 @@ class OrganizationSeeder extends Seeder
                     'code' => $role['code']
                 ])
                 ->create();
-                
+
             $executiveTeam->push($executive);
         }
-        
+
         $this->command->info("Created {$executiveTeam->count()} executive positions reporting to CEO");
-        
+
         return $executiveTeam;
     }
-    
+
     /**
      * Create middle management positions
      * 
@@ -167,25 +191,26 @@ class OrganizationSeeder extends Seeder
      * @param Collection $executiveTeam
      * @return Collection
      */
-    private function createMiddleManagement(Collection $departments, Collection $executiveTeam): Collection
+    private function createMiddleManagement(Collection $departments, Collection $executiveTeam, Collection $locations): Collection
     {
         $middleManagement = collect();
         $middleManagerCount = rand(25, 40);
         $executiveCount = $executiveTeam->count();
-        
+
         // Calculate how many managers per executive (distribute evenly)
         $managersPerExecutive = ceil($middleManagerCount / $executiveCount);
-        
+
         foreach ($executiveTeam as $executive) {
             $department = $executive->department;
             $managerCount = min($managersPerExecutive, $middleManagerCount - $middleManagement->count());
-            
+
             for ($i = 0; $i < $managerCount; $i++) {
                 // Determine manager title based on department
                 $managerTitle = $this->getManagerTitleForDepartment($department, $i);
-                
+
                 $manager = Position::factory()
                     ->for($department)
+                    ->withLocation($locations->random())
                     ->state([
                         'name' => $managerTitle,
                         'arabic_name' => 'مدير ' . $managerTitle,
@@ -194,43 +219,44 @@ class OrganizationSeeder extends Seeder
                         'code' => $managerTitle
                     ])
                     ->create();
-                    
+
                 $middleManagement->push($manager);
-                
+
                 if ($middleManagement->count() >= $middleManagerCount) {
                     break; // Reached the maximum count
                 }
             }
-            
+
             if ($middleManagement->count() >= $middleManagerCount) {
                 break; // Reached the maximum count
             }
         }
-        
+
         $this->command->info("Created {$middleManagement->count()} middle management positions");
-        
+
         return $middleManagement;
     }
-    
+
     /**
      * Create staff positions under middle management
      * 
      * @param Collection $departments
      * @param Collection $middleManagement
      */
-    private function createStaffPositions(Collection $departments, Collection $middleManagement): void
+    private function createStaffPositions(Collection $departments, Collection $middleManagement, Collection $locations): void
     {
         $totalStaffCount = 0;
-        
+
         foreach ($middleManagement as $manager) {
             $department = $manager->department;
             $staffCount = 5; // Exactly 5 positions under each middle manager
-            
+
             for ($i = 0; $i < $staffCount; $i++) {
                 $staffTitle = $this->getStaffTitleForDepartment($department, $i);
-                
+
                 $staff = Position::factory()
                     ->for($department)
+                    ->withLocation($locations->random())
                     ->state([
                         'name' => $staffTitle,
                         'arabic_name' => $staffTitle . ' (Arabic)',
@@ -240,13 +266,13 @@ class OrganizationSeeder extends Seeder
                     ])
                     ->create();
             }
-            
+
             $totalStaffCount += $staffCount;
         }
-        
+
         $this->command->info("Created {$totalStaffCount} staff positions");
     }
-    
+
     /**
      * Get an appropriate manager title based on department
      * 
@@ -327,7 +353,7 @@ class OrganizationSeeder extends Seeder
                 'Intellectual Property Manager',
             ],
         ];
-        
+
         $defaultTitles = [
             'Regional Manager',
             'Department Manager',
@@ -335,12 +361,12 @@ class OrganizationSeeder extends Seeder
             'Division Manager',
             'Area Manager',
         ];
-        
+
         $titles = $departmentTitles[$department->name] ?? $defaultTitles;
-        
+
         return $titles[$index % count($titles)];
     }
-    
+
     /**
      * Get an appropriate staff title based on department
      * 
@@ -436,7 +462,7 @@ class OrganizationSeeder extends Seeder
                 'Compliance Specialist',
             ],
         ];
-        
+
         $defaultTitles = [
             'Specialist',
             'Analyst',
@@ -446,12 +472,12 @@ class OrganizationSeeder extends Seeder
             'Administrator',
             'Officer',
         ];
-        
+
         $titles = $departmentTitles[$department->name] ?? $defaultTitles;
-        
+
         return $titles[$index % count($titles)];
     }
-    
+
     /**
      * Display summary of seeded data
      */
@@ -460,16 +486,16 @@ class OrganizationSeeder extends Seeder
         $totalDepartments = Department::count();
         $totalPositions = Position::count();
         $ceoCount = Position::whereNull('parent_id')->count();
-        $executiveCount = Position::whereHas('parent', function($q) {
+        $executiveCount = Position::whereHas('parent', function ($q) {
             $q->whereNull('parent_id');
         })->count();
-        $middleManagementCount = Position::whereHas('parent', function($q) {
-            $q->whereHas('parent', function($q2) {
+        $middleManagementCount = Position::whereHas('parent', function ($q) {
+            $q->whereHas('parent', function ($q2) {
                 $q2->whereNull('parent_id');
             });
         })->count();
         $staffCount = $totalPositions - $ceoCount - $executiveCount - $middleManagementCount;
-        
+
         $this->command->info('Organization Seeding Completed:');
         $this->command->info("- Created $totalDepartments departments");
         $this->command->info("- Created $totalPositions positions:");
@@ -477,16 +503,16 @@ class OrganizationSeeder extends Seeder
         $this->command->info("  - $executiveCount executives (C-suite)");
         $this->command->info("  - $middleManagementCount middle managers");
         $this->command->info("  - $staffCount staff positions");
-        
+
         foreach (Department::all() as $department) {
             $positionsCount = Position::where('department_id', $department->id)->count();
             $this->command->info("  - {$department->name}: $positionsCount positions");
         }
-        
+
         // Display hierarchy depth
         $this->analyzeHierarchyDepth();
     }
-    
+
     /**
      * Analyze and display hierarchy depth information
      */
@@ -494,15 +520,15 @@ class OrganizationSeeder extends Seeder
     {
         $rootPositions = Position::whereNull('parent_id')->get();
         $maxDepth = 0;
-        
+
         foreach ($rootPositions as $rootPosition) {
             $depth = $this->calculateMaxDepth($rootPosition);
             $maxDepth = max($maxDepth, $depth);
         }
-        
+
         $this->command->info("- Maximum hierarchy depth: " . $maxDepth . " levels");
     }
-    
+
     /**
      * Calculate maximum depth of a position hierarchy
      * 
@@ -513,17 +539,17 @@ class OrganizationSeeder extends Seeder
     private function calculateMaxDepth(Position $position, int $currentDepth = 0): int
     {
         $children = Position::where('parent_id', $position->id)->get();
-        
+
         if ($children->isEmpty()) {
             return $currentDepth;
         }
-        
+
         $maxChildDepth = 0;
         foreach ($children as $child) {
             $childDepth = $this->calculateMaxDepth($child, $currentDepth + 1);
             $maxChildDepth = max($maxChildDepth, $childDepth);
         }
-        
+
         return $maxChildDepth;
     }
 }

@@ -14,6 +14,7 @@ use App\Livewire\Settings\UsersIndex;
 use App\Http\Controllers\Hierarchy\OrganizationController;
 use App\Livewire\Base\BankIndex;
 use App\Livewire\Base\InsuranceOfficeIndex;
+use App\Livewire\Base\LocationIndex;
 use App\Livewire\Benefits\ConfigurationIndex;
 use App\Livewire\Benefits\EmployeeConfiguration;
 use App\Livewire\Benefits\PackageIndex;
@@ -47,6 +48,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('/hierarchy/tree', [OrganizationController::class, 'index']);
     Route::get('/hierarchy/positions', PositionIndex::class);
+    Route::get('/hierarchy/locations', LocationIndex::class);
 
     Route::get('/recruitment/vacancies/{id}', VacancyShow::class)->name('recruitment.vacancies.show');
     Route::get('/recruitment/vacancies', VacancyIndex::class)->name('recruitment.vacancies');

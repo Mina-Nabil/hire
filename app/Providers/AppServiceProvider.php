@@ -24,6 +24,7 @@ use App\Models\Benefits\Vacations\VacationDay;
 use App\Models\Benefits\Vacations\VacationDetail;
 use App\Models\Benefits\Vacations\VacationPayment;
 use App\Models\Hierarchy\Department;
+use App\Models\Hierarchy\Location;
 use App\Models\Hierarchy\OrganizationalChart;
 use App\Models\Hierarchy\Position;
 use App\Models\Personel\Docs\BankAccount;
@@ -141,6 +142,7 @@ class AppServiceProvider extends ServiceProvider
             PackageDetail::MORPH_NAME => PackageDetail::class,
             BenefitPayment::MORPH_NAME => BenefitPayment::class,
             ExtraPayment::MORPH_NAME => ExtraPayment::class,
+            Location::MORPH_NAME => Location::class,
         ]);
     }
 }

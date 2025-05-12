@@ -20,6 +20,7 @@ class Position extends Model
     const MORPH_NAME = 'position';
 
     protected $fillable = [
+        'location_id',
         'department_id',
         'code',
         'name',
@@ -44,6 +45,13 @@ class Position extends Model
         return $this->belongsTo(Department::class);
     }
 
+    /**
+     * Get the location that this position belongs to.
+     */
+    public function location(): BelongsTo
+    {
+        return $this->belongsTo(Location::class);
+    }
     /**
      * Get the employee assigned to this position.
      */
@@ -88,20 +96,21 @@ class Position extends Model
      * @return Position
      */
     public static function createPosition(
+        int $locationId,
         int $departmentId,
         string $name,
-        ?int $parentId,
-        string $arabicName,
-        ?string $jobDescription,
-        ?string $arabicJobDescription,
-        ?string $jobRequirements,
-        ?string $arabicJobRequirements,
-        ?string $jobQualifications,
-        ?string $arabicJobQualifications,
-        ?string $jobBenefits,
-        ?string $arabicJobBenefits,
-        ?string $code,
-        ?string $employeeId,
+        string $arabicName ,
+        ?int $parentId = null,
+        ?string $jobDescription = null,
+        ?string $arabicJobDescription = null,
+        ?string $jobRequirements = null,
+        ?string $arabicJobRequirements = null,
+        ?string $jobQualifications = null,
+        ?string $arabicJobQualifications = null,
+        ?string $jobBenefits = null,
+        ?string $arabicJobBenefits = null,
+        ?string $code = null,
+        ?string $employeeId = null,
     ): Position {
         /** @var User $loggerInUser */
         $loggerInUser = Auth::user();
@@ -111,6 +120,7 @@ class Position extends Model
 
         try {
             $newPosition = self::create([
+                'location_id' => $locationId,
                 'department_id' => $departmentId,
                 'name' => $name,
                 'arabic_name' => $arabicName,
@@ -137,6 +147,7 @@ class Position extends Model
 
 
     public function editInfo(
+        int $locationId,
         int $departmentId,
         string $name,
         ?int $parentId,
@@ -161,6 +172,7 @@ class Position extends Model
 
 
             return $this->update([
+                'location_id' => $locationId,
                 'department_id' => $departmentId,
                 'name' => $name,
                 'arabic_name' => $arabicName,

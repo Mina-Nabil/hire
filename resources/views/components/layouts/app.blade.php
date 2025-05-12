@@ -91,8 +91,7 @@
                         <ul class="sidebar-submenu">
                             @can('viewAny', App\Models\Payroll\Payroll::class)
                                 <li>
-                                    <a class="{{ $payrollsIndex ?? '' }}"
-                                        href="{{ url('/payrolls') }}">Payrolls</a>
+                                    <a class="{{ $payrollsIndex ?? '' }}" href="{{ url('/payrolls') }}">Payrolls</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Payroll\Payroll::class)
@@ -103,7 +102,8 @@
                             @endcan
                             @can('viewAny', App\Models\Payroll\Payroll::class)
                                 <li>
-                                    <a class="{{ $submitAttendanceIndex ?? '' }}" href="{{ url('/payrolls/submit-attendance') }}">
+                                    <a class="{{ $submitAttendanceIndex ?? '' }}"
+                                        href="{{ url('/payrolls/submit-attendance') }}">
                                         Submit Attendance</a>
                                 </li>
                             @endcan
@@ -126,7 +126,72 @@
                     <li class="">
                         <a href="javascript:void(0)" class="navItem">
                             <span class="flex items-center">
-                                <span>Benefits</span>
+                                <span>Employees</span>
+                            </span>
+                            <iconify-icon class="icon-arrow" icon="heroicons-outline:chevron-right"></iconify-icon>
+                        </a>
+                        <ul class="sidebar-submenu">
+                            @can('viewDashboard', App\Models\Personel\Employee::class)
+                                <li>
+                                    <a class="{{ $employeeDashboard ?? '' }}"
+                                        href="{{ route('employees.dashboard') }}">Dashboard</a>
+                                </li>
+                            @endcan
+                            @can('viewMissingDocReport', App\Models\Personel\Employee::class)
+                                <li>
+                                    <a class="{{ $missingDocReport ?? '' }}"
+                                        href="{{ route('employees.reports.missing-documents') }}">Document Status</a>
+                                </li>
+                            @endcan
+                            @can('viewAny', App\Models\Personel\Employee::class)
+                                <li>
+                                    <a class="{{ $employeesIndex ?? '' }}" href="{{ route('employees') }}">Employees</a>
+                                </li>
+                            @endcan
+                            @can('create', App\Models\Personel\Employee::class)
+                                <li>
+                                    <a class="{{ $employeeCreate ?? '' }}" href="{{ route('employees.create') }}">Create
+                                        Employee</a>
+                                </li>
+                            @endcan
+                        </ul>
+                    </li>
+
+                    <li class="">
+                        <a href="javascript:void(0)" class="navItem">
+                            <span class="flex items-center">
+                                <span>Employee Requests</span>
+                            </span>
+                            <iconify-icon class="icon-arrow" icon="heroicons-outline:chevron-right"></iconify-icon>
+                        </a>
+                        <ul class="sidebar-submenu">
+                            <li>
+                                <a href="{{ route('employees.requests.hr-letters.index') }}"
+                                    class="navItem {{ request()->routeIs('employees.requests.hr-letters.index') ? 'active' : '' }}">
+                                    <span class="flex items-center">
+                                        <iconify-icon class="nav-icon"
+                                            icon="heroicons-outline:document-text"></iconify-icon>
+                                        <span>HR Letter Requests</span>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('employees.requests.overtime.index') }}"
+                                    class="navItem {{ request()->routeIs('employees.requests.overtime.index') ? 'active' : '' }}">
+                                    <span class="flex items-center">
+                                        <iconify-icon class="nav-icon" icon="heroicons-outline:clock"></iconify-icon>
+                                        <span>Overtime Requests</span>
+                                    </span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+
+                    <li class="">
+                        <a href="javascript:void(0)" class="navItem">
+                            <span class="flex items-center">
+                                <span>Compensation Packages</span>
                             </span>
                             <iconify-icon class="icon-arrow" icon="heroicons-outline:chevron-right"></iconify-icon>
                         </a>
@@ -218,69 +283,6 @@
                     <li class="">
                         <a href="javascript:void(0)" class="navItem">
                             <span class="flex items-center">
-                                <span>Employees</span>
-                            </span>
-                            <iconify-icon class="icon-arrow" icon="heroicons-outline:chevron-right"></iconify-icon>
-                        </a>
-                        <ul class="sidebar-submenu">
-                            @can('viewDashboard', App\Models\Personel\Employee::class)
-                                <li>
-                                    <a class="{{ $employeeDashboard ?? '' }}"
-                                        href="{{ route('employees.dashboard') }}">Dashboard</a>
-                                </li>
-                            @endcan
-                            @can('viewMissingDocReport', App\Models\Personel\Employee::class)
-                                <li>
-                                    <a class="{{ $missingDocReport ?? '' }}"
-                                        href="{{ route('employees.reports.missing-documents') }}">Document Status</a>
-                                </li>
-                            @endcan
-                            @can('viewAny', App\Models\Personel\Employee::class)
-                                <li>
-                                    <a class="{{ $employeesIndex ?? '' }}" href="{{ route('employees') }}">Employees</a>
-                                </li>
-                            @endcan
-                            @can('create', App\Models\Personel\Employee::class)
-                                <li>
-                                    <a class="{{ $employeeCreate ?? '' }}" href="{{ route('employees.create') }}">Create
-                                        Employee</a>
-                                </li>
-                            @endcan
-                        </ul>
-                    </li>
-
-                    <li class="">
-                        <a href="javascript:void(0)" class="navItem">
-                            <span class="flex items-center">
-                                <span>Employee Requests</span>
-                            </span>
-                            <iconify-icon class="icon-arrow" icon="heroicons-outline:chevron-right"></iconify-icon>
-                        </a>
-                        <ul class="sidebar-submenu">
-                            <li>
-                                <a href="{{ route('employees.requests.hr-letters.index') }}" 
-                                   class="navItem {{ request()->routeIs('employees.requests.hr-letters.index') ? 'active' : '' }}">
-                                    <span class="flex items-center">
-                                        <iconify-icon class="nav-icon" icon="heroicons-outline:document-text"></iconify-icon>
-                                        <span>HR Letter Requests</span>
-                                    </span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('employees.requests.overtime.index') }}" 
-                                   class="navItem {{ request()->routeIs('employees.requests.overtime.index') ? 'active' : '' }}">
-                                    <span class="flex items-center">
-                                        <iconify-icon class="nav-icon" icon="heroicons-outline:clock"></iconify-icon>
-                                        <span>Overtime Requests</span>
-                                    </span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <li class="">
-                        <a href="javascript:void(0)" class="navItem">
-                            <span class="flex items-center">
                                 <span>Settings</span>
                             </span>
                             <iconify-icon class="icon-arrow" icon="heroicons-outline:chevron-right"></iconify-icon>
@@ -309,17 +311,20 @@
                             @endcan
                             @can('viewAny', App\Models\Base\Location::class)
                                 <li>
-                                    <a class="{{ $locationsIndex ?? '' }}" href="{{ url('/hierarchy/locations') }}">Locations</a>
+                                    <a class="{{ $locationsIndex ?? '' }}"
+                                        href="{{ url('/hierarchy/locations') }}">Locations</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Attendance\PublicHoliday::class)
                                 <li>
-                                    <a class="{{ $publicHolidaysIndex ?? '' }}" href="{{ route('public-holidays.index') }}">Public Holidays</a>
+                                    <a class="{{ $publicHolidaysIndex ?? '' }}"
+                                        href="{{ route('public-holidays.index') }}">Public Holidays</a>
                                 </li>
                             @endcan
-                            @if(Auth::user()->is_admin)
+                            @if (Auth::user()->is_admin)
                                 <li>
-                                    <a class="{{ $importData ?? '' }}" href="{{ route('import-data') }}">Import Data</a>
+                                    <a class="{{ $importData ?? '' }}" href="{{ route('import-data') }}">Import
+                                        Data</a>
                                 </li>
                             @endif
                         </ul>

@@ -252,6 +252,35 @@
                     <li class="">
                         <a href="javascript:void(0)" class="navItem">
                             <span class="flex items-center">
+                                <span>Employee Requests</span>
+                            </span>
+                            <iconify-icon class="icon-arrow" icon="heroicons-outline:chevron-right"></iconify-icon>
+                        </a>
+                        <ul class="sidebar-submenu">
+                            <li>
+                                <a href="{{ route('employees.requests.hr-letters.index') }}" 
+                                   class="navItem {{ request()->routeIs('employees.requests.hr-letters.index') ? 'active' : '' }}">
+                                    <span class="flex items-center">
+                                        <iconify-icon class="nav-icon" icon="heroicons-outline:document-text"></iconify-icon>
+                                        <span>HR Letter Requests</span>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('employees.requests.overtime.index') }}" 
+                                   class="navItem {{ request()->routeIs('employees.requests.overtime.index') ? 'active' : '' }}">
+                                    <span class="flex items-center">
+                                        <iconify-icon class="nav-icon" icon="heroicons-outline:clock"></iconify-icon>
+                                        <span>Overtime Requests</span>
+                                    </span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class="">
+                        <a href="javascript:void(0)" class="navItem">
+                            <span class="flex items-center">
                                 <span>Settings</span>
                             </span>
                             <iconify-icon class="icon-arrow" icon="heroicons-outline:chevron-right"></iconify-icon>

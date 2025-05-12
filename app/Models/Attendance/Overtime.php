@@ -2,14 +2,28 @@
 
 namespace App\Models\Attendance;
 
+use App\Exceptions\AppException;
 use App\Models\Personel\Employee;
 use App\Models\Users\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Overtime extends Model
 {
 
     protected $table = 'overtimes';
+
+    protected $fillable = [
+        'employee_id',
+        'creator_id',
+        'date',
+        'start_time',
+        'end_time',
+        'hours',
+        'status',
+        'approved_at',
+        'admin_note',
+    ];
 
     const STATUS_PENDING = 'pending';
     const STATUS_APPROVED = 'approved';
@@ -21,15 +35,28 @@ class Overtime extends Model
         self::STATUS_REJECTED,
     ];
 
-    protected $fillable = [
-        'employee_id',
-        'creator_id',
-        'date',
-        'start_time',
-        'end_time',
-        'hours',
-        'status',
-    ];
+    public function setStatus(string $status, ?string $admin_note = null)
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('updateOvertime', $this->employee)) {
+            throw new AppException('You dont have permission to approve overtime');
+        }
+
+        try {
+            $this->update([
+                'status' => $status,
+                'approved_at' => now(),
+                'admin_note' => $admin_note,
+            ]);
+
+            $this->save();
+            return true;
+        } catch (\Exception $e) {
+            report($e);
+            throw new AppException('Error approving overtime');
+        }
+    }
 
     public function employee()
     {

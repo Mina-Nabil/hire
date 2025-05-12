@@ -98,7 +98,9 @@
         <div id="simpleToast"></div>
 
         <div class="guest-header">
-            <img src="{{ asset('images/logo/logo.svg') }}" alt="{{ config('app.name', 'HiRe') }} Logo">
+            <div class="flex justify-center">
+                <img src="{{ asset('images/logo/hire-logo-wide.png') }}" alt="{{ config('app.name', 'HiRe') }} Logo">
+            </div>
             <h1 class="text-2xl font-bold text-slate-900">{{ $title ?? 'Welcome' }}</h1>
             @if(isset($description))
                 <p class="text-slate-500 mt-2">{{ $description }}</p>

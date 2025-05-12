@@ -28,7 +28,7 @@ class ApplicantsCreate extends Component
     //Page settings
     public $pageTitle = 'Create New Applicant';
     public $pageDescription = 'Create a new applicant for the selected vacancy';
-    public $pageLayout = 'components.layouts.app';
+    public $pageLayout = 'components.layouts.guest';
     // Page data
     public $cities = [];
     public $areas = [];

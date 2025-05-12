@@ -6,7 +6,6 @@ use App\Models\Hierarchy\Location;
 use App\Traits\AlertFrontEnd;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Illuminate\Support\Facades\Auth;
 
 class LocationIndex extends Component
 {

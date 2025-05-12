@@ -3,6 +3,7 @@
 namespace App\Models\Personel;
 
 use App\Exceptions\AppException;
+use App\Models\Attendance\Overtime;
 use App\Models\Base\City;
 use App\Models\Base\InsuranceOffice;
 use App\Models\Benefits\Payrolls\AppliedVacation;
@@ -42,6 +43,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Personel\Docs\EmployeeHrLetterRequest;
 
 class Employee extends Model
 {
@@ -364,6 +366,32 @@ class Employee extends Model
         } catch (Exception $e) {
             report($e);
             throw new AppException('Error applying for vacation');
+        }
+    }
+
+    public function createHrLetterRequest(
+        int $requested_by,
+        string $directed_to,
+        ?string $employee_note = null
+    ): EmployeeHrLetterRequest {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('createHrLetterRequest', $this)) {
+            throw new AppException('You dont have permission to create HR letter request');
+        }
+
+        try {
+            return DB::transaction(function () use ($requested_by, $directed_to, $employee_note) {
+                return $this->hrLetterRequests()->create([
+                    'requested_by' => $requested_by,
+                    'directed_to' => $directed_to,
+                    'employee_note' => $employee_note,
+                    'status' => EmployeeHrLetterRequest::STATUS_PENDING
+                ]);
+            });
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException('Error creating HR letter request: ' . $e->getMessage());
         }
     }
 
@@ -2404,6 +2432,11 @@ class Employee extends Model
         return $this->hasMany(BaseBenefit::class);
     }
 
+    public function overtimes()
+    {
+        return $this->hasMany(Overtime::class);
+    }
+
 
     //// document status check ////
     /**
@@ -2922,4 +2955,11 @@ class Employee extends Model
             throw new AppException('Error creating employee: ' . $e->getMessage());
         }
     }
+
+    public function hrLetterRequests()
+    {
+        return $this->hasMany(EmployeeHrLetterRequest::class);
+    }
+
+
 }

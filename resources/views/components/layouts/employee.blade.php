@@ -102,11 +102,31 @@
                     </li>
 
                     <li>
+                        <a href="{{ route('employee.request-hr-letter') }}"
+                            class="navItem {{ request()->routeIs('employee.request-hr-letter') ? 'active' : '' }}">
+                            <span class="flex items-center">
+                                <iconify-icon class="nav-icon" icon="heroicons-outline:document"></iconify-icon>
+                                <span>Request HR Letter</span>
+                            </span>
+                        </a>
+                    </li>
+
+                    <li>
                         <a href="{{ route('employee.documents') }}"
                             class="navItem {{ request()->routeIs('employee.documents') ? 'active' : '' }}">
                             <span class="flex items-center">
                                 <iconify-icon class="nav-icon" icon="heroicons-outline:document-text"></iconify-icon>
                                 <span>My Documents</span>
+                            </span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ route('employee.overtime-requests') }}"
+                            class="navItem {{ request()->routeIs('employee.overtime-requests') ? 'active' : '' }}">
+                            <span class="flex items-center">
+                                <iconify-icon class="nav-icon" icon="heroicons-outline:clock"></iconify-icon>
+                                <span>Overtime Requests</span>
                             </span>
                         </a>
                     </li>

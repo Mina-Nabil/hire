@@ -52,7 +52,9 @@ class Vacancy extends Model
         'arabic_job_qualifications',
         'job_benefits',
         'arabic_job_benefits',
-        'job_salary'
+        'job_salary',
+        'hiring_manager_id',
+        'hr_manager_id',
     ];
 
     protected $casts = [

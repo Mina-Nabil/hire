@@ -13,7 +13,9 @@ use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\UsersIndex;
 use App\Http\Controllers\Hierarchy\OrganizationController;
 use App\Livewire\Base\BankIndex;
+use App\Livewire\Base\ImportData;
 use App\Livewire\Base\InsuranceOfficeIndex;
+use App\Livewire\Base\LocationIndex;
 use App\Livewire\Benefits\ConfigurationIndex;
 use App\Livewire\Benefits\EmployeeConfiguration;
 use App\Livewire\Benefits\PackageIndex;
@@ -38,6 +40,12 @@ use App\Livewire\Employee\EmployeeOvertimeRequests;
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/', Dashboard::class)->name('home');
 
+    // Payroll & Attendance routes
+    Route::get('/attendance/public-holidays', App\Livewire\Attendance\PublicHolidayIndex::class)->name('public-holidays.index');
+    Route::get('/payrolls/submit-attendance', App\Livewire\Attendance\AddSheet::class)->name('submit-attendance');
+    Route::get('/attendance', App\Livewire\Attendance\ShowAttendance::class)->name('attendance.index');
+    Route::get('/attendance/overtime', App\Livewire\Attendance\ShowOvertime::class)->name('overtime.index');
+    
     //benefits routes
     Route::get('/benefits/packages', PackageIndex::class)->name('benefits.packages');
     Route::get('/benefits/configurations', ConfigurationIndex::class)->name('benefits.configurations');
@@ -45,6 +53,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('/hierarchy/tree', [OrganizationController::class, 'index']);
     Route::get('/hierarchy/positions', PositionIndex::class);
+    Route::get('/hierarchy/locations', LocationIndex::class);
 
     Route::get('/recruitment/vacancies/{id}', VacancyShow::class)->name('recruitment.vacancies.show');
     Route::get('/recruitment/vacancies', VacancyIndex::class)->name('recruitment.vacancies');
@@ -82,6 +91,8 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('employees/requests/hr-letters', HrLetterRequests::class)->name('employees.requests.hr-letters.index');
     Route::get('employees/requests/overtime', OvertimeRequests::class)->name('employees.requests.overtime.index');
+
+    Route::get('/import-data', ImportData::class)->name('import-data');
 });
 
 Route::group(['middleware' => 'guest'], function () {

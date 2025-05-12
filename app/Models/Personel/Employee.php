@@ -60,7 +60,23 @@ class Employee extends Model
     // Default days threshold for near expiry warning (7 days)
     const NEAR_EXPIRY_DAYS = 7;
 
-    protected $fillable = ['user_id', 'created_by', 'name', 'email', 'phone', 'address', 'nationality', 'gender', 'birth_date', 'image_url', 'birth_place_id', 'license_required', 'employment_date', 'applicant_id', 'termination_date'];
+    protected $fillable = [
+        'user_id',
+        'created_by',
+        'name',
+        'email',
+        'phone',
+        'address',
+        'nationality',
+        'gender',
+        'birth_date',
+        'image_url',
+        'birth_place_id',
+        'license_required',
+        'employment_date',
+        'applicant_id',
+        'termination_date',
+    ];
 
     protected $casts = [
         'employment_date' => 'date',
@@ -2231,6 +2247,17 @@ class Employee extends Model
             'expired' => $expired,
             'missing' => $missing,
         ];
+    }
+
+    /// attribute
+    public function getIsManagerAttribute()
+    {
+        return $this->positions()->first()->children()->count();
+    }
+
+    public function getManagerIdAttribute()
+    {
+        return $this->positions()->first()->parent->employee_id;
     }
 
     //// relations ////

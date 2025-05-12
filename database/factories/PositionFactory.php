@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Hierarchy\Department;
+use App\Models\Hierarchy\Location;
 use App\Models\Hierarchy\Position;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -63,6 +64,21 @@ class PositionFactory extends Factory
             return [
                 'department_id' => $parent->department_id, // Ensure same department as parent
                 'parent_id' => $parent->id,
+            ];
+        });
+    }
+
+    /**
+     * Define a position with a location relationship.
+     * 
+     * @param Location $location The location
+     * @return static
+     */
+    public function withLocation(Location $location): static
+    {
+        return $this->state(function (array $attributes) use ($location) {
+            return [
+                'location_id' => $location->id,
             ];
         });
     }

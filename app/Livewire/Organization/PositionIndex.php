@@ -4,6 +4,7 @@ namespace App\Livewire\Organization;
 
 use App\Exceptions\AppException;
 use App\Models\Hierarchy\Department;
+use App\Models\Hierarchy\Location;
 use App\Models\Hierarchy\Position;
 use App\Models\Personel\Employee;
 use App\Traits\AlertFrontEnd;
@@ -20,7 +21,7 @@ class PositionIndex extends Component
 
     // form data
     public $employees = [];
-
+    public $locations = [];
     // Department section
     public $newDepartmentModal = false;
     public $editDepartmentModal = false;
@@ -36,6 +37,7 @@ class PositionIndex extends Component
     public $positionName;
     public $positionArabicName;
     public $selectedDepartmentId;
+    public $selectedLocationId;
     public $jobDescription;
     public $arabicJobDescription;
     public $jobRequirements;
@@ -178,14 +180,16 @@ class PositionIndex extends Component
             'jobBenefits' => 'nullable|string',
             'arabicJobBenefits' => 'nullable|string',
             'parentId' => 'nullable|exists:positions,id',
+            'selectedLocationId' => 'required|exists:locations,id',
         ]);
 
         try {
             $position = Position::createPosition(
+                $this->selectedLocationId,
                 $this->selectedDepartmentId,
                 $this->positionName,
-                $this->parentId,
                 $this->positionArabicName,
+                $this->parentId,
                 $this->jobDescription,
                 $this->arabicJobDescription,
                 $this->jobRequirements,
@@ -226,6 +230,7 @@ class PositionIndex extends Component
         $this->parentId = $position->parent_id;
         $this->code = $position->code;
         $this->employeeId = $position->employee_id;
+        $this->selectedLocationId = $position->location_id;
         $this->editPositionModal = true;
     }
 
@@ -249,6 +254,7 @@ class PositionIndex extends Component
             'jobBenefits' => 'nullable|string',
             'arabicJobBenefits' => 'nullable|string',
             'parentId' => 'nullable|exists:positions,id',
+            'selectedLocationId' => 'required|exists:locations,id',
         ]);
 
         try {
@@ -261,6 +267,7 @@ class PositionIndex extends Component
             }
 
             $position->editInfo(
+                $this->selectedLocationId,
                 $this->selectedDepartmentId,
                 $this->positionName,
                 $this->parentId,
@@ -355,6 +362,7 @@ class PositionIndex extends Component
     public function mount()
     {
         $this->employees = Employee::current()->get();
+        $this->locations = Location::all();
     }
 
     public function render()

@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Hierarchy\Department;
+use App\Models\Hierarchy\Location;
 use App\Models\Hierarchy\Position;
 use App\Models\Personel\Employee;
 use Illuminate\Database\Migrations\Migration;
@@ -14,9 +15,15 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::create('locations', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+        });
+
         Schema::create('positions', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Department::class)->constrained('departments');
+            $table->foreignIdFor(Location::class)->constrained('locations');
             $table->string('name');
             $table->string('arabic_name');
             $table->string('code');

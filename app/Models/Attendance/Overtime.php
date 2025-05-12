@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Auth;
 
 class Overtime extends Model
 {
+
+    protected $table = 'overtimes';
+
     protected $fillable = [
         'employee_id',
         'creator_id',

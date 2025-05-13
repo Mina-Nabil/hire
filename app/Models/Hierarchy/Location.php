@@ -37,6 +37,8 @@ class Location extends Model
         return $this->belongsToMany(User::class, 'hr_location_assignments');
     }
 
+    
+    
     ////static functions
     public static function createLocation(string $name): Location
     {
@@ -104,5 +106,40 @@ class Location extends Model
         } catch (\Exception $e) {
             throw new AppException('Error assigning HR users: ' . $e->getMessage());
         }
+    }
+
+    protected static function booted()
+    {
+        static::addGlobalScope('hrAccessibleLocations', function ($builder) {
+            $user = Auth::user();
+            
+            // If no user is logged in or if they are admin, don't restrict
+            if (!$user || $user->is_admin) {
+                return;
+            }
+            
+            // If user is HR, restrict to their assigned locations
+            if ($user->is_hr) {
+                // Use direct query to avoid infinite loop
+                $locationIds = HrLocationAssignment::where('user_id', $user->id)
+                    ->pluck('location_id')
+                    ->toArray();
+                
+                // Only apply filter if the user has assigned locations
+                if (!empty($locationIds)) {
+                    $builder->whereIn('locations.id', $locationIds);
+                }
+            }
+        });
+    }
+    
+    /**
+     * Get all locations without the HR accessibility scope.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public static function withoutHrScope()
+    {
+        return static::withoutGlobalScope('hrAccessibleLocations');
     }
 }

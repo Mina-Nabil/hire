@@ -100,6 +100,31 @@ class Employee extends Model
         'birth_date' => 'date',
     ];
 
+    protected static function booted()
+    {
+        static::addGlobalScope('hrAccessibleEmployees', function ($builder) {
+            $user = Auth::user();
+            
+            // If no user is logged in or if they are admin, don't restrict
+            if (!$user || $user->is_admin) {
+                return;
+            }
+            
+            // If user is HR, restrict to employees in their assigned locations
+            if ($user->is_hr) {
+                // Get the HR user's assigned location IDs
+                $locationIds = $user->assignedLocations()->pluck('locations.id')->toArray();
+                
+                // Only apply filter if the user has assigned locations
+                if (!empty($locationIds)) {
+                    $builder->whereHas('positions', function($query) use ($locationIds) {
+                        $query->whereIn('location_id', $locationIds);
+                    });
+                }
+            }
+        });
+    }
+
     ////attributes
     public function getFullNameAttribute(): string
     {

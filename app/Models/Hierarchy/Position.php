@@ -5,6 +5,7 @@ namespace App\Models\Hierarchy;
 use App\Exceptions\AppException;
 use App\Models\Personel\Employee;
 use App\Models\Recruitment\Vacancies\Vacancy;
+use App\Scopes\HrLocationScope;
 use Database\Factories\PositionFactory;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -36,6 +37,18 @@ class Position extends Model
         'employee_id',
         'parent_id',
     ];
+
+    /**
+     * The "booted" method of the model.
+     *
+     * @return void
+     */
+    protected static function booted()
+    {
+        return static::addGlobalScope(new HrLocationScope);
+    }
+
+
 
     /**
      * Get the department that this position belongs to.

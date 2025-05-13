@@ -207,7 +207,7 @@
                                     <div class="row mb-3">
                                         <div class="col-md-5 font-weight-bold">Package:</div>
                                         <div class="col-md-7">
-                                            {{ $employee->benefitConfiguration->benefitPackage->name ?? '-' }}</div>
+                                            {{ $employee->benefitConfiguration->salaryGrade->name ?? '-' }}</div>
                                     </div>
                                     <div class="row mb-3">
                                         <div class="col-md-5 font-weight-bold">Attendance Calculation:</div>

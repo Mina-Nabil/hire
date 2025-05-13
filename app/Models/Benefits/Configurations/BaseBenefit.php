@@ -4,7 +4,7 @@ namespace App\Models\Benefits\Configurations;
 
 use App\Exceptions\AppException;
 use App\Models\Personel\Employee;
-use App\Models\Benefits\Configurations\BenefitPackage;
+use App\Models\Benefits\Configurations\SalaryGrade;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -55,9 +55,9 @@ class BaseBenefit extends Model
         return $this->belongsTo(Employee::class);
     }
 
-    public function benefitPackage()
+    public function salaryGrade()
     {
-        return $this->belongsTo(BenefitPackage::class);
+        return $this->belongsTo(SalaryGrade::class);
     }
 
     public function benefitPayments()
@@ -139,10 +139,10 @@ class BaseBenefit extends Model
     }
 
     ///scopes
-    public function scopeByPackage($query, $package_id)
+    public function scopeBySalaryGrade($query, $salary_grade_id)
     {
         return $query
             ->join('package_details', 'base_benefits.package_detail_id', '=', 'package_details.id')
-            ->where('package_details.benefit_package_id', $package_id);
+            ->where('package_details.salary_grade_id', $salary_grade_id);
     }
 }

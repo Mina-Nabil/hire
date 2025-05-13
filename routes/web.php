@@ -19,6 +19,7 @@ use App\Livewire\Base\LocationIndex;
 use App\Livewire\Benefits\ConfigurationIndex;
 use App\Livewire\Benefits\EmployeeConfiguration;
 use App\Livewire\Benefits\PackageIndex;
+use App\Livewire\Benefits\VacationPackageIndex;
 use App\Livewire\Employee\EmployeeBenefitsView;
 use App\Livewire\Employee\EmployeeDashboard;
 use App\Livewire\Employee\EmployeeIndex;
@@ -48,6 +49,7 @@ Route::group(['middleware' => 'auth'], function () {
     
     //benefits routes
     Route::get('/benefits/packages', PackageIndex::class)->name('benefits.packages');
+    Route::get('/benefits/vacation-packages', VacationPackageIndex::class)->name('benefits.vacation-packages');
     Route::get('/benefits/configurations', ConfigurationIndex::class)->name('benefits.configurations');
     Route::get('/benefits/employee/{employee}', EmployeeConfiguration::class)->name('employee.configuration');
 

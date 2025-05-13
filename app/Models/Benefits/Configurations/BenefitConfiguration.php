@@ -3,7 +3,7 @@
 namespace App\Models\Benefits\Configurations;
 
 use App\Models\Personel\Employee;
-use App\Models\Benefits\Configurations\BenefitPackage;
+use App\Models\Benefits\Configurations\SalaryGrade;
 use App\Models\Users\User;
 use Illuminate\Database\Eloquent\Model;
 
@@ -22,7 +22,10 @@ class BenefitConfiguration extends Model
     protected $table = 'benefit_configurations';
     protected $fillable = [
         'employee_id',
-        'benefit_package_id',
+        'salary_grade_id',
+        'manager_id',
+        'vacation_package_id',
+        'gross_salary',
         'attendace_calculation',
         'working_day_start_min',
         'working_day_start_max',
@@ -30,7 +33,7 @@ class BenefitConfiguration extends Model
         'working_day_end_max',
         'daily_working_hours',
         'overtime_rate',
-        'creator_id',
+        'is_automatic_overtime'
     ];
 
     public function employee()
@@ -38,14 +41,9 @@ class BenefitConfiguration extends Model
         return $this->belongsTo(Employee::class);
     }
 
-    public function benefitPackage()
+    public function salaryGrade()
     {
-        return $this->belongsTo(BenefitPackage::class);
-    }
-
-    public function creator()
-    {
-        return $this->belongsTo(User::class, 'creator_id');
+        return $this->belongsTo(SalaryGrade::class);
     }
     
     

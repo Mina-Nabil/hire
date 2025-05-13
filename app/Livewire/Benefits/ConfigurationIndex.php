@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Benefits;
 
-use App\Models\Benefits\Configurations\BenefitPackage;
+use App\Models\Benefits\Configurations\SalaryGrade;
 use App\Models\Personel\Employee;
 use App\Models\Hierarchy\Department;
 use App\Traits\AlertFrontEnd;
@@ -44,7 +44,7 @@ class ConfigurationIndex extends Component
 
     public function loadPackages()
     {
-        $this->packages = BenefitPackage::all();
+        $this->packages = SalaryGrade::all();
     }
 
     public function toggleFilters()
@@ -102,7 +102,7 @@ class ConfigurationIndex extends Component
     public function render()
     {
         $query = Employee::query()
-            ->with(['benefitConfiguration.benefitPackage', 'positions.department'])
+            ->with(['benefitConfiguration.salaryGrade', 'position.department'])
             ->search($this->search, $this->startDate ? Carbon::parse($this->startDate) : null, $this->endDate ? Carbon::parse($this->endDate) : null, $this->packageId, $this->departmentId);
 
         $employees = $query->paginate(10);

@@ -33,11 +33,29 @@
                         </div>
                     @endif
 
+                    <!-- Configuration Options -->
+                    <div class="card mb-6">
+                        <div class="card-header">
+                            <h3 class="card-title">Configuration Options</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <label class="flex items-center">
+                                    <input type="checkbox" wire:model="deleteOldConf" class="form-checkbox">
+                                    <span class="ml-2">Delete old configuration and create new one</span>
+                                </label>
+                                <p class="text-sm text-gray-500 mt-1">
+                                    If unchecked, the old configuration will be ended and a new one will be created
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Package Selection -->
                     <div class="mb-6">
                         <x-select title="Select Package" wire:model="selectedPackageId" wire:change="loadPackageDetails"
-                            errorMessage="{{ $errors->first('selectedPackageId') }}">
-                            <option value="">-- Select Package --</option>
+                            errorMessage="{{ $errors->first('selectedPackageId') }}" disabled>
+                            <option value="">-- Package is selected from position automatically, make sure position has a salary grade and the employee is selected --</option>
                             @foreach ($packages as $package)
                                 <option value="{{ $package->id }}">{{ $package->name }}</option>
                             @endforeach
@@ -48,7 +66,7 @@
                         <!-- Package Details Section -->
                         <div class="card mb-6">
                             <div class="card-header">
-                                <h3 class="card-title">Package Details</h3>
+                                <h3 class="card-title">Compensation & Benefits</h3>
                             </div>
                             <div class="card-body">
                                 <div class="space-y-4">
@@ -57,6 +75,14 @@
                                             <x-text-input label="Start Date*" type="date"
                                                 wire:model="packageStartDate" />
                                             <x-text-input label="End Date" type="date" wire:model="packageEndDate" />
+                                            <div class="col-span-2">
+                                                <x-text-input label="Gross Salary*" type="number"
+                                                    wire:model="grossSalary" />
+                                                <span class="text-sm text-gray-500">
+                                                    Amount: {{ $selectedPackage->gross_min }} ->
+                                                    {{ $selectedPackage->gross_max }}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                     @foreach ($packageDetails as $index => $detail)
@@ -65,7 +91,6 @@
                                                 <div class="col-span-3">
                                                     <div class="flex justify-between items-center mb-2">
                                                         <p class="font-bold">{{ $detail['name'] }}</p>
-
                                                     </div>
                                                     <div class="grid grid-cols-2 gap-4">
                                                         <x-text-input label="Amount*" type="number"
@@ -99,7 +124,6 @@
                                                         <span class="text-sm text-gray-500">
                                                             {{ $detail['is_hidden'] ? 'Hidden' : '' }}
                                                         </span>
-
                                                     </div>
                                                 </div>
                                             </div>

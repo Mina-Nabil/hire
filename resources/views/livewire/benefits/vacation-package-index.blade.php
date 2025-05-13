@@ -1,8 +1,8 @@
 <div class="space-y-5 profile-page mx-auto">
     <div class="flex justify-between items-center mb-4">
-        <h2 class="text-lg font-medium">Grading Systems</h2>
+        <h2 class="text-lg font-medium">Vacation Packages</h2>
         <button type="button" class="btn btn-primary" wire:click="showCreateModal">
-            <i class="fas fa-plus mr-1"></i> Create & Manage Salary Tiers
+            <i class="fas fa-plus mr-1"></i> Create & Manage Vacation Packages
         </button>
     </div>
 
@@ -16,9 +16,7 @@
                                 class="border-t border-slate-100 dark:border-slate-800 bg-slate-200 dark:bg-slate-700">
                                 <tr>
                                     <th class="table-th">Name</th>
-                                    <th class="table-th">Gross Min</th>
-                                    <th class="table-th">Gross Max</th>
-                                    <th class="table-th">Compensation & Benefit Details</th>
+                                    <th class="table-th">Vacation & Leaves</th>
                                     <th class="table-th">Actions</th>
                                 </tr>
                             </thead>
@@ -26,9 +24,7 @@
                                 @forelse ($packages as $package)
                                     <tr>
                                         <td class="table-td">{{ $package->name }}</td>
-                                        <td class="table-td">{{ $package->gross_min }}</td>
-                                        <td class="table-td">{{ $package->gross_max }}</td>
-                                        <td class="table-td">{{ $package->packageDetails->count() }}</td>
+                                        <td class="table-td">{{ $package->vacationDetails->count() }}</td>
                                         <td class="table-td">
                                             <div class="flex space-x-3 rtl:space-x-reverse">
                                                 <button class="action-btn btn-edit"
@@ -75,73 +71,68 @@
 
             <x-slot name="title">{{ $isEditing ? 'Edit Salary Grade' : 'Create Salary Grade' }}</x-slot>
             <div class="modal-body">
-
                 <!-- Main Info -->
-                <div class="space-y-2">
-                    <x-text-input label="Salary Grade Name" type="text" class="w-full" wire:model.defer="name" />
-                <x-textarea label="Description" class="w-full" wire:model.defer="desc"></x-textarea>
-                <x-text-input label="Gross Min" type="number" step="0.01" class="w-full"
-                    wire:model.defer="grossMin" />
-                    <x-text-input label="Gross Max" type="number" step="0.01" class="w-full"
-                        wire:model.defer="grossMax" />
+
+                <div class="space-y-4">
+                    <x-text-input label="Vacation Package Name" type="text" class="w-full" wire:model.defer="name" />
+                    <x-textarea label="Description" class="w-full" wire:model.defer="desc"></x-textarea>
                 </div>
 
 
-                <!-- Package Details Section -->
+                <!-- Vacation Details Section -->
                 <div class="border-t pt-4">
                     <div class="flex justify-between items-center mb-2">
                         <div class="flex flex-col">
-                            <span class="font-semibold">Compensation & Benefit Details</span>
+                            <span class="font-semibold">Vacation & Leaves</span>
                             <span class="text-xs text-gray-500">
                                 <i class="fas fa-info-circle mr-1"></i>
-                                Included payments & allowances for the employee, paid directly to the employee or other
-                                parties.
+                                Vacations/Leaves allowed for the employee. Other than public holidays.
                             </span>
                         </div>
-                        <button type="button" class="btn btn-xs btn-outline-primary" wire:click="addPackageDetail">
-                            <i class="fas fa-plus mr-1"></i> Add Detail
+                        <button type="button" class="btn btn-xs btn-outline-primary" wire:click="addVacationDetail">
+                            <i class="fas fa-plus mr-1"></i> Add Vacation
                         </button>
                     </div>
-                    @foreach ($packageDetails as $i => $detail)
+                    @foreach ($vacationDetails as $i => $detail)
                         <hr class="w-full mt-5">
                         <div class="flex flex-wrap justify-between gap-2 mb-1 w-full mt-2">
-                            <div class="flex flex-col">
-                                <span class="font-semibold mb-2">Compensation / Benefit Detail
-                                    #{{ $i + 1 }}</span>
+                            <div class="flex flex-col gap-2">
                                 <div class="flex gap-5">
-                                    <x-select class="w-20" label="Paid to"
-                                        wire:model.defer="packageDetails.{{ $i }}.receiver">
-                                        <option value="" disabled selected>Receiver</option>
-                                        @foreach ($packageDetailReceivers as $receiver)
-                                            <option value="{{ $receiver }}">{{ ucfirst($receiver) }}</option>
-                                        @endforeach
-                                    </x-select>
-                                    <x-text-input type="text" class="w-24" label="Benefit Name"
-                                        wire:model.defer="packageDetails.{{ $i }}.name" />
+                                    <x-text-input type="text" class="w-24" label="Name"
+                                        wire:model.defer="vacationDetails.{{ $i }}.name" />
                                     <x-select class="w-20" label="Type"
-                                        wire:model.defer="packageDetails.{{ $i }}.type">
+                                        wire:model.defer="vacationDetails.{{ $i }}.type">
                                         <option value="" disabled selected>Type</option>
-                                        @foreach ($packageDetailTypes as $type)
+                                        @foreach ($vacationDetailTypes as $type)
                                             <option value="{{ $type }}">{{ ucfirst($type) }}</option>
                                         @endforeach
                                     </x-select>
-                                    <x-text-input type="number" step="0.01" class="w-20" label="Payment Min"
-                                        wire:model.defer="packageDetails.{{ $i }}.amount_min" />
-                                    <x-text-input type="number" step="0.01" class="w-20" label="Payment Max"
-                                        wire:model.defer="packageDetails.{{ $i }}.amount_max" />
+
+                                    <x-text-input type="number" step="0.01" class="w-20"
+                                        label="Increase Rate Minimum"
+                                        wire:model.defer="vacationDetails.{{ $i }}.inc_rate_min" />
+                                    <x-text-input type="number" step="0.01" class="w-20"
+                                        label="Increase Rate Maximum"
+                                        wire:model.defer="vacationDetails.{{ $i }}.inc_rate_max" />
                                 </div>
-                                <div class="flex gap-5 mt-2">
-                                    <label class="flex items-center space-x-1 text-md">
-                                        <input type="checkbox"
-                                            wire:model="packageDetails.{{ $i }}.is_hidden"
-                                            @checked($detail['is_hidden'])>
-                                        <span>Hidden</span>
-                                    </label>
+                                <div class="flex gap-5">
+                                    <x-text-input type="number" step="0.01" class="w-20"
+                                        label="Max Balance Minimum"
+                                        wire:model.defer="vacationDetails.{{ $i }}.max_balance_min" />
+                                    <x-text-input type="number" step="0.01" class="w-20"
+                                        label="Max Balance Maximum"
+                                        wire:model.defer="vacationDetails.{{ $i }}.max_balance_max" />
+                                    <x-text-input type="number" step="0.01" class="w-20"
+                                        label="Hour Price Minimum"
+                                        wire:model.defer="vacationDetails.{{ $i }}.hour_price_min" />
+                                    <x-text-input type="number" step="0.01" class="w-20"
+                                        label="Hour Price Maximum"
+                                        wire:model.defer="vacationDetails.{{ $i }}.hour_price_max" />
                                 </div>
                             </div>
                             <div class="flex flex-col items-center">
                                 <button type="button" class="btn btn-xs btn-danger"
-                                    wire:click="removePackageDetail({{ $i }})">
+                                    wire:click="removeVacationDetail({{ $i }})">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -152,7 +143,7 @@
             </div>
             <x-slot name="footer">
                 <div class="flex justify-end gap-3">
-                    <x-secondary-button wire:click="$set('showAddModal', false)">Cancel</x-secondary-button>
+                    <x-secondary-button wire:click="closeAddModal">Cancel</x-secondary-button>
                     <x-primary-button wire:click.prevent="savePackage" loadingFunction="savePackage">
                         {{ $isEditing ? 'Update Package' : 'Save Package' }}
                     </x-primary-button>

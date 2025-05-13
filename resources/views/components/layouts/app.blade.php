@@ -123,39 +123,6 @@
                         </ul>
                     </li>
 
-                    <li class="">
-                        <a href="javascript:void(0)" class="navItem">
-                            <span class="flex items-center">
-                                <span>Employees</span>
-                            </span>
-                            <iconify-icon class="icon-arrow" icon="heroicons-outline:chevron-right"></iconify-icon>
-                        </a>
-                        <ul class="sidebar-submenu">
-                            @can('viewDashboard', App\Models\Personel\Employee::class)
-                                <li>
-                                    <a class="{{ $employeeDashboard ?? '' }}"
-                                        href="{{ route('employees.dashboard') }}">Dashboard</a>
-                                </li>
-                            @endcan
-                            @can('viewMissingDocReport', App\Models\Personel\Employee::class)
-                                <li>
-                                    <a class="{{ $missingDocReport ?? '' }}"
-                                        href="{{ route('employees.reports.missing-documents') }}">Document Status</a>
-                                </li>
-                            @endcan
-                            @can('viewAny', App\Models\Personel\Employee::class)
-                                <li>
-                                    <a class="{{ $employeesIndex ?? '' }}" href="{{ route('employees') }}">Employees</a>
-                                </li>
-                            @endcan
-                            @can('create', App\Models\Personel\Employee::class)
-                                <li>
-                                    <a class="{{ $employeeCreate ?? '' }}" href="{{ route('employees.create') }}">Create
-                                        Employee</a>
-                                </li>
-                            @endcan
-                        </ul>
-                    </li>
 
                     <li class="">
                         <a href="javascript:void(0)" class="navItem">
@@ -196,19 +163,61 @@
                             <iconify-icon class="icon-arrow" icon="heroicons-outline:chevron-right"></iconify-icon>
                         </a>
                         <ul class="sidebar-submenu">
-                            @can('viewAny', App\Models\Benefits\Configurations\BenefitPackage::class)
+                            @can('viewAny', App\Models\Benefits\Configurations\SalaryGrade::class)
                                 <li>
                                     <a class="{{ $configurationsIndex ?? '' }}"
                                         href="{{ url('/benefits/configurations') }}">Employees</a>
                                 </li>
                             @endcan
-                            @can('viewAny', App\Models\Benefits\Configurations\BenefitPackage::class)
+                            @can('viewAny', App\Models\Benefits\Configurations\SalaryGrade::class)
                                 <li>
                                     <a class="{{ $packagesIndex ?? '' }}" href="{{ url('/benefits/packages') }}">
-                                        Salary Grades</a>
+                                        Grading System</a>
+                                </li>
+                            @endcan
+                            @can('viewAny', App\Models\Benefits\Configurations\VacationPackage::class)
+                                <li>
+                                    <a class="{{ $vacationPackagesIndex ?? '' }}"
+                                        href="{{ url('/benefits/vacation-packages') }}">
+                                        Vacation Packages</a>
                                 </li>
                             @endcan
 
+                        </ul>
+                    </li>
+
+
+                    <li class="">
+                        <a href="javascript:void(0)" class="navItem">
+                            <span class="flex items-center">
+                                <span>Documents</span>
+                            </span>
+                            <iconify-icon class="icon-arrow" icon="heroicons-outline:chevron-right"></iconify-icon>
+                        </a>
+                        <ul class="sidebar-submenu">
+                            @can('viewDashboard', App\Models\Personel\Employee::class)
+                                <li>
+                                    <a class="{{ $employeeDashboard ?? '' }}"
+                                        href="{{ route('employees.dashboard') }}">Dashboard</a>
+                                </li>
+                            @endcan
+                            @can('viewMissingDocReport', App\Models\Personel\Employee::class)
+                                <li>
+                                    <a class="{{ $missingDocReport ?? '' }}"
+                                        href="{{ route('employees.reports.missing-documents') }}">Document Status</a>
+                                </li>
+                            @endcan
+                            @can('viewAny', App\Models\Personel\Employee::class)
+                                <li>
+                                    <a class="{{ $employeesIndex ?? '' }}" href="{{ route('employees') }}">Employees</a>
+                                </li>
+                            @endcan
+                            @can('create', App\Models\Personel\Employee::class)
+                                <li>
+                                    <a class="{{ $employeeCreate ?? '' }}" href="{{ route('employees.create') }}">Create
+                                        Employee</a>
+                                </li>
+                            @endcan
                         </ul>
                     </li>
 

@@ -123,11 +123,21 @@
                                         </div>
                                     </td>
                                     <td class="table-td">
-                                        {{ $employee->positions->count() ? $employee->positions->pluck('department.name')->implode(', ') : 'N/A' }}
+                                        @if ($employee->position)
+                                        <span class="text-sm text-slate-600 dark:text-slate-300 capitalize">
+                                            {{ $employee->position?->department?->name ?? "N/A" }}
+                                        </span>
+                                        <span class="block text-xs text-slate-500">
+                                                {{ $employee->position?->name ?? "N/A" }}
+                                            </span>
+                                        @else
+                                            <span class="badge badge-danger">N/A</span>
+                                        @endif
+
                                     </td>
                                     <td class="table-td">
                                         @if ($employee->benefitConfiguration)
-                                            {{ ucfirst($employee->benefitConfiguration->benefitPackage->name) }}
+                                            {{ ucfirst($employee->benefitConfiguration->salaryGrade->name) }}
                                         @else
                                             <span class="badge badge-danger">Not Configured</span>
                                         @endif

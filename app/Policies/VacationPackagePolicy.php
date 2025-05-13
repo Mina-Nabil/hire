@@ -2,11 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\Benefits\Configurations\BenefitPackage;
+use App\Models\Benefits\Configurations\VacationPackage;
 use App\Models\Users\User;
 use Illuminate\Auth\Access\Response;
 
-class BenefitPackagePolicy
+class VacationPackagePolicy
 {
     /**
      * Determine whether the user can view any models.
@@ -19,7 +19,7 @@ class BenefitPackagePolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, BenefitPackage $benefitPackage): bool
+    public function view(User $user, VacationPackage $vacationPackage): bool
     {
         return $user->is_admin;
     }
@@ -35,7 +35,7 @@ class BenefitPackagePolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, BenefitPackage $benefitPackage): bool
+    public function update(User $user, VacationPackage $vacationPackage): bool
     {
         return $user->is_admin;
     }
@@ -43,7 +43,7 @@ class BenefitPackagePolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, BenefitPackage $benefitPackage): bool
+    public function delete(User $user, VacationPackage $vacationPackage): bool
     {
         return $user->is_admin;
     }

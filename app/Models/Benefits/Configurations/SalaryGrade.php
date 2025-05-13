@@ -14,14 +14,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class BenefitPackage extends Model
+class SalaryGrade extends Model
 {
-    const MORPH_NAME = 'benefit_package';
+    const MORPH_NAME = 'salary_grade';
 
-    protected $table = 'benefit_packages';
+    protected $table = 'salary_grades';
     protected $fillable = [
         'name',
         'desc',
+        'gross_min',
+        'gross_max',
     ];
 
     public function packageDetails()
@@ -32,11 +34,6 @@ class BenefitPackage extends Model
     public function baseBenefits()
     {
         return $this->hasMany(BaseBenefit::class);
-    }
-
-    public function vacationDetails()
-    {
-        return $this->hasMany(VacationDetail::class);
     }
 
     public function benefitConfigurations()
@@ -54,6 +51,8 @@ class BenefitPackage extends Model
     /**
      * @param string $name
      * @param string $desc
+     * @param float $grossMin
+     * @param float $grossMax
      * @param array $packageDetails
      * [
      *  [
@@ -62,43 +61,30 @@ class BenefitPackage extends Model
      *      'type' => 'type',
      *      'amount_min' => 'amount_min',
      *      'amount_max' => 'amount_max',
-     *      'is_net' => 'is_net',
-     *      'is_gross' => 'is_gross',
-     *      'is_grand_gross' => 'is_grand_gross',
      *      'is_hidden' => 'is_hidden',
      *  ]
      * ]
-     * @param array $vacationDetails
-     * [
-     *  [
-     *      'name' => 'name',
-     *      'type' => 'type',
-     *      'inc_rate_min' => 'inc_rate_min',
-     *      'inc_rate_max' => 'inc_rate_max',
-     *      'max_balance' => 'max_balance',
-     *      'hour_price' => 'hour_price',
-     *  ]
-     * ]
-     * @return BenefitPackage
+     * @return SalaryGrade
      */
-    public static function createPackage($name, $desc, $packageDetails, $vacationDetails)
+    public static function createSalaryGrade(string $name, float $grossMin, float $grossMax, array $packageDetails = [], ?string $desc = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if ($loggedInUser && !$loggedInUser->can('create', BenefitPackage::class)) {
+        if ($loggedInUser && !$loggedInUser->can('create', SalaryGrade::class)) {
             throw new AppException('Unauthorized');
         }
         try {
-            DB::transaction(function () use ($name, $desc, $packageDetails, $vacationDetails) {
+            DB::transaction(function () use ($name, $desc, $grossMin, $grossMax, $packageDetails) {
 
-                $package = new BenefitPackage([
+                $package = new SalaryGrade([
                     'name' => $name,
+                    'gross_min' => $grossMin,
+                    'gross_max' => $grossMax,
                     'desc' => $desc,
                 ]);
                 $package->save();
 
                 $package->packageDetails()->createMany($packageDetails);
-                $package->vacationDetails()->createMany($vacationDetails);
 
                 return $package;
             });
@@ -113,6 +99,8 @@ class BenefitPackage extends Model
     /**
      * @param string $name
      * @param string $desc
+     * @param float $grossMin
+     * @param float $grossMax
      * @param array $packageDetails
      * [
      *  [
@@ -122,30 +110,12 @@ class BenefitPackage extends Model
      *      'amount_min' => 'amount_min',
      *      'amount_max' => 'amount_max',
      *      'receiver' => 'receiver',
-     *      'is_net' => 'is_net',
-     *      'is_gross' => 'is_gross',
-     *      'is_grand_gross' => 'is_grand_gross',
      *      'is_hidden' => 'is_hidden',
-     *  ]
-     * ]
-     * @param array $vacationDetails
-     * [
-     *  [
-     *      'id' => 'id',
-     *      'name' => 'name',
-     *      'type' => 'type',
-     *      'receiver' => 'receiver',
-     *      'inc_rate_min' => 'inc_rate_min',
-     *      'inc_rate_max' => 'inc_rate_max',
-     *      'max_balance_min' => 'max_balance_min',
-     *      'max_balance_max' => 'max_balance_max',
-     *      'hour_price_min' => 'hour_price_min',
-     *      'hour_price_max' => 'hour_price_max',
      *  ]
      * ]
      * @return void
      */
-    public function editPackage($name, $desc, $packageDetails, $vacationDetails)
+    public function editPackage(string $name, float $grossMin, float $grossMax, array $packageDetails = [], ?string $desc = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -153,16 +123,16 @@ class BenefitPackage extends Model
             throw new AppException('Unauthorized');
         }
         try {
-            DB::transaction(function () use ($name, $desc, $packageDetails, $vacationDetails) {
+            DB::transaction(function () use ($name, $grossMin, $grossMax, $desc, $packageDetails) {
                 $this->name = $name;
+                $this->gross_min = $grossMin;
+                $this->gross_max = $grossMax;
                 $this->desc = $desc;
                 $this->save();
 
                 $this->packageDetails()->delete();
-                $this->vacationDetails()->delete();
 
                 $this->packageDetails()->createMany($packageDetails);
-                $this->vacationDetails()->createMany($vacationDetails);
             });
         } catch (Exception $e) {
             report($e);

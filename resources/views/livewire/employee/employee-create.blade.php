@@ -38,11 +38,20 @@
                         <div class="input-area">
                             <label for="name" class="form-label">Employee Name</label>
                             <input id="name" type="text"
-                                class="form-control @error('name') !border-danger-500 @enderror"
-                                wire:model.live="name"
+                                class="form-control @error('name') !border-danger-500 @enderror" wire:model.live="name"
                                 wire:input="previewUsername">
                             @error('name')
                                 <span class="text-danger-500 text-xs">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="input-area">
+                            <label for="name_ar" class="form-label">Arabic Name</label>
+                            <input id="name_ar" type="text"
+                                class="form-control @error('name_ar') !border-danger-500 @enderror"
+                                wire:model="name_ar">
+                            @error('name_ar')
+                                <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
 
@@ -65,10 +74,20 @@
                         </div>
 
                         <!-- Address -->
-                        <div class="input-area">
+                        <div class="input-area col-span-2">
                             <label for="address" class="form-label">Address</label>
-                            <input id="address" type="text" class="form-control" wire:model="address">
+                            <textarea id="address" class="form-control" wire:model="address"></textarea>
                             @error('address')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="input-area">
+                            <label for="mother_name" class="form-label">Mother Name</label>
+                            <input id="mother_name" type="text"
+                                class="form-control @error('mother_name') !border-danger-500 @enderror"
+                                wire:model="mother_name">
+                            @error('mother_name')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
@@ -119,11 +138,22 @@
                             @enderror
                         </div>
 
+                        <!-- Employment Date -->
+                        <div class="input-area">
+                            <label for="employment_date" class="form-label">Employment Date</label>
+                            <input id="employment_date" type="date" class="form-control"
+                                wire:model="employment_date">
+                            @error('employment_date')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
                         <!-- License Required -->
                         <div class="input-area">
                             <div class="checkbox-area">
                                 <label class="inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" class="hidden" name="checkbox" wire:model="license_required">
+                                    <input type="checkbox" class="hidden" name="checkbox"
+                                        wire:model="license_required">
                                     <span
                                         class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
                                         <img src="{{ asset('images/icon/ck-white.svg') }}" alt=""
@@ -138,15 +168,6 @@
                             @enderror
                         </div>
 
-                        <!-- Employment Date -->
-                        <div class="input-area">
-                            <label for="employment_date" class="form-label">Employment Date</label>
-                            <input id="employment_date" type="date" class="form-control"
-                                wire:model="employment_date">
-                            @error('employment_date')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
                     </div>
                 </div>
 
@@ -262,30 +283,108 @@
                     </div>
                 </div>
 
+                <div class="bg-slate-50 dark:bg-slate-900 p-5 rounded-md col-span-2">
+                    <div class="grid grid-cols-12 gap-4">
+                            <div class="col-span-12">
+                                <label for="id_card_file" class="form-label">ID Card Document
+                                    <iconify-icon wire:loading wire:target="id_card_file"
+                                        icon="line-md:loading-twotone-loop" width="18"
+                                        height="18"></iconify-icon></label>
+                                <div class="border-2 border-dashed border-slate-200 rounded-md p-4 text-center">
+                                    @if ($id_card_file)
+                                        <div class="flex items-center justify-center mb-3">
+                                            @if (in_array($id_card_file->getClientOriginalExtension(), ['pdf']))
+                                                <iconify-icon icon="mingcute:file-pdf-fill" width="48"
+                                                    height="48" class="text-red-500"></iconify-icon>
+                                            @else
+                                                <img src="{{ $id_card_file->temporaryUrl() }}"
+                                                    class="h-40 max-w-full rounded-md object-contain"
+                                                    alt="ID Card Preview">
+                                            @endif
+                                        </div>
+                                        <p class="text-sm text-slate-500">
+                                            {{ $id_card_file->getClientOriginalName() }}</p>
+                                        <button type="button" class="text-sm text-red-500 mt-2"
+                                            wire:click="$set('id_card_file', null)">
+                                            Remove File
+                                        </button>
+                                    @else
+                                        <label for="id_card_file_input" class="cursor-pointer block">
+                                            <iconify-icon icon="mingcute:upload-line" width="32" height="32"
+                                                class="text-slate-400 mx-auto"></iconify-icon>
+                                            <p class="mt-2 text-sm text-slate-500">Click to upload or
+                                                drag
+                                                and drop</p>
+                                            <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF (Max
+                                                10MB)
+                                            </p>
+                                            <input id="id_card_file_input" type="file" class="hidden"
+                                                wire:model="id_card_file" accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
+                                        </label>
+                                    @endif
+                                </div>
+                                @error('id_card_file')
+                                    <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        <div class="col-span-12">
+                            <label for="id_number" class="form-label">ID Number</label>
+                            <input type="text"
+                                class="form-control @error('id_number') !border-danger-500 @enderror"
+                                wire:model="id_number">
+                            @error('id_number')
+                                <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="col-span-12 xl:col-span-6">
+                            <label for="id_issue_date" class="form-label">Issue Date</label>
+                            <input type="date"
+                                class="form-control @error('id_issue_date') !border-danger-500 @enderror"
+                                wire:model="id_issue_date">
+                            @error('id_issue_date')
+                                <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="col-span-12 xl:col-span-6">
+                            <label for="id_expiry_date" class="form-label">Expiry Date</label>
+                            <input type="date"
+                                class="form-control @error('id_expiry_date') !border-danger-500 @enderror"
+                                wire:model="id_expiry_date">
+                            @error('id_expiry_date')
+                                <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
                 <!-- User Account Information Section -->
                 <div class="bg-slate-50 dark:bg-slate-900 p-5 rounded-md col-span-2 ">
                     <h5 class="font-medium text-xl text-slate-900 dark:text-white mb-5">
                         User Account Information
                     </h5>
 
-                    @if(!empty($previewedUsername))
-                    <div class="mt-4 bg-white dark:bg-slate-800 p-4 rounded-md border border-slate-200 dark:border-slate-700">
-                        <h6 class="text-sm font-medium text-slate-900 dark:text-white mb-2">Username Preview</h6>
-                        <div class="flex items-center">
-                            <span class="text-sm text-info-600 dark:text-info-400 font-medium">{{ $previewedUsername }}</span>
-                            <span class="ml-2 text-xs text-slate-500">(Generated from the employee name)</span>
+                    @if (!empty($previewedUsername))
+                        <div
+                            class="mt-4 bg-white dark:bg-slate-800 p-4 rounded-md border border-slate-200 dark:border-slate-700">
+                            <h6 class="text-sm font-medium text-slate-900 dark:text-white mb-2">Username Preview</h6>
+                            <div class="flex items-center">
+                                <span
+                                    class="text-sm text-info-600 dark:text-info-400 font-medium">{{ $previewedUsername }}</span>
+                                <span class="ml-2 text-xs text-slate-500">(Generated from the employee name)</span>
+                            </div>
+                            <div class="mt-2 text-xs text-amber-600 dark:text-amber-400">
+                                The password is: {{ $password }}
+                            </div>
+                            @if ($usernameHasSuffix)
+                                <div class="mt-2 text-xs text-amber-600 dark:text-amber-400">
+                                    <iconify-icon icon="material-symbols:info-outline"
+                                        class="inline-block mr-1"></iconify-icon>
+                                    The base username "{{ $baseUsername }}" is already taken, so a number has been
+                                    added.
+                                </div>
+                                <div class="mt-2 text-xs text-amber-600 dark:text-amber-400">
+                            @endif
                         </div>
-                        <div class="mt-2 text-xs text-amber-600 dark:text-amber-400">
-                            The password is: {{ $password }}
-                        </div>
-                        @if($usernameHasSuffix)
-                        <div class="mt-2 text-xs text-amber-600 dark:text-amber-400">
-                            <iconify-icon icon="material-symbols:info-outline" class="inline-block mr-1"></iconify-icon>
-                            The base username "{{ $baseUsername }}" is already taken, so a number has been added.
-                        </div>
-                        <div class="mt-2 text-xs text-amber-600 dark:text-amber-400">
-                        @endif
-                    </div>
                     @endif
                 </div>
             </div>

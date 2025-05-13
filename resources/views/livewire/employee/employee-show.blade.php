@@ -588,42 +588,50 @@
                             <div class="xl:col-span-6 lg:col-span-6 md:col-span-6 col-span-12">
                                 <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Name</label>
-                                    <div class="text-base text-slate-900 dark:text-white">{{ $employee->name }}</div>
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">{{ $employee->name }}</div>
                                 </div>
                                 <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Email</label>
-                                    <div class="text-base text-slate-900 dark:text-white">{{ $employee->email }}</div>
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">{{ $employee->email }}</div>
                                 </div>
                                 <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Phone</label>
-                                    <div class="text-base text-slate-900 dark:text-white">{{ $employee->phone }}</div>
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">{{ $employee->phone }}</div>
                                 </div>
                                 <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Address</label>
-                                    <div class="text-base text-slate-900 dark:text-white">
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
                                         {{ $employee->address }}</div>
+                                </div>
+                                <div class="mb-5 text-wrap">
+                                    <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Mother Name</label>
+                                    <div class="text-base text-slate-900 dark:text-white arabic-font">{{ $employee->mother_name }}</div>
                                 </div>
                             </div>
                             <div class="xl:col-span-6 lg:col-span-6 md:col-span-6 col-span-12">
                                 <div class="mb-5 text-wrap">
+                                    <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Arabic Name</label>
+                                    <div class="text-base text-slate-900 dark:text-white arabic-font">{{ $employee->name_ar }}</div>
+                                </div>
+                                <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Nationality</label>
-                                    <div class="text-base text-slate-900 dark:text-white">{{ $employee->nationality }}
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">{{ $employee->nationality }}
                                     </div>
                                 </div>
                                 <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Gender</label>
-                                    <div class="text-base text-slate-900 dark:text-white">{{ $employee->gender }}
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">{{ $employee->gender }}
                                     </div>
                                 </div>
                                 <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Birth Date</label>
-                                    <div class="text-base text-slate-900 dark:text-white">
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
                                         {{ $employee->birth_date?->format('d/m/Y') }}</div>
                                 </div>
                                 <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Employment
                                         Date</label>
-                                    <div class="text-base text-slate-900 dark:text-white">
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
                                         {{ $employee->employment_date?->format('d/m/Y') }}</div>
                                 </div>
                             </div>
@@ -651,24 +659,24 @@
                                 <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Insurance
                                         Number</label>
-                                    <div class="text-base text-slate-900 dark:text-white">
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
                                         {{ $employee->info?->insurance_number ?? 'N/A' }}</div>
                                 </div>
                                 <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Insurance
                                         Amount</label>
-                                    <div class="text-base text-slate-900 dark:text-white">
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
                                         {{ $employee->info?->insurance_amount ?? 'N/A' }}</div>
                                 </div>
                                 <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Academic
                                         Qualification</label>
-                                    <div class="text-base text-slate-900 dark:text-white">
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
                                         {{ $employee->info?->academic_qualification ?? 'N/A' }}</div>
                                 </div>
                                 <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">University</label>
-                                    <div class="text-base text-slate-900 dark:text-white">
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
                                         {{ $employee->info?->university ?? 'N/A' }}</div>
                                 </div>
                             </div>
@@ -676,19 +684,19 @@
                                 <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Graduation
                                         Year</label>
-                                    <div class="text-base text-slate-900 dark:text-white">
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
                                         {{ $employee->info?->graduation_year ?? 'N/A' }}</div>
                                 </div>
                                 <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Military
                                         Status</label>
-                                    <div class="text-base text-slate-900 dark:text-white">
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
                                         {{ $employee->info?->military_status ?? 'N/A' }}</div>
                                 </div>
                                 <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Marital
                                         Status</label>
-                                    <div class="text-base text-slate-900 dark:text-white">
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
                                         {{ $employee->info?->marital_status ?? 'N/A' }}</div>
                                 </div>
                             </div>
@@ -2651,6 +2659,15 @@
                                         @enderror
                                     </div>
                                     <div class="col-span-12 xl:col-span-6">
+                                        <label for="name_ar" class="form-label">Arabic Name</label>
+                                        <input type="text"
+                                            class="form-control @error('name_ar') !border-danger-500 @enderror"
+                                            wire:model="name_ar">
+                                            @error('name_ar')
+                                                <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                            @enderror
+                                    </div>
+                                    <div class="col-span-12 xl:col-span-6">
                                         <label for="email" class="form-label">Email</label>
                                         <input type="email"
                                             class="form-control @error('email') !border-danger-500 @enderror"
@@ -2675,6 +2692,15 @@
                                             wire:model="address">
                                         @error('address')
                                             <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-span-12 xl:col-span-6">
+                                        <label for="mother_name" class="form-label">Mother Name</label>
+                                        <input type="text"
+                                            class="form-control @error('mother_name') !border-danger-500 @enderror"
+                                            wire:model="mother_name">
+                                        @error('mother_name')
+                                                <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
                                         @enderror
                                     </div>
                                     <div class="col-span-12 xl:col-span-6">

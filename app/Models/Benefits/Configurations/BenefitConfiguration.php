@@ -45,6 +45,14 @@ class BenefitConfiguration extends Model
     {
         return $this->belongsTo(SalaryGrade::class);
     }
+
+    public function manager()
+    {
+        return $this->belongsTo(Employee::class, 'manager_id');
+    }
+    
+    
+    
     
     
     

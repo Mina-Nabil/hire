@@ -210,6 +210,11 @@
                                             {{ $employee->benefitConfiguration->salaryGrade->name ?? '-' }}</div>
                                     </div>
                                     <div class="row mb-3">
+                                        <div class="col-md-5 font-weight-bold">Manager:</div>
+                                        <div class="col-md-7">
+                                            {{ $employee->benefitConfiguration->manager->name ?? '-' }}</div>
+                                    </div>
+                                    <div class="row mb-3">
                                         <div class="col-md-5 font-weight-bold">Attendance Calculation:</div>
                                         <div class="col-md-7">
                                             {{ $this->getAttendanceCalculationLabel($employee->benefitConfiguration->attendace_calculation) }}

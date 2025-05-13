@@ -117,13 +117,18 @@ class Employee extends Model
      * @param bool $delete_old_conf delete old configuration if true and end old configuration if false
      * @return void
      */
-    public function applyBenefitsPackage(SalaryGrade $salaryGrade, $package_details, $grossSalary, $manager_id, bool $delete_old_conf = true)
+    public function applyBenefitsPackage(SalaryGrade $salaryGrade, $package_details, $grossSalary, $manager_id = null, bool $delete_old_conf = true)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
         if (!$loggedInUser->can('updateEmployeeBenefits', $this)) {
             throw new AppException('You dont have permission to apply benefits package');
         }
+
+        if ($grossSalary < $salaryGrade->gross_min || $grossSalary > $salaryGrade->gross_max) {
+            throw new AppException("Gross salary is not in the range of the salary grade");
+        }
+
 
         foreach ($package_details as $applied_package_detail) {
             $package_detail = PackageDetail::find($applied_package_detail['package_detail_id']);
@@ -2321,7 +2326,7 @@ class Employee extends Model
 
     public function getManagerIdAttribute()
     {
-        return $this->position()->parent->employee_id;
+        return $this->benefitConfiguration?->manager_id;
     }
 
     //// relations ////

@@ -5,11 +5,9 @@ namespace App\Livewire\Benefits\Partials;
 use App\Models\Benefits\Configurations\BenefitConfiguration;
 use App\Models\Benefits\Configurations\SalaryGrade;
 use App\Models\Benefits\Configurations\PackageDetail;
-use App\Models\Benefits\Vacations\VacationDetail;
 use App\Models\Personel\Employee;
 use App\Traits\AlertFrontEnd;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
 class ApplyPackageModal extends Component
@@ -17,6 +15,7 @@ class ApplyPackageModal extends Component
     use AlertFrontEnd;
 
     public $packages = [];
+    public $potentialManagers = [];
     public $attendanceCalculations = BenefitConfiguration::ATTENDANCE_CALCULATION_LIST;
 
     public $selectedEmployee;
@@ -24,7 +23,7 @@ class ApplyPackageModal extends Component
 
     public $selectedPackage;
     public $selectedPackageId;
-
+    public $managerId;
     public $packageDetails = [];
     public $grossSalary;
     public $packageStartDate;
@@ -45,14 +44,8 @@ class ApplyPackageModal extends Component
             $this->selectedPackage = $this->selectedEmployee->benefitConfiguration->salaryGrade;
             $this->selectedPackageId = $this->selectedEmployee->benefitConfiguration->salaryGrade->id;
             $this->grossSalary = $this->selectedEmployee->benefitConfiguration->gross_salary;
-        } else {
-            $this->selectedPackage = $this->selectedEmployee->position->salaryGrade;
-            $this->selectedPackageId = $this->selectedEmployee->position->salary_grade_id;
-        }
 
-
-
-        $this->packageDetails = $this->selectedEmployee->baseBenefits()
+            $this->packageDetails = $this->selectedEmployee->baseBenefits()
             ->bySalaryGrade($this->selectedPackageId)->get()->map(function ($benefit) {
                 $tmpPackageDetail = PackageDetail::find($benefit->package_detail_id);
                 return [
@@ -69,7 +62,36 @@ class ApplyPackageModal extends Component
                     'amount_min' => $tmpPackageDetail->amount_min,
                     'amount_max' => $tmpPackageDetail->amount_max,
                 ];
-            });
+            })->toArray();
+
+            $this->potentialManagers = $this->selectedEmployee->position?->potentialManagers;
+        } else if ($this->selectedEmployee->position?->salaryGrade) {
+            $this->selectedPackage = $this->selectedEmployee->position->salaryGrade;
+            $this->selectedPackageId = $this->selectedEmployee->position->salary_grade_id;
+
+            $this->packageDetails = PackageDetail::bySalaryGrade($this->selectedPackageId)->get()->map(function ($detail) {
+                return [
+                    'package_detail_id' => $detail->id,
+                    'name' => $detail->name,
+                    'type' => $detail->type,
+                    'receiver' => $detail->receiver,
+                    'is_hidden' => $detail->is_hidden,
+                    'start_date' => $detail->start_date,
+                    'end_date' => $detail->end_date,
+                    'amount_min' => $detail->amount_min,
+                    'amount_max' => $detail->amount_max,
+                ];
+            })->toArray();
+
+            $this->potentialManagers = $this->selectedEmployee->position?->potentialManagers;
+        } else {
+            $this->showApplyPackageModal = true;
+            return;
+        }
+
+
+
+
 
 
         if (count($this->packageDetails)) {
@@ -82,6 +104,8 @@ class ApplyPackageModal extends Component
         }
 
         $this->showApplyPackageModal = true;
+
+
     }
 
     public function closeApplyPackageModal()
@@ -133,14 +157,15 @@ class ApplyPackageModal extends Component
             'packageDetails.*.amount' => 'required|numeric',
             'packageStartDate' => 'required|date',
             'packageEndDate' => 'nullable|date|after:packageStartDate',
-            'grossSalary' => 'required|numeric|min:1',
+            'grossSalary' => 'required|numeric|min:' . $this->selectedPackage->gross_min . '|max:' . $this->selectedPackage->gross_max,
         ], [
             'packageDetails.*.amount' => 'Amount#:position is required',
             'packageStartDate.required' => 'Start date is required',
             'packageEndDate.after' => 'End date must be after start date',
             'grossSalary.required' => 'Gross salary is required',
             'grossSalary.numeric' => 'Gross salary must be a number',
-            'grossSalary.min' => 'Gross salary must be greater than 0',
+            'grossSalary.min' => 'Gross salary must be greater than ' . $this->selectedPackage->gross_min,
+            'grossSalary.max' => 'Gross salary must be less than ' . $this->selectedPackage->gross_max,
         ]);
 
         try {
@@ -157,13 +182,15 @@ class ApplyPackageModal extends Component
 
             $this->selectedEmployee->applyBenefitsPackage(
                 $this->selectedPackage,
-                $this->grossSalary,
                 $this->packageDetails,
+                $this->grossSalary,
+                $this->managerId,
                 $this->deleteOldConf
             );
 
             $this->alertSuccess('Benefits package applied successfully!');
             $this->closeApplyPackageModal();
+            $this->dispatch('refreshConfiguration');
         } catch (\Exception $e) {
             $this->alertError($e->getMessage());
         }

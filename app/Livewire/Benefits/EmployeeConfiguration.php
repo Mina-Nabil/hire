@@ -71,6 +71,12 @@ class EmployeeConfiguration extends Component
     ];
     public $purchasePayments = [];
     public $purchaseRemainingAmount = 0;
+    public $listeners = ['refreshConfiguration'];
+
+    public function refreshConfiguration()
+    {
+        $this->mount($this->employee);
+    }
 
     public function editConfiguration()
     {

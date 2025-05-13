@@ -254,6 +254,19 @@ class Position extends Model
         return $level;
     }
 
+    public function getPotentialManagersAttribute(): array
+    {
+        $potentialManagers = [];
+        $current = $this;
+        while ($current->parent_id) {
+            if($current->parent->employee_id) {                                 
+                $potentialManagers[] = $current->parent->employee;
+            }
+            $current = $current->parent;
+        }
+        return $potentialManagers;
+    }
+
     /**
      * Check if this position is a manager position 
      * (has child positions)

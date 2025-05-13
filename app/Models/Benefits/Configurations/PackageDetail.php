@@ -34,4 +34,10 @@ class PackageDetail extends Model
     {
         return $this->belongsTo(SalaryGrade::class);
     }
+
+    ///scope 
+    public function scopeBySalaryGrade($query, $salaryGradeId)
+    {
+        return $query->where('salary_grade_id', $salaryGradeId);
+    }
 }

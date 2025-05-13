@@ -60,6 +60,20 @@ class Employee extends Model
     // Default days threshold for near expiry warning (7 days)
     const NEAR_EXPIRY_DAYS = 7;
 
+    // Employee status constants
+    const STATUS_ACTIVE = 'active';
+    const STATUS_SUSPENDED = 'suspended';
+    const STATUS_TERMINATED = 'terminated';
+    const STATUS_RESIGNED = 'resigned';
+
+    const STATUS_LIST = [
+        self::STATUS_ACTIVE,
+        self::STATUS_SUSPENDED,
+        self::STATUS_TERMINATED,
+        self::STATUS_RESIGNED,
+    ];
+    
+    // Employee statuses
     protected $fillable = [
         'user_id',
         'created_by',
@@ -78,6 +92,7 @@ class Employee extends Model
         'applicant_id',
         'termination_date',
         'mother_name',
+        'status',
     ];
 
     protected $casts = [
@@ -2926,7 +2941,8 @@ class Employee extends Model
         string $id_number,
         string $id_issue_date,
         string $id_expiry_date,
-        string $mother_name = null
+        string $mother_name = null,
+        string $status = self::STATUS_ACTIVE
     ) {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -2951,6 +2967,7 @@ class Employee extends Model
                 'employment_date' => $employment_date,
                 'applicant_id' => $applicant_id,
                 'mother_name' => $mother_name,
+                'status' => $status,
             ]);
 
             $employee->setIDCard(
@@ -2981,5 +2998,21 @@ class Employee extends Model
         return $this->hasMany(EmployeeHrLetterRequest::class);
     }
 
+    public function setStatus(string $status)
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('update', $this)) {
+            throw new AppException('You do not have permission to update employee status');
+        }
+        try {
+            $this->status = $status;
+            $this->save();
+            return true;
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException('Error updating employee status: ' . $e->getMessage());
+        }
+    }
 
 }

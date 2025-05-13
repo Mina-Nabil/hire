@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('phone');
             $table->string('address');
             $table->string('nationality');
+            $table->enum('status', Employee::STATUS_LIST)->default(Employee::STATUS_ACTIVE);
             $table->string('mother_name')->nullable();
             $table->enum('gender', Applicant::GENDER);
             $table->date('birth_date');

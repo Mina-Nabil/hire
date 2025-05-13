@@ -1,8 +1,20 @@
 <div class="card">
     <div class="card-header">
-        <h4 class="font-medium lg:text-2xl text-xl capitalize text-slate-900 mb-2">
-            Create New Employee
-        </h4>
+        <div class="flex items-center gap-5">
+            <h4 class="font-medium lg:text-2xl text-xl capitalize text-slate-900">
+                Create New Employee
+            </h4>
+            <div class="flex items-center">
+                <select id="status" class="form-control w-auto @error('status') !border-danger-500 @enderror" wire:model="status">
+                    @foreach ($statuses as $statusValue)
+                        <option value="{{ $statusValue }}">{{ ucfirst($statusValue) }}</option>
+                    @endforeach
+                </select>
+                @error('status')
+                    <span class="text-danger-500 text-xs ml-2">{{ $message }}</span>
+                @enderror
+            </div>
+        </div>
         <div class="flex justify-end">
             <button type="button" wire:click="openApplicantModal" class="btn btn-primary btn-sm">
                 <i class="fas fa-user-tie mr-1"></i> Select Applicant

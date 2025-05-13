@@ -194,6 +194,19 @@ class EmployeeShow extends Component
     public $keep_existing_work_declaration = false;
     public $editing_work_declaration_id = null;
 
+    public $statuses;
+
+    public function changeStatus($status)
+    {
+        $res = $this->employee->setStatus($status);
+        if ($res) {
+            $this->alertSuccess('Status updated successfully!');
+            $this->mount($this->employee->id);
+        } else {
+            $this->alertError();
+        }
+    }
+
     public function mount($id)
     {
         $this->employee = Employee::with([
@@ -218,6 +231,7 @@ class EmployeeShow extends Component
         $this->birthCertificateTypes = BirthCertificate::TYPES;
         $this->armyServicePaperTypes = ArmyServicePaper::TYPES;
         $this->employeeS6DocLeavingReasons = EmployeeS6Doc::LEAVING_REASONS;
+        $this->statuses = Employee::STATUS_LIST;
     }
     
     public function openEditIdCardModal()

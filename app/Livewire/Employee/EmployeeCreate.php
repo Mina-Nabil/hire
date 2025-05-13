@@ -37,6 +37,9 @@ class EmployeeCreate extends Component
     public $employment_date;
     public $mother_name;
 
+    public $status;
+    public $statuses;
+
     // Employee Additional Info
     public $insurance_office_id;
     public $insurance_number;
@@ -127,6 +130,8 @@ class EmployeeCreate extends Component
         }
 
         $this->password = $this->generatePassword();
+        $this->statuses = Employee::STATUS_LIST;
+        $this->status = Employee::STATUS_ACTIVE;
     }
     
     /**
@@ -327,7 +332,8 @@ class EmployeeCreate extends Component
                 $this->id_number,
                 $this->id_issue_date,
                 $this->id_expiry_date,
-                $this->mother_name
+                $this->mother_name,
+                $this->status
             );
 
             // Update the user with employee_id

@@ -3,7 +3,10 @@
 namespace App\Models\Hierarchy;
 
 use App\Exceptions\AppException;
+use App\Models\HrLocationAssignment;
+use App\Models\Users\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
 
@@ -16,6 +19,22 @@ class Location extends Model
     public function positions(): HasMany
     {
         return $this->hasMany(Position::class);
+    }
+    
+    /**
+     * Get the HR assignments for this location.
+     */
+    public function hrAssignments(): HasMany
+    {
+        return $this->hasMany(HrLocationAssignment::class);
+    }
+    
+    /**
+     * Get the HR users assigned to this location.
+     */
+    public function assignedHrUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'hr_location_assignments');
     }
 
     ////static functions
@@ -61,5 +80,29 @@ class Location extends Model
         }
 
         return $this->delete();
+    }
+
+    /**
+     * Assign HR users to this location.
+     * 
+     * @param array $userIds Array of HR user IDs to assign to the location
+     * @return void
+     * @throws AppException If the user is not authorized to update assignments
+     */
+    public function setAssignedHrUsers(array $userIds): void
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('update', $this)) {
+            throw new AppException('You are not authorized to update HR user assignments for this location');
+        }
+
+        try {
+            // Use sync to efficiently manage the pivot relationship
+            // This will add new assignments, keep existing ones, and remove those not in the array
+            $this->assignedHrUsers()->sync($userIds);
+        } catch (\Exception $e) {
+            throw new AppException('Error assigning HR users: ' . $e->getMessage());
+        }
     }
 }

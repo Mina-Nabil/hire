@@ -34,6 +34,7 @@ return [
     'change_password' => 'Change Password',
     'set_as_deactivated' => 'Set As Deactivated',
     'set_as_active' => 'Set As Active',
+    'set_locations' => 'Assign Locations',
     
     // Empty state messages
     'no_users_with_filters' => 'No users with the applied filters',
@@ -46,6 +47,9 @@ return [
     'close' => 'Close',
     'submit' => 'Submit',
     'save' => 'Save',
+    'cancel' => 'Cancel',
+    'assign_locations' => 'Assign Locations',
+    'no_locations_available' => 'No locations available',
     
     // Form labels
     'password' => 'Password',

@@ -22,6 +22,9 @@ return new class extends Migration
             $table->time('start_time');
             $table->time('end_time');
             $table->float('hours');
+            $table->float('extra_hours')->nullable();
+            $table->boolean('is_extra_hours_approved')->nullable();
+            $table->boolean('is_approved')->nullable()->after('is_extra_hours_approved');
             $table->timestamps();
         });
 
@@ -51,7 +54,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('attendance');
+        Schema::dropIfExists('attendances');
         Schema::dropIfExists('overtimes');
         Schema::dropIfExists('public_holidays');
     }

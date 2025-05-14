@@ -278,7 +278,7 @@ class Employee extends Model
      * @param bool $is_automatic_overtime
      * @return void
      */
-    public function setAttendanceConfigurations(array $working_days, $attendace_calculation, $working_day_start_min, $working_day_start_max, $working_day_end_min, $working_day_end_max, $daily_working_hours, $is_automatic_overtime, $overtime_rate)
+    public function setAttendanceConfigurations(array $working_days, $attendace_calculation, $working_day_start_min, $working_day_start_max, $working_day_end_min, $working_day_end_max, $daily_working_hours, $is_automatic_overtime, $overtime_rate, $is_require_attendance_approval = false)
     {
         if ($attendace_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_FIXED) {
             if ($working_day_start_min !== $working_day_start_max) {
@@ -310,7 +310,7 @@ class Employee extends Model
         }
 
         try {
-            DB::transaction(function () use ($attendace_calculation, $working_day_start_min, $working_day_start_max, $working_day_end_min, $working_day_end_max, $daily_working_hours, $overtime_rate, $is_automatic_overtime, $working_days) {
+            DB::transaction(function () use ($attendace_calculation, $working_day_start_min, $working_day_start_max, $working_day_end_min, $working_day_end_max, $daily_working_hours, $overtime_rate, $is_automatic_overtime, $working_days, $is_require_attendance_approval) {
                 $this->workingDays()->delete();
                 
                 $dbWorkingDays = [];
@@ -325,6 +325,7 @@ class Employee extends Model
                     'employee_id' => $this->id,
                 ], [
                     'is_automatic_overtime' => $is_automatic_overtime,
+                    'is_require_attendance_approval' => $is_require_attendance_approval,
                     'attendace_calculation' => $attendace_calculation,
                     'working_day_start_min' => $working_day_start_min,
                     'working_day_start_max' => $working_day_start_max,
@@ -2373,7 +2374,8 @@ class Employee extends Model
     /// attribute
     public function getIsManagerAttribute()
     {
-        return $this->position()->children()->count();
+        $position = $this->position()->first();
+        return $position ? $position->children()->count() > 0 : false;
     }
 
     public function getManagerIdAttribute()
@@ -3022,10 +3024,7 @@ class Employee extends Model
      * @param string $nationality
      * @param string $gender
      * @param string|Carbon $birth_date
-     * @param int|null $birth_place_id
-     * @param bool $license_required
      * @param string|Carbon $employment_date
-     * @param array $employeeInfoData Optional employee info data
      * @return Employee
      * @throws AppException
      */

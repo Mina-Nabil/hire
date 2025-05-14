@@ -33,7 +33,8 @@ class BenefitConfiguration extends Model
         'working_day_end_max',
         'daily_working_hours',
         'overtime_rate',
-        'is_automatic_overtime'
+        'is_automatic_overtime',
+        'is_require_attendance_approval'
     ];
 
     public function employee()

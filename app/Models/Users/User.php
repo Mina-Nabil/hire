@@ -7,6 +7,7 @@ namespace App\Models\Users;
 use App\Exceptions\AppException;
 use App\Models\HrLocationAssignment;
 use App\Models\Hierarchy\Location;
+use App\Models\Personel\Employee;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -277,6 +278,11 @@ class User extends Authenticatable
     public function assignedLocations()
     {
         return $this->belongsToMany(Location::class, 'hr_location_assignments');
+    }
+
+    public function employee()
+    {
+        return $this->hasOne(Employee::class);
     }
 
     

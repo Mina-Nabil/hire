@@ -24,7 +24,7 @@ return new class extends Migration
             $table->float('hours');
             $table->float('extra_hours')->nullable();
             $table->boolean('is_extra_hours_approved')->nullable();
-            $table->boolean('is_approved')->nullable()->after('is_extra_hours_approved');
+            $table->boolean('is_approved')->nullable();
             $table->timestamps();
         });
 

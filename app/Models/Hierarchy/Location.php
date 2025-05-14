@@ -14,8 +14,19 @@ class Location extends Model
 {
     const MORPH_NAME = 'location';
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'latitude', 'longitude'];
     public $timestamps = false;
+
+    protected $appends = ['map_link'];
+
+    public function getMapLinkAttribute(): ?string
+    {
+        if ($this->latitude && $this->longitude) {
+            return "https://www.google.com/maps?q={$this->latitude},{$this->longitude}";
+        }
+        return null;
+    }
+
     public function positions(): HasMany
     {
         return $this->hasMany(Position::class);
@@ -40,7 +51,7 @@ class Location extends Model
     
     
     ////static functions
-    public static function createLocation(string $name): Location
+    public static function createLocation(string $name, ?float $latitude = null, ?float $longitude = null): Location
     {
         /** @var User $loggerInUser */
         $loggerInUser = Auth::user();
@@ -50,12 +61,14 @@ class Location extends Model
 
         return self::create([
             'name' => $name,
+            'latitude' => $latitude,
+            'longitude' => $longitude,
         ]);
     }
 
 
     ////model functions
-    public function editInfo(string $name): bool
+    public function editInfo(string $name, ?float $latitude = null, ?float $longitude = null): bool
     {
         /** @var User $loggerInUser */
         $loggerInUser = Auth::user();
@@ -65,6 +78,8 @@ class Location extends Model
 
         return $this->update([
             'name' => $name,
+            'latitude' => $latitude,
+            'longitude' => $longitude,
         ]);
     }
 

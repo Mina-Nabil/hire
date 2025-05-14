@@ -15,7 +15,7 @@ class ApplyPackageModal extends Component
     use AlertFrontEnd;
 
     public $packages = [];
-    public $potentialManagers = [];
+    public $managersList = [];
     public $attendanceCalculations = BenefitConfiguration::ATTENDANCE_CALCULATION_LIST;
 
     public $selectedEmployee;
@@ -64,7 +64,7 @@ class ApplyPackageModal extends Component
                 ];
             })->toArray();
 
-            $this->potentialManagers = $this->selectedEmployee->position?->potentialManagers;
+            $this->managersList = $this->selectedEmployee->position?->potentialManagers;
         } else if ($this->selectedEmployee->position?->salaryGrade) {
             $this->selectedPackage = $this->selectedEmployee->position->salaryGrade;
             $this->selectedPackageId = $this->selectedEmployee->position->salary_grade_id;
@@ -83,7 +83,7 @@ class ApplyPackageModal extends Component
                 ];
             })->toArray();
 
-            $this->potentialManagers = $this->selectedEmployee->position?->potentialManagers;
+            $this->managersList = $this->selectedEmployee->position?->potentialManagers;
         } else {
             $this->showApplyPackageModal = true;
             return;

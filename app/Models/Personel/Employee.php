@@ -270,7 +270,15 @@ class Employee extends Model
         try {
             DB::transaction(function () use ($attendace_calculation, $working_day_start_min, $working_day_start_max, $working_day_end_min, $working_day_end_max, $daily_working_hours, $overtime_rate, $is_automatic_overtime, $working_days) {
                 $this->workingDays()->delete();
-                $this->workingDays()->createMany($working_days);
+                
+                $dbWorkingDays = [];
+                foreach ($working_days as $working_day) {
+                    $dbWorkingDays[] = [
+                        'name' => $working_day,
+                    ];
+                }
+
+                $this->workingDays()->createMany($dbWorkingDays);
                 $this->benefitConfiguration()->updateOrCreate([
                     'employee_id' => $this->id,
                 ], [

@@ -16,7 +16,17 @@
                     <li wire:click="editConfiguration()"
                         class="text-slate-600 dark:text-white block font-Inter font-normal px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-600
                                                 dark:hover:text-white cursor-pointer">
-                        Edit Main Package
+                        Edit Compensation & Benefits
+                    </li>
+                    <li wire:click="editVacations()"
+                        class="text-slate-600 dark:text-white block font-Inter font-normal px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-600
+                                                dark:hover:text-white cursor-pointer">
+                        Edit Vacation Package
+                    </li>
+                    <li wire:click="editAttendance()"
+                        class="text-slate-600 dark:text-white block font-Inter font-normal px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-600
+                                                dark:hover:text-white cursor-pointer">
+                        Edit Attendance Rules
                     </li>
                     <li wire:click="addCustomBaseBenefit()"
                         class="text-slate-600 dark:text-white block font-Inter font-normal px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-600
@@ -241,6 +251,12 @@
                                     <div class="row mb-3">
                                         <div class="col-md-5 font-weight-bold">Overtime Rate:</div>
                                         <div class="col-md-7">{{ $employee->benefitConfiguration->overtime_rate }}
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-5 font-weight-bold">Is Automatic Overtime:</div>
+                                        <div class="col-md-7">
+                                            {{ $employee->benefitConfiguration->is_automatic_overtime ? 'Yes' : 'No' }}
                                         </div>
                                     </div>
                                 @else
@@ -651,6 +667,8 @@
 
 
     <livewire:benefits.partials.apply-package-modal />
+    <livewire:benefits.partials.apply-attendance-modal />
+    <livewire:benefits.partials.apply-vacations-modal />
 
     <!-- Custom Base Benefit Modal -->
     <div>

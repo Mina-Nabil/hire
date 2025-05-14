@@ -83,6 +83,16 @@ class EmployeeConfiguration extends Component
         $this->dispatch('editConfiguration', employeeId: $this->employee->id);
     }
 
+    public function editAttendance()
+    {
+        $this->dispatch('editAttendance', employeeId: $this->employee->id);
+    }
+
+    public function editVacations()
+    {
+        $this->dispatch('editVacations', employeeId: $this->employee->id);
+    }
+
     public function setActiveTab($tab)
     {
         $this->activeTab = $tab;

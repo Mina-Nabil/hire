@@ -13,6 +13,9 @@ class WorkingDay extends Model
         'employee_id',
         'type',
     ];
+
+    public $timestamps = false;
+
     const DAY_SATURDAY = 'saturday';
     const DAY_SUNDAY = 'sunday';
     const DAY_MONDAY = 'monday';

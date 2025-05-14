@@ -71,10 +71,26 @@ class EmployeeConfiguration extends Component
     ];
     public $purchasePayments = [];
     public $purchaseRemainingAmount = 0;
+    public $listeners = ['refreshConfiguration'];
+
+    public function refreshConfiguration()
+    {
+        $this->mount($this->employee);
+    }
 
     public function editConfiguration()
     {
         $this->dispatch('editConfiguration', employeeId: $this->employee->id);
+    }
+
+    public function editAttendance()
+    {
+        $this->dispatch('editAttendance', employeeId: $this->employee->id);
+    }
+
+    public function editVacations()
+    {
+        $this->dispatch('editVacations', employeeId: $this->employee->id);
     }
 
     public function setActiveTab($tab)

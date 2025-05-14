@@ -173,6 +173,6 @@ class VacationBenefit extends Model
     {
         return $query
         ->join('vacation_details', 'vacation_benefits.vacation_detail_id', '=', 'vacation_details.id')
-        ->where('vacation_details.benefit_package_id', $package_id);
+        ->where('vacation_details.vacation_package_id', $package_id);
     }
 }

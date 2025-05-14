@@ -8,7 +8,7 @@ use App\Models\Base\City;
 use App\Models\Base\InsuranceOffice;
 use App\Models\Benefits\Payrolls\AppliedVacation;
 use App\Models\Benefits\Configurations\BaseBenefit;
-use App\Models\Benefits\Configurations\BenefitPackage;
+use App\Models\Benefits\Configurations\SalaryGrade;
 use App\Models\Benefits\Vacations\GainedVacation;
 use App\Models\Benefits\Extras\Loan;
 use App\Models\Benefits\Configurations\PackageDetail;
@@ -16,6 +16,8 @@ use App\Models\Benefits\Extras\Purchase;
 use App\Models\Benefits\Vacations\VacationBenefit;
 use App\Models\Benefits\Vacations\VacationDetail;
 use App\Models\Benefits\Configurations\BenefitConfiguration;
+use App\Models\Benefits\Configurations\VacationPackage;
+use App\Models\Benefits\Configurations\WorkingDay;
 use App\Models\Hierarchy\Position;
 use App\Models\Personel\Docs\ArmyServicePaper;
 use App\Models\Personel\Docs\BankAccount;
@@ -140,22 +142,74 @@ class Employee extends Model
     ////model benefit functions
     /**
      * Apply for benefit package
-     * @param BenefitPackage $benefitPackage
+     * @param SalaryGrade $salaryGrade
      * @param array $package_details
      * [
      *  [
      *      'package_detail_id' => 1,
      *      'amount' => 1000,
      *      'receiver' => 'employee',
-     *      'type' => 'fixed',
-     *      'is_net' => true,
-     *      'is_gross' => true,
-     *      'is_grand_gross' => true,
-     *      'is_hidden' => true,
+     *      'type' => 'monthly',
      *      'start_date' => '2025-01-01',
      *      'end_date' => '2025-12-31' //optional
      *  ],
      * ]
+     * @param float $grossSalary
+     * @param int $manager_id
+     * @param bool $delete_old_conf delete old configuration if true and end old configuration if false
+     * @return void
+     */
+    public function applyBenefitsPackage(SalaryGrade $salaryGrade, $package_details, $grossSalary, $manager_id = null, bool $delete_old_conf = true)
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('updateEmployeeBenefits', $this)) {
+            throw new AppException('You dont have permission to apply benefits package');
+        }
+
+        if ($grossSalary < $salaryGrade->gross_min || $grossSalary > $salaryGrade->gross_max) {
+            throw new AppException("Gross salary is not in the range of the salary grade");
+        }
+
+
+        foreach ($package_details as $applied_package_detail) {
+            $package_detail = PackageDetail::find($applied_package_detail['package_detail_id']);
+            if (!($applied_package_detail['amount'] >= $package_detail->amount_min
+                && $applied_package_detail['amount'] <= $package_detail->amount_max)) {
+                throw new AppException('Amount is not in the range of the package detail');
+            }
+            $applied_package_detail['type'] = $package_detail->type;
+        }
+
+        try {
+            DB::transaction(function () use ($package_details, $salaryGrade, $grossSalary, $manager_id, $delete_old_conf) {
+                if ($delete_old_conf) {
+                    $this->baseBenefits()->delete();
+                } else {
+                    $start_date = Carbon::parse($this->baseBenefits()->first()->start_date);
+                    $this->baseBenefits()->update([
+                        'end_date' => $start_date->subDay()->format('Y-m-d'),
+                    ]);
+                }
+                $this->baseBenefits()->createMany($package_details);
+                $this->benefitConfiguration()->updateOrCreate([
+                    'employee_id' => $this->id,
+                ], [
+                    'salary_grade_id' => $salaryGrade->id,
+                    'vacation_package_id' => $salaryGrade->vacation_package_id,
+                    'gross_salary' => $grossSalary,
+                    'manager_id' => $manager_id,
+                ]);
+            });
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException('Error applying benefits package');
+        }
+    }
+
+    /**
+     * Apply for benefit package
+     * @param VacationPackage $salaryGrade
      * @param array $vacation_benefits
      * [
      *  [
@@ -167,6 +221,53 @@ class Employee extends Model
      *      'hour_price' => 100,
      *  ],
      * ]
+     * @return void
+     */
+    public function applyVacationPackage(VacationPackage $vacationPackage, $vacation_benefits, bool $delete_old_conf = true)
+    {
+        foreach ($vacation_benefits as $applied_vacation_benefit) {
+            $vacation_benefit = VacationDetail::find($applied_vacation_benefit['vacation_detail_id']);
+            if (!($applied_vacation_benefit['inc_rate'] >= $vacation_benefit->inc_rate_min
+                && $applied_vacation_benefit['inc_rate'] <= $vacation_benefit->inc_rate_max)) {
+                throw new AppException('Increase rate is not in the range of the ' . $vacation_benefit->name);
+            }
+            if (!($applied_vacation_benefit['max_balance'] >= $vacation_benefit->max_balance_min
+                && $applied_vacation_benefit['max_balance'] <= $vacation_benefit->max_balance_max)) {
+                throw new AppException('Maximum balance is not in the range of the ' . $vacation_benefit->name);
+            }
+            if (!($applied_vacation_benefit['hour_price'] >= $vacation_benefit->hour_price_min
+                && $applied_vacation_benefit['hour_price'] <= $vacation_benefit->hour_price_max)) {
+                throw new AppException('Hour price is not in the range of the ' . $vacation_benefit->name);
+            }
+            $applied_vacation_benefit['type'] = $vacation_benefit->type;
+        }
+
+        try {
+            DB::transaction(function () use ($vacation_benefits, $vacationPackage, $delete_old_conf) {
+                if ($delete_old_conf) {
+                    $this->vacationBenefits()->delete();
+                } else {
+                    $start_date = Carbon::parse($this->vacationBenefits()->first()->start_date);
+                    $this->vacationBenefits()->update([
+                        'end_date' => $start_date->subDay()->format('Y-m-d'),
+                    ]);
+                }
+                $this->vacationBenefits()->createMany($vacation_benefits);
+                $this->benefitConfiguration()->updateOrCreate([
+                    'employee_id' => $this->id,
+                ], [
+                    'vacation_package_id' => $vacationPackage->id,
+                ]);
+            });
+        } catch (Exception $e) {
+            throw new AppException('Error applying benefits package');
+        }
+    }
+
+    /**
+     * Apply for benefit package
+     * @param array $working_days
+     * ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday']
      * @param int $attendace_calculation
      * @param int $working_day_start_min
      * @param int $working_day_start_max
@@ -174,42 +275,11 @@ class Employee extends Model
      * @param int $working_day_end_max
      * @param int $daily_working_hours
      * @param int $overtime_rate
+     * @param bool $is_automatic_overtime
      * @return void
      */
-    public function applyBenefitsPackage(BenefitPackage $benefitPackage, $package_details, $vacation_benefits, $attendace_calculation, $working_day_start_min, $working_day_start_max, $working_day_end_min, $working_day_end_max, $daily_working_hours, $overtime_rate)
+    public function setAttendanceConfigurations(array $working_days, $attendace_calculation, $working_day_start_min, $working_day_start_max, $working_day_end_min, $working_day_end_max, $daily_working_hours, $is_automatic_overtime, $overtime_rate)
     {
-        /** @var User $loggedInUser */
-        $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('updateEmployeeBenefits', $this)) {
-            throw new AppException('You dont have permission to apply benefits package');
-        }
-
-        foreach ($package_details as $applied_package_detail) {
-            $package_detail = PackageDetail::find($applied_package_detail['package_detail_id']);
-            if (!($applied_package_detail['amount'] >= $package_detail->amount_min
-                && $applied_package_detail['amount'] <= $package_detail->amount_max)) {
-                throw new AppException('Amount is not in the range of the package detail');
-            }
-            $applied_package_detail['type'] = $package_detail->type;
-        }
-
-        foreach ($vacation_benefits as $applied_vacation_benefit) {
-            $vacation_benefit = VacationDetail::find($applied_vacation_benefit['vacation_detail_id']);
-            if (!($applied_vacation_benefit['inc_rate'] >= $vacation_benefit->inc_rate_min
-                && $applied_vacation_benefit['inc_rate'] <= $vacation_benefit->inc_rate_max)) {
-                throw new AppException('Increase rate is not in the range of the vacation detail');
-            }
-            if (!($applied_vacation_benefit['max_balance'] >= $vacation_benefit->max_balance_min
-                && $applied_vacation_benefit['max_balance'] <= $vacation_benefit->max_balance_max)) {
-                throw new AppException('Maximum balance is not in the range of the vacation detail');
-            }
-            if (!($applied_vacation_benefit['hour_price'] >= $vacation_benefit->hour_price_min
-                && $applied_vacation_benefit['hour_price'] <= $vacation_benefit->hour_price_max)) {
-                throw new AppException('Hour price is not in the range of the vacation detail');
-            }
-            $applied_vacation_benefit['type'] = $vacation_benefit->type;
-        }
-
         if ($attendace_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_FIXED) {
             if ($working_day_start_min !== $working_day_start_max) {
                 throw new AppException('Working day start min and max must be the same for fixed attendance calculation');
@@ -239,17 +309,22 @@ class Employee extends Model
             throw new AppException('Working day duration is not valid, must be the same as the daily working hours difference');
         }
 
-
         try {
-            DB::transaction(function () use ($package_details, $vacation_benefits, $benefitPackage, $attendace_calculation, $working_day_start_min, $working_day_start_max, $working_day_end_min, $working_day_end_max, $daily_working_hours, $overtime_rate) {
-                $this->baseBenefits()->delete();
-                $this->vacationBenefits()->delete();
-                $this->baseBenefits()->createMany($package_details);
-                $this->vacationBenefits()->createMany($vacation_benefits);
+            DB::transaction(function () use ($attendace_calculation, $working_day_start_min, $working_day_start_max, $working_day_end_min, $working_day_end_max, $daily_working_hours, $overtime_rate, $is_automatic_overtime, $working_days) {
+                $this->workingDays()->delete();
+                
+                $dbWorkingDays = [];
+                foreach ($working_days as $working_day) {
+                    $dbWorkingDays[] = [
+                        'name' => $working_day,
+                    ];
+                }
+
+                $this->workingDays()->createMany($dbWorkingDays);
                 $this->benefitConfiguration()->updateOrCreate([
                     'employee_id' => $this->id,
                 ], [
-                    'benefit_package_id' => $benefitPackage->id,
+                    'is_automatic_overtime' => $is_automatic_overtime,
                     'attendace_calculation' => $attendace_calculation,
                     'working_day_start_min' => $working_day_start_min,
                     'working_day_start_max' => $working_day_start_max,
@@ -257,10 +332,10 @@ class Employee extends Model
                     'working_day_end_max' => $working_day_end_max,
                     'daily_working_hours' => $daily_working_hours,
                     'overtime_rate' => $overtime_rate,
-                    'creator_id' => Auth::user()->id,
                 ]);
             });
         } catch (Exception $e) {
+            report($e);
             throw new AppException('Error applying benefits package');
         }
     }
@@ -981,7 +1056,7 @@ class Employee extends Model
      * @return EmployeeInfo
      * @throws AppException
      */
-    public function updateEmployeeInfo(int $insurance_office_id, ?string $insurance_number = null, ?string $insurance_amount = null, ?string $academic_qualification = null, ?string $university = null, ?int $graduation_year = null, ?string $military_status = null, ?string $marital_status = null, ?int $benefit_package_id = null)
+    public function updateEmployeeInfo(int $insurance_office_id, ?string $insurance_number = null, ?string $insurance_amount = null, ?string $academic_qualification = null, ?string $university = null, ?int $graduation_year = null, ?string $military_status = null, ?string $marital_status = null, ?int $salary_grade_id = null, ?int $vacation_package_id = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -993,6 +1068,8 @@ class Employee extends Model
             $employeeInfo = $this->info()->updateOrCreate(
                 ['employee_id' => $this->id],
                 [
+                    'salary_grade_id' => $salary_grade_id,
+                    'vacation_package_id' => $vacation_package_id,
                     'insurance_office_id' => $insurance_office_id,
                     'insurance_number' => $insurance_number,
                     'insurance_amount' => $insurance_amount,
@@ -1243,7 +1320,7 @@ class Employee extends Model
                 $q->where('package_id', $packageId);
             });
         })->when($departmentId, function ($query) use ($departmentId) {
-            $query->whereHas('positions', function ($q) use ($departmentId) {
+            $query->whereHas('position', function ($q) use ($departmentId) {
                 $q->where('department_id', $departmentId);
             });
         })->when($search, function ($query) use ($search) {
@@ -2296,12 +2373,12 @@ class Employee extends Model
     /// attribute
     public function getIsManagerAttribute()
     {
-        return $this->positions()->first()->children()->count();
+        return $this->position()->children()->count();
     }
 
     public function getManagerIdAttribute()
     {
-        return $this->positions()->first()->parent->employee_id;
+        return $this->benefitConfiguration?->manager_id;
     }
 
     //// relations ////
@@ -2315,9 +2392,9 @@ class Employee extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function positions()
+    public function position()
     {
-        return $this->hasMany(Position::class);
+        return $this->hasOne(Position::class);
     }
 
     public function info()
@@ -2474,6 +2551,11 @@ class Employee extends Model
     public function baseBenefits()
     {
         return $this->hasMany(BaseBenefit::class);
+    }
+
+    public function workingDays()
+    {
+        return $this->hasMany(WorkingDay::class);
     }
 
     public function overtimes()

@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
+use App\Models\Benefits\Configurations\VacationPackage;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -20,6 +22,8 @@ class DatabaseSeeder extends Seeder
             VacancySeeder::class,
             ApplicantSeeder::class,
             InterviewSeeder::class,
+            SalaryGradeSeeder::class,
+            VacationPackageSeeder::class,
             EmployeeSeeder::class,
             BenefitPackageSeeder::class,
         ]);

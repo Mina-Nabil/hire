@@ -3,14 +3,14 @@
 namespace App\Models\Benefits\Vacations;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Benefits\Configurations\BenefitPackage;
+use App\Models\Benefits\Configurations\SalaryGrade;
 
 class VacationDetail extends Model
 {
     const MORPH_NAME = 'vacation_detail';
     protected $table = 'vacation_details';
     protected $fillable = [
-        'benefit_package_id',
+        'vacation_package_id',
         'name',
         'type',
         'inc_rate_min',
@@ -37,8 +37,8 @@ class VacationDetail extends Model
     ];
 
 
-    public function benefitPackage()
+    public function salaryGrade()
     {
-        return $this->belongsTo(BenefitPackage::class);
+        return $this->belongsTo(SalaryGrade::class);
     }
 }

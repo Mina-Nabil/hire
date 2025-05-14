@@ -1,0 +1,215 @@
+<?php
+
+namespace App\Livewire\Benefits\Partials;
+
+use App\Models\Benefits\Configurations\BenefitConfiguration;
+use App\Models\Benefits\Vacations\VacationDetail;
+use App\Models\Personel\Employee;
+use App\Traits\AlertFrontEnd;
+use Carbon\Carbon;
+use Livewire\Component;
+use App\Models\Benefits\Configurations\VacationPackage;
+
+class ApplyVacationsModal extends Component
+{
+    use AlertFrontEnd;
+
+    public $packages = [];
+    public $attendanceCalculations = BenefitConfiguration::ATTENDANCE_CALCULATION_LIST;
+
+    public $selectedEmployee;
+    public $showApplyPackageModal = false;
+    public $selectedPackage;
+    public $selectedPackageId;
+
+    public $vacationBenefits;
+
+    public $packageStartDate;
+    public $packageEndDate;
+    public $showApplyVacationsModal = false;
+    public $selectedVacationPackage;
+    public $deleteOldConf = true;
+
+    public $listeners = ['editVacations'];
+
+    public function editVacations($employeeId)
+    {
+        $this->closeApplyVacationsModal();
+        $this->selectedEmployee = Employee::findOrFail($employeeId);
+
+        $this->selectedPackageId = $this->selectedEmployee->benefitConfiguration?->vacation_package_id;
+        if (!$this->selectedPackageId) {
+            $this->showApplyVacationsModal = true;
+            return;
+        }
+
+        $this->selectedPackage = VacationPackage::with(['vacationDetails'])->findOrFail($this->selectedPackageId);
+        $this->vacationBenefits = $this->selectedEmployee->vacationBenefits()->byPackage($this->selectedPackageId)->get()->map(function ($benefit) {
+            $tmpVacationDetail = VacationDetail::find($benefit->vacation_detail_id);
+            return [
+                'vacation_detail_id' => $benefit->vacation_detail_id,
+                'name' => $benefit->name,
+                'inc_rate' => $benefit->inc_rate,
+                'max_balance' => $benefit->max_balance,
+                'hour_price' => $benefit->hour_price,
+                'current_balance' => $benefit->current_balance,
+                'type' => $benefit->type,
+                'start_date' => $benefit->start_date,
+                'end_date' => $benefit->end_date,
+                'inc_rate_min' => $tmpVacationDetail->inc_rate_min,
+                'inc_rate_max' => $tmpVacationDetail->inc_rate_max,
+                'max_balance_min' => $tmpVacationDetail->max_balance_min,
+                'max_balance_max' => $tmpVacationDetail->max_balance_max,
+                'hour_price_min' => $tmpVacationDetail->hour_price_min,
+                'hour_price_max' => $tmpVacationDetail->hour_price_max,
+            ];
+        });
+
+        if (count($this->vacationBenefits)) {
+            if ($this->vacationBenefits[0]['start_date']) {
+                $this->packageStartDate = Carbon::parse($this->vacationBenefits[0]['start_date'])->format('Y-m-d');
+            }
+            if ($this->vacationBenefits[0]['end_date']) {
+                $this->packageEndDate = Carbon::parse($this->vacationBenefits[0]['end_date'])->format('Y-m-d');
+            }
+        }
+
+        $this->showApplyVacationsModal = true;
+    }
+
+    public function closeApplyVacationsModal()
+    {
+        $this->showApplyVacationsModal = false;
+        $this->reset([
+            'showApplyVacationsModal',
+            'selectedEmployee',
+            'selectedPackageId',
+            'selectedPackage',
+            'vacationBenefits',
+
+        ]);
+    }
+
+    public function updatedSelectedPackageId()
+    {
+        if (!$this->selectedPackageId) {
+            return;
+        }
+
+        $this->selectedPackage = VacationPackage::with(['vacationDetails'])->findOrFail($this->selectedPackageId);
+
+        // Initialize vacation benefits with min values
+        $this->vacationBenefits = $this->selectedPackage->vacationDetails->map(function ($detail) {
+
+            return [
+                'start_date' => $detail->start_date,
+                'end_date' => $detail->end_date,
+                'vacation_detail_id' => $detail->id,
+                'name' => $detail->name,
+                'inc_rate' => $detail->inc_rate_min,
+                'inc_rate_min' => $detail->inc_rate_min,
+                'inc_rate_max' => $detail->inc_rate_max,
+                'max_balance' => $detail->max_balance_min,
+                'max_balance_min' => $detail->max_balance_min,
+                'max_balance_max' => $detail->max_balance_max,
+                'hour_price' => $detail->hour_price_min,
+                'hour_price_min' => $detail->hour_price_min,
+                'hour_price_max' => $detail->hour_price_max,
+                'type' => $detail->type
+            ];
+        })->toArray();
+
+
+        foreach ($this->vacationBenefits as $key => $benefit) {
+            $this->updateCurrentBalance($key);
+        }
+    }
+
+    public function updateCurrentBalance($key)
+    {
+        $value = $this->vacationBenefits[$key]['inc_rate'];
+        switch ($this->vacationBenefits[$key]['type']) {
+            case VacationDetail::TYPE_YEARLY:
+                $startDate = Carbon::parse($this->vacationBenefits[$key]['start_date']);
+                $startOfYear = Carbon::parse($startDate)->startOfYear();
+                $leftRatio = $startOfYear->diffInDays($startDate, true) / 365;
+                $this->vacationBenefits[$key]['current_balance'] = $value * $leftRatio;
+                break;
+            case VacationDetail::TYPE_MONTHLY:
+                $startDate = Carbon::parse($this->vacationBenefits[$key]['start_date']);
+                $startOfMonth = Carbon::parse($startDate)->startOfMonth();
+                $leftRatio = $startOfMonth->diffInDays($startDate, true) / 30;
+                $this->vacationBenefits[$key]['current_balance'] = $value * $leftRatio;
+                break;
+            case VacationDetail::TYPE_WEEKLY:
+                $startDate = Carbon::parse($this->vacationBenefits[$key]['start_date']);
+                $startOfWeek = Carbon::parse($startDate)->startOfWeek();
+                $leftRatio = $startOfWeek->diffInDays($startDate, true) / 7;
+                $this->vacationBenefits[$key]['current_balance'] = $value * $leftRatio;
+                break;
+            case VacationDetail::TYPE_QUARTERLY:
+                $startDate = Carbon::parse($this->vacationBenefits[$key]['start_date']);
+                $startOfQuarter = Carbon::parse($startDate)->startOfQuarter();
+                $leftRatio = $startOfQuarter->diffInDays($startDate, true) / 90;
+                $this->vacationBenefits[$key]['current_balance'] = $value * $leftRatio;
+                break;
+
+            case VacationDetail::TYPE_DAILY:
+                $this->vacationBenefits[$key]['current_balance'] = $value;
+                break;
+        }
+    }
+
+    public function applyVacationPackage()
+    {
+        $this->validate([
+            'selectedPackageId' => 'required|exists:vacation_packages,id',
+            'vacationBenefits.*.inc_rate' => 'required|numeric',
+            'vacationBenefits.*.max_balance' => 'required|numeric',
+            'vacationBenefits.*.hour_price' => 'required|numeric',
+            'vacationBenefits.*.current_balance' => 'required|numeric',
+            'packageStartDate' => 'required|date',
+            'packageEndDate' => 'nullable|date|after:packageStartDate',
+        ], [
+            'vacationBenefits.*.inc_rate' => 'Inc Rate#:position is required',
+            'vacationBenefits.*.max_balance' => 'Max Balance#:position is required',
+            'vacationBenefits.*.hour_price' => 'Hour Price#:position is required',
+            'vacationBenefits.*.current_balance' => 'Current Balance#:position is required',
+            'packageStartDate' => 'Start Date#:position is required',
+            'packageEndDate' => 'End Date#:position is required',
+        ]);
+        try {
+
+            foreach ($this->vacationBenefits as &$benefit) {
+                $benefit['vacation_detail_id'] = $benefit['vacation_detail_id'];
+                $benefit['start_date'] = $this->packageStartDate;
+                if ($this->packageEndDate) {
+                    $benefit['end_date'] = $this->packageEndDate;
+                } else {
+                    $benefit['end_date'] = null;
+                }
+            }
+
+            $this->selectedEmployee->applyVacationPackage(
+                $this->selectedPackage,
+                $this->vacationBenefits,
+                $this->deleteOldConf
+            );
+
+            $this->closeApplyVacationsModal();
+            $this->alertSuccess('Vacation package applied successfully.');
+        } catch (\Exception $e) {
+            $this->alertError('Error applying benefits package: ' . $e->getMessage());
+        }
+    }
+
+    public function mount()
+    {
+        $this->packages = VacationPackage::all();
+    }
+
+    public function render()
+    {
+        return view('livewire.benefits.partials.apply-vacations-modal');
+    }
+}

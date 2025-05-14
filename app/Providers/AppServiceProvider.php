@@ -8,8 +8,9 @@ use App\Models\Base\City;
 use App\Models\Base\InsuranceOffice;
 use App\Models\Benefits\Configurations\BaseBenefit;
 use App\Models\Benefits\Configurations\BenefitConfiguration;
-use App\Models\Benefits\Configurations\BenefitPackage;
+use App\Models\Benefits\Configurations\SalaryGrade;
 use App\Models\Benefits\Configurations\PackageDetail;
+use App\Models\Benefits\Configurations\VacationPackage;
 use App\Models\Benefits\Configurations\WorkingDay;
 use App\Models\Benefits\Extras\Loan;
 use App\Models\Benefits\Extras\Purchase;
@@ -124,7 +125,7 @@ class AppServiceProvider extends ServiceProvider
             PoliceRecord::MORPH_NAME => PoliceRecord::class,
             SkillsQualification::MORPH_NAME => SkillsQualification::class,
             InsuranceOffice::MORPH_NAME => InsuranceOffice::class,
-            BenefitPackage::MORPH_NAME => BenefitPackage::class,
+            SalaryGrade::MORPH_NAME => SalaryGrade::class,
             BaseBenefit::MORPH_NAME => BaseBenefit::class,
             BenefitConfiguration::MORPH_NAME => BenefitConfiguration::class,
             PackageDetail::MORPH_NAME => PackageDetail::class,
@@ -143,6 +144,8 @@ class AppServiceProvider extends ServiceProvider
             BenefitPayment::MORPH_NAME => BenefitPayment::class,
             ExtraPayment::MORPH_NAME => ExtraPayment::class,
             Location::MORPH_NAME => Location::class,
+            VacationPackage::MORPH_NAME => VacationPackage::class,
+
         ]);
     }
 }

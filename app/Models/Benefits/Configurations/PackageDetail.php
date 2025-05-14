@@ -3,7 +3,7 @@
 namespace App\Models\Benefits\Configurations;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Benefits\Configurations\BenefitPackage;
+use App\Models\Benefits\Configurations\SalaryGrade;
 
 ///Compensation or benefit details for a benefit package
 class PackageDetail extends Model
@@ -22,20 +22,22 @@ class PackageDetail extends Model
         'is_hidden',
     ];
     const RECEIVER_EMPLOYEE = 'employee';
-    const RECEIVER_TAXES = 'taxes';
-    const RECEIVER_INSURANCE = 'insurance';
     const RECEIVER_MEDICAL = 'medical';
     const RECEIVER_OTHER = 'other';
     const RECEIVER_LIST = [
         self::RECEIVER_EMPLOYEE,
-        self::RECEIVER_TAXES,
-        self::RECEIVER_INSURANCE,
         self::RECEIVER_MEDICAL,
         self::RECEIVER_OTHER,
     ];
 
-    public function benefitPackage()
+    public function salaryGrade()
     {
-        return $this->belongsTo(BenefitPackage::class);
+        return $this->belongsTo(SalaryGrade::class);
+    }
+
+    ///scope 
+    public function scopeBySalaryGrade($query, $salaryGradeId)
+    {
+        return $query->where('salary_grade_id', $salaryGradeId);
     }
 }

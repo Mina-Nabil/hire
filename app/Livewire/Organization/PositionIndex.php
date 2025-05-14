@@ -3,6 +3,7 @@
 namespace App\Livewire\Organization;
 
 use App\Exceptions\AppException;
+use App\Models\Benefits\Configurations\SalaryGrade;
 use App\Models\Hierarchy\Department;
 use App\Models\Hierarchy\Location;
 use App\Models\Hierarchy\Position;
@@ -22,6 +23,8 @@ class PositionIndex extends Component
     // form data
     public $employees = [];
     public $locations = [];
+    public $salaryGrades = [];
+
     // Department section
     public $newDepartmentModal = false;
     public $editDepartmentModal = false;
@@ -48,6 +51,7 @@ class PositionIndex extends Component
     public $arabicJobBenefits;
     public $parentId;
     public $employeeId;
+    public $salaryGradeId;
     public $code;
     public $sapCode;
 
@@ -181,6 +185,7 @@ class PositionIndex extends Component
             'arabicJobBenefits' => 'nullable|string',
             'parentId' => 'nullable|exists:positions,id',
             'selectedLocationId' => 'required|exists:locations,id',
+            'salaryGradeId' => 'nullable|exists:salary_grades,id',
         ]);
 
         try {
@@ -199,7 +204,8 @@ class PositionIndex extends Component
                 $this->jobBenefits,
                 $this->arabicJobBenefits,
                 $this->code,
-                $this->employeeId
+                $this->employeeId,
+                $this->salaryGradeId
             );
 
             $this->closeNewPositionSec();
@@ -231,6 +237,7 @@ class PositionIndex extends Component
         $this->code = $position->code;
         $this->employeeId = $position->employee_id;
         $this->selectedLocationId = $position->location_id;
+        $this->salaryGradeId = $position->salary_grade_id;
         $this->editPositionModal = true;
     }
 
@@ -255,6 +262,7 @@ class PositionIndex extends Component
             'arabicJobBenefits' => 'nullable|string',
             'parentId' => 'nullable|exists:positions,id',
             'selectedLocationId' => 'required|exists:locations,id',
+            'salaryGradeId' => 'nullable|exists:salary_grades,id',
         ]);
 
         try {
@@ -281,7 +289,8 @@ class PositionIndex extends Component
                 $this->jobBenefits,
                 $this->arabicJobBenefits,
                 $this->code,
-                $this->employeeId
+                $this->employeeId,
+                $this->salaryGradeId
             );
 
             $this->closeEditPositionSec();
@@ -363,6 +372,7 @@ class PositionIndex extends Component
     {
         $this->employees = Employee::current()->get();
         $this->locations = Location::all();
+        $this->salaryGrades = SalaryGrade::all();
     }
 
     public function render()

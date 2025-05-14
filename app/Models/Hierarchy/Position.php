@@ -3,6 +3,7 @@
 namespace App\Models\Hierarchy;
 
 use App\Exceptions\AppException;
+use App\Models\Benefits\Configurations\SalaryGrade;
 use App\Models\Personel\Employee;
 use App\Models\Recruitment\Vacancies\Vacancy;
 use App\Scopes\HrLocationScope;
@@ -35,6 +36,7 @@ class Position extends Model
         'job_benefits',
         'arabic_job_benefits',
         'employee_id',
+        'salary_grade_id',
         'parent_id',
     ];
 
@@ -71,6 +73,14 @@ class Position extends Model
     public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class);
+    }
+
+    /**
+     * Get the salary grade assigned to this position.
+     */
+    public function salaryGrade(): BelongsTo
+    {
+        return $this->belongsTo(SalaryGrade::class);
     }
 
     /**
@@ -124,6 +134,7 @@ class Position extends Model
         ?string $arabicJobBenefits = null,
         ?string $code = null,
         ?string $employeeId = null,
+        ?int $salaryGradeId = null,
     ): Position {
         /** @var User $loggerInUser */
         $loggerInUser = Auth::user();
@@ -148,6 +159,7 @@ class Position extends Model
                 'parent_id' => $parentId,
                 'code' => $code,
                 'employee_id' => $employeeId,
+                'salary_grade_id' => $salaryGradeId,
             ]);
             return $newPosition;
         } catch (Exception $e) {
@@ -175,6 +187,7 @@ class Position extends Model
         ?string $arabicJobBenefits,
         ?string $code,
         ?string $employeeId,
+        ?int $salaryGradeId,
     ): bool {
         try {
             /** @var User $loggerInUser */
@@ -200,6 +213,7 @@ class Position extends Model
                 'parent_id' => $parentId,
                 'code' => $code,
                 'employee_id' => $employeeId,
+                'salary_grade_id' => $salaryGradeId,
             ]);
         } catch (Exception $e) {
             report($e);
@@ -251,6 +265,19 @@ class Position extends Model
         }
 
         return $level;
+    }
+
+    public function getPotentialManagersAttribute(): array
+    {
+        $potentialManagers = [];
+        $current = $this;
+        while ($current->parent_id) {
+            if($current->parent->employee_id) {                                 
+                $potentialManagers[] = $current->parent->employee;
+            }
+            $current = $current->parent;
+        }
+        return $potentialManagers;
     }
 
     /**

@@ -12,17 +12,20 @@ use App\Traits\AlertFrontEnd;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
+use Livewire\WithFileUploads;   
 
 class EmployeeCreate extends Component
 {
-    use AlertFrontEnd;
+    use AlertFrontEnd, WithFileUploads;
     
     // Applicant ID for pre-filling data
     public $applicant_id;
     
     // Basic Employee Info
     public $name;
+    public $name_ar;
     public $email;
     public $phone;
     public $address;
@@ -32,7 +35,11 @@ class EmployeeCreate extends Component
     public $birth_place_id;
     public $license_required = false;
     public $employment_date;
-    
+    public $mother_name;
+
+    public $status;
+    public $statuses;
+
     // Employee Additional Info
     public $insurance_office_id;
     public $insurance_number;
@@ -55,6 +62,11 @@ class EmployeeCreate extends Component
     public $militaryStatuses = [];
     public $maritalStatuses = [];
 
+    public $id_card_file;
+    public $id_number;
+    public $id_issue_date;
+    public $id_expiry_date;
+
     // Applicant Selection Modal
     public $showApplicantModal = false;
     public $applicantSearch = '';
@@ -63,6 +75,7 @@ class EmployeeCreate extends Component
     protected $rules = [
         // Basic employee info validation
         'name' => 'required|string|max:255',
+        'name_ar' => 'required|string|max:255',
         'email' => 'required|email|max:255',
         'phone' => 'required|string|max:20',
         'address' => 'required|string|max:255',
@@ -72,7 +85,7 @@ class EmployeeCreate extends Component
         'birth_place_id' => 'required|exists:cities,id',
         'license_required' => 'boolean',
         'employment_date' => 'required|date',
-        
+        'mother_name' => 'nullable|string|max:255',
         // Employee additional info validation
         'insurance_office_id' => 'required|exists:insurance_offices,id',
         'insurance_number' => 'nullable|string|max:50',
@@ -82,6 +95,11 @@ class EmployeeCreate extends Component
         'graduation_year' => 'nullable|integer|min:1900|max:2100',
         'military_status' => 'nullable|required_if:gender,Male|in:Exempted,Drafted,Completed',
         'marital_status' => 'required|string|in:Single,Married,Divorced,Widowed',
+
+        'id_card_file' => 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
+        'id_number' => 'required|string|max:50',
+        'id_issue_date' => 'required|date',
+        'id_expiry_date' => 'required|date|after:id_issue_date',
     ];
 
     public function mount($applicant_id = null)
@@ -112,6 +130,8 @@ class EmployeeCreate extends Component
         }
 
         $this->password = $this->generatePassword();
+        $this->statuses = Employee::STATUS_LIST;
+        $this->status = Employee::STATUS_ACTIVE;
     }
     
     /**
@@ -277,6 +297,8 @@ class EmployeeCreate extends Component
                 $this->password,
                 User::TYPE_EMPLOYEE
             );
+
+            $path = $this->id_card_file->store(Employee::FILES_DIRECTORY.'/id_cards', 's3');
             
             // Create employee info data array
             $employeeInfoData = [
@@ -294,6 +316,7 @@ class EmployeeCreate extends Component
             $employee = Employee::createEmployee(
                 $user->id,
                 $this->name,
+                $this->name_ar,
                 $this->email,
                 $this->phone,
                 $this->address,
@@ -304,9 +327,15 @@ class EmployeeCreate extends Component
                 $this->license_required,
                 $this->employment_date,
                 $employeeInfoData,
-                $this->applicant_id
+                $this->applicant_id,
+                $path,
+                $this->id_number,
+                $this->id_issue_date,
+                $this->id_expiry_date,
+                $this->mother_name,
+                $this->status
             );
-            
+
             // Update the user with employee_id
             $user->employee_id = $employee->id;
             $user->save();
@@ -327,11 +356,28 @@ class EmployeeCreate extends Component
             
         } catch (AppException $e) {
             DB::rollBack();
+            // If there was an uploaded file, attempt to delete it from storage
+            if (isset($path) && Storage::disk('s3')->exists($path)) {
+                try {
+                    Storage::disk('s3')->delete($path);
+                } catch (Exception $deleteException) {
+                    report($deleteException);
+                    // Continue with the error handling even if file deletion fails
+                }
+            }
             $this->alert('failed', $e->getMessage());
         } catch (Exception $e) {
             DB::rollBack();
+            if (isset($path) && Storage::disk('s3')->exists($path)) {
+                try {
+                    Storage::disk('s3')->delete($path);
+                } catch (Exception $deleteException) {
+                    report($deleteException);
+                    // Continue with the error handling even if file deletion fails
+                }
+            }
             report($e);
-            $this->alertError();
+            $this->alertError($e->getMessage());
         }
     }
 

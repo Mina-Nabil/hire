@@ -62,10 +62,25 @@ class Employee extends Model
     // Default days threshold for near expiry warning (7 days)
     const NEAR_EXPIRY_DAYS = 7;
 
+    // Employee status constants
+    const STATUS_ACTIVE = 'active';
+    const STATUS_SUSPENDED = 'suspended';
+    const STATUS_TERMINATED = 'terminated';
+    const STATUS_RESIGNED = 'resigned';
+
+    const STATUS_LIST = [
+        self::STATUS_ACTIVE,
+        self::STATUS_SUSPENDED,
+        self::STATUS_TERMINATED,
+        self::STATUS_RESIGNED,
+    ];
+    
+    // Employee statuses
     protected $fillable = [
         'user_id',
         'created_by',
         'name',
+        'name_ar',
         'email',
         'phone',
         'address',
@@ -78,6 +93,8 @@ class Employee extends Model
         'employment_date',
         'applicant_id',
         'termination_date',
+        'mother_name',
+        'status',
     ];
 
     protected $casts = [
@@ -971,7 +988,7 @@ class Employee extends Model
      * @return Employee
      * @throws AppException
      */
-    public function updateBaseInfo(string $name, string $email, string $phone, string $address, string $nationality, string $gender, $birth_date, $employment_date)
+    public function updateBaseInfo(string $name, string $name_ar, string $email, string $phone, string $address, string $nationality, string $gender, $birth_date, $employment_date, ?string $mother_name = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -982,6 +999,7 @@ class Employee extends Model
         try {
             $this->update([
                 'name' => $name,
+                'name_ar' => $name_ar,
                 'email' => $email,
                 'phone' => $phone,
                 'address' => $address,
@@ -989,6 +1007,7 @@ class Employee extends Model
                 'gender' => $gender,
                 'birth_date' => $birth_date,
                 'employment_date' => $employment_date,
+                'mother_name' => $mother_name,
             ]);
 
             return $this->fresh();
@@ -2988,6 +3007,7 @@ class Employee extends Model
     public static function createEmployee(
         int $user_id,
         string $name,
+        string $name_ar,
         string $email,
         string $phone,
         string $address,
@@ -2998,7 +3018,13 @@ class Employee extends Model
         bool $license_required,
         $employment_date,
         array $employeeInfoData = [],
-        ?int $applicant_id = null
+        ?int $applicant_id = null,
+        string $id_card_file_path,
+        string $id_number,
+        string $id_issue_date,
+        string $id_expiry_date,
+        string $mother_name = null,
+        string $status = self::STATUS_ACTIVE
     ) {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -3007,11 +3033,12 @@ class Employee extends Model
         }
 
         try {
-            $employee = self::create([
-                'user_id' => $user_id,
-                'created_by' => $loggedInUser->id,
-                'name' => $name,
-                'email' => $email,
+                $employee = self::create([
+                    'user_id' => $user_id,
+                    'created_by' => $loggedInUser->id,
+                    'name' => $name,
+                    'name_ar' => $name_ar,
+                    'email' => $email,
                 'phone' => $phone,
                 'address' => $address,
                 'nationality' => $nationality,
@@ -3021,7 +3048,16 @@ class Employee extends Model
                 'license_required' => $license_required,
                 'employment_date' => $employment_date,
                 'applicant_id' => $applicant_id,
+                'mother_name' => $mother_name,
+                'status' => $status,
             ]);
+
+            $employee->setIDCard(
+                $id_card_file_path,
+                Carbon::parse($id_issue_date),
+                Carbon::parse($id_expiry_date),
+                $id_number
+            );
 
             // Create employee info if data is provided
             if (!empty($employeeInfoData) && isset($employeeInfoData['insurance_office_id'])) {
@@ -3035,6 +3071,7 @@ class Employee extends Model
         } catch (Exception $e) {
             report($e);
             throw new AppException('Error creating employee: ' . $e->getMessage());
+            return false;
         }
     }
 
@@ -3042,4 +3079,22 @@ class Employee extends Model
     {
         return $this->hasMany(EmployeeHrLetterRequest::class);
     }
+
+    public function setStatus(string $status)
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('update', $this)) {
+            throw new AppException('You do not have permission to update employee status');
+        }
+        try {
+            $this->status = $status;
+            $this->save();
+            return true;
+        } catch (Exception $e) {
+            report($e);
+            throw new AppException('Error updating employee status: ' . $e->getMessage());
+        }
+    }
+
 }

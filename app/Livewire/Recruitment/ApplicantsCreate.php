@@ -20,6 +20,9 @@ use App\Models\Recruitment\Vacancies\BaseQuestion;
 use App\Models\Recruitment\Applicants\ApplicantSkill;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Session;
+use Livewire\Attributes\Layout;
 
 class ApplicantsCreate extends Component
 {
@@ -40,6 +43,8 @@ class ApplicantsCreate extends Component
     // Current step
     public $currentStep = 1;
     public $totalSteps = 8;
+    // Current language
+    public $locale;
 
     // Step 1: Personal Information
     public $areaId;
@@ -99,6 +104,10 @@ class ApplicantsCreate extends Component
 
     public function mount($vacancyID = null, $referralID = null)
     {
+        // Set the locale from session or default to English
+        $this->locale = Session::get('locale', 'en');
+        App::setLocale($this->locale);
+
         if ($vacancyID) {
             $vacancyID = decrypt($vacancyID);
             $this->selectedVacancy = Vacancy::findOrFail($vacancyID);
@@ -133,6 +142,14 @@ class ApplicantsCreate extends Component
         $this->computerSkillsList = ApplicantSkill::COMPUTER_SKILLS;
         $this->technicalSkillsList = ApplicantSkill::TECHNICAL_SKILLS;
         $this->softSkillsList = ApplicantSkill::SOFT_SKILLS;
+        
+    }
+
+    public function switchLocale($locale)
+    {
+        $this->locale = $locale;
+        Session::put('locale', $locale);
+        App::setLocale($locale);
     }
 
     public function updatedCityId($value)
@@ -679,7 +696,7 @@ class ApplicantsCreate extends Component
             $this->pageLayout = 'components.layouts.guest';
         }
 
-        $view = view('livewire.recruitment.applicants-create', [
+        return view('livewire.recruitment.applicants-create', [
             'areas' => $this->areas,
             'channels' => $this->channels,
             'employees' => $this->employees,

@@ -21,10 +21,13 @@ return new class extends Migration
             $table->foreignIdFor(User::class)->constrained('users');
             $table->foreignIdFor(User::class, 'created_by')->constrained('users');
             $table->string('name');
+            $table->string('name_ar');
             $table->string('email');
             $table->string('phone');
             $table->string('address');
             $table->string('nationality');
+            $table->enum('status', Employee::STATUS_LIST)->default(Employee::STATUS_ACTIVE);
+            $table->string('mother_name')->nullable();
             $table->enum('gender', Applicant::GENDER);
             $table->date('birth_date');
             $table->string('image_url')->nullable();

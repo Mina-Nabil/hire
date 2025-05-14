@@ -3,6 +3,7 @@
 namespace App\Livewire\Settings;
 
 use App\Exceptions\AppException;
+use App\Models\Hierarchy\Location;
 use App\Models\Users\User;
 use App\Traits\AlertFrontEnd;
 use Exception;
@@ -35,6 +36,11 @@ class UsersIndex extends Component
     public $selectedUserId;
     public $newPassword;
     public $newPassword_confirmation;
+
+    // Location assignment properties
+    public $locationsModal = false;
+    public $selectedLocations = [];
+    public $availableLocations = [];
 
     public function clearImage()
     {
@@ -192,6 +198,43 @@ class UsersIndex extends Component
         }
     }
 
+    // Open locations assignment modal
+    public function openLocationsModal($id)
+    {
+        $this->selectedUserId = $id;
+        
+        // Get all available locations
+        $this->availableLocations = Location::all();
+        
+        // Get user's currently assigned locations
+        $user = User::find($id);
+        $this->selectedLocations = $user->assignedLocations()->pluck('locations.id')->toArray();
+        
+        $this->locationsModal = true;
+    }
+    
+    // Close locations assignment modal
+    public function closeLocationsModal()
+    {
+        $this->locationsModal = false;
+        $this->reset(['selectedLocations', 'availableLocations']);
+    }
+    
+    // Save location assignments
+    public function saveLocationAssignments()
+    {
+        try {
+            $user = User::find($this->selectedUserId);
+            $user->setAssignedLocations($this->selectedLocations);
+            $this->closeLocationsModal();
+            $this->alertSuccess('Location assignments updated successfully');
+        } catch (AppException $e) {
+            $this->alertError($e->getMessage());
+        } catch (Exception $e) {
+            report($e);
+            $this->alertError('Internal server error: ' . $e->getMessage());
+        }
+    }
 
     public function render()
     {

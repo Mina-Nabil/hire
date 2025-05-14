@@ -3,6 +3,7 @@
 namespace App\Livewire\Base;
 
 use App\Models\Hierarchy\Location;
+use App\Models\Users\User;
 use App\Traits\AlertFrontEnd;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -18,6 +19,12 @@ class LocationIndex extends Component
     
     #[Validate('required|min:3')]
     public $name = '';
+
+    // HR User assignment properties
+    public $hrUsersModal = false;
+    public $selectedLocation = null;
+    public $selectedUsers = [];
+    public $availableHrUsers = [];
 
     protected $listeners = ['deleteLocation'];
 
@@ -88,6 +95,43 @@ class LocationIndex extends Component
             $location = Location::findOrFail($id);
             $location->deleteLocation();
             $this->alertSuccess('Location deleted successfully!');
+        } catch (\Exception $e) {
+            $this->alertError($e->getMessage());
+        }
+    }
+
+    // Open HR users assignment modal
+    public function openHrUsersModal($id)
+    {
+        $this->selectedLocation = Location::findOrFail($id);
+        
+        // Get all available HR users
+        $this->availableHrUsers = User::hr()->active()->get();
+        
+        // Get location's currently assigned HR users
+        $this->selectedUsers = $this->selectedLocation->assignedHrUsers()->pluck('users.id')->toArray();
+        
+        $this->hrUsersModal = true;
+    }
+    
+    // Close HR users assignment modal
+    public function closeHrUsersModal()
+    {
+        $this->hrUsersModal = false;
+        $this->reset(['selectedLocation', 'selectedUsers', 'availableHrUsers']);
+    }
+    
+    // Save HR user assignments
+    public function saveHrUserAssignments()
+    {
+        try {
+            if (!$this->selectedLocation) {
+                throw new \Exception('Location not found');
+            }
+            
+            $this->selectedLocation->setAssignedHrUsers($this->selectedUsers);
+            $this->closeHrUsersModal();
+            $this->alertSuccess('HR users assigned successfully');
         } catch (\Exception $e) {
             $this->alertError($e->getMessage());
         }

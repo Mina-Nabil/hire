@@ -1,15 +1,38 @@
 <div>
-    @can('setDocs',$employee)
-    <div class="flex justify-between flex-wrap items-center">
-        <div class="md:mb-6 mb-4 flex space-x-3 rtl:space-x-reverse">
-            <div>
-                <h4 class="font-medium lg:text-2xl text-xl capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
-                    {{ $employee->name }}
-                </h4>
-                <p class="text-xs text-slate-500 dark:text-slate-400">Employee</p>
+    @can('setDocs', $employee)
+        <div class="flex justify-between flex-wrap items-center">
+            <div class="md:mb-6 mb-4 flex space-x-3 rtl:space-x-reverse">
+                <div>
+                    <h4 class="font-medium flex items-center lg:text-2xl text-xl capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
+                        <span class="flex items-center gap-2">
+                            {{ $employee->name }}
+                            @switch($employee->status)
+                                @case('active')
+                                    <span
+                                        class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize">{{ __('Active') }}</span>
+                                @break
+
+                                @case('suspended')
+                                    <span
+                                        class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize">{{ __('Suspended') }}</span>
+                                @break
+
+                                @case('terminated')
+                                    <span
+                                        class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize">{{ __('Terminated') }}</span>
+                                @break
+
+                                @case('resigned')
+                                    <span
+                                        class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize">{{ __('Resigned') }}</span>
+                                @break
+                            @endswitch
+                        </span>
+                    </h4>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Employee</p>
+                </div>
             </div>
         </div>
-    </div>
     @endcan
     <div class="grid grid-cols-12 gap-5">
 
@@ -307,17 +330,22 @@
                         <li wire:click="changeSection('police_record')"
                             class="block py-[8px] p-6  {{ $section == 'police_record' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                Police Record 
+                                Police Record
                                 <span>
-                                @if ($employee->checkPoliceRecordStatus()['status'] === 'valid')
-                                    <span class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
-                                @elseif($employee->checkPoliceRecordStatus()['status'] === 'near_expiry')
-                                    <span class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near Expiry</span>
-                                @elseif($employee->checkPoliceRecordStatus()['status'] === 'expired')
-                                    <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
-                                @elseif($employee->checkPoliceRecordStatus()['status'] === 'missing')
-                                    <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
-                                @endif
+                                    @if ($employee->checkPoliceRecordStatus()['status'] === 'valid')
+                                        <span
+                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                    @elseif($employee->checkPoliceRecordStatus()['status'] === 'near_expiry')
+                                        <span
+                                            class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
+                                            Expiry</span>
+                                    @elseif($employee->checkPoliceRecordStatus()['status'] === 'expired')
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                    @elseif($employee->checkPoliceRecordStatus()['status'] === 'missing')
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                    @endif
                                 </span>
                                 @if ($section == 'police_record')
                                     <div class="flex-none">
@@ -337,13 +365,18 @@
                                 HR Letter
                                 <span>
                                     @if ($employee->checkHrLettersStatus()['status'] === 'valid')
-                                        <span class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                        <span
+                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
                                     @elseif($employee->checkHrLettersStatus()['status'] === 'near_expiry')
-                                        <span class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near Expiry</span>
+                                        <span
+                                            class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
+                                            Expiry</span>
                                     @elseif($employee->checkHrLettersStatus()['status'] === 'expired')
-                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
                                     @elseif($employee->checkHrLettersStatus()['status'] === 'missing')
-                                        <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
                                     @endif
                                 </span>
 
@@ -574,56 +607,98 @@
                             Base Information
                         </h4>
 
-                        @can('setDocs',$employee)
-                            @if (!$employee->idCard)
-                            <button type="button" class="text-slate-900 dark:text-white"
-                                wire:click="openEditBaseInfoModal">
-                                <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
+                        <div class="flex items-center gap-5">
+                        <div class="dropdown relative">
+                            <button
+                                class="btn inline-flex justify-center btn-dark items-center btn-sm"
+                                type="button"
+                                id="statusDropdown"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                Change Status
+                                <iconify-icon icon="heroicons-outline:chevron-down" class="text-xl ltr:ml-2 rtl:mr-2"></iconify-icon>
                             </button>
+                            <ul class="dropdown-menu min-w-max absolute text-sm text-slate-700 dark:text-white hidden bg-white dark:bg-slate-700 shadow z-[2] float-left overflow-hidden list-none text-left rounded-lg mt-1 m-0 bg-clip-padding border-none">
+                                @foreach($statuses as $statusValue)
+                                    @if($statusValue !== $employee->status)
+                                        <li>
+                                            <a href="#" 
+                                                wire:click.prevent="changeStatus('{{ $statusValue }}')"
+                                                class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent hover:bg-slate-100 dark:hover:bg-slate-600 dark:hover:text-white">
+                                                Set as {{ ucfirst($statusValue) }}
+                                            </a>
+                                        </li>
+                                    @endif
+                                @endforeach
+                            </ul>
+                        </div>
+
+                        @can('setDocs', $employee)
+                            @if (!$employee->idCard)
+                                <button type="button" class="text-slate-900 dark:text-white"
+                                    wire:click="openEditBaseInfoModal">
+                                    <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
+                                </button>
                             @endif
                         @endcan
+                        </div>
                     </div>
                     <div class="card-body p-6">
                         <div class="grid grid-cols-12 gap-5">
                             <div class="xl:col-span-6 lg:col-span-6 md:col-span-6 col-span-12">
                                 <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Name</label>
-                                    <div class="text-base text-slate-900 dark:text-white">{{ $employee->name }}</div>
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
+                                        {{ $employee->name }}</div>
                                 </div>
                                 <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Email</label>
-                                    <div class="text-base text-slate-900 dark:text-white">{{ $employee->email }}</div>
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
+                                        {{ $employee->email }}</div>
                                 </div>
                                 <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Phone</label>
-                                    <div class="text-base text-slate-900 dark:text-white">{{ $employee->phone }}</div>
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
+                                        {{ $employee->phone }}</div>
                                 </div>
                                 <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Address</label>
-                                    <div class="text-base text-slate-900 dark:text-white">
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
                                         {{ $employee->address }}</div>
+                                </div>
+                                <div class="mb-5 text-wrap">
+                                    <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Mother Name</label>
+                                    <div class="text-base text-slate-900 dark:text-white arabic-font">
+                                        {{ $employee->mother_name }}</div>
                                 </div>
                             </div>
                             <div class="xl:col-span-6 lg:col-span-6 md:col-span-6 col-span-12">
                                 <div class="mb-5 text-wrap">
+                                    <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Arabic Name</label>
+                                    <div class="text-base text-slate-900 dark:text-white arabic-font">
+                                        {{ $employee->name_ar }}</div>
+                                </div>
+                                <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Nationality</label>
-                                    <div class="text-base text-slate-900 dark:text-white">{{ $employee->nationality }}
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
+                                        {{ $employee->nationality }}
                                     </div>
                                 </div>
                                 <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Gender</label>
-                                    <div class="text-base text-slate-900 dark:text-white">{{ $employee->gender }}
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
+                                        {{ $employee->gender }}
                                     </div>
                                 </div>
                                 <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Birth Date</label>
-                                    <div class="text-base text-slate-900 dark:text-white">
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
                                         {{ $employee->birth_date?->format('d/m/Y') }}</div>
                                 </div>
                                 <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Employment
                                         Date</label>
-                                    <div class="text-base text-slate-900 dark:text-white">
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
                                         {{ $employee->employment_date?->format('d/m/Y') }}</div>
                                 </div>
                             </div>
@@ -638,7 +713,7 @@
                             Employee Information
                         </h4>
 
-                        @can('setDocs',$employee)
+                        @can('setDocs', $employee)
                             <button type="button" class="text-slate-900 dark:text-white"
                                 wire:click="openEditEmployeeInfoModal">
                                 <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
@@ -651,24 +726,24 @@
                                 <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Insurance
                                         Number</label>
-                                    <div class="text-base text-slate-900 dark:text-white">
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
                                         {{ $employee->info?->insurance_number ?? 'N/A' }}</div>
                                 </div>
                                 <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Insurance
                                         Amount</label>
-                                    <div class="text-base text-slate-900 dark:text-white">
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
                                         {{ $employee->info?->insurance_amount ?? 'N/A' }}</div>
                                 </div>
                                 <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Academic
                                         Qualification</label>
-                                    <div class="text-base text-slate-900 dark:text-white">
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
                                         {{ $employee->info?->academic_qualification ?? 'N/A' }}</div>
                                 </div>
                                 <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">University</label>
-                                    <div class="text-base text-slate-900 dark:text-white">
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
                                         {{ $employee->info?->university ?? 'N/A' }}</div>
                                 </div>
                             </div>
@@ -676,19 +751,19 @@
                                 <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Graduation
                                         Year</label>
-                                    <div class="text-base text-slate-900 dark:text-white">
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
                                         {{ $employee->info?->graduation_year ?? 'N/A' }}</div>
                                 </div>
                                 <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Military
                                         Status</label>
-                                    <div class="text-base text-slate-900 dark:text-white">
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
                                         {{ $employee->info?->military_status ?? 'N/A' }}</div>
                                 </div>
                                 <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Marital
                                         Status</label>
-                                    <div class="text-base text-slate-900 dark:text-white">
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
                                         {{ $employee->info?->marital_status ?? 'N/A' }}</div>
                                 </div>
                             </div>
@@ -703,10 +778,10 @@
                             ID Card Information
                         </h4>
 
-                        @can('setDocs',$employee)
-                        <button type="button" class="text-slate-900 dark:text-white"
-                            wire:click="openEditIdCardModal">
-                            <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
+                        @can('setDocs', $employee)
+                            <button type="button" class="text-slate-900 dark:text-white"
+                                wire:click="openEditIdCardModal">
+                                <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
                             </button>
                         @endcan
                     </div>
@@ -782,11 +857,11 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No ID Card Document Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload an ID card document for this employee</p>
-                                @can('setDocs',$employee)
-                                <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
-                                    wire:click="openEditIdCardModal">
-                                    <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
-                                        class="mr-1"></iconify-icon>
+                                @can('setDocs', $employee)
+                                    <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                        wire:click="openEditIdCardModal">
+                                        <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                            class="mr-1"></iconify-icon>
                                         Upload ID Card
                                     </button>
                                 @endcan
@@ -802,11 +877,11 @@
                             Birth Certificate Information
                         </h4>
 
-                        @can('setDocs',$employee)
-                        <button type="button" class="text-slate-900 dark:text-white"
-                            wire:click="openEditBirthCertificateModal">
-                            <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
-                        </button>
+                        @can('setDocs', $employee)
+                            <button type="button" class="text-slate-900 dark:text-white"
+                                wire:click="openEditBirthCertificateModal">
+                                <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
+                            </button>
                         @endcan
                     </div>
                     <div class="card-body p-6">
@@ -892,11 +967,11 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No Birth Certificate Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload a birth certificate for this employee</p>
-                                @can('setDocs',$employee)
-                                <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
-                                    wire:click="openEditBirthCertificateModal">
-                                    <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
-                                        class="mr-1"></iconify-icon>
+                                @can('setDocs', $employee)
+                                    <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                        wire:click="openEditBirthCertificateModal">
+                                        <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                            class="mr-1"></iconify-icon>
                                         Upload Birth Certificate
                                     </button>
                                 @endcan
@@ -912,11 +987,11 @@
                             Army Service Paper Information
                         </h4>
 
-                        @can('setDocs',$employee)
-                        <button type="button" class="text-slate-900 dark:text-white"
-                            wire:click="openEditArmyServicePaperModal">
-                            <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
-                        </button>
+                        @can('setDocs', $employee)
+                            <button type="button" class="text-slate-900 dark:text-white"
+                                wire:click="openEditArmyServicePaperModal">
+                                <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
+                            </button>
                         @endcan
                     </div>
                     <div class="card-body p-6">
@@ -998,11 +1073,11 @@
                                 <h5 class="text-xl font-semibold mb-4">No Army Service Paper Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload an army service paper for this employee
                                 </p>
-                                @can('setDocs',$employee)
-                                <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
-                                    wire:click="openEditArmyServicePaperModal">
-                                    <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
-                                        class="mr-1"></iconify-icon>
+                                @can('setDocs', $employee)
+                                    <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                        wire:click="openEditArmyServicePaperModal">
+                                        <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                            class="mr-1"></iconify-icon>
                                         Upload Army Service Paper
                                     </button>
                                 @endcan
@@ -1018,11 +1093,11 @@
                             Driver License Information
                         </h4>
 
-                        @can('setDocs',$employee)
-                        <button type="button" class="text-slate-900 dark:text-white"
-                            wire:click="openEditDriverLicenseModal">
-                            <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
-                        </button>
+                        @can('setDocs', $employee)
+                            <button type="button" class="text-slate-900 dark:text-white"
+                                wire:click="openEditDriverLicenseModal">
+                                <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
+                            </button>
                         @endcan
                     </div>
                     <div class="card-body p-6">
@@ -1094,11 +1169,11 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No Driver License Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload a driver license for this employee</p>
-                                @can('setDocs',$employee)
-                                <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
-                                    wire:click="openEditDriverLicenseModal">
-                                    <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
-                                        class="mr-1"></iconify-icon>
+                                @can('setDocs', $employee)
+                                    <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                        wire:click="openEditDriverLicenseModal">
+                                        <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                            class="mr-1"></iconify-icon>
                                         Upload Driver License
                                     </button>
                                 @endcan
@@ -1114,10 +1189,10 @@
                             Employee Contract Information
                         </h4>
 
-                        @can('setDocs',$employee)
-                        <button wire:click="openEditEmployeeContractModal" class="action-btn" type="button">
-                            <iconify-icon icon="heroicons:plus"></iconify-icon>
-                        </button>
+                        @can('setDocs', $employee)
+                            <button wire:click="openEditEmployeeContractModal" class="action-btn" type="button">
+                                <iconify-icon icon="heroicons:plus"></iconify-icon>
+                            </button>
                         @endcan
                     </div>
                     <div class="card-body p-6">
@@ -1127,18 +1202,18 @@
                                     <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
                                         <h5 class="card-title text-slate-900 dark:text-white">Contract - Issue Date
                                             {{ $contract->issue_date }}</h5>
-                                        @can('setDocs',$employee)
-                                        <div class="flex space-x-3 rtl:space-x-reverse">
-                                            <button wire:click="openEditSpecificContractModal({{ $contract->id }})"
-                                                class="action-btn" type="button">
-                                                <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
-                                            </button>
-                                            <button
-                                                wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to delete this contract?',color:'danger',callback:'deleteEmployeeContractModal',params:{{ $contract->id }}})"
-                                                class="action-btn" type="button">
-                                                <iconify-icon icon="heroicons:trash"></iconify-icon>
-                                            </button>
-                                        </div>
+                                        @can('setDocs', $employee)
+                                            <div class="flex space-x-3 rtl:space-x-reverse">
+                                                <button wire:click="openEditSpecificContractModal({{ $contract->id }})"
+                                                    class="action-btn" type="button">
+                                                    <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                                                </button>
+                                                <button
+                                                    wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to delete this contract?',color:'danger',callback:'deleteEmployeeContractModal',params:{{ $contract->id }}})"
+                                                    class="action-btn" type="button">
+                                                    <iconify-icon icon="heroicons:trash"></iconify-icon>
+                                                </button>
+                                            </div>
                                         @endcan
                                     </div>
                                     <div class="card-body p-4">
@@ -1206,11 +1281,11 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No Employee Contracts Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload a contract for this employee</p>
-                                @can('setDocs',$employee)
-                                <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
-                                    wire:click="openEditEmployeeContractModal">
-                                    <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
-                                        class="mr-1"></iconify-icon>
+                                @can('setDocs', $employee)
+                                    <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                        wire:click="openEditEmployeeContractModal">
+                                        <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                            class="mr-1"></iconify-icon>
                                         Upload Contract
                                     </button>
                                 @endcan
@@ -1226,11 +1301,11 @@
                             Employee S6 Doc Information
                         </h4>
 
-                        @can('setDocs',$employee)
-                        <button type="button" class="text-slate-900 dark:text-white"
-                            wire:click="openEditEmployeeS6DocModal">
-                            <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
-                        </button>
+                        @can('setDocs', $employee)
+                            <button type="button" class="text-slate-900 dark:text-white"
+                                wire:click="openEditEmployeeS6DocModal">
+                                <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
+                            </button>
                         @endcan
                     </div>
                     <div class="card-body p-6">
@@ -1239,7 +1314,7 @@
                                 <div class="card mb-5">
                                     <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
                                         <h5 class="card-title text-slate-900 dark:text-white">S6 Document</h5>
-                                        @can('setDocs',$employee)
+                                        @can('setDocs', $employee)
                                             <div class="flex space-x-3 rtl:space-x-reverse">
                                                 <button type="button" class="text-slate-900 dark:text-white"
                                                     wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to delete this S6 document?',color:'danger',callback:'deleteEmployeeS6DocModal',params:{{ $s6Doc->id }}})">
@@ -1343,11 +1418,11 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No S6 Documents Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload an S6 document for this employee</p>
-                                @can('setDocs',$employee)
-                                <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
-                                    wire:click="openEditEmployeeS6DocModal">
-                                    <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
-                                        class="mr-1"></iconify-icon>
+                                @can('setDocs', $employee)
+                                    <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                        wire:click="openEditEmployeeS6DocModal">
+                                        <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                            class="mr-1"></iconify-icon>
                                         Upload S6 Document
                                     </button>
                                 @endcan
@@ -1363,10 +1438,10 @@
                             Police Record Information
                         </h4>
 
-                        @can('setDocs',$employee)
-                        <button wire:click="openEditPoliceRecordModal" class="action-btn" type="button">
-                            <iconify-icon icon="heroicons:plus"></iconify-icon>
-                        </button>
+                        @can('setDocs', $employee)
+                            <button wire:click="openEditPoliceRecordModal" class="action-btn" type="button">
+                                <iconify-icon icon="heroicons:plus"></iconify-icon>
+                            </button>
                         @endcan
                     </div>
                     <div class="card-body p-6">
@@ -1377,19 +1452,19 @@
                                         <h5 class="card-title text-slate-900 dark:text-white">Police Record - Issue
                                             Date
                                             {{ $record->issue_date }}</h5>
-                                        @can('setDocs',$employee)
-                                        <div class="flex space-x-3 rtl:space-x-reverse">
-                                            <button
-                                                wire:click="openEditSpecificPoliceRecordModal({{ $record->id }})"
-                                                class="action-btn" type="button">
-                                                <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
-                                            </button>
-                                            <button
-                                                wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to delete this police record?',color:'danger',callback:'deletePoliceRecordModal',params:{{ $record->id }}})"
-                                                class="action-btn" type="button">
-                                                <iconify-icon icon="heroicons:trash"></iconify-icon>
-                                            </button>
-                                        </div>
+                                        @can('setDocs', $employee)
+                                            <div class="flex space-x-3 rtl:space-x-reverse">
+                                                <button
+                                                    wire:click="openEditSpecificPoliceRecordModal({{ $record->id }})"
+                                                    class="action-btn" type="button">
+                                                    <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                                                </button>
+                                                <button
+                                                    wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to delete this police record?',color:'danger',callback:'deletePoliceRecordModal',params:{{ $record->id }}})"
+                                                    class="action-btn" type="button">
+                                                    <iconify-icon icon="heroicons:trash"></iconify-icon>
+                                                </button>
+                                            </div>
                                         @endcan
                                     </div>
                                     <div class="card-body p-4">
@@ -1416,7 +1491,8 @@
                                                 <div class="flex justify-between">
                                                     <span class="text-sm text-slate-500 dark:text-slate-400">Issue
                                                         Date:</span>
-                                                    <span class="text-sm font-medium">{{ $record->issue_date }}</span>
+                                                    <span
+                                                        class="text-sm font-medium">{{ $record->issue_date }}</span>
                                                 </div>
                                                 <div class="flex justify-between">
                                                     <span class="text-sm text-slate-500 dark:text-slate-400">Expiry
@@ -1456,13 +1532,13 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No Police Records Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload a police record for this employee</p>
-                                @can('setDocs',$employee)
-                                <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
-                                    wire:click="openEditPoliceRecordModal">
-                                    <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
-                                        class="mr-1"></iconify-icon>
-                                    Upload Police Record
-                                </button>
+                                @can('setDocs', $employee)
+                                    <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                        wire:click="openEditPoliceRecordModal">
+                                        <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                            class="mr-1"></iconify-icon>
+                                        Upload Police Record
+                                    </button>
                                 @endcan
                             </div>
                         @endif
@@ -1476,10 +1552,10 @@
                             HR Letter Information
                         </h4>
 
-                        @can('setDocs',$employee)
-                        <button wire:click="openEditHrLetterModal" class="action-btn" type="button">
-                            <iconify-icon icon="heroicons:plus"></iconify-icon>
-                        </button>
+                        @can('setDocs', $employee)
+                            <button wire:click="openEditHrLetterModal" class="action-btn" type="button">
+                                <iconify-icon icon="heroicons:plus"></iconify-icon>
+                            </button>
                         @endcan
                     </div>
                     <div class="card-body p-6">
@@ -1489,7 +1565,7 @@
                                     <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
                                         <h5 class="card-title text-slate-900 dark:text-white">HR Letter - Issue Date
                                             {{ $letter->issue_date }}</h5>
-                                        @can('setDocs',$employee)
+                                        @can('setDocs', $employee)
                                             <div class="flex space-x-3 rtl:space-x-reverse">
                                                 <button wire:click="openEditSpecificHrLetterModal({{ $letter->id }})"
                                                     class="action-btn" type="button">
@@ -1527,7 +1603,8 @@
                                                 <div class="flex justify-between">
                                                     <span class="text-sm text-slate-500 dark:text-slate-400">Issue
                                                         Date:</span>
-                                                    <span class="text-sm font-medium">{{ $letter->issue_date }}</span>
+                                                    <span
+                                                        class="text-sm font-medium">{{ $letter->issue_date }}</span>
                                                 </div>
                                                 <div class="flex justify-between">
                                                     <span class="text-sm text-slate-500 dark:text-slate-400">Expiry
@@ -1567,19 +1644,19 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No HR Letters Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload an HR letter for this employee</p>
-                                @can('setDocs',$employee)
-                                <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
-                                    wire:click="openEditHrLetterModal">
-                                    <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
-                                        class="mr-1"></iconify-icon>
-                                    Upload HR Letter
-                                </button>
+                                @can('setDocs', $employee)
+                                    <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                        wire:click="openEditHrLetterModal">
+                                        <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                            class="mr-1"></iconify-icon>
+                                        Upload HR Letter
+                                    </button>
                                 @endcan
                             </div>
                         @endif
                     </div>
                 </div>
-                @elseif ($section === 'work_declaration')
+            @elseif ($section === 'work_declaration')
                 <div class="card">
                     <div class="card-header flex justify-between items-center">
                         <h4
@@ -1587,10 +1664,10 @@
                             Work Declaration Information
                         </h4>
 
-                        @can('setDocs',$employee)
-                        <button wire:click="openEditWorkDeclarationModal" class="action-btn" type="button">
-                            <iconify-icon icon="heroicons:plus"></iconify-icon>
-                        </button>
+                        @can('setDocs', $employee)
+                            <button wire:click="openEditWorkDeclarationModal" class="action-btn" type="button">
+                                <iconify-icon icon="heroicons:plus"></iconify-icon>
+                            </button>
                         @endcan
                     </div>
                     <div class="card-body p-6">
@@ -1598,20 +1675,22 @@
                             @foreach ($employee->workDeclarations as $declaration)
                                 <div class="card border border-slate-200 dark:border-slate-700 mb-5">
                                     <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
-                                        <h5 class="card-title text-slate-900 dark:text-white">Work Declaration - Issue Date
+                                        <h5 class="card-title text-slate-900 dark:text-white">Work Declaration - Issue
+                                            Date
                                             {{ $declaration->issue_date }}</h5>
-                                        @can('setDocs',$employee)
-                                        <div class="flex space-x-3 rtl:space-x-reverse">
-                                            <button wire:click="openEditSpecificWorkDeclarationModal({{ $declaration->id }})"
-                                                class="action-btn" type="button">
-                                                <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
-                                            </button>
-                                            <button
-                                                wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to delete this Work Declaration?',color:'danger',callback:'deleteWorkDeclarationModal',params:{{ $declaration->id }}})"
-                                                class="action-btn" type="button">
-                                                <iconify-icon icon="heroicons:trash"></iconify-icon>
-                                            </button>
-                                        </div>
+                                        @can('setDocs', $employee)
+                                            <div class="flex space-x-3 rtl:space-x-reverse">
+                                                <button
+                                                    wire:click="openEditSpecificWorkDeclarationModal({{ $declaration->id }})"
+                                                    class="action-btn" type="button">
+                                                    <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                                                </button>
+                                                <button
+                                                    wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to delete this Work Declaration?',color:'danger',callback:'deleteWorkDeclarationModal',params:{{ $declaration->id }}})"
+                                                    class="action-btn" type="button">
+                                                    <iconify-icon icon="heroicons:trash"></iconify-icon>
+                                                </button>
+                                            </div>
                                         @endcan
                                     </div>
                                     <div class="card-body p-4">
@@ -1638,7 +1717,8 @@
                                                 <div class="flex justify-between">
                                                     <span class="text-sm text-slate-500 dark:text-slate-400">Issue
                                                         Date:</span>
-                                                    <span class="text-sm font-medium">{{ $declaration->issue_date }}</span>
+                                                    <span
+                                                        class="text-sm font-medium">{{ $declaration->issue_date }}</span>
                                                 </div>
                                                 <div class="flex justify-between">
                                                     <span class="text-sm text-slate-500 dark:text-slate-400">Expiry
@@ -1649,7 +1729,8 @@
 
                                                 <!-- Download Button -->
                                                 <div class="mt-3">
-                                                    <button wire:click="downloadWorkDeclaration({{ $declaration->id }})"
+                                                    <button
+                                                        wire:click="downloadWorkDeclaration({{ $declaration->id }})"
                                                         type="button" class="btn btn-dark btn-sm">
                                                         <span class="inline-flex items-center justify-center"
                                                             wire:loading.remove
@@ -1678,13 +1759,13 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No Work Declarations Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload a Work Declaration for this employee</p>
-                                @can('setDocs',$employee)
-                                <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
-                                    wire:click="openEditWorkDeclarationModal">
-                                    <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
-                                        class="mr-1"></iconify-icon>
-                                    Upload Work Declaration
-                                </button>
+                                @can('setDocs', $employee)
+                                    <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                        wire:click="openEditWorkDeclarationModal">
+                                        <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                            class="mr-1"></iconify-icon>
+                                        Upload Work Declaration
+                                    </button>
                                 @endcan
                             </div>
                         @endif
@@ -1698,11 +1779,11 @@
                             Employee S1 Doc Information
                         </h4>
 
-                        @can('setDocs',$employee)
-                        <button type="button" class="text-slate-900 dark:text-white"
-                            wire:click="openEditEmployeeS1DocModal">
-                            <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
-                        </button>
+                        @can('setDocs', $employee)
+                            <button type="button" class="text-slate-900 dark:text-white"
+                                wire:click="openEditEmployeeS1DocModal">
+                                <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
+                            </button>
                         @endcan
                     </div>
                     <div class="card-body p-6">
@@ -1780,13 +1861,13 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No Employee S1 Doc Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload an S1 document for this employee</p>
-                                @can('setDocs',$employee)
-                                <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
-                                    wire:click="openEditEmployeeS1DocModal">
-                                    <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
-                                        class="mr-1"></iconify-icon>
-                                    Upload S1 Document
-                                </button>
+                                @can('setDocs', $employee)
+                                    <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                        wire:click="openEditEmployeeS1DocModal">
+                                        <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                            class="mr-1"></iconify-icon>
+                                        Upload S1 Document
+                                    </button>
                                 @endcan
                             </div>
                         @endif
@@ -1800,10 +1881,10 @@
                             Employee S2 Doc Information
                         </h4>
 
-                        @can('setDocs',$employee)
-                        <button wire:click="openEditEmployeeS2DocModal" class="action-btn" type="button">
-                            <iconify-icon icon="heroicons:plus"></iconify-icon>
-                        </button>
+                        @can('setDocs', $employee)
+                            <button wire:click="openEditEmployeeS2DocModal" class="action-btn" type="button">
+                                <iconify-icon icon="heroicons:plus"></iconify-icon>
+                            </button>
                         @endcan
                     </div>
                     <div class="card-body p-6">
@@ -1826,18 +1907,18 @@
                                     <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
                                         <h5 class="card-title text-slate-900 dark:text-white">S2 Doc - Year
                                             {{ $s2Doc->year }}</h5>
-                                        @can('setDocs',$employee)
-                                        <div class="flex space-x-3 rtl:space-x-reverse">
-                                            <button wire:click="openEditSpecificS2DocModal({{ $s2Doc->id }})"
-                                                class="action-btn" type="button">
-                                                <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
-                                            </button>
-                                            <button
-                                                wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to delete this S2 document?',color:'danger',callback:'deleteEmployeeS2DocModal',params:{{ $s2Doc->id }}})"
-                                                class="action-btn" type="button">
-                                                <iconify-icon icon="heroicons:trash"></iconify-icon>
-                                            </button>
-                                        </div>
+                                        @can('setDocs', $employee)
+                                            <div class="flex space-x-3 rtl:space-x-reverse">
+                                                <button wire:click="openEditSpecificS2DocModal({{ $s2Doc->id }})"
+                                                    class="action-btn" type="button">
+                                                    <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                                                </button>
+                                                <button
+                                                    wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to delete this S2 document?',color:'danger',callback:'deleteEmployeeS2DocModal',params:{{ $s2Doc->id }}})"
+                                                    class="action-btn" type="button">
+                                                    <iconify-icon icon="heroicons:trash"></iconify-icon>
+                                                </button>
+                                            </div>
                                         @endcan
                                     </div>
                                     <div class="card-body p-4">
@@ -1874,7 +1955,8 @@
                                                 <div class="flex justify-between">
                                                     <span class="text-sm text-slate-500 dark:text-slate-400">Issue
                                                         Date:</span>
-                                                    <span class="text-sm font-medium">{{ $s2Doc->issue_date }}</span>
+                                                    <span
+                                                        class="text-sm font-medium">{{ $s2Doc->issue_date }}</span>
                                                 </div>
                                                 <div class="flex justify-between">
                                                     <span class="text-sm text-slate-500 dark:text-slate-400">Expiry
@@ -1914,13 +1996,13 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No Employee S2 Docs Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload an S2 document for this employee</p>
-                                @can('setDocs',$employee)
-                                <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
-                                    wire:click="openEditEmployeeS2DocModal">
-                                    <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
-                                        class="mr-1"></iconify-icon>
-                                    Upload S2 Document
-                                </button>
+                                @can('setDocs', $employee)
+                                    <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                        wire:click="openEditEmployeeS2DocModal">
+                                        <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                            class="mr-1"></iconify-icon>
+                                        Upload S2 Document
+                                    </button>
                                 @endcan
                             </div>
                         @endif
@@ -1934,10 +2016,10 @@
                             Medical Record Information
                         </h4>
 
-                        @can('setDocs',$employee)
-                        <button wire:click="openEditMedicalRecordModal" class="action-btn" type="button">
-                            <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
-                        </button>
+                        @can('setDocs', $employee)
+                            <button wire:click="openEditMedicalRecordModal" class="action-btn" type="button">
+                                <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                            </button>
                         @endcan
                     </div>
                     <div class="card-body p-6">
@@ -1982,7 +2064,8 @@
                                                     class="text-sm font-medium">{{ $employee->medicalRecord->expiry_date ?? 'N/A' }}</span>
                                             </div>
                                             <div class="flex justify-between">
-                                                <span class="text-sm text-slate-500 dark:text-slate-400">Status:</span>
+                                                <span
+                                                    class="text-sm text-slate-500 dark:text-slate-400">Status:</span>
                                                 <span
                                                     class="text-sm font-medium">{{ $employee->medicalRecord->status }}</span>
                                             </div>
@@ -2047,40 +2130,41 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No Medical Record Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload a medical record for this employee</p>
-                                @can('setDocs',$employee)
-                                <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
-                                    wire:click="openEditMedicalRecordModal">
-                                    <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
-                                        class="mr-1"></iconify-icon>
-                                    Upload Medical Record
-                                </button>
+                                @can('setDocs', $employee)
+                                    <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                        wire:click="openEditMedicalRecordModal">
+                                        <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                            class="mr-1"></iconify-icon>
+                                        Upload Medical Record
+                                    </button>
                                 @endcan
                             </div>
                         @endif
 
-                        
+
                     </div>
                 </div>
-            
             @elseif ($section == 'external_medical_record')
                 <!-- External Medical Record Section -->
                 <div class="card">
                     <div class="card-header flex justify-between items-center">
-                        <h4 class="font-medium lg:text-xl text-lg capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
-                        External Medical Record
+                        <h4
+                            class="font-medium lg:text-xl text-lg capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
+                            External Medical Record
                         </h4>
 
-                        @can('setDocs',$employee)
-                        <button wire:click="openEditExternalMedicalRecordModal" class="action-btn" type="button">
-                            <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
-                        </button>
+                        @can('setDocs', $employee)
+                            <button wire:click="openEditExternalMedicalRecordModal" class="action-btn" type="button">
+                                <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                            </button>
                         @endcan
                     </div>
 
                     @if ($employee->externalMedicalRecord)
                         <div class="card border border-slate-200 dark:border-slate-700 mb-5">
                             <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
-                                <h5 class="card-title text-slate-900 dark:text-white">External Medical Record - Issue Date
+                                <h5 class="card-title text-slate-900 dark:text-white">External Medical Record - Issue
+                                    Date
                                     {{ $employee->externalMedicalRecord->issue_date }}</h5>
                             </div>
                             <div class="card-body p-4">
@@ -2088,7 +2172,9 @@
                                     <!-- Document Preview -->
                                     <div class="col-span-3 flex justify-center items-center">
                                         @php
-                                            $fileExt = $this->getFileExtension($employee->externalMedicalRecord->file_path);
+                                            $fileExt = $this->getFileExtension(
+                                                $employee->externalMedicalRecord->file_path,
+                                            );
                                         @endphp
 
                                         @if ($fileExt == 'pdf')
@@ -2107,15 +2193,20 @@
                                     <div class="col-span-1 pl-4 space-y-2">
                                         <div class="flex justify-between">
                                             <span class="text-sm text-slate-500 dark:text-slate-400">ID Number:</span>
-                                            <span class="text-sm font-medium">{{ $employee->externalMedicalRecord->id_number }}</span>
+                                            <span
+                                                class="text-sm font-medium">{{ $employee->externalMedicalRecord->id_number }}</span>
                                         </div>
                                         <div class="flex justify-between">
-                                            <span class="text-sm text-slate-500 dark:text-slate-400">Issue Date:</span>
-                                            <span class="text-sm font-medium">{{ $employee->externalMedicalRecord->issue_date }}</span>
+                                            <span class="text-sm text-slate-500 dark:text-slate-400">Issue
+                                                Date:</span>
+                                            <span
+                                                class="text-sm font-medium">{{ $employee->externalMedicalRecord->issue_date }}</span>
                                         </div>
                                         <div class="flex justify-between">
-                                            <span class="text-sm text-slate-500 dark:text-slate-400">Expiry Date:</span>
-                                            <span class="text-sm font-medium">{{ $employee->externalMedicalRecord->expiry_date ?? 'N/A' }}</span>
+                                            <span class="text-sm text-slate-500 dark:text-slate-400">Expiry
+                                                Date:</span>
+                                            <span
+                                                class="text-sm font-medium">{{ $employee->externalMedicalRecord->expiry_date ?? 'N/A' }}</span>
                                         </div>
 
                                         <!-- Download Button -->
@@ -2145,31 +2236,32 @@
                                     class="text-slate-400"></iconify-icon>
                             </div>
                             <h5 class="text-xl font-semibold mb-4">No External Medical Record Found</h5>
-                            <p class="text-slate-500 mb-5">Please upload an external medical record for this employee</p>
-                            @can('setDocs',$employee)
-                            <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
-                                wire:click="openEditExternalMedicalRecordModal">
-                                <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
-                                    class="mr-1"></iconify-icon>
-                                Upload External Medical Record
-                            </button>
+                            <p class="text-slate-500 mb-5">Please upload an external medical record for this employee
+                            </p>
+                            @can('setDocs', $employee)
+                                <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                    wire:click="openEditExternalMedicalRecordModal">
+                                    <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                        class="mr-1"></iconify-icon>
+                                    Upload External Medical Record
+                                </button>
                             @endcan
                         </div>
                     @endif
                 </div>
-
             @elseif ($section == 'practice_card')
                 <!-- Practice Card Section -->
                 <div class="card">
                     <div class="card-header flex justify-between items-center">
-                        <h4 class="font-medium lg:text-xl text-lg capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
-                        Practice Card
+                        <h4
+                            class="font-medium lg:text-xl text-lg capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
+                            Practice Card
                         </h4>
 
-                        @can('setDocs',$employee)
-                        <button wire:click="openEditPracticeCardModal" class="action-btn" type="button">
-                            <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
-                        </button>
+                        @can('setDocs', $employee)
+                            <button wire:click="openEditPracticeCardModal" class="action-btn" type="button">
+                                <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                            </button>
                         @endcan
                     </div>
 
@@ -2202,12 +2294,16 @@
                                     <!-- Document Info -->
                                     <div class="col-span-1 pl-4 space-y-2">
                                         <div class="flex justify-between">
-                                            <span class="text-sm text-slate-500 dark:text-slate-400">Issue Date:</span>
-                                            <span class="text-sm font-medium">{{ $employee->practiceCard->issue_date }}</span>
+                                            <span class="text-sm text-slate-500 dark:text-slate-400">Issue
+                                                Date:</span>
+                                            <span
+                                                class="text-sm font-medium">{{ $employee->practiceCard->issue_date }}</span>
                                         </div>
                                         <div class="flex justify-between">
-                                            <span class="text-sm text-slate-500 dark:text-slate-400">Expiry Date:</span>
-                                            <span class="text-sm font-medium">{{ $employee->practiceCard->expiry_date ?? 'N/A' }}</span>
+                                            <span class="text-sm text-slate-500 dark:text-slate-400">Expiry
+                                                Date:</span>
+                                            <span
+                                                class="text-sm font-medium">{{ $employee->practiceCard->expiry_date ?? 'N/A' }}</span>
                                         </div>
 
                                         <!-- Download Button -->
@@ -2238,37 +2334,38 @@
                             </div>
                             <h5 class="text-xl font-semibold mb-4">No Practice Card Found</h5>
                             <p class="text-slate-500 mb-5">Please upload a practice card for this employee</p>
-                            @can('setDocs',$employee)
-                            <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
-                                wire:click="openEditPracticeCardModal">
-                                <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
-                                    class="mr-1"></iconify-icon>
-                                Upload Practice Card
-                            </button>
+                            @can('setDocs', $employee)
+                                <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                    wire:click="openEditPracticeCardModal">
+                                    <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                        class="mr-1"></iconify-icon>
+                                    Upload Practice Card
+                                </button>
                             @endcan
                         </div>
                     @endif
                 </div>
-
             @elseif ($section == 'skills_qualification')
                 <!-- Skills Qualification Section -->
                 <div class="card">
                     <div class="card-header flex justify-between items-center">
-                        <h4 class="font-medium lg:text-xl text-lg capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
-                        Skills Qualification
+                        <h4
+                            class="font-medium lg:text-xl text-lg capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
+                            Skills Qualification
                         </h4>
 
-                        @can('setDocs',$employee)
-                        <button wire:click="openEditSkillsQualificationModal" class="action-btn" type="button">
-                            <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
-                        </button>
+                        @can('setDocs', $employee)
+                            <button wire:click="openEditSkillsQualificationModal" class="action-btn" type="button">
+                                <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                            </button>
                         @endcan
                     </div>
 
                     @if ($employee->skillsQualifications)
                         <div class="card border border-slate-200 dark:border-slate-700 mb-5">
                             <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
-                                <h5 class="card-title text-slate-900 dark:text-white">Skills Qualification - Issue Date
+                                <h5 class="card-title text-slate-900 dark:text-white">Skills Qualification - Issue
+                                    Date
                                     {{ $employee->skillsQualifications->issue_date }}</h5>
                             </div>
                             <div class="card-body p-4">
@@ -2276,7 +2373,9 @@
                                     <!-- Document Preview -->
                                     <div class="col-span-3 flex justify-center items-center">
                                         @php
-                                            $fileExt = $this->getFileExtension($employee->skillsQualifications->file_path);
+                                            $fileExt = $this->getFileExtension(
+                                                $employee->skillsQualifications->file_path,
+                                            );
                                         @endphp
 
                                         @if ($fileExt == 'pdf')
@@ -2294,12 +2393,16 @@
                                     <!-- Document Info -->
                                     <div class="col-span-1 pl-4 space-y-2">
                                         <div class="flex justify-between">
-                                            <span class="text-sm text-slate-500 dark:text-slate-400">Issue Date:</span>
-                                            <span class="text-sm font-medium">{{ $employee->skillsQualifications->issue_date }}</span>
+                                            <span class="text-sm text-slate-500 dark:text-slate-400">Issue
+                                                Date:</span>
+                                            <span
+                                                class="text-sm font-medium">{{ $employee->skillsQualifications->issue_date }}</span>
                                         </div>
                                         <div class="flex justify-between">
-                                            <span class="text-sm text-slate-500 dark:text-slate-400">Expiry Date:</span>
-                                            <span class="text-sm font-medium">{{ $employee->skillsQualifications->expiry_date ?? 'N/A' }}</span>
+                                            <span class="text-sm text-slate-500 dark:text-slate-400">Expiry
+                                                Date:</span>
+                                            <span
+                                                class="text-sm font-medium">{{ $employee->skillsQualifications->expiry_date ?? 'N/A' }}</span>
                                         </div>
 
                                         <!-- Download Button -->
@@ -2330,30 +2433,30 @@
                             </div>
                             <h5 class="text-xl font-semibold mb-4">No Skills Qualification Found</h5>
                             <p class="text-slate-500 mb-5">Please upload a skills qualification for this employee</p>
-                            @can('setDocs',$employee)
-                            <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
-                                wire:click="openEditSkillsQualificationModal">
-                                <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
-                                    class="mr-1"></iconify-icon>
-                                Upload Skills Qualification
-                            </button>
+                            @can('setDocs', $employee)
+                                <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                    wire:click="openEditSkillsQualificationModal">
+                                    <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                        class="mr-1"></iconify-icon>
+                                    Upload Skills Qualification
+                                </button>
                             @endcan
                         </div>
                     @endif
                 </div>
-
             @elseif ($section == 'syndicate_card')
                 <!-- Syndicate Card Section -->
                 <div class="card">
                     <div class="card-header flex justify-between items-center">
-                        <h4 class="font-medium lg:text-xl text-lg capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
-                        Syndicate Card
+                        <h4
+                            class="font-medium lg:text-xl text-lg capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
+                            Syndicate Card
                         </h4>
 
-                        @can('setDocs',$employee)
-                        <button wire:click="openEditSyndicateCardModal" class="action-btn" type="button">
-                            <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
-                        </button>
+                        @can('setDocs', $employee)
+                            <button wire:click="openEditSyndicateCardModal" class="action-btn" type="button">
+                                <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                            </button>
                         @endcan
                     </div>
 
@@ -2386,12 +2489,16 @@
                                     <!-- Document Info -->
                                     <div class="col-span-1 pl-4 space-y-2">
                                         <div class="flex justify-between">
-                                            <span class="text-sm text-slate-500 dark:text-slate-400">Issue Date:</span>
-                                            <span class="text-sm font-medium">{{ $employee->syndicateCard->issue_date }}</span>
+                                            <span class="text-sm text-slate-500 dark:text-slate-400">Issue
+                                                Date:</span>
+                                            <span
+                                                class="text-sm font-medium">{{ $employee->syndicateCard->issue_date }}</span>
                                         </div>
                                         <div class="flex justify-between">
-                                            <span class="text-sm text-slate-500 dark:text-slate-400">Expiry Date:</span>
-                                            <span class="text-sm font-medium">{{ $employee->syndicateCard->expiry_date ?? 'N/A' }}</span>
+                                            <span class="text-sm text-slate-500 dark:text-slate-400">Expiry
+                                                Date:</span>
+                                            <span
+                                                class="text-sm font-medium">{{ $employee->syndicateCard->expiry_date ?? 'N/A' }}</span>
                                         </div>
 
                                         <!-- Download Button -->
@@ -2422,13 +2529,13 @@
                             </div>
                             <h5 class="text-xl font-semibold mb-4">No Syndicate Card Found</h5>
                             <p class="text-slate-500 mb-5">Please upload a syndicate card for this employee</p>
-                            @can('setDocs',$employee)
-                            <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
-                                wire:click="openEditSyndicateCardModal">
-                                <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
-                                    class="mr-1"></iconify-icon>
-                                Upload Syndicate Card
-                            </button>
+                            @can('setDocs', $employee)
+                                <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                    wire:click="openEditSyndicateCardModal">
+                                    <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                        class="mr-1"></iconify-icon>
+                                    Upload Syndicate Card
+                                </button>
                             @endcan
                         </div>
                     @endif
@@ -2651,6 +2758,15 @@
                                         @enderror
                                     </div>
                                     <div class="col-span-12 xl:col-span-6">
+                                        <label for="name_ar" class="form-label">Arabic Name</label>
+                                        <input type="text"
+                                            class="form-control @error('name_ar') !border-danger-500 @enderror"
+                                            wire:model="name_ar">
+                                        @error('name_ar')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-span-12 xl:col-span-6">
                                         <label for="email" class="form-label">Email</label>
                                         <input type="email"
                                             class="form-control @error('email') !border-danger-500 @enderror"
@@ -2674,6 +2790,15 @@
                                             class="form-control @error('address') !border-danger-500 @enderror"
                                             wire:model="address">
                                         @error('address')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-span-12 xl:col-span-6">
+                                        <label for="mother_name" class="form-label">Mother Name</label>
+                                        <input type="text"
+                                            class="form-control @error('mother_name') !border-danger-500 @enderror"
+                                            wire:model="mother_name">
+                                        @error('mother_name')
                                             <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
                                         @enderror
                                     </div>
@@ -4545,21 +4670,22 @@
                                 </button>
                             </div>
 
-                            
+
 
                             <!-- Modal body -->
                             <div class="p-6 space-y-4">
                                 <!-- Validation Errors Summary -->
-                            @if ($errors->any())
-                            <div class="p-4 mb-4 text-sm text-danger-700 bg-danger-100 rounded-lg dark:bg-danger-200 dark:text-danger-800" role="alert">
-                                <div class="font-medium">Please fix the following errors:</div>
-                                <ul class="mt-1.5 list-disc list-inside">
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                            @endif
+                                @if ($errors->any())
+                                    <div class="p-4 mb-4 text-sm text-danger-700 bg-danger-100 rounded-lg dark:bg-danger-200 dark:text-danger-800"
+                                        role="alert">
+                                        <div class="font-medium">Please fix the following errors:</div>
+                                        <ul class="mt-1.5 list-disc list-inside">
+                                            @foreach ($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @endif
                                 <div class="grid grid-cols-12 gap-4">
                                     @if (!$keep_existing_medical_record)
                                         <div class="col-span-12">
@@ -4610,9 +4736,8 @@
                                                                 <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF
                                                                     (Max
                                                                     10MB)</p>
-                                                                <input id="medical_record_file_input"
-                                                                    type="file" class="hidden"
-                                                                    wire:model="medical_record_file"
+                                                                <input id="medical_record_file_input" type="file"
+                                                                    class="hidden" wire:model="medical_record_file"
                                                                     accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
                                                             </label>
                                                         @endif
@@ -4772,7 +4897,8 @@
         <div>
             <div id="editExternalMedicalRecordModal"
                 class="modal fade fixed top-0 left-0 show w-full h-full outline-none overflow-x-hidden overflow-y-auto"
-                tabindex="-1" aria-labelledby="editExternalMedicalRecordModalLabel" aria-hidden="true" wire:ignore.self>
+                tabindex="-1" aria-labelledby="editExternalMedicalRecordModalLabel" aria-hidden="true"
+                wire:ignore.self>
                 <div class="modal-dialog relative w-auto pointer-events-none">
                     <div
                         class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
@@ -4799,19 +4925,21 @@
                             <div class="p-6 space-y-4">
                                 <!-- Validation Errors Summary -->
                                 @if ($errors->any())
-                                <div class="p-4 mb-4 text-sm text-danger-700 bg-danger-100 rounded-lg dark:bg-danger-200 dark:text-danger-800" role="alert">
-                                    <div class="font-medium">Please fix the following errors:</div>
-                                    <ul class="mt-1.5 list-disc list-inside">
-                                        @foreach ($errors->all() as $error)
-                                            <li>{{ $error }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
+                                    <div class="p-4 mb-4 text-sm text-danger-700 bg-danger-100 rounded-lg dark:bg-danger-200 dark:text-danger-800"
+                                        role="alert">
+                                        <div class="font-medium">Please fix the following errors:</div>
+                                        <ul class="mt-1.5 list-disc list-inside">
+                                            @foreach ($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
                                 @endif
                                 <div class="grid grid-cols-12 gap-4">
                                     @if (!$keep_existing_external_medical_record)
                                         <div class="col-span-12">
-                                            <label for="external_medical_record_file" class="form-label">External Medical Record
+                                            <label for="external_medical_record_file" class="form-label">External
+                                                Medical Record
                                                 Document
                                                 <iconify-icon wire:loading wire:target="external_medical_record_file"
                                                     icon="line-md:loading-twotone-loop" width="18"
@@ -4832,7 +4960,8 @@
                                                         @endif
                                                     </div>
                                                     <p class="text-sm text-slate-500">
-                                                        {{ $external_medical_record_file->getClientOriginalName() }}</p>
+                                                        {{ $external_medical_record_file->getClientOriginalName() }}
+                                                    </p>
                                                     <button type="button" class="text-sm text-red-500 mt-2"
                                                         wire:click="$set('external_medical_record_file', null)">
                                                         Remove File
@@ -4876,8 +5005,9 @@
                                                             <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF (Max
                                                                 10MB)
                                                             </p>
-                                                            <input id="external_medical_record_file_input" type="file"
-                                                                class="hidden" wire:model="external_medical_record_file"
+                                                            <input id="external_medical_record_file_input"
+                                                                type="file" class="hidden"
+                                                                wire:model="external_medical_record_file"
                                                                 accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
                                                         </label>
                                                     @endif
@@ -4908,7 +5038,8 @@
                                         </div>
                                     @endif
                                     <div class="col-span-12">
-                                        <label for="external_medical_record_id_number" class="form-label">ID Number</label>
+                                        <label for="external_medical_record_id_number" class="form-label">ID
+                                            Number</label>
                                         <input type="text" wire:model="external_medical_record_id_number"
                                             class="form-control @error('external_medical_record_id_number') !border-danger-500 @enderror"
                                             id="external_medical_record_id_number">
@@ -4917,7 +5048,8 @@
                                         @enderror
                                     </div>
                                     <div class="col-span-12">
-                                        <label for="external_medical_record_issue_date" class="form-label">Issue Date</label>
+                                        <label for="external_medical_record_issue_date" class="form-label">Issue
+                                            Date</label>
                                         <input type="date" wire:model="external_medical_record_issue_date"
                                             class="form-control @error('external_medical_record_issue_date') !border-danger-500 @enderror"
                                             id="external_medical_record_issue_date">
@@ -5000,7 +5132,8 @@
                                                             wire:model.live="keep_existing_practice_card">
                                                         <span
                                                             class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
-                                                            <img src="{{ asset('images/icon/ck-white.svg') }}" alt=""
+                                                            <img src="{{ asset('images/icon/ck-white.svg') }}"
+                                                                alt=""
                                                                 class="h-[10px] w-[10px] block m-auto opacity-0" />
                                                         </span>
                                                         <span
@@ -5053,7 +5186,8 @@
                                                         <div class="flex items-center justify-center">
                                                             <label
                                                                 class="cursor-pointer flex flex-col items-center justify-center w-full h-40 rounded-lg  text-slate-500 hover:border-primary-500 transition-colors duration-150">
-                                                                <div class="flex flex-col items-center justify-center">
+                                                                <div
+                                                                    class="flex flex-col items-center justify-center">
                                                                     <iconify-icon
                                                                         icon="heroicons:cloud-arrow-up-solid"
                                                                         class="text-slate-500 text-2xl"></iconify-icon>
@@ -5076,8 +5210,10 @@
                                         @endif
 
                                         <div class="col-span-6">
-                                            <label for="practice_card_issue_date" class="form-label">Issue Date</label>
-                                            <input type="date" class="form-control @error('practice_card_issue_date') !border-danger-500 @enderror"
+                                            <label for="practice_card_issue_date" class="form-label">Issue
+                                                Date</label>
+                                            <input type="date"
+                                                class="form-control @error('practice_card_issue_date') !border-danger-500 @enderror"
                                                 id="practice_card_issue_date" wire:model="practice_card_issue_date">
                                             @error('practice_card_issue_date')
                                                 <span class="text-danger-500 text-sm">{{ $message }}</span>
@@ -5085,9 +5221,12 @@
                                         </div>
 
                                         <div class="col-span-6">
-                                            <label for="practice_card_expiry_date" class="form-label">Expiry Date</label>
-                                            <input type="date" class="form-control @error('practice_card_expiry_date') !border-danger-500 @enderror"
-                                                id="practice_card_expiry_date" wire:model="practice_card_expiry_date">
+                                            <label for="practice_card_expiry_date" class="form-label">Expiry
+                                                Date</label>
+                                            <input type="date"
+                                                class="form-control @error('practice_card_expiry_date') !border-danger-500 @enderror"
+                                                id="practice_card_expiry_date"
+                                                wire:model="practice_card_expiry_date">
                                             @error('practice_card_expiry_date')
                                                 <span class="text-danger-500 text-sm">{{ $message }}</span>
                                             @enderror
@@ -5123,7 +5262,8 @@
         <div>
             <div id="editSkillsQualificationModal"
                 class="modal fade fixed top-0 left-0 show w-full h-full outline-none overflow-x-hidden overflow-y-auto"
-                tabindex="-1" aria-labelledby="editSkillsQualificationModalLabel" aria-hidden="true" wire:ignore.self>
+                tabindex="-1" aria-labelledby="editSkillsQualificationModalLabel" aria-hidden="true"
+                wire:ignore.self>
                 <div class="modal-dialog relative w-auto pointer-events-none">
                     <div
                         class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
@@ -5157,7 +5297,8 @@
                                                             wire:model.live="keep_existing_skills_qualification">
                                                         <span
                                                             class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
-                                                            <img src="{{ asset('images/icon/ck-white.svg') }}" alt=""
+                                                            <img src="{{ asset('images/icon/ck-white.svg') }}"
+                                                                alt=""
                                                                 class="h-[10px] w-[10px] block m-auto opacity-0" />
                                                         </span>
                                                         <span
@@ -5170,7 +5311,8 @@
 
                                         @if (!$keep_existing_skills_qualification)
                                             <div class="col-span-12">
-                                                <label for="skills_qualification_file" class="form-label">Skills Qualification
+                                                <label for="skills_qualification_file" class="form-label">Skills
+                                                    Qualification
                                                     Document
                                                     <iconify-icon wire:loading wire:target="skills_qualification_file"
                                                         icon="line-md:loading-twotone-loop" width="18"
@@ -5191,7 +5333,8 @@
                                                             @endif
                                                         </div>
                                                         <p class="text-sm text-slate-500">
-                                                            {{ $skills_qualification_file->getClientOriginalName() }}</p>
+                                                            {{ $skills_qualification_file->getClientOriginalName() }}
+                                                        </p>
                                                         <button type="button" class="text-sm text-red-500 mt-2"
                                                             wire:click="$set('skills_qualification_file', null)">
                                                             Remove File
@@ -5210,7 +5353,8 @@
                                                         <div class="flex items-center justify-center">
                                                             <label
                                                                 class="cursor-pointer flex flex-col items-center justify-center w-full h-40 rounded-lg text-slate-500 hover:border-primary-500 transition-colors duration-150">
-                                                                <div class="flex flex-col items-center justify-center">
+                                                                <div
+                                                                    class="flex flex-col items-center justify-center">
                                                                     <iconify-icon
                                                                         icon="heroicons:cloud-arrow-up-solid"
                                                                         class="text-slate-500 text-2xl"></iconify-icon>
@@ -5233,18 +5377,24 @@
                                         @endif
 
                                         <div class="col-span-6">
-                                            <label for="skills_qualification_issue_date" class="form-label">Issue Date</label>
-                                            <input type="date" class="form-control @error('skills_qualification_issue_date') !border-danger-500 @enderror"
-                                                id="skills_qualification_issue_date" wire:model="skills_qualification_issue_date">
+                                            <label for="skills_qualification_issue_date" class="form-label">Issue
+                                                Date</label>
+                                            <input type="date"
+                                                class="form-control @error('skills_qualification_issue_date') !border-danger-500 @enderror"
+                                                id="skills_qualification_issue_date"
+                                                wire:model="skills_qualification_issue_date">
                                             @error('skills_qualification_issue_date')
                                                 <span class="text-danger-500 text-sm">{{ $message }}</span>
                                             @enderror
                                         </div>
 
                                         <div class="col-span-6">
-                                            <label for="skills_qualification_expiry_date" class="form-label">Expiry Date</label>
-                                            <input type="date" class="form-control @error('skills_qualification_expiry_date') !border-danger-500 @enderror"
-                                                id="skills_qualification_expiry_date" wire:model="skills_qualification_expiry_date">
+                                            <label for="skills_qualification_expiry_date" class="form-label">Expiry
+                                                Date</label>
+                                            <input type="date"
+                                                class="form-control @error('skills_qualification_expiry_date') !border-danger-500 @enderror"
+                                                id="skills_qualification_expiry_date"
+                                                wire:model="skills_qualification_expiry_date">
                                             @error('skills_qualification_expiry_date')
                                                 <span class="text-danger-500 text-sm">{{ $message }}</span>
                                             @enderror
@@ -5314,7 +5464,8 @@
                                                             wire:model.live="keep_existing_syndicate_card">
                                                         <span
                                                             class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
-                                                            <img src="{{ asset('images/icon/ck-white.svg') }}" alt=""
+                                                            <img src="{{ asset('images/icon/ck-white.svg') }}"
+                                                                alt=""
                                                                 class="h-[10px] w-[10px] block m-auto opacity-0" />
                                                         </span>
                                                         <span
@@ -5367,7 +5518,8 @@
                                                         <div class="flex items-center justify-center">
                                                             <label
                                                                 class="cursor-pointer flex flex-col items-center justify-center w-full h-40 rounded-lg text-slate-500 hover:border-primary-500 transition-colors duration-150">
-                                                                <div class="flex flex-col items-center justify-center">
+                                                                <div
+                                                                    class="flex flex-col items-center justify-center">
                                                                     <iconify-icon
                                                                         icon="heroicons:cloud-arrow-up-solid"
                                                                         class="text-slate-500 text-2xl"></iconify-icon>
@@ -5390,18 +5542,24 @@
                                         @endif
 
                                         <div class="col-span-6">
-                                            <label for="syndicate_card_issue_date" class="form-label">Issue Date</label>
-                                            <input type="date" class="form-control @error('syndicate_card_issue_date') !border-danger-500 @enderror"
-                                                id="syndicate_card_issue_date" wire:model="syndicate_card_issue_date">
+                                            <label for="syndicate_card_issue_date" class="form-label">Issue
+                                                Date</label>
+                                            <input type="date"
+                                                class="form-control @error('syndicate_card_issue_date') !border-danger-500 @enderror"
+                                                id="syndicate_card_issue_date"
+                                                wire:model="syndicate_card_issue_date">
                                             @error('syndicate_card_issue_date')
                                                 <span class="text-danger-500 text-sm">{{ $message }}</span>
                                             @enderror
                                         </div>
 
                                         <div class="col-span-6">
-                                            <label for="syndicate_card_expiry_date" class="form-label">Expiry Date</label>
-                                            <input type="date" class="form-control @error('syndicate_card_expiry_date') !border-danger-500 @enderror"
-                                                id="syndicate_card_expiry_date" wire:model="syndicate_card_expiry_date">
+                                            <label for="syndicate_card_expiry_date" class="form-label">Expiry
+                                                Date</label>
+                                            <input type="date"
+                                                class="form-control @error('syndicate_card_expiry_date') !border-danger-500 @enderror"
+                                                id="syndicate_card_expiry_date"
+                                                wire:model="syndicate_card_expiry_date">
                                             @error('syndicate_card_expiry_date')
                                                 <span class="text-danger-500 text-sm">{{ $message }}</span>
                                             @enderror
@@ -5434,39 +5592,41 @@
 
     <!-- Work Declaration Edit Modal -->
     @if ($editWorkDeclarationModal)
-    <div>
-        <div id="editWorkDeclarationModal"
-            class="modal fade fixed top-0 left-0 show w-full h-full outline-none overflow-x-hidden overflow-y-auto"
-            tabindex="-1" aria-labelledby="editWorkDeclarationModalLabel" aria-hidden="true" wire:ignore.self>
-            <div class="modal-dialog relative w-auto pointer-events-none">
-                <div
-                    class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
-                    <div class="relative bg-white rounded-lg shadow dark:bg-slate-700">
-                        <!-- Modal header -->
-                        <div
-                            class="flex items-center justify-between p-5 border-b rounded-t dark:border-slate-600 bg-black-500">
-                            <h3 class="text-xl font-medium text-white dark:text-white capitalize">
-                                {{ $editing_work_declaration_id ? 'Edit' : 'Add' }} Work Declaration
-                            </h3>
-                            <button wire:click="closeEditWorkDeclarationModal" type="button"
-                                class="text-slate-400 bg-transparent hover:text-slate-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-slate-600 dark:hover:text-white"
-                                data-bs-dismiss="modal">
-                                <svg aria-hidden="true" class="w-5 h-5" fill="#ffffff" viewBox="0 0 20 20"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd"
-                                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                        clip-rule="evenodd"></path>
-                                </svg>
-                                <span class="sr-only">Close modal</span>
-                            </button>
-                        </div>
+        <div>
+            <div id="editWorkDeclarationModal"
+                class="modal fade fixed top-0 left-0 show w-full h-full outline-none overflow-x-hidden overflow-y-auto"
+                tabindex="-1" aria-labelledby="editWorkDeclarationModalLabel" aria-hidden="true"
+                wire:ignore.self>
+                <div class="modal-dialog relative w-auto pointer-events-none">
+                    <div
+                        class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
+                        <div class="relative bg-white rounded-lg shadow dark:bg-slate-700">
+                            <!-- Modal header -->
+                            <div
+                                class="flex items-center justify-between p-5 border-b rounded-t dark:border-slate-600 bg-black-500">
+                                <h3 class="text-xl font-medium text-white dark:text-white capitalize">
+                                    {{ $editing_work_declaration_id ? 'Edit' : 'Add' }} Work Declaration
+                                </h3>
+                                <button wire:click="closeEditWorkDeclarationModal" type="button"
+                                    class="text-slate-400 bg-transparent hover:text-slate-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-slate-600 dark:hover:text-white"
+                                    data-bs-dismiss="modal">
+                                    <svg aria-hidden="true" class="w-5 h-5" fill="#ffffff" viewBox="0 0 20 20"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd"
+                                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span class="sr-only">Close modal</span>
+                                </button>
+                            </div>
 
-                        <!-- Modal body -->
-                        <div class="modal-body p-6">
-                            <div class="grid grid-cols-12 gap-4">
-                                @if (!$keep_existing_work_declaration)
+                            <!-- Modal body -->
+                            <div class="modal-body p-6">
+                                <div class="grid grid-cols-12 gap-4">
+                                    @if (!$keep_existing_work_declaration)
                                         <div class="col-span-12">
-                                            <label for="work_declaration_file" class="form-label">Work Declaration Document
+                                            <label for="work_declaration_file" class="form-label">Work Declaration
+                                                Document
                                                 <iconify-icon wire:loading wire:target="work_declaration_file"
                                                     icon="line-md:loading-twotone-loop" width="18"
                                                     height="18"></iconify-icon></label>
@@ -5511,8 +5671,9 @@
                                                                 <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF
                                                                     (Max
                                                                     2MB)</p>
-                                                                <input id="work_declaration_file_input" type="file"
-                                                                    class="hidden" wire:model="work_declaration_file"
+                                                                <input id="work_declaration_file_input"
+                                                                    type="file" class="hidden"
+                                                                    wire:model="work_declaration_file"
                                                                     accept=".pdf,.jpg,.jpeg,.png">
                                                             </label>
                                                         @endif
@@ -5539,8 +5700,8 @@
                                                 <span class="text-danger-500 text-sm mt-1">{{ $message }}</span>
                                             @enderror
                                         </div>
-                                @endif
-                                @if ($editing_work_declaration_id)
+                                    @endif
+                                    @if ($editing_work_declaration_id)
                                         <div class="col-span-12 form-check">
                                             <div class="checkbox-area">
                                                 <label class="inline-flex items-center cursor-pointer"
@@ -5559,49 +5720,49 @@
                                                 </label>
                                             </div>
                                         </div>
-                                @endif
-                                <div class="col-span-12 xl:col-span-6">
-                                    <label for="work_declaration_issue_date" class="form-label">Issue
-                                        Date</label>
-                                    <input type="date"
-                                        class="form-control @error('work_declaration_issue_date') !border-danger-500 @enderror"
-                                        wire:model="work_declaration_issue_date">
-                                    @error('work_declaration_issue_date')
-                                        <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                                <div class="col-span-12 xl:col-span-6">
-                                    <label for="work_declaration_expiry_date" class="form-label">Expiry Date</label>
-                                    <input type="date"
-                                        class="form-control @error('work_declaration_expiry_date') !border-danger-500 @enderror"
-                                        wire:model="work_declaration_expiry_date">
-                                    @error('work_declaration_expiry_date')
-                                        <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
-                                    @enderror
+                                    @endif
+                                    <div class="col-span-12 xl:col-span-6">
+                                        <label for="work_declaration_issue_date" class="form-label">Issue
+                                            Date</label>
+                                        <input type="date"
+                                            class="form-control @error('work_declaration_issue_date') !border-danger-500 @enderror"
+                                            wire:model="work_declaration_issue_date">
+                                        @error('work_declaration_issue_date')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-span-12 xl:col-span-6">
+                                        <label for="work_declaration_expiry_date" class="form-label">Expiry
+                                            Date</label>
+                                        <input type="date"
+                                            class="form-control @error('work_declaration_expiry_date') !border-danger-500 @enderror"
+                                            wire:model="work_declaration_expiry_date">
+                                        @error('work_declaration_expiry_date')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <!-- Modal footer -->
-                        <div
-                            class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
-                            <button wire:click="closeEditWorkDeclarationModal" type="button"
-                                class="btn inline-flex justify-center btn-outline-dark">Cancel</button>
-                            <button wire:click="updateWorkDeclaration" type="button" wire:target='updateWorkDeclaration'
-                                wire:loading.remove
-                                class="btn inline-flex justify-center btn-dark">{{ $editing_work_declaration_id ? 'Update' : 'Upload' }}</button>
-                            <button wire:loading wire:target="updateWorkDeclaration" type="button"
-                                class="btn inline-flex justify-center btn-dark">
-                                <span class="flex items-center">
-                                    <iconify-icon icon="line-md:loading-twotone-loop" width="25"
-                                        height="25"></iconify-icon>
-                                </span>
-                            </button>
+                            <!-- Modal footer -->
+                            <div
+                                class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
+                                <button wire:click="closeEditWorkDeclarationModal" type="button"
+                                    class="btn inline-flex justify-center btn-outline-dark">Cancel</button>
+                                <button wire:click="updateWorkDeclaration" type="button"
+                                    wire:target='updateWorkDeclaration' wire:loading.remove
+                                    class="btn inline-flex justify-center btn-dark">{{ $editing_work_declaration_id ? 'Update' : 'Upload' }}</button>
+                                <button wire:loading wire:target="updateWorkDeclaration" type="button"
+                                    class="btn inline-flex justify-center btn-dark">
+                                    <span class="flex items-center">
+                                        <iconify-icon icon="line-md:loading-twotone-loop" width="25"
+                                            height="25"></iconify-icon>
+                                    </span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            </div>
         </div>
     @endif
 </div>
-

@@ -41,6 +41,9 @@
                                         {{ __('Phone') }}
                                     </th>
                                     <th scope="col" class=" table-th ">
+                                        {{ __('Status') }}
+                                    </th>
+                                    <th scope="col" class=" table-th ">
                                         {{ __('Actions') }}
                                     </th>
                                 </tr>
@@ -56,6 +59,22 @@
                                         </td>
                                         <td class="table-td">
                                             {{ $employee->phone }}
+                                        </td>
+                                        <td class="table-td">
+                                            @switch($employee->status)
+                                                @case('active')
+                                                    <span class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize">{{ __('Active') }}</span>
+                                                    @break
+                                                @case('suspended')
+                                                    <span class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize">{{ __('Suspended') }}</span>
+                                                    @break
+                                                @case('terminated')
+                                                    <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize">{{ __('Terminated') }}</span>
+                                                    @break
+                                                @case('resigned')
+                                                    <span class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize">{{ __('Resigned') }}</span>
+                                                    @break
+                                            @endswitch
                                         </td>
                                         <td class="table-td">
                                             <a href="{{ route('employees.show', $employee->id) }}" class="btn btn-sm inline-flex justify-center btn-dark">

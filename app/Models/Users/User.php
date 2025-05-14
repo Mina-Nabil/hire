@@ -5,7 +5,10 @@ namespace App\Models\Users;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use App\Exceptions\AppException;
+use App\Models\HrLocationAssignment;
+use App\Models\Hierarchy\Location;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
@@ -192,7 +195,30 @@ class User extends Authenticatable
         $this->save();
     }
 
+    /**
+     * Assign locations to an HR user.
+     * 
+     * @param array $locationIds Array of location IDs to assign to the user
+     * @return void
+     * @throws AppException If the user is not authorized to update assignments
+     */
+    public function setAssignedLocations(array $locationIds): void
+    {
+    
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('update', $this) || !$this->is_hr) {
+            throw new AppException('You are not authorized to update location assignments or this user is not an HR');
+        }
 
+        // Use sync to efficiently manage the pivot relationship
+        // This will add new assignments, keep existing ones, and remove those not in the array
+        try {
+            $this->assignedLocations()->sync($locationIds);
+        } catch (\Exception $e) {
+            throw new AppException('Error assigning locations: ' . $e->getMessage());
+        }
+    }
 
     public function scopeSearch($query, $search)
     {
@@ -236,4 +262,22 @@ class User extends Authenticatable
     {
         return $query->where('type', '!=', self::TYPE_EMPLOYEE);
     }
+
+    /**
+     * Get the location assignments for the HR user.
+     */
+    public function locationAssignments(): HasMany
+    {
+        return $this->hasMany(HrLocationAssignment::class);
+    }
+    
+    /**
+     * Get the locations assigned to the HR user.
+     */
+    public function assignedLocations()
+    {
+        return $this->belongsToMany(Location::class, 'hr_location_assignments');
+    }
+
+    
 }

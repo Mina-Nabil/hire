@@ -39,6 +39,8 @@ class EmployeeShow extends Component
     // Base Info Edit Modal
     public $editBaseInfoModal = false;
     public $name;
+    public $name_ar;
+    public $mother_name;
     public $email;
     public $phone;
     public $address;
@@ -192,6 +194,19 @@ class EmployeeShow extends Component
     public $keep_existing_work_declaration = false;
     public $editing_work_declaration_id = null;
 
+    public $statuses;
+
+    public function changeStatus($status)
+    {
+        $res = $this->employee->setStatus($status);
+        if ($res) {
+            $this->alertSuccess('Status updated successfully!');
+            $this->mount($this->employee->id);
+        } else {
+            $this->alertError();
+        }
+    }
+
     public function mount($id)
     {
         $this->employee = Employee::with([
@@ -216,6 +231,7 @@ class EmployeeShow extends Component
         $this->birthCertificateTypes = BirthCertificate::TYPES;
         $this->armyServicePaperTypes = ArmyServicePaper::TYPES;
         $this->employeeS6DocLeavingReasons = EmployeeS6Doc::LEAVING_REASONS;
+        $this->statuses = Employee::STATUS_LIST;
     }
     
     public function openEditIdCardModal()
@@ -316,6 +332,8 @@ class EmployeeShow extends Component
     {
         $this->resetValidation();
         $this->name = $this->employee->name;
+        $this->name_ar = $this->employee->name_ar;
+        $this->mother_name = $this->employee->mother_name;
         $this->email = $this->employee->email;
         $this->phone = $this->employee->phone;
         $this->address = $this->employee->address;
@@ -336,6 +354,8 @@ class EmployeeShow extends Component
     {
         $this->validate([
             'name' => 'required|string|max:255',
+            'name_ar' => 'required|string|max:255',
+            'mother_name' => 'nullable|string|max:255',
             'email' => 'required|email|max:255',
             'phone' => 'required|string|max:20',
             'address' => 'required|string|max:255',
@@ -348,13 +368,15 @@ class EmployeeShow extends Component
 
             $res = $this->employee->updateBaseInfo(
                 $this->name,
+                $this->name_ar,
                 $this->email,
                 $this->phone,
                 $this->address,
                 $this->nationality,
                 $this->gender,
                 $this->birth_date,
-                $this->employment_date
+                $this->employment_date,
+                $this->mother_name
             );
 
             if ($res) {

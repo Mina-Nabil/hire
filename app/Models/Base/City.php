@@ -3,7 +3,9 @@
 namespace App\Models\Base;
 
 use App\Exceptions\AppException;
+use App\Models\Users\AppLog;
 use App\Models\Users\User;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
@@ -36,7 +38,15 @@ class City extends Model
             throw new AppException(__('misc.not_authorized'));
         }
 
-        return City::create(['name' => $name]);
+        try {
+            $city = City::create(['name' => $name]);
+            AppLog::info('City Created', "Name: $name", loggable: $city);
+            return $city;
+        } catch (Exception $e) {
+            report($e);
+            AppLog::error('Error creating city', $e->getMessage());
+            throw new AppException('Error creating city');
+        }
     }
     
     public function updateCity($name)
@@ -47,7 +57,15 @@ class City extends Model
             throw new AppException(__('misc.not_authorized'));
         }
 
-        return $this->update(['name' => $name]);
+        try {
+            $this->update(['name' => $name]);
+            AppLog::info('City Updated', "Name: $name", loggable: $this);
+            return $this;
+        } catch (Exception $e) {
+            report($e);
+            AppLog::error('Error updating city', $e->getMessage());
+            throw new AppException('Error updating city');
+        }
     }
     
     public function deleteCity()
@@ -60,9 +78,17 @@ class City extends Model
 
         // First check if there are any areas associated with this city
         if ($this->areas()->count() > 0) {
+            AppLog::error('City has areas', "Name: $this->name", loggable: $this);
             throw new AppException(__('areas.city_has_areas'));
         }
-        
-        return $this->delete();
+
+        try {
+            $this->delete();
+            AppLog::info('City Deleted', "Name: $this->name", loggable: $this);
+        } catch (Exception $e) {
+            report($e);
+            AppLog::error('Error deleting city', $e->getMessage(), loggable: $this);
+            throw new AppException('Error deleting city');
+        }
     }
 }

@@ -6,6 +6,7 @@ use App\Exceptions\AppException;
 use App\Models\Base\Area;
 use App\Models\Recruitment\Interviews\Interview;
 use App\Models\Recruitment\JobOffers\JobOffer;
+use App\Models\Users\AppLog;
 use App\Models\Users\Document;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
@@ -220,9 +221,11 @@ class Applicant extends Model
                     'phone' => $phone,
                     'email' =>  $email
                 ], $additionalData));
+                AppLog::info('Applicant Created', 'Applicant. ' . $firstName . ' ' . $lastName . ' created successfully', loggable: $applicant);
             });
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error creating applicant', $e->getMessage());
             throw new AppException('Failed to create applicant: ' . $e->getMessage());
         }
     }
@@ -236,9 +239,12 @@ class Applicant extends Model
     public function updatePersonalInfo(array $data): bool
     {
         try {
-            return $this->update($data);
+            $updated = $this->update($data);
+            AppLog::info('Applicant Updated', 'Applicant. ' . $this->full_name . ' updated successfully', loggable: $this);
+            return $updated;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error updating applicant', $e->getMessage());
             throw new AppException('Failed to update applicant information: ' . $e->getMessage());
         }
     }
@@ -257,9 +263,12 @@ class Applicant extends Model
                 Storage::disk('s3')->delete($this->cv_url);
             }
             $this->cv_url = $cvUrl;
-            return $this->save();
+            $updated = $this->save();
+            AppLog::info('Applicant CV Updated', 'Applicant. ' . $this->full_name . ' CV updated successfully', loggable: $this);
+            return $updated;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error updating CV', $e->getMessage(), loggable: $this);
             throw new AppException('Failed to update CV: ' . $e->getMessage());
         }
     }
@@ -282,10 +291,12 @@ class Applicant extends Model
                     $this->educations()->create($education);
                 }
 
+                AppLog::info('Education Records Set', 'Education records set for applicant: ' . $this->full_name, loggable: $this);
                 return $this;
             });
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error setting education records', $e->getMessage(), loggable: $this);
             throw new AppException('Failed to set education records: ' . $e->getMessage());
         }
     }
@@ -309,10 +320,12 @@ class Applicant extends Model
                     $this->trainings()->create($training);
                 }
 
+                AppLog::info('Training Records Set', 'Training records set for applicant: ' . $this->full_name, loggable: $this);
                 return $this;
             });
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error setting training records', $e->getMessage(), loggable: $this);
             throw new AppException('Failed to set training records: ' . $e->getMessage());
         }
     }
@@ -336,10 +349,12 @@ class Applicant extends Model
                     $this->experiences()->create($experience);
                 }
 
+                AppLog::info('Experience Records Set', 'Experience records set for applicant: ' . $this->full_name, loggable: $this);
                 return $this;
             });
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error setting experience records', $e->getMessage(), loggable: $this);
             throw new AppException('Failed to set experience records: ' . $e->getMessage());
         }
     }
@@ -363,10 +378,12 @@ class Applicant extends Model
                     $this->languages()->create($language);
                 }
 
+                AppLog::info('Language Records Set', 'Language records set for applicant: ' . $this->full_name, loggable: $this);
                 return $this;
             });
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error setting language records', $e->getMessage(), loggable: $this);
             throw new AppException('Failed to set language records: ' . $e->getMessage());
         }
     }
@@ -390,10 +407,12 @@ class Applicant extends Model
                     $this->references()->create($reference);
                 }
 
+                AppLog::info('Reference Records Set', 'Reference records set for applicant: ' . $this->full_name, loggable: $this);
                 return $this;
             });
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error setting reference records', $e->getMessage(), loggable: $this);
             throw new AppException('Failed to set reference records: ' . $e->getMessage());
         }
     }
@@ -417,10 +436,12 @@ class Applicant extends Model
                     $this->skills()->create($skill);
                 }
 
+                AppLog::info('Skill Records Set', 'Skill records set for applicant: ' . $this->full_name, loggable: $this);
                 return $this;
             });
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error setting skill records', $e->getMessage(), loggable: $this);
             throw new AppException('Failed to set skill records: ' . $e->getMessage());
         }
     }
@@ -437,16 +458,19 @@ class Applicant extends Model
     {
         try {
             return DB::transaction(function () use ($hasHealthIssues, $healthIssues) {
-                return $this->health()->updateOrCreate(
+                $healthRecord = $this->health()->updateOrCreate(
                     ['applicant_id' => $this->id],
                     [
                         'has_health_issues' => $hasHealthIssues,
                         'health_issues' => $healthIssues,
                     ]
                 );
+                AppLog::info('Health Record Set', 'Health record set for applicant: ' . $this->full_name, loggable: $this);
+                return $healthRecord;
             });
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error setting health record', $e->getMessage(), loggable: $this);
             throw new AppException('Failed to set health record: ' . $e->getMessage());
         }
     }
@@ -460,9 +484,12 @@ class Applicant extends Model
     public function setImage(string $imageUrl): bool
     {
         try {
-            return $this->update(['image_url' => $imageUrl]);
+            $image = $this->update(['image_url' => $imageUrl]);
+            AppLog::info('Applicant Image Updated', 'Applicant. ' . $this->full_name . ' image updated successfully', loggable: $this);
+            return $image;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error setting profile image', $e->getMessage(), loggable: $this);
             throw new AppException('Failed to set profile image: ' . $e->getMessage());
         }
     }
@@ -476,12 +503,15 @@ class Applicant extends Model
     public function setSignature(string $signatureUrl): bool
     {
         try {
-            return $this->update([
+            $signature = $this->update([
                 'signature_url' => $signatureUrl,
                 'signature_date' => now(),
             ]);
+            AppLog::info('Applicant Signature Updated', 'Applicant. ' . $this->full_name . ' signature updated successfully', loggable: $this);
+            return $signature;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error setting signature', $e->getMessage(), loggable: $this);
             throw new AppException('Failed to set signature: ' . $e->getMessage());
         }
     }
@@ -497,15 +527,18 @@ class Applicant extends Model
     {
         try {
             return DB::transaction(function () use ($vacancyId, $coverLetter, $refered_by_id) {
-                return $this->applications()->create([
+                $application = $this->applications()->create([
                     'vacancy_id' => $vacancyId,
                     'cover_letter' => $coverLetter,
                     'status' => Application::STATUS_PENDING,
                     'referred_by_id' => $refered_by_id,
                 ]);
+                AppLog::info('Application Created', 'Application created for applicant: ' . $this->full_name, loggable: $application);
+                return $application;
             });
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error applying for vacancy', $e->getMessage(), loggable: $this);
             throw new AppException('Failed to apply for vacancy: ' . $e->getMessage());
         }
     }
@@ -517,7 +550,9 @@ class Applicant extends Model
      */
     public function hire(): bool
     {
-        return $this->update(['is_hired' => true]);
+        $hired = $this->update(['is_hired' => true]);
+        AppLog::info('Applicant Hired', 'Applicant. ' . $this->full_name . ' hired successfully', loggable: $this);
+        return $hired;
     }
 
     /**

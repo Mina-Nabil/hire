@@ -46,9 +46,11 @@ class Document extends Model
         $newDoc->docOwner()->associate($docOwner);
         try {
             $newDoc->save();
+            AppLog::info('Document Created', 'Document created for ' . $docOwner->full_name, loggable: $newDoc);
             return $newDoc;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error creating document', $e->getMessage());
             throw new AppException("Failed to create document");
         }
     }

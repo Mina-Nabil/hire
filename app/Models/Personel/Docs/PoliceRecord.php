@@ -3,6 +3,7 @@
 namespace App\Models\Personel\Docs;
 
 use App\Exceptions\AppException;
+use App\Models\Users\AppLog;
 use App\Traits\DocumentModel;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
@@ -50,9 +51,11 @@ class PoliceRecord extends Model
                 'expiry_date' => $expiry_date,
                 'created_by' => Auth::id(), // Track who updated it
             ]);
+            AppLog::info('Police Record Updated', 'Police record updated for employee: ' . $this->employee->name, loggable: $this);
             return true;
         } catch (\Exception $e) {
             report($e);
+            AppLog::error('Error updating police record', $e->getMessage(), loggable: $this);
             throw new AppException('Error updating police record');
         }
     }
@@ -72,9 +75,11 @@ class PoliceRecord extends Model
 
         try {
             $this->delete();
+            AppLog::info('Police Record Deleted', 'Police record deleted for employee: ' . $this->employee->name);
             return true;
         } catch (\Exception $e) {
             report($e);
+            AppLog::error('Error deleting police record', $e->getMessage(), loggable: $this);
             throw new AppException('Error deleting police record');
         }
     }

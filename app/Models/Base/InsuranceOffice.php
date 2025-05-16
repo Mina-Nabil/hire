@@ -3,6 +3,7 @@
 namespace App\Models\Base;
 
 use App\Exceptions\AppException;
+use App\Models\Users\AppLog;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -47,8 +48,10 @@ class InsuranceOffice extends Model
                 'name' => $name,
                 'arabic_name' => $arabic_name,
             ]);
+            AppLog::info('Insurance Office Created', "Name: $name", loggable: $insuranceOffice);
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error creating insurance office', $e->getMessage());
             throw new AppException("Failed to create insurance office");
         }
     }
@@ -65,8 +68,10 @@ class InsuranceOffice extends Model
                 'name' => $name,
                 'arabic_name' => $arabic_name,
             ]);
+            AppLog::info('Insurance Office Updated', "Name: $name", loggable: $this);
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error editing insurance office', $e->getMessage(), loggable: $this);
             throw new AppException("Failed to edit insurance office");
         }
     }
@@ -80,8 +85,10 @@ class InsuranceOffice extends Model
 
         try {
             $this->delete();
+            AppLog::info('Insurance Office Deleted', "Name: $this->name");
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error deleting insurance office', $e->getMessage(), loggable: $this);
             throw new AppException("Failed to delete insurance office");
         }
     }

@@ -4,6 +4,7 @@ namespace App\Models\Recruitment\JobOffers;
 
 use App\Exceptions\AppException;
 use App\Models\Recruitment\Applicants\Application;
+use App\Models\Users\AppLog;
 use App\Models\Users\User;
 use Carbon\Carbon;
 use Exception;
@@ -121,8 +122,11 @@ class JobOffer extends Model
                 'benefits' => $benefits,
                 'notes' => $notes,
             ]);
+            AppLog::info('Job Offer Updated', 'Job offer updated for applicant: ' . $this->application->applicant->full_name, loggable: $this);
+            return true;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error updating job offer', $e->getMessage());
             throw new AppException('Failed to edit job offer');
         }
     }
@@ -144,6 +148,8 @@ class JobOffer extends Model
             'response_date' => now(),
             'response_notes' => $response_notes,
           ]);
+          AppLog::info('Job Offer Accepted', 'Job offer accepted for applicant: ' . $this->application->applicant->full_name, loggable: $this);
+          return true;
     }
 
     public function reject($response_notes=null)
@@ -163,6 +169,8 @@ class JobOffer extends Model
                 'response_date' => now(),
                 'response_notes' => $response_notes,
             ]);
+            AppLog::info('Job Offer Rejected', 'Job offer rejected for applicant: ' . $this->application->applicant->full_name, loggable: $this);
+            return true;
     }
 
     public function expire()
@@ -184,6 +192,8 @@ class JobOffer extends Model
          $this->update([
             'status' => self::STATUS_EXPIRED,
          ]);
+         AppLog::info('Job Offer Expired', 'Job offer expired for applicant: ' . $this->application->applicant->full_name, loggable: $this);
+         return true;
     }
 
     public function send()
@@ -202,6 +212,8 @@ class JobOffer extends Model
             'status' => self::STATUS_SENT,
             'offer_date' => now(),
         ]);
+        AppLog::info('Job Offer Sent', 'Job offer sent for applicant: ' . $this->application->applicant->full_name, loggable: $this);
+        return true;
     }
     
     

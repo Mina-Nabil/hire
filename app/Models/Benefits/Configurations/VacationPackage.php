@@ -7,6 +7,7 @@ use App\Models\Personel\Employee;
 use App\Models\Users\User;
 use App\Models\Benefits\Configurations\BenefitConfiguration;
 use App\Models\Benefits\Vacations\VacationDetail;
+use App\Models\Users\AppLog;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -73,10 +74,12 @@ class VacationPackage extends Model
 
                 $package->vacationDetails()->createMany($vacationDetails);
 
+                AppLog::info('Vacation Package Created', "Name: $name", loggable: $package);
                 return $package;
             });
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error creating vacation package', $e->getMessage());
             throw new AppException('Failed to create benefit package');
         }
     }
@@ -120,8 +123,10 @@ class VacationPackage extends Model
 
                 $this->vacationDetails()->createMany($vacationDetails);
             });
+            AppLog::info('Vacation Package Updated', "Name: $name", loggable: $this);
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error editing vacation package', $e->getMessage(), loggable: $this);
             throw new AppException('Failed to edit benefit package');
         }
     }
@@ -140,8 +145,10 @@ class VacationPackage extends Model
         }
         try {
             $this->delete();
+            AppLog::info('Vacation Package Deleted', "Name: $this->name", loggable: $this);
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error deleting vacation package', $e->getMessage(), loggable: $this);
             throw new AppException('Failed to delete benefit package');
         }
     }

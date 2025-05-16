@@ -3,6 +3,8 @@
 namespace App\Models\Base;
 
 use App\Exceptions\AppException;
+use App\Models\Users\AppLog;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
@@ -36,7 +38,15 @@ class Area extends Model
             throw new AppException(__('misc.not_authorized'));
         }
 
-        return Area::create(['name' => $name, 'city_id' => $city_id]);
+        try {
+            $area = Area::create(['name' => $name, 'city_id' => $city_id]);
+            AppLog::info('Area Created', "Name: $name, City: $city_id", loggable: $area);
+            return $area;
+        } catch (Exception $e) {
+            report($e);
+            AppLog::error('Error creating area', $e->getMessage());
+            throw new AppException('Error creating area');
+        }
     }
     
     public function updateArea($name, $city_id)
@@ -47,10 +57,18 @@ class Area extends Model
             throw new AppException(__('misc.not_authorized'));
         }
 
-        return $this->update([
-            'name' => $name,
-            'city_id' => $city_id
-        ]);
+        try {
+            $this->update([
+                'name' => $name,
+                'city_id' => $city_id
+            ]);
+            AppLog::info('Area Updated', "Name: $name, City: $city_id", loggable: $this);
+            return $this;
+        } catch (Exception $e) {
+            report($e);
+            AppLog::error('Error updating area', $e->getMessage());
+            throw new AppException('Error updating area');
+        }
     }
     
     public function deleteArea()
@@ -61,6 +79,13 @@ class Area extends Model
             throw new AppException(__('misc.not_authorized'));
         }
 
-        return $this->delete();
+        try {
+            $this->delete();
+            AppLog::info('Area Deleted', "Name: $this->name");
+        } catch (Exception $e) {
+            report($e);
+            AppLog::error('Error deleting area', $e->getMessage(), loggable: $this);
+            throw new AppException('Error deleting area');
+        }
     }
 }

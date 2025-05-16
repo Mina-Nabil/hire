@@ -4,6 +4,7 @@ namespace App\Models\Attendance;
 
 use App\Exceptions\AppException;
 use App\Models\Personel\Employee;
+use App\Models\Users\AppLog;
 use App\Models\Users\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -50,10 +51,12 @@ class Overtime extends Model
                 'admin_note' => $admin_note,
             ]);
 
+            AppLog::info('Overtime Status Updated for ' . $this->employee->name, "Status: $status, Admin Note: $admin_note", loggable: $this);
             $this->save();
             return true;
         } catch (\Exception $e) {
             report($e);
+            AppLog::error('Error approving overtime', $e->getMessage());
             throw new AppException('Error approving overtime');
         }
     }

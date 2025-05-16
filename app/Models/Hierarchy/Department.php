@@ -3,6 +3,7 @@
 namespace App\Models\Hierarchy;
 
 use App\Exceptions\AppException;
+use App\Models\Users\AppLog;
 use Database\Factories\DepartmentFactory;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -47,13 +48,16 @@ class Department extends Model
         }
 
         try {
-            return self::create([
+            $department = self::create([
                 'name' => $name,
                 'prefix_code' => $prefix_code,
                 'desc' => $description,
             ]);
+            AppLog::info('Department Created', "Name: $name", loggable: $department);
+            return $department;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error creating department', $e->getMessage());
             throw new AppException('Failed to create department');
         }
     }
@@ -69,13 +73,16 @@ class Department extends Model
         }
 
         try {
-            return $this->update([
+            $department = $this->update([
                 'name' => $name,
                 'prefix_code' => $prefix_code,
                 'desc' => $description,
             ]);
+            AppLog::info('Department Updated', "Name: $name", loggable: $department);
+            return $department;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error editing department', $e->getMessage());
             throw new AppException('Failed to edit department');
         }
     }
@@ -90,9 +97,11 @@ class Department extends Model
         }
         // Check if there are any positions associated with this department
         if ($this->positions()->count() > 0) {
+            AppLog::error('Cannot delete department with associated positions.', loggable: $this);
             throw new AppException('Cannot delete department with associated positions.');
         } else {
             $this->delete();
+            AppLog::info('Department Deleted', "Name: $this->name", loggable: $this);
         }
     }
 

@@ -4,6 +4,7 @@ namespace App\Models\Attendance;
 
 use App\Exceptions\AppException;
 use App\Models\Personel\Employee;
+use App\Models\Users\AppLog;
 use App\Models\Users\User;
 use Carbon\Carbon;
 use Exception;
@@ -105,6 +106,7 @@ class Attendance extends Model
         $public_file_path = storage_path($file_path);
         $writer->save($public_file_path);
 
+        AppLog::info('Attendance Template Downloaded', ['file_path' => $file_path]);
         return response()->download($public_file_path)->deleteFileAfterSend(true);
     }
 
@@ -165,6 +167,7 @@ class Attendance extends Model
             ];
         }
 
+        AppLog::info('Uploaded Attendance');
         return $attendance;
     }
 
@@ -178,7 +181,10 @@ class Attendance extends Model
                     }
                 }
             });
+            AppLog::info('Saved Attendance');
         } catch (Exception $e) {
+            report($e);
+            AppLog::error('Failed to save attendance', $e->getMessage());
             throw new AppException('Failed to save attendance: ' . $e->getMessage());
         }
     }
@@ -198,8 +204,20 @@ class Attendance extends Model
             }
             
             $this->is_extra_hours_approved = true;
+
+            $employee = $this->employee->name ?? 'Unknown Employee';
+            $date = $this->date ?? 'Unknown Date';
+            $extraHours = $this->extra_hours ?? 0;
+            AppLog::info(
+                "Approved Extra Hours for $employee", 
+                "Date: $date, Extra Hours: $extraHours hours", 
+                loggable: $this
+            );
+
             return $this->save();
         } catch (Exception $e) {
+            report($e);
+            AppLog::error('Failed to approve extra hours', $e->getMessage());
             throw new AppException('Failed to approve extra hours: ' . $e->getMessage());
         }
     }
@@ -216,10 +234,20 @@ class Attendance extends Model
             if ($this->extra_hours === null) {
                 throw new AppException('This attendance record has no extra hours to reject.');
             }
-            
+
+            $employee = $this->employee->name ?? 'Unknown Employee';
+            $date = $this->date ?? 'Unknown Date';
+            $extraHours = $this->extra_hours ?? 0;
+            AppLog::info(
+                "Rejected Extra Hours for $employee", 
+                "Date: $date, Extra Hours: $extraHours hours", 
+                loggable: $this
+            );
             $this->is_extra_hours_approved = false;
             return $this->save();
         } catch (Exception $e) {
+            report($e);
+            AppLog::error('Failed to reject extra hours', $e->getMessage());
             throw new AppException('Failed to reject extra hours: ' . $e->getMessage());
         }
     }
@@ -234,8 +262,18 @@ class Attendance extends Model
     {
         try {
             $this->is_approved = true;
+            $employee = $this->employee->name ?? 'Unknown Employee';
+            $date = $this->date ?? 'Unknown Date';
+            $hours = $this->hours ?? 0;
+            AppLog::info(
+                "Approved Attendance for $employee", 
+                "Date: $date, Hours: $hours hours", 
+                loggable: $this
+            );
             return $this->save();
         } catch (Exception $e) {
+            report($e);
+            AppLog::error('Failed to approve attendance', $e->getMessage());
             throw new AppException('Failed to approve attendance: ' . $e->getMessage());
         }
     }
@@ -250,8 +288,18 @@ class Attendance extends Model
     {
         try {
             $this->is_approved = false;
+            $employee = $this->employee->name ?? 'Unknown Employee';
+            $date = $this->date ?? 'Unknown Date';
+            $hours = $this->hours ?? 0;
+            AppLog::info(
+                "Rejected Attendance for $employee", 
+                "Date: $date, Hours: $hours hours", 
+                loggable: $this
+            );
             return $this->save();
         } catch (Exception $e) {
+            report($e);
+            AppLog::error('Failed to reject attendance', $e->getMessage());
             throw new AppException('Failed to reject attendance: ' . $e->getMessage());
         }
     }

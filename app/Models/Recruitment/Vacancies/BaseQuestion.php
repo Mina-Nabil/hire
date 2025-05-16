@@ -4,6 +4,7 @@ namespace App\Models\Recruitment\Vacancies;
 
 use App\Exceptions\AppException;
 use App\Models\Recruitment\Applicants\Application;
+use App\Models\Users\AppLog;
 use App\Models\Users\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -109,7 +110,7 @@ class BaseQuestion extends Model
         }
         
         $this->save();
-        
+        AppLog::info('Question Updated', 'Question updated for vacancy: ' . $this->vacancy->id, loggable: $this);
         return $this;
     }
 
@@ -125,7 +126,8 @@ class BaseQuestion extends Model
         if (!$loggedInUser->can('delete', BaseQuestion::class)) {
             throw new AppException(__('misc.not_authorized'));
         }
-        
-        return $this->delete();
+        $deleted = $this->delete();
+        AppLog::info('Question Deleted', 'Question deleted for vacancy: ' . $this->vacancy->id, loggable: $this);
+        return $deleted;
     }
 }

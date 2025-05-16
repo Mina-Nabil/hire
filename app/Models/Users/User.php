@@ -110,6 +110,7 @@ class User extends Authenticatable
             throw new AppException('Invalid password');
         }
         Auth::login($user);
+        AppLog::info('User Logged In', 'User logged in: ' . $user->name, loggable: $user);
         return $user;
     }
 
@@ -129,6 +130,7 @@ class User extends Authenticatable
             'type' => $type,
             'image_url' => $imageUrl
         ]);
+        AppLog::info('User Created', 'User created: ' . $user->name, loggable: $user);
         return $user;
     }
 
@@ -154,6 +156,7 @@ class User extends Authenticatable
         }
         $this->image_url = $imageUrl;
         $this->save();
+        AppLog::info('User Updated', 'User updated: ' . $this->name, loggable: $this);
     }
 
     public function changePassword($password)
@@ -194,6 +197,7 @@ class User extends Authenticatable
         }
         $this->default_language = $language;
         $this->save();
+        AppLog::info('Language Set', 'Language set to ' . $language, loggable: $this);
     }
 
     /**
@@ -216,7 +220,9 @@ class User extends Authenticatable
         // This will add new assignments, keep existing ones, and remove those not in the array
         try {
             $this->assignedLocations()->sync($locationIds);
+            AppLog::info('Locations Assigned', 'Locations assigned to HR: ' . $this->name, loggable: $this);
         } catch (\Exception $e) {
+            AppLog::error('Error assigning locations', $e->getMessage());
             throw new AppException('Error assigning locations: ' . $e->getMessage());
         }
     }

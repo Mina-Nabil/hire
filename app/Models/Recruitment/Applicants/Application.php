@@ -9,6 +9,7 @@ use App\Models\Recruitment\Interviews\InterviewFeedback;
 use App\Models\Recruitment\JobOffers\JobOffer;
 use App\Models\Recruitment\Vacancies\Vacancy;
 use App\Models\Recruitment\Vacancies\VacancySlot;
+use App\Models\Users\AppLog;
 use App\Models\Users\User;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
@@ -140,7 +141,7 @@ class Application extends Model
     public static function createApplication(int $applicantId, int $vacancyId, ?string $coverLetter = null, ?int $refered_by_id = null): Application
     {
         try {
-            return self::updateOrCreate([
+            $application = self::updateOrCreate([
                 'applicant_id' => $applicantId,
                 'vacancy_id' => $vacancyId
             ], [
@@ -148,8 +149,11 @@ class Application extends Model
                 'status' => self::STATUS_PENDING,
                 'referred_by_id' => $refered_by_id,
             ]);
+            AppLog::info('Application Created', 'Application created for applicant: ' . $application->applicant->full_name, loggable: $application);
+            return $application;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error creating application', $e->getMessage());
             throw new AppException('Failed to create application: ' . $e->getMessage());
         }
     }
@@ -167,9 +171,12 @@ class Application extends Model
         }
 
         try {
-            return $this->update(['status' => $status]);
+            $updated = $this->update(['status' => $status]);
+            AppLog::info('Application Status Updated', 'Application status updated for applicant: ' . $this->applicant->full_name, loggable: $this);
+            return $updated;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error updating application status', $e->getMessage());
             throw new AppException('Failed to update application status: ' . $e->getMessage());
         }
     }
@@ -190,12 +197,15 @@ class Application extends Model
                     throw new AppException('This slot does not belong to the vacancy of this application');
                 }
 
-                return $this->slots()->create([
+                $slot = $this->slots()->create([
                     'vacancy_slot_id' => $vacancySlotId,
                 ]);
+                AppLog::info('Slot Booked', 'Slot booked for applicant: ' . $this->applicant->full_name, loggable: $this);
+                return $slot;
             });
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error booking slot', $e->getMessage());
             throw new AppException('Failed to book slot: ' . $e->getMessage());
         }
     }
@@ -237,10 +247,12 @@ class Application extends Model
 
                 $this->moveToInterview();
 
+                AppLog::info('Interview Created', 'Interview created for applicant: ' . $this->applicant->full_name, loggable: $ret);
                 return $ret;
             });
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error creating interview', $e->getMessage());
             throw new AppException('Failed to create interview: ' . $e->getMessage());
         }
     }
@@ -260,9 +272,11 @@ class Application extends Model
             $newAnswer->answer = $answer;
             $newAnswer->answerable()->associate($answerable);
             $newAnswer->save();
+            AppLog::info('Answer Added', 'Answer added for applicant: ' . $this->applicant->full_name, loggable: $newAnswer);
             return $newAnswer;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error adding answer', $e->getMessage());
             throw new AppException('Failed to add answer: ' . $e->getMessage());
         }
     }
@@ -274,7 +288,9 @@ class Application extends Model
      */
     public function shortlist(): bool
     {
-        return $this->updateStatus(self::STATUS_SHORTLISTED);
+        $shortlisted = $this->updateStatus(self::STATUS_SHORTLISTED);
+        AppLog::info('Application Shortlisted', 'Application shortlisted for applicant: ' . $this->applicant->full_name, loggable: $this);
+        return $shortlisted;
     }
 
     /**
@@ -284,7 +300,9 @@ class Application extends Model
      */
     public function moveToInterview(): bool
     {
-        return $this->updateStatus(self::STATUS_INTERVIEW);
+        $moved = $this->updateStatus(self::STATUS_INTERVIEW);
+        AppLog::info('Application Moved to Interview', 'Application moved to interview for applicant: ' . $this->applicant->full_name, loggable: $this);
+        return $moved;
     }
 
     /**
@@ -299,12 +317,13 @@ class Application extends Model
             DB::transaction(function () {
                 $this->applicant->hire();
                 $this->updateStatus(self::STATUS_HIRED);
+                AppLog::info('Applicant Hired', 'Applicant hired for applicant: ' . $this->applicant->full_name, loggable: $this);
             });
             return true;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error hiring applicant', $e->getMessage());
             throw new AppException("Failed to accept offer");
-            return false;
         }
     }
 
@@ -315,7 +334,9 @@ class Application extends Model
      */
     public function reject(): bool
     {
-        return $this->updateStatus(self::STATUS_REJECTED);
+        $rejected = $this->updateStatus(self::STATUS_REJECTED);
+        AppLog::info('Application Rejected', 'Application rejected for applicant: ' . $this->applicant->full_name, loggable: $this);
+        return $rejected;
     }
 
     /**
@@ -374,11 +395,13 @@ class Application extends Model
                     'benefits' => $benefits,
                     'notes' => $notes,
                 ]);
-                return $this->updateStatus(self::STATUS_OFFER);
+                $this->updateStatus(self::STATUS_OFFER);
             });
+            AppLog::info('Offer Created', 'Offer created for applicant: ' . $this->applicant->full_name, loggable: $this);
             return true;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error creating offer', $e->getMessage());
             throw new AppException('Failed to create offer');
         }
     }

@@ -4,6 +4,7 @@ namespace App\Models\Recruitment\Interviews;
 
 use App\Exceptions\AppException;
 use App\Models\Recruitment\Applicants\Application;
+use App\Models\Users\AppLog;
 use App\Models\Users\User;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
@@ -130,9 +131,12 @@ class Interview extends Model
         }
 
         try {
-            return $this->update(['status' => $status]);
+            $updated = $this->update(['status' => $status]);
+            AppLog::info('Interview Status Updated', 'Interview status updated for applicant: ' . $this->application->applicant->full_name, loggable: $this);
+            return $updated;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error updating interview status', $e->getMessage());
             throw new AppException('Failed to update interview status: ' . $e->getMessage());
         }
     }
@@ -154,8 +158,10 @@ class Interview extends Model
 
         try {
             $this->interviewers()->sync($userIds);
+            AppLog::info('Interviewers Set', 'Interviewers set for interview: ' . $this->id, loggable: $this);
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error setting interviewers', $e->getMessage());
             throw new AppException('Failed to set interviewers: ' . $e->getMessage());
         }
     }
@@ -191,8 +197,11 @@ class Interview extends Model
                 'weaknesses' => $weaknesses,
                 'feedback' => $feedback,
             ]);
+            AppLog::info('Feedback Added', 'Feedback added for interview: ' . $this->id, loggable: $feedback);
+            return $feedback;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error adding feedback', $e->getMessage());
             throw new AppException('Failed to add feedback.');
         }
     }
@@ -230,9 +239,12 @@ class Interview extends Model
                 $data['zoom_link'] = $newZoomLink;
             }
             
-            return $this->update($data);
+            $updated = $this->update($data);
+            AppLog::info('Interview Rescheduled', 'Interview rescheduled for applicant: ' . $this->application->applicant->full_name, loggable: $this);
+            return $updated;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error rescheduling interview', $e->getMessage());
             throw new AppException('Failed to reschedule interview: ' . $e->getMessage());
         }
     }
@@ -244,7 +256,9 @@ class Interview extends Model
      */
     public function cancel(): bool
     {
-        return $this->updateStatus(self::STATUS_CANCELLED);
+        $cancelled = $this->updateStatus(self::STATUS_CANCELLED);
+        AppLog::info('Interview Cancelled', 'Interview cancelled for applicant: ' . $this->application->applicant->full_name, loggable: $this);
+        return $cancelled;
     }
 
     /**
@@ -254,7 +268,9 @@ class Interview extends Model
      */
     public function complete(): bool
     {
-        return $this->updateStatus(self::STATUS_COMPLETED);
+        $completed = $this->updateStatus(self::STATUS_COMPLETED);
+        AppLog::info('Interview Completed', 'Interview completed for applicant: ' . $this->application->applicant->full_name, loggable: $this);
+        return $completed;
     }
 
     /**
@@ -279,8 +295,11 @@ class Interview extends Model
                 'title' => $title,
                 'note' => $note,
             ]);
+            AppLog::info('Note Added', 'Note added for interview: ' . $this->id, loggable: $note);
+            return $note;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error adding note', $e->getMessage());
             throw new AppException('Failed to add note: ' . $e->getMessage());
         }
     }

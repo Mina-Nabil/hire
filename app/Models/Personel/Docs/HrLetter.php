@@ -3,6 +3,7 @@
 namespace App\Models\Personel\Docs;
 
 use App\Exceptions\AppException;
+use App\Models\Users\AppLog;
 use App\Traits\DocumentModel;
 use Carbon\Carbon;
 use Exception;
@@ -51,9 +52,11 @@ class HrLetter extends Model
                 'expiry_date' => $expiry_date,
                 'created_by' => Auth::id(), // Track who updated it
             ]);
+            AppLog::info('HR Letter Updated', 'HR letter updated for employee: ' . $this->employee->name, loggable: $this);
             return true;
         } catch (\Exception $e) {
             report($e);
+            AppLog::error('Error updating hr letter', $e->getMessage(), loggable: $this);
             throw new AppException('Error updating hr letter');
         }
     }
@@ -73,9 +76,11 @@ class HrLetter extends Model
 
         try {
             $this->delete();
+            AppLog::info('HR Letter Deleted', 'HR letter deleted for employee: ' . $this->employee->name);
             return true;
         } catch (\Exception $e) {
             report($e);
+            AppLog::error('Error deleting hr letter', $e->getMessage(), loggable: $this);
             throw new AppException('Error deleting hr letter');
         }
     }

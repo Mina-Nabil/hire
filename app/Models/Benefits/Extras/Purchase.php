@@ -6,6 +6,7 @@ use App\Exceptions\AppException;
 use App\Models\Benefits\Payrolls\BenefitPayment;
 use App\Models\Benefits\Payrolls\ExtraPayment;
 use App\Models\Personel\Employee;
+use App\Models\Users\AppLog;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -87,9 +88,11 @@ class Purchase extends Model
                     $extraPayment->payable()->associate($purchase);
                     $extraPayment->save();
                 }
+                AppLog::info('Purchase Created', "Employee: $employee->name, Amount: $amount, Desc: $desc", loggable: $purchase);
             });
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error creating purchase', $e->getMessage());
             throw new AppException('Error creating purchase');
         }
     }

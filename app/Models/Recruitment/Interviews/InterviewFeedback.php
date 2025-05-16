@@ -3,6 +3,7 @@
 namespace App\Models\Recruitment\Interviews;
 
 use App\Exceptions\AppException;
+use App\Models\Users\AppLog;
 use App\Models\Users\User;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
@@ -51,9 +52,12 @@ class InterviewFeedback extends Model
             $this->strengths = $strengths;
             $this->weaknesses = $weaknesses;
             $this->feedback = $feedback;
-            return $this->save();
+            $saved = $this->save();
+            AppLog::info('Feedback Updated', 'Feedback updated for interview: ' . $this->interview->id, loggable: $this);
+            return $saved;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error updating feedback', $e->getMessage());
             throw new AppException('Failed to edit feedback.');
         }
     }

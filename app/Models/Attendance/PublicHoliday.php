@@ -3,6 +3,7 @@
 namespace App\Models\Attendance;
 
 use App\Exceptions\AppException;
+use App\Models\Users\AppLog;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
@@ -35,8 +36,10 @@ class PublicHoliday extends Model
                 'name' => $name,
                 'date' => $date,
             ]);
+            AppLog::info('Public Holiday Created', "Name: $name created at $date");
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error creating public holiday', $e->getMessage());
             throw new AppException('Error creating public holiday');
         }
     }
@@ -54,8 +57,10 @@ class PublicHoliday extends Model
                 'name' => $name,
                 'date' => $date,
             ]);
+            AppLog::info('Public Holiday Updated', "Name: $name updated at $date", loggable: $this);
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error editing public holiday', $e->getMessage());
             throw new AppException('Error editing public holiday');
         }
     }
@@ -70,8 +75,10 @@ class PublicHoliday extends Model
         }
         try {
             $this->delete();
+            AppLog::info('Public Holiday Deleted', "Name: $this->name deleted at $this->date");
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error deleting public holiday', $e->getMessage());
             throw new AppException('Error deleting public holiday');
         }
     }

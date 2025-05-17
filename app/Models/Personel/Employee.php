@@ -2986,6 +2986,12 @@ class Employee extends Model
         return $summary;
     }
 
+    public function importEmployeesFromCSV($file_path)
+    {
+    
+        
+    }
+
     /**
      * Create a new employee with basic information and optional employee info
      *
@@ -3014,16 +3020,16 @@ class Employee extends Model
         string $nationality,
         string $gender,
         $birth_date,
-        ?int $birth_place_id,
+        string $id_number,
         bool $license_required,
         $employment_date,
+        int $birth_place_id,
         array $employeeInfoData = [],
         ?int $applicant_id = null,
-        string $id_card_file_path,
-        string $id_number,
-        string $id_issue_date,
-        string $id_expiry_date,
-        string $mother_name = null,
+        ?string $id_card_file_path = null,
+        ?string $id_issue_date = null,
+        ?string $id_expiry_date = null,
+        ?string $mother_name = null,
         string $status = self::STATUS_ACTIVE
     ) {
         /** @var User $loggedInUser */
@@ -3049,6 +3055,7 @@ class Employee extends Model
                 'employment_date' => $employment_date,
                 'applicant_id' => $applicant_id,
                 'mother_name' => $mother_name,
+                'id_number' => $id_number,
                 'status' => $status,
             ]);
 

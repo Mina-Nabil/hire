@@ -131,6 +131,17 @@
                         </a>
                     </li>
 
+                    @if (Auth::user()->employee->is_manager)
+                    <li>
+                        <a href="{{ route('attendance.index') }}"
+                            class="navItem {{ request()->routeIs('attendance.index') ? 'active' : '' }}">
+                            <span class="flex items-center">
+                                <iconify-icon class="nav-icon" icon="heroicons-outline:clock"></iconify-icon>
+                                <span>Attendance</span>
+                            </span>
+                        </a>
+                    </li>
+                    @endif
                 </ul>
             </div>
         </div>

@@ -133,9 +133,14 @@
                                     wire:model="overtimeRate" errorMessage="{{ $errors->first('overtimeRate') }}"
                                     min="1" />
 
-                                <label class="flex items-center mt-2">
+                                <label class="flex items-center mt-2 col-span-2">
                                     <input type="checkbox" wire:model="isAutomaticOvertime" class="form-checkbox">
                                     <span class="ml-2">Enable Automatic Overtime from Attendance Sheet</span>
+                                </label>
+
+                                <label class="flex items-center mt-2 col-span-2">
+                                    <input type="checkbox" wire:model="isRequireAttendanceApproval" class="form-checkbox">
+                                    <span class="ml-2">Require Attendance Approval</span>
                                 </label>
 
                             </div>

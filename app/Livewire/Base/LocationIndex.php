@@ -20,6 +20,12 @@ class LocationIndex extends Component
     #[Validate('required|min:3')]
     public $name = '';
 
+    #[Validate('nullable|numeric|between:-90,90')]
+    public $latitude = '';
+
+    #[Validate('nullable|numeric|between:-180,180')]
+    public $longitude = '';
+
     // HR User assignment properties
     public $hrUsersModal = false;
     public $selectedLocation = null;
@@ -57,20 +63,24 @@ class LocationIndex extends Component
 
     public function resetForm()
     {
-        $this->reset(['locationId', 'name']);
+        $this->reset(['locationId', 'name', 'latitude', 'longitude']);
     }
 
     public function save()
     {
-        $this->validate();
-
+        $this->validate([
+            'name' => 'required|min:3',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
+        ]);
+        
         try {
             if ($this->locationId) {
                 $location = Location::findOrFail($this->locationId);
-                $location->editInfo($this->name);
+                $location->editInfo($this->name, $this->latitude ?? null, $this->longitude ?? null);
                 $this->alertSuccess('Location updated successfully!');
             } else {
-                Location::createLocation($this->name);
+                Location::createLocation($this->name, $this->latitude ?? null, $this->longitude ?? null);
                 $this->alertSuccess('Location created successfully!');
             }
             
@@ -86,6 +96,8 @@ class LocationIndex extends Component
         $location = Location::findOrFail($id);
         $this->locationId = $location->id;
         $this->name = $location->name;
+        $this->latitude = $location->latitude;
+        $this->longitude = $location->longitude;
         $this->showModal = true;
     }
 

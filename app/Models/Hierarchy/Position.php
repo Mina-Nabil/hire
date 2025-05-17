@@ -6,6 +6,8 @@ use App\Exceptions\AppException;
 use App\Models\Benefits\Configurations\SalaryGrade;
 use App\Models\Personel\Employee;
 use App\Models\Recruitment\Vacancies\Vacancy;
+use App\Models\Users\AppLog;
+use App\Scopes\HrLocationScope;
 use Database\Factories\PositionFactory;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -38,6 +40,18 @@ class Position extends Model
         'salary_grade_id',
         'parent_id',
     ];
+
+    /**
+     * The "booted" method of the model.
+     *
+     * @return void
+     */
+    protected static function booted()
+    {
+        return static::addGlobalScope(new HrLocationScope);
+    }
+
+
 
     /**
      * Get the department that this position belongs to.
@@ -148,9 +162,11 @@ class Position extends Model
                 'employee_id' => $employeeId,
                 'salary_grade_id' => $salaryGradeId,
             ]);
+            AppLog::info('Position Created', "Name: $name", loggable: $newPosition);
             return $newPosition;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error creating position', $e->getMessage());
             throw new AppException('Failed to create position');
         }
     }
@@ -202,8 +218,11 @@ class Position extends Model
                 'employee_id' => $employeeId,
                 'salary_grade_id' => $salaryGradeId,
             ]);
+            AppLog::info('Position Updated', "Name: $name", loggable: $this);
+            return true;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error editing position', $e->getMessage(), loggable: $this);
             throw new AppException('Failed to edit position');
         }
     }
@@ -231,8 +250,11 @@ class Position extends Model
 
         try {
             $this->delete();
+            AppLog::info('Position Deleted', "Name: $this->name");
+            return true;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error deleting position', $e->getMessage(), loggable: $this);
             throw new AppException('Failed to delete position');
         }
     }

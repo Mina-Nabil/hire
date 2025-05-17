@@ -6,6 +6,7 @@ use App\Exceptions\AppException;
 use App\Models\Hierarchy\Position;
 use App\Models\Recruitment\Applicants\Application;
 use App\Models\Recruitment\JobOffers\JobOffer;
+use App\Models\Users\AppLog;
 use App\Models\Users\User;
 use Exception;
 use Illuminate\Container\Attributes\DB;
@@ -172,9 +173,11 @@ class Vacancy extends Model
                 }
             }
 
+            AppLog::info('Vacancy Created', 'Vacancy created for position: ' . $vacancy->position->name, loggable: $vacancy);
             return $vacancy;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error creating vacancy', $e->getMessage());
             throw new AppException(__('misc.something_went_wrong'));
         }
     }
@@ -230,9 +233,11 @@ class Vacancy extends Model
                     }
                 }
             });
+            AppLog::info('Vacancy Updated', 'Vacancy updated for position: ' . $this->position->name, loggable: $this);
             return $this;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error updating vacancy', $e->getMessage());
             throw new AppException(__('misc.something_went_wrong'));
         }
     }
@@ -259,11 +264,14 @@ class Vacancy extends Model
             $this->vacancy_slots()->delete();
 
             // Delete the vacancy
-            return $this->delete();
+            $deleted = $this->delete();
+            AppLog::info('Vacancy Deleted', 'Vacancy deleted for position: ' . $this->position->name, loggable: $this);
+            return $deleted;
         } catch (AppException $e) {
             throw $e;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error deleting vacancy', $e->getMessage());
             throw new AppException(__('misc.something_went_wrong'));
         }
     }

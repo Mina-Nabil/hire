@@ -46,6 +46,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Personel\Docs\EmployeeHrLetterRequest;
+use App\Models\Users\AppLog;
 
 class Employee extends Model
 {
@@ -101,6 +102,31 @@ class Employee extends Model
         'employment_date' => 'date',
         'birth_date' => 'date',
     ];
+
+    protected static function booted()
+    {
+        static::addGlobalScope('hrAccessibleEmployees', function ($builder) {
+            $user = Auth::user();
+            
+            // If no user is logged in or if they are admin, don't restrict
+            if (!$user || $user->is_admin) {
+                return;
+            }
+            
+            // If user is HR, restrict to employees in their assigned locations
+            if ($user->is_hr) {
+                // Get the HR user's assigned location IDs
+                $locationIds = $user->assignedLocations()->pluck('locations.id')->toArray();
+                
+                // Only apply filter if the user has assigned locations
+                if (!empty($locationIds)) {
+                    $builder->whereHas('positions', function($query) use ($locationIds) {
+                        $query->whereIn('location_id', $locationIds);
+                    });
+                }
+            }
+        });
+    }
 
     ////attributes
     public function getFullNameAttribute(): string
@@ -175,9 +201,11 @@ class Employee extends Model
                     'gross_salary' => $grossSalary,
                     'manager_id' => $manager_id,
                 ]);
+                AppLog::info('Benefits Package Applied', 'Benefits package applied for employee: ' . $this->name, loggable: $this);
             });
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error applying benefits package', $e->getMessage(), loggable: $this);
             throw new AppException('Error applying benefits package');
         }
     }
@@ -233,8 +261,11 @@ class Employee extends Model
                 ], [
                     'vacation_package_id' => $vacationPackage->id,
                 ]);
+                AppLog::info('Vacation Package Applied', 'Vacation package applied for employee: ' . $this->name, loggable: $this);
             });
         } catch (Exception $e) {
+            report($e);
+            AppLog::error('Error applying vacation package', $e->getMessage(), loggable: $this);
             throw new AppException('Error applying benefits package');
         }
     }
@@ -253,7 +284,7 @@ class Employee extends Model
      * @param bool $is_automatic_overtime
      * @return void
      */
-    public function setAttendanceConfigurations(array $working_days, $attendace_calculation, $working_day_start_min, $working_day_start_max, $working_day_end_min, $working_day_end_max, $daily_working_hours, $is_automatic_overtime, $overtime_rate)
+    public function setAttendanceConfigurations(array $working_days, $attendace_calculation, $working_day_start_min, $working_day_start_max, $working_day_end_min, $working_day_end_max, $daily_working_hours, $is_automatic_overtime, $overtime_rate, $is_require_attendance_approval = false)
     {
         if ($attendace_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_FIXED) {
             if ($working_day_start_min !== $working_day_start_max) {
@@ -285,7 +316,7 @@ class Employee extends Model
         }
 
         try {
-            DB::transaction(function () use ($attendace_calculation, $working_day_start_min, $working_day_start_max, $working_day_end_min, $working_day_end_max, $daily_working_hours, $overtime_rate, $is_automatic_overtime, $working_days) {
+            DB::transaction(function () use ($attendace_calculation, $working_day_start_min, $working_day_start_max, $working_day_end_min, $working_day_end_max, $daily_working_hours, $overtime_rate, $is_automatic_overtime, $working_days, $is_require_attendance_approval) {
                 $this->workingDays()->delete();
                 
                 $dbWorkingDays = [];
@@ -300,6 +331,7 @@ class Employee extends Model
                     'employee_id' => $this->id,
                 ], [
                     'is_automatic_overtime' => $is_automatic_overtime,
+                    'is_require_attendance_approval' => $is_require_attendance_approval,
                     'attendace_calculation' => $attendace_calculation,
                     'working_day_start_min' => $working_day_start_min,
                     'working_day_start_max' => $working_day_start_max,
@@ -308,10 +340,12 @@ class Employee extends Model
                     'daily_working_hours' => $daily_working_hours,
                     'overtime_rate' => $overtime_rate,
                 ]);
+                AppLog::info('Attendance Configurations Set', 'Attendance configurations set for employee: ' . $this->name, loggable: $this);
             });
         } catch (Exception $e) {
             report($e);
-            throw new AppException('Error applying benefits package');
+            AppLog::error('Error setting attendance configurations', $e->getMessage(), loggable: $this);
+            throw new AppException('Error setting attendance configurations');
         }
     }
 
@@ -340,9 +374,11 @@ class Employee extends Model
                     'type' => $type,
                     'start_date' => $start_date,
                 ]);
+                AppLog::info('Custom Base Benefit Added', 'Custom base benefit added for employee: ' . $this->name, loggable: $this);
             });
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error adding custom base benefit', $e->getMessage(), loggable: $this);
             throw new AppException('Error adding custom base benefit');
         }
     }
@@ -382,8 +418,10 @@ class Employee extends Model
                 'type' => $type,
                 'start_date' => $start_date
             ]);
+            AppLog::info('Custom Vacation Benefit Added', 'Custom vacation benefit added for employee: ' . $this->name, loggable: $this);
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error adding custom vacation benefit', $e->getMessage(), loggable: $this);
             throw new AppException('Error adding custom vacation benefit');
         }
     }
@@ -406,8 +444,10 @@ class Employee extends Model
                 'status' => 'pending',
                 'creator_id' => $loggedInUser->id,
             ]);
+            AppLog::info('Overtime Added', 'Overtime added for employee: ' . $this->name, loggable: $this);
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error adding overtime', $e->getMessage(), loggable: $this);
             throw new AppException('Error adding overtime');
         }
     }
@@ -454,9 +494,11 @@ class Employee extends Model
                 $vacationBenefit->update([
                     'current_balance' => $currentBalance - $hours_count,
                 ]);
+                AppLog::info('Vacation Applied', 'Vacation applied for employee: ' . $this->name, loggable: $this);
             });
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error applying for vacation', $e->getMessage(), loggable: $this);
             throw new AppException('Error applying for vacation');
         }
     }
@@ -480,9 +522,11 @@ class Employee extends Model
                     'employee_note' => $employee_note,
                     'status' => EmployeeHrLetterRequest::STATUS_PENDING
                 ]);
+                AppLog::info('HR Letter Request Created', 'HR letter request created for employee: ' . $this->name, loggable: $this);
             });
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error creating HR letter request', $e->getMessage(), loggable: $this);
             throw new AppException('Error creating HR letter request: ' . $e->getMessage());
         }
     }
@@ -509,9 +553,11 @@ class Employee extends Model
                     'type' => $type,
                 ],
             );
+            AppLog::info('Army Service Paper Set', 'Army service paper set for employee: ' . $this->name, loggable: $this);
             return true;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error setting army service paper', $e->getMessage(), loggable: $this);
             throw new AppException('Error setting army service paper');
         }
     }
@@ -537,9 +583,11 @@ class Employee extends Model
                     'type' => $type,
                 ],
             );
+            AppLog::info('Birth Certificate Set', 'Birth certificate set for employee: ' . $this->name, loggable: $this);
             return true;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error setting birth certificate', $e->getMessage(), loggable: $this);
             throw new AppException('Error setting birth certificate');
         }
     }
@@ -565,9 +613,11 @@ class Employee extends Model
                     'id_number' => $id_number,
                 ],
             );
+            AppLog::info('ID Card Set', 'ID card set for employee: ' . $this->name, loggable: $this);
             return true;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error setting ID card', $e->getMessage(), loggable: $this);
             throw new AppException('Error setting ID card');
         }
     }
@@ -592,9 +642,11 @@ class Employee extends Model
                     'expiry_date' => $expiry_date,
                 ],
             );
+            AppLog::info('Driver License Set', 'Driver license set for employee: ' . $this->name, loggable: $this);
             return true;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error setting driver license', $e->getMessage(), loggable: $this);
             throw new AppException('Error setting driver license');
         }
     }
@@ -620,9 +672,11 @@ class Employee extends Model
                     'expiry_date' => $expiry_date,
                 ],
             );
+            AppLog::info('Employee Contract Set', 'Employee contract set for employee: ' . $this->name, loggable: $this);
             return true;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error setting employee contract', $e->getMessage(), loggable: $this);
             throw new AppException('Error setting employee contract: ' . $e->getMessage());
         }
     }
@@ -648,9 +702,11 @@ class Employee extends Model
                     's1_number' => $s1_number,
                 ],
             );
+            AppLog::info('Employee S1 Doc Set', 'Employee S1 doc set for employee: ' . $this->name, loggable: $this);
             return true;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error setting employee S1 doc', $e->getMessage(), loggable: $this);
             throw new AppException('Error setting employee S1 doc');
         }
     }
@@ -679,9 +735,11 @@ class Employee extends Model
                     'year' => $year,
                 ],
             );
+            AppLog::info('Employee S2 Doc Set', 'Employee S2 doc set for employee: ' . $this->name, loggable: $this);
             return true;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error setting employee S2 doc', $e->getMessage(), loggable: $this);
             throw new AppException('Error setting employee S2 doc');
         }
     }
@@ -709,9 +767,11 @@ class Employee extends Model
                     'leaving_reason' => $leaving_reason,
                 ],
             );
+            AppLog::info('Employee S6 Doc Set', 'Employee S6 doc set for employee: ' . $this->name, loggable: $this);
             return true;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error setting employee S6 doc', $e->getMessage(), loggable: $this);
             throw new AppException('Error setting employee S6 doc');
         }
     }
@@ -731,9 +791,11 @@ class Employee extends Model
                 'issue_date' => $issue_date,
                 'expiry_date' => $expiry_date,
             ]);
+            AppLog::info('Police Record Set', 'Police record set for employee: ' . $this->name, loggable: $this);
             return true;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error setting police record', $e->getMessage(), loggable: $this);
             throw new AppException('Error setting police record');
         }
     }
@@ -753,9 +815,11 @@ class Employee extends Model
                 'issue_date' => $issue_date,
                 'expiry_date' => $expiry_date,
             ]);
+            AppLog::info('HR Letter Set', 'HR letter set for employee: ' . $this->name, loggable: $this);
             return true;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error setting hr letter', $e->getMessage(), loggable: $this);
             throw new AppException('Error setting hr letter');
         }
     }
@@ -799,9 +863,11 @@ class Employee extends Model
                     'medical_card_expiry' => $medical_card_expiry,
                 ],
             );
+            AppLog::info('Medical Record Set', 'Medical record set for employee: ' . $this->name, loggable: $this);
             return true;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error setting medical record', $e->getMessage(), loggable: $this);
             throw new AppException('Error setting medical record: ' . $e->getMessage());
         }
     }
@@ -828,9 +894,11 @@ class Employee extends Model
                     'expiry_date' => $expiry_date,
                 ],
             );
+            AppLog::info('External Medical Record Set', 'External medical record set for employee: ' . $this->name, loggable: $this);
             return true;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error setting external medical record', $e->getMessage(), loggable: $this);
             throw new AppException('Error setting external medical record: ' . $e->getMessage());
         }
     }
@@ -864,9 +932,11 @@ class Employee extends Model
                     'expiry_date' => $expiry_date,
                 ],
             );
+            AppLog::info('Practice Card Set', 'Practice card set for employee: ' . $this->name, loggable: $this);
             return true;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error setting practice card', $e->getMessage(), loggable: $this);
             throw new AppException('Error setting practice card: ' . $e->getMessage());
         }
     }
@@ -900,9 +970,11 @@ class Employee extends Model
                     'expiry_date' => $expiry_date,
                 ],
             );
+            AppLog::info('Skills Qualification Set', 'Skills qualification set for employee: ' . $this->name, loggable: $this);
             return true;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error setting skills qualification', $e->getMessage(), loggable: $this);
             throw new AppException('Error setting skills qualification: ' . $e->getMessage());
         }
     }
@@ -936,9 +1008,11 @@ class Employee extends Model
                     'expiry_date' => $expiry_date,
                 ],
             );
+            AppLog::info('Syndicate Card Set', 'Syndicate card set for employee: ' . $this->name, loggable: $this);
             return true;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error setting syndicate card', $e->getMessage(), loggable: $this);
             throw new AppException('Error setting syndicate card: ' . $e->getMessage());
         }
     }
@@ -967,9 +1041,11 @@ class Employee extends Model
                 'issue_date' => $issue_date,
                 'expiry_date' => $expiry_date,
             ]);
+            AppLog::info('Work Declaration Set', 'Work declaration set for employee: ' . $this->name, loggable: $this);
             return true;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error setting work declaration', $e->getMessage(), loggable: $this);
             throw new AppException('Error setting work declaration: ' . $e->getMessage());
         }
     }
@@ -1009,10 +1085,11 @@ class Employee extends Model
                 'employment_date' => $employment_date,
                 'mother_name' => $mother_name,
             ]);
-
+            AppLog::info('Employee Base Info Updated', 'Employee base info updated for employee: ' . $this->name, loggable: $this);
             return $this->fresh();
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error updating employee base information', $e->getMessage(), loggable: $this);
             throw new AppException('Error updating employee base information: ' . $e->getMessage());
         }
     }
@@ -1056,10 +1133,11 @@ class Employee extends Model
                     'gender' => $this->gender, // Copy from employee
                 ],
             );
-
+            AppLog::info('Employee Info Updated', 'Employee info updated for employee: ' . $this->name, loggable: $this);
             return $employeeInfo;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error updating employee information', $e->getMessage(), loggable: $this);
             throw new AppException('Error updating employee information: ' . $e->getMessage());
         }
     }
@@ -2348,7 +2426,8 @@ class Employee extends Model
     /// attribute
     public function getIsManagerAttribute()
     {
-        return $this->position()->children()->count();
+        $position = $this->position()->first();
+        return $position ? $position->children()->count() > 0 : false;
     }
 
     public function getManagerIdAttribute()
@@ -3003,10 +3082,7 @@ class Employee extends Model
      * @param string $nationality
      * @param string $gender
      * @param string|Carbon $birth_date
-     * @param int|null $birth_place_id
-     * @param bool $license_required
      * @param string|Carbon $employment_date
-     * @param array $employeeInfoData Optional employee info data
      * @return Employee
      * @throws AppException
      */
@@ -3074,9 +3150,11 @@ class Employee extends Model
                 ));
             }
 
+            AppLog::info('Employee Created', 'Employee ' . $name .' created successfully', loggable: $employee);
             return $employee;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error creating employee', $e->getMessage());
             throw new AppException('Error creating employee: ' . $e->getMessage());
             return false;
         }
@@ -3097,9 +3175,11 @@ class Employee extends Model
         try {
             $this->status = $status;
             $this->save();
+            AppLog::info('Employee Status Updated', 'Employee status updated for employee: ' . $this->name . ' to ' . ucfirst(str_replace('_', ' ', $status)), loggable: $this);
             return true;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error updating employee status', $e->getMessage(), loggable: $this);
             throw new AppException('Error updating employee status: ' . $e->getMessage());
         }
     }

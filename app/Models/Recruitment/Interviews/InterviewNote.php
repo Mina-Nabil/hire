@@ -3,6 +3,7 @@
 namespace App\Models\Recruitment\Interviews;
 
 use App\Exceptions\AppException;
+use App\Models\Users\AppLog;
 use App\Models\Users\User;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
@@ -59,8 +60,11 @@ class InterviewNote extends Model
                 'title' => $title,
                 'note' => $note,
             ]);
+            AppLog::info('Note Created', 'Note created for interview: ' . $interviewId, loggable: $note);
+            return $note;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error creating note', $e->getMessage());
             throw new AppException('Failed to create interview note: ' . $e->getMessage());
         }
     }
@@ -75,12 +79,15 @@ class InterviewNote extends Model
     public function updateNote(string $title, ?string $note = null): bool
     {
         try {
-            return $this->update([
+            $updated = $this->update([
                 'title' => $title,
                 'note' => $note,
             ]);
+            AppLog::info('Note Updated', 'Note updated for interview: ' . $this->interview->id, loggable: $this);
+            return $updated;
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error updating note', $e->getMessage());
             throw new AppException('Failed to update interview note: ' . $e->getMessage());
         }
     }

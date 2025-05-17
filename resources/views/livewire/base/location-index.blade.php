@@ -39,6 +39,9 @@
                                         Name
                                     </th>
                                     <th scope="col" class="table-th">
+                                        Location
+                                    </th>
+                                    <th scope="col" class="table-th">
                                         Positions Count
                                     </th>
                                     <th scope="col" class="table-th">
@@ -53,6 +56,16 @@
                                 @foreach ($locations as $location)
                                     <tr class="even:bg-slate-50 dark:even:bg-slate-700">
                                         <td class="table-td">{{ $location->name }}</td>
+                                        <td class="table-td">
+                                            @if($location->map_link)
+                                                <a href="{{ $location->map_link }}" target="_blank" class="text-primary-500 hover:text-primary-600">
+                                                    <iconify-icon icon="heroicons:map-pin" class="text-lg"></iconify-icon>
+                                                    View on Map
+                                                </a>
+                                            @else
+                                                <span class="text-slate-400">No location set</span>
+                                            @endif
+                                        </td>
                                         <td class="table-td">{{ $location->positions()->count() }}</td>
                                         <td class="table-td">
                                             <span class="badge bg-primary-500 text-primary-500 bg-opacity-30 capitalize rounded-3xl cursor-pointer" wire:click="openHrUsersModal({{ $location->id }})">
@@ -104,10 +117,24 @@
 
         <div class="space-y-4">
             <div>
-                <x-text-input class="" wire:model.live="name" label="Name" placeholder="Enter location name" />
+                <x-text-input wire:model.live="name" label="Name" placeholder="Enter location name" />
                 @error('name')
                     <span class="font-Inter text-sm text-danger-500 inline-block">{{ $message }}</span>
                 @enderror
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <x-text-input type="number" step="any" wire:model.live="latitude" label="Latitude" placeholder="Enter latitude (-90 to 90)" />
+                    @error('latitude')
+                        <span class="font-Inter text-sm text-danger-500 inline-block">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div>
+                    <x-text-input type="number" step="any" wire:model.live="longitude" label="Longitude" placeholder="Enter longitude (-180 to 180)" />
+                    @error('longitude')
+                        <span class="font-Inter text-sm text-danger-500 inline-block">{{ $message }}</span>
+                    @enderror
+                </div>
             </div>
         </div>
 

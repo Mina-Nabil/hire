@@ -63,15 +63,19 @@
                         <thead class="border-t border-slate-100 dark:border-slate-800 bg-slate-200 dark:bg-slate-700">
                             <tr>
                                 <th scope="col" class="table-th">Employee</th>
+                                <th scope="col" class="table-th">Status</th>
                                 <th scope="col" class="table-th">Date</th>
                                 <th scope="col" class="table-th">Start Time</th>
                                 <th scope="col" class="table-th">End Time</th>
                                 <th scope="col" class="table-th">Hours</th>
+                                <th scope="col" class="table-th">Extra Hours</th>
+                                <th scope="col" class="table-th">Extra Hours Status</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
                             @foreach ($attendances as $attendance)
-                                <tr class="even:bg-slate-100 dark:even:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700">
+                                <tr
+                                    class="even:bg-slate-100 dark:even:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700">
                                     <td class="table-td">
                                         <div class="flex items-center">
                                             @if ($attendance->employee && $attendance->employee->full_image_url)
@@ -96,6 +100,55 @@
                                         </div>
                                     </td>
                                     <td class="table-td">
+                                        @if ($attendance->is_approved === null)
+                                            @if ($isManager && $attendance->employee && $attendance->employee->benefitConfiguration && $attendance->employee->benefitConfiguration->manager_id === Auth::user()->employee_id)
+                                                <div class="dropdown relative">
+                                                    <button
+                                                        class="btn inline-flex justify-center btn-warning items-center btn-sm"
+                                                        type="button" id="attendanceDropdownMenuButton"
+                                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                                        Pending
+                                                        <iconify-icon class="text-xl ltr:ml-2 rtl:mr-2"
+                                                            icon="ic:round-keyboard-arrow-down"></iconify-icon>
+                                                    </button>
+                                                    <ul
+                                                        class="dropdown-menu min-w-max absolute text-sm text-slate-700 dark:text-white hidden bg-white dark:bg-slate-700 shadow
+                                                            z-[2] float-left overflow-hidden list-none text-left rounded-lg mt-1 m-0 bg-clip-padding border-none">
+                                                        <li
+                                                            wire:click.prevent="approveAttendance({{ $attendance->id }})">
+                                                            <a href="#"
+                                                                class="text-slate-600 dark:text-white block font-Inter font-normal px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-600
+                                                                    dark:hover:text-white">
+                                                                Approve</a>
+                                                        </li>
+                                                        <li
+                                                            wire:click.prevent="rejectAttendance({{ $attendance->id }})">
+                                                            <a href="#"
+                                                                class="text-slate-600 dark:text-white block font-Inter font-normal px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-600
+                                                                    dark:hover:text-white">
+                                                                Reject</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            @else
+                                                <span
+                                                    class="inline-block px-3 min-w-[90px] text-center py-1 rounded-[999px] bg-opacity-25 text-warning-500 bg-warning-500 text-xs">
+                                                    Pending Manager Approval
+                                                </span>
+                                            @endif
+                                        @elseif($attendance->is_approved)
+                                            <span
+                                                class="inline-block px-3 min-w-[90px] text-center py-1 rounded-[999px] bg-opacity-25 text-success-500 bg-success-500 text-xs">
+                                                Approved
+                                            </span>
+                                        @else
+                                            <span
+                                                class="inline-block px-3 min-w-[90px] text-center py-1 rounded-[999px] bg-opacity-25 text-danger-500 bg-danger-500 text-xs">
+                                                Rejected
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td class="table-td">
                                         {{ $attendance->date }}
                                     </td>
                                     <td class="table-td">
@@ -107,6 +160,74 @@
                                     <td class="table-td">
                                         {{ $attendance->hours }}
                                     </td>
+                                    <td class="table-td">
+                                        <div class="flex items-center gap-2">
+                                            @if ($attendance->extra_hours)
+
+                                                <span>
+                                                    <span class="badge @if($attendance->extra_hours > 0) bg-success-500 @else bg-danger-500 @endif text-slate-900 bg-opacity-50 capitalize">{{ $attendance->extra_hours }}</span>
+                                                </span>
+                                            @endif
+                                            @if ($isManager)
+                                                <button  wire:click="openEditExtraHours({{ $attendance->id }})" class="action-btn" type="button">
+                                                    <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                                                    </button>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td class="table-td">
+                                        @if ($attendance->extra_hours)
+                                            @if ($attendance->is_extra_hours_approved === null)
+                                                @if ($isHr)
+                                                <div class="dropdown relative">
+                                                    <button
+                                                        class="btn inline-flex justify-center btn-warning items-center btn-sm"
+                                                        type="button" id="successDropdownMenuButton"
+                                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                                        Pending
+                                                        <iconify-icon class="text-xl ltr:ml-2 rtl:mr-2"
+                                                            icon="ic:round-keyboard-arrow-down"></iconify-icon>
+                                                    </button>
+                                                    <ul
+                                                        class=" dropdown-menu min-w-max absolute text-sm text-slate-700 dark:text-white hidden bg-white dark:bg-slate-700 shadow
+                                                            z-[2] float-left overflow-hidden list-none text-left rounded-lg mt-1 m-0 bg-clip-padding border-none">
+                                                        <li
+                                                            wire:click.prevent="approveExtraHours({{ $attendance->id }})">
+                                                            <a href="#"
+                                                                class="text-slate-600 dark:text-white block font-Inter font-normal px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-600
+                                                                    dark:hover:text-white">
+                                                                Approve</a>
+                                                        </li>
+                                                        <li
+                                                            wire:click.prevent="rejectExtraHours({{ $attendance->id }})">
+                                                            <a href="#"
+                                                                class="text-slate-600 dark:text-white block font-Inter font-normal px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-600
+                                                                    dark:hover:text-white">
+                                                                Reject</a>
+                                                        </li>
+
+                                                    </ul>
+                                                </div>
+                                                @else
+                                                <span
+                                                    class="inline-block px-3 min-w-[90px] text-center py-1 rounded-[999px] bg-opacity-25 text-warning-500 bg-warning-500 text-xs">
+                                                    Pending HR Approval
+                                                </span>
+                                                @endif
+                                            @elseif($attendance->is_extra_hours_approved)
+                                                <span
+                                                    class="inline-block px-3 min-w-[90px] text-center py-1 rounded-[999px] bg-opacity-25 text-success-500 bg-success-500 text-xs">
+                                                    Approved
+                                                </span>
+                                            @else
+                                                <span
+                                                    class="inline-block px-3 min-w-[90px] text-center py-1 rounded-[999px] bg-opacity-25 text-danger-500 bg-danger-500 text-xs">
+                                                    Rejected
+                                                </span>
+                                            @endif
+                                        @endif
+                                    </td>
+                                    
                                 </tr>
                             @endforeach
                         </tbody>
@@ -122,7 +243,8 @@
                                 <h2>
                                     <iconify-icon icon="icon-park-outline:search"></iconify-icon>
                                 </h2>
-                                <h2 class="card-title text-slate-900 dark:text-white mb-3">No attendance records found with
+                                <h2 class="card-title text-slate-900 dark:text-white mb-3">No attendance records found
+                                    with
                                     the applied filters</h2>
                                 <p class="card-text">Try changing the filters or search terms for this view.</p>
                             </div>
@@ -132,4 +254,54 @@
             </div>
         </div>
     </div>
+
+    <!-- Extra Hours Edit Modal -->
+    <x-modal wire:model="showExtraHoursModal">
+        <x-slot name="title">Edit Extra Hours</x-slot>
+        
+        <!-- Modal body -->
+        <div class="p-6 space-y-4">
+            <div class="from-group">
+                <label class="form-label">Employee</label>
+                <input type="text" class="form-control" disabled value="{{ $employeeName }}">
+            </div>
+            
+            <div class="from-group">
+                <label class="form-label">Date</label>
+                <input type="text" class="form-control" disabled value="{{ $attendanceDate }}">
+            </div>
+            
+            <div class="from-group">
+                <label class="form-label">Regular Hours</label>
+                <input type="text" class="form-control" disabled value="{{ $attendanceHours }}">
+            </div>
+            
+            <div class="from-group">
+                <label class="form-label">Extra Hours <span class="text-danger-500">*</span></label>
+                <input type="number" step="0.01" min="0" class="form-control @error('editExtraHours') !border-danger-500 @enderror" 
+                    wire:model="editExtraHours">
+                @error('editExtraHours')
+                    <span class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                @enderror
+            </div>
+            
+            <div class="bg-slate-50 dark:bg-slate-700 p-3 rounded-md">
+                <div class="flex items-start">
+                    <iconify-icon class="text-lg text-warning-500 mr-2 mt-0.5" 
+                        icon="heroicons-outline:exclamation-circle"></iconify-icon>
+                    <p class="text-sm text-slate-600 dark:text-slate-300">
+                        Extra hours will be submitted to HR for approval. Once approved, they will be
+                        included in payroll calculations.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal footer -->
+        <x-slot name="footer">
+            <x-secondary-button wire:click="closeExtraHoursModal">Cancel</x-secondary-button>
+            <x-primary-button wire:click.prevent="saveExtraHours" 
+                loadingFunction="saveExtraHours">Save Changes</x-primary-button>
+        </x-slot>
+    </x-modal>
 </div>

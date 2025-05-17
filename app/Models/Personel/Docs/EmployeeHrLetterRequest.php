@@ -3,6 +3,7 @@
 namespace App\Models\Personel\Docs;
 
 use App\Models\Personel\Employee;
+use App\Models\Users\AppLog;
 use App\Models\Users\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -99,11 +100,12 @@ class EmployeeHrLetterRequest extends Model
                     if ($result) {
                         return $this->update(['status' => self::STATUS_COMPLETED]);
                     }
-                    
+                    AppLog::error('Error creating HR letter', 'Failed to create HR letter for employee: ' . $this->employee->name, loggable: $this);
                     return true;
                 });
             } catch (\Exception $e) {
                 report($e);
+                AppLog::error('Error creating HR letter', $e->getMessage(), loggable: $this);
                 throw new \RuntimeException('Failed to generate HR letter: ' . $e->getMessage());
             }
         }
@@ -116,7 +118,7 @@ class EmployeeHrLetterRequest extends Model
         if ($this->status !== self::STATUS_PENDING) {
             throw new \InvalidArgumentException('Only pending requests can be deleted');
         }
-
+        AppLog::info('Employee HR Letter Request Deleted', 'Request deleted for employee: ' . $this->employee->name, loggable: $this);
         return parent::delete();
     }
 } 

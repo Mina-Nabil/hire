@@ -6,6 +6,7 @@ use App\Exceptions\AppException;
 use App\Models\Personel\Employee;
 use App\Models\Benefits\Payrolls\ExtraPayment;
 use App\Models\Benefits\Payrolls\BenefitPayment;
+use App\Models\Users\AppLog;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -92,9 +93,11 @@ class Loan extends Model
                     $extraPayment->payable()->associate($loan);
                     $extraPayment->save();
                 }
+                AppLog::info('Loan Created', "Employee: $employee->name, Amount: $amount, Desc: $desc", loggable: $loan);
             });
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error creating loan', $e->getMessage());
             throw new AppException('Error creating loan');
         }
     }

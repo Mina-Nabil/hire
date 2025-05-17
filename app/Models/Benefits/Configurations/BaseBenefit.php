@@ -9,6 +9,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Benefits\Payrolls\BenefitPayment;
+use App\Models\Users\AppLog;
 
 class BaseBenefit extends Model
 {
@@ -90,11 +91,18 @@ class BaseBenefit extends Model
             }
         }
 
-        $this->update([
-            'name' => $name,
-            'amount' => $amount,
-            'type' => $type,
-        ]);
+        try {
+            $this->update([
+                'name' => $name,
+                'amount' => $amount,
+                'type' => $type,
+            ]);
+            AppLog::info('Benefit Updated', "Name: $name", loggable: $this);
+        } catch (Exception $e) {
+            report($e);
+            AppLog::error('Error updating benefit', $e->getMessage(), loggable: $this);
+            throw new AppException('Failed to update benefit');
+        }
     }
 
     public function deactiveBenefit()
@@ -112,8 +120,10 @@ class BaseBenefit extends Model
             $this->update([
                 'end_date' => now()
             ]);
+            AppLog::info('Benefit Deactivated', "Name: $this->name", loggable: $this);
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error deactivating benefit', $e->getMessage(), loggable: $this);
             throw new AppException('Failed to deactive benefit');
         }
     }
@@ -132,8 +142,10 @@ class BaseBenefit extends Model
 
         try {
             $this->delete();
+            AppLog::info('Benefit Deleted', "Name: $this->name");
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error deleting benefit', $e->getMessage(), loggable: $this);
             throw new AppException('Failed to delete benefit');
         }
     }

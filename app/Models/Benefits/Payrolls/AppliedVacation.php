@@ -7,6 +7,7 @@ use App\Models\Personel\Employee;
 use App\Models\Benefits\Vacations\VacationBenefit;
 use App\Models\Benefits\Payrolls\Payroll;
 use App\Models\Benefits\Vacations\VacationDay;
+use App\Models\Users\AppLog;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
@@ -43,6 +44,7 @@ class AppliedVacation extends Model
 
         $this->status = self::STATUS_APPROVED;
         $this->save();
+        AppLog::info('Vacation Approved', "Employee: $this->employee->name, Vacation: $this->vacationBenefit->name", loggable: $this);
     }
 
 
@@ -56,6 +58,7 @@ class AppliedVacation extends Model
 
         $this->status = self::STATUS_REJECTED;
         $this->save();
+        AppLog::info('Vacation Rejected', "Employee: $this->employee->name, Vacation: $this->vacationBenefit->name", loggable: $this);
     }
     
     

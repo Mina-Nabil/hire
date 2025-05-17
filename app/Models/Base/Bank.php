@@ -3,6 +3,7 @@
 namespace App\Models\Base;
 
 use App\Exceptions\AppException;
+use App\Models\Users\AppLog;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -46,8 +47,10 @@ class Bank extends Model
                 ['name' => $name],
                 ['arabic_name' => $arabic_name]
             );
+            AppLog::info('Bank Created', "Name: $name, Arabic Name: $arabic_name", loggable: $bank);
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error creating bank', $e->getMessage());
             throw new AppException("Failed to create bank");
         }
     }
@@ -64,8 +67,10 @@ class Bank extends Model
                 'name' => $name,
                 'arabic_name' => $arabic_name,
             ]);
+            AppLog::info('Bank Updated', "Name: $name, Arabic Name: $arabic_name", loggable: $this);
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error editing bank', $e->getMessage());
             throw new AppException("Failed to edit bank");
         }
     }
@@ -73,6 +78,17 @@ class Bank extends Model
     ///delete methods
     public function deleteBank()
     {
-        $this->delete();
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('delete', $this)) throw new AppException("You are not authorized to delete this bank");
+
+        try {
+            $this->delete();
+            AppLog::info('Bank Deleted', "Name: $this->name", loggable: $this);
+        } catch (Exception $e) {
+            report($e);
+            AppLog::error('Error deleting bank', $e->getMessage(), loggable: $this);
+            throw new AppException("Failed to delete bank");
+        }
     }
 }

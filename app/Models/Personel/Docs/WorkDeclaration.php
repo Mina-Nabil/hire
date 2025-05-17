@@ -3,6 +3,7 @@
 namespace App\Models\Personel\Docs;
 
 use App\Exceptions\AppException;
+use App\Models\Users\AppLog;
 use App\Traits\DocumentModel;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
@@ -50,9 +51,11 @@ class WorkDeclaration extends Model
                 'expiry_date' => $expiry_date,
                 'created_by' => Auth::id(), // Track who updated it
             ]);
+            AppLog::info('Work Declaration Updated', 'Work declaration updated for employee: ' . $this->employee->name, loggable: $this);
             return true;
         } catch (\Exception $e) {
             report($e);
+            AppLog::error('Error updating work declaration', $e->getMessage(), loggable: $this);
             throw new AppException('Error updating work declaration');
         }
     }
@@ -72,9 +75,11 @@ class WorkDeclaration extends Model
 
         try {
             $this->delete();
+            AppLog::info('Work Declaration Deleted', 'Work declaration deleted for employee: ' . $this->employee->name, loggable: $this);
             return true;
         } catch (\Exception $e) {
             report($e);
+            AppLog::error('Error deleting work declaration', $e->getMessage(), loggable: $this);
             throw new AppException('Error deleting work declaration');
         }
     }

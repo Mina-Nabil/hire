@@ -9,6 +9,7 @@ use App\Models\Benefits\Vacations\VacationPayment;
 use App\Models\Benefits\Payrolls\AppliedVacation;
 use App\Models\Benefits\Vacations\GainedVacation;
 use App\Models\Benefits\Configurations\PackageDetail;
+use App\Models\Users\AppLog;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -109,7 +110,10 @@ class VacationBenefit extends Model
                 'hour_price' => $hour_price,
                 'max_balance' => $max_balance
             ]);
+            AppLog::info('Vacation Benefit Updated', "$name updated for $this->employee->name", loggable: $this);
         } catch (Exception $e) {
+            report($e);
+            AppLog::error('Error updating vacation benefit', $e->getMessage(), loggable: $this);
             throw new AppException('Failed to update benefit');
         }
     }
@@ -129,8 +133,10 @@ class VacationBenefit extends Model
             $this->update([
                 'end_date' => now()
             ]);
+            AppLog::info('Vacation Benefit Deactivated', "$this->name deactivated for $this->employee->name", loggable: $this);
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error deactivating vacation benefit', $e->getMessage(), loggable: $this);
             throw new AppException('Failed to deactive benefit');
         }
     }
@@ -160,9 +166,11 @@ class VacationBenefit extends Model
         }
 
         try {
+            AppLog::info('Vacation Benefit Deleted', "$this->name deleted for $this->employee->name");
             $this->delete();
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error deleting vacation benefit', $e->getMessage(), loggable: $this);
             throw new AppException('Failed to delete benefit');
         }
     }

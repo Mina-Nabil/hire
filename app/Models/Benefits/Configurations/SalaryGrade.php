@@ -9,6 +9,7 @@ use App\Models\Benefits\Configurations\PackageDetail;
 use App\Models\Benefits\Configurations\BaseBenefit;
 use App\Models\Benefits\Configurations\BenefitConfiguration;
 use App\Models\Benefits\Vacations\VacationDetail;
+use App\Models\Users\AppLog;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -86,10 +87,12 @@ class SalaryGrade extends Model
 
                 $package->packageDetails()->createMany($packageDetails);
 
+                AppLog::info('Salary Grade Created', "Name: $name", loggable: $package);
                 return $package;
             });
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error creating salary grade', $e->getMessage());
             throw new AppException('Failed to create benefit package');
         }
     }
@@ -133,9 +136,12 @@ class SalaryGrade extends Model
                 $this->packageDetails()->delete();
 
                 $this->packageDetails()->createMany($packageDetails);
+
+                AppLog::info('Salary Grade Updated', "Name: $name", loggable: $this);
             });
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error editing salary grade', $e->getMessage(), loggable: $this);
             throw new AppException('Failed to edit benefit package');
         }
     }
@@ -154,8 +160,10 @@ class SalaryGrade extends Model
         }
         try {
             $this->delete();
+            AppLog::info('Salary Grade Deleted', "Name: $this->name", loggable: $this);
         } catch (Exception $e) {
             report($e);
+            AppLog::error('Error deleting salary grade', $e->getMessage(), loggable: $this);
             throw new AppException('Failed to delete benefit package');
         }
     }

@@ -160,7 +160,7 @@ class Employee extends Model
      * @param bool $delete_old_conf delete old configuration if true and end old configuration if false
      * @return void
      */
-    public function applyBenefitsPackage(SalaryGrade $salaryGrade, $package_details, $grossSalary, $manager_id = null, bool $delete_old_conf = true)
+    public function applyBenefitsPackage(SalaryGrade $salaryGrade, $package_details, $grossSalary, $insuranceAmount, $manager_id = null, bool $delete_old_conf = true)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -183,7 +183,7 @@ class Employee extends Model
         }
 
         try {
-            DB::transaction(function () use ($package_details, $salaryGrade, $grossSalary, $manager_id, $delete_old_conf) {
+            DB::transaction(function () use ($package_details, $salaryGrade, $grossSalary, $manager_id, $delete_old_conf, $insuranceAmount) {
                 if ($delete_old_conf) {
                     $this->baseBenefits()->delete();
                 } else {
@@ -199,6 +199,7 @@ class Employee extends Model
                     'salary_grade_id' => $salaryGrade->id,
                     'vacation_package_id' => $salaryGrade->vacation_package_id,
                     'gross_salary' => $grossSalary,
+                    'insurance_amount' => $insuranceAmount,
                     'manager_id' => $manager_id,
                 ]);
                 AppLog::info('Benefits Package Applied', 'Benefits package applied for employee: ' . $this->name, loggable: $this);
@@ -2433,6 +2434,21 @@ class Employee extends Model
     public function getManagerIdAttribute()
     {
         return $this->benefitConfiguration?->manager_id;
+    }
+
+    public function getInsuranceAmountAttribute()
+    {
+        return $this->benefitConfiguration?->insurance_amount;
+    }
+
+    public function getGrossSalaryAttribute()
+    {
+        return $this->benefitConfiguration?->gross_salary;
+    }
+
+    public function getBasicSalaryAttribute()
+    {
+        return $this->baseBenefits?->where('name', 'basic')->first()?->amount;
     }
 
     //// relations ////

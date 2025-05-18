@@ -26,6 +26,7 @@ class ApplyPackageModal extends Component
     public $managerId;
     public $packageDetails = [];
     public $grossSalary;
+    public $insuranceAmount;
     public $packageStartDate;
     public $packageEndDate;
     public $deleteOldConf = true;
@@ -44,6 +45,7 @@ class ApplyPackageModal extends Component
             $this->selectedPackage = $this->selectedEmployee->benefitConfiguration->salaryGrade;
             $this->selectedPackageId = $this->selectedEmployee->benefitConfiguration->salaryGrade->id;
             $this->grossSalary = $this->selectedEmployee->benefitConfiguration->gross_salary;
+            $this->insuranceAmount = $this->selectedEmployee->benefitConfiguration->insurance_amount;
 
             $this->packageDetails = $this->selectedEmployee->baseBenefits()
             ->bySalaryGrade($this->selectedPackageId)->get()->map(function ($benefit) {
@@ -118,6 +120,7 @@ class ApplyPackageModal extends Component
             'selectedPackage',
             'packageDetails',
             'grossSalary',
+            'insuranceAmount',
             'packageStartDate',
             'packageEndDate',
             'deleteOldConf',
@@ -158,6 +161,7 @@ class ApplyPackageModal extends Component
             'packageStartDate' => 'required|date',
             'packageEndDate' => 'nullable|date|after:packageStartDate',
             'grossSalary' => 'required|numeric|min:' . $this->selectedPackage->gross_min . '|max:' . $this->selectedPackage->gross_max,
+            'insuranceAmount' => 'required|numeric',
         ], [
             'packageDetails.*.amount' => 'Amount#:position is required',
             'packageStartDate.required' => 'Start date is required',
@@ -166,6 +170,8 @@ class ApplyPackageModal extends Component
             'grossSalary.numeric' => 'Gross salary must be a number',
             'grossSalary.min' => 'Gross salary must be greater than ' . $this->selectedPackage->gross_min,
             'grossSalary.max' => 'Gross salary must be less than ' . $this->selectedPackage->gross_max,
+            'insuranceAmount.required' => 'Insurance amount is required',
+            'insuranceAmount.numeric' => 'Insurance amount must be a number',
         ]);
 
         try {
@@ -184,6 +190,7 @@ class ApplyPackageModal extends Component
                 $this->selectedPackage,
                 $this->packageDetails,
                 $this->grossSalary,
+                $this->insuranceAmount,
                 $this->managerId,
                 $this->deleteOldConf
             );

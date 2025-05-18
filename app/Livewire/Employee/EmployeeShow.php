@@ -53,7 +53,6 @@ class EmployeeShow extends Component
     public $editEmployeeInfoModal = false;
     public $insurance_office_id;
     public $insurance_number;
-    public $insurance_amount;
     public $academic_qualification;
     public $university;
     public $graduation_year;
@@ -394,7 +393,6 @@ class EmployeeShow extends Component
         if ($this->employee->info) {
             $this->insurance_office_id = $this->employee->info->insurance_office_id;
             $this->insurance_number = $this->employee->info->insurance_number;
-            $this->insurance_amount = $this->employee->info->insurance_amount;
             $this->academic_qualification = $this->employee->info->academic_qualification;
             $this->university = $this->employee->info->university;
             $this->graduation_year = $this->employee->info->graduation_year;
@@ -418,7 +416,6 @@ class EmployeeShow extends Component
         $this->validate([
             'insurance_office_id' => 'required|exists:insurance_offices,id',
             'insurance_number' => 'nullable|string|max:50',
-            'insurance_amount' => 'nullable|string|max:50',
             'academic_qualification' => 'nullable|string|max:255',
             'university' => 'nullable|string|max:255',
             'graduation_year' => 'nullable|integer',
@@ -429,7 +426,6 @@ class EmployeeShow extends Component
             $res = $this->employee->updateEmployeeInfo(
                 $this->insurance_office_id,
                 $this->insurance_number,
-                $this->insurance_amount,
                 $this->academic_qualification,
                 $this->university,
                 $this->graduation_year,
@@ -526,9 +522,6 @@ class EmployeeShow extends Component
         } catch (\Exception $e) {
             $this->alertError($e->getMessage());
         }
-
-        // dd($this->employee->birthCertificate->expiry_date);
-
     }
 
     public function downloadBirthCertificate()

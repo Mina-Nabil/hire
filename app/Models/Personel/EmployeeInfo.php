@@ -13,7 +13,6 @@ class EmployeeInfo extends Model
         'employee_id',
         'insurance_office_id',
         'insurance_number',
-        'insurance_amount',
         'academic_qualification',
         'university',
         'graduation_year',

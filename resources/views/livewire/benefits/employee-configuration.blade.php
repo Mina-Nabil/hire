@@ -1010,16 +1010,16 @@
                     @endif
 
                     <div class="grid grid-cols-1 gap-4">
-                        
-                        <x-text-input label="Amount*" type="number" step="0.01"
+
+                        <x-text-input label="Amount*" class="@error('extraPayment.amount') !border-danger-500 @enderror" type="number" step="0.01"
                             wire:model="extraPayment.amount"
                             errorMessage="{{ $errors->first('extraPayment.amount') }}" />
 
-                        <x-text-input label="Due Date*" type="date"
+                        <x-text-input label="Due Date*" class="@error('extraPayment.due_date') !border-danger-500 @enderror" type="date"
                             wire:model="extraPayment.due_date"
                             errorMessage="{{ $errors->first('extraPayment.due_date') }}" />
 
-                        <x-textarea label="Description" wire:model="extraPayment.desc"
+                        <x-textarea label="Description" class="@error('extraPayment.desc') !border-danger-500 @enderror" wire:model="extraPayment.desc"
                             errorMessage="{{ $errors->first('extraPayment.desc') }}" />
                     </div>
                 </div>

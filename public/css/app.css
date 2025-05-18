@@ -17961,3 +17961,11 @@ ul.custom-list ul {
         grid-column: span 3 / span 3;
     }
 }
+
+.th-highlight-red {
+    background-color: #ff000047 !important;
+}
+
+.th-highlight-green {
+    background-color: #00ff0047 !important;
+}

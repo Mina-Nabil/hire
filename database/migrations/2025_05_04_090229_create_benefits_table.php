@@ -77,6 +77,7 @@ return new class extends Migration
             $table->boolean('is_automatic_overtime')->default(false);
             $table->boolean('is_require_attendance_approval')->default(false);
             $table->float('gross_salary')->nullable();
+            $table->float('insurance_amount')->nullable();
             $table->float('daily_working_hours')->nullable();
             $table->float('overtime_rate')->default(1);
             $table->time('working_day_start_min')->nullable();

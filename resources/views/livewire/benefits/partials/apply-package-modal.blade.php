@@ -100,6 +100,12 @@
                                                 </span>
                                             </div>
 
+                                            <div>
+                                                <x-text-input label="Insurance Amount*" type="number"
+                                                    wire:model="insuranceAmount"
+                                                    errorMessage="{{ $errors->first('insuranceAmount') }}" />
+                                            </div>
+
                                         </div>
                                     </div>
                                     @foreach ($packageDetails as $index => $detail)

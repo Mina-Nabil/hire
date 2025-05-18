@@ -217,17 +217,6 @@
                             @enderror
                         </div>
 
-                        <!-- Insurance Amount -->
-                        <div class="input-area">
-                            <label for="insurance_amount" class="form-label">Insurance Amount</label>
-                            <input id="insurance_amount" type="number" step="0.01"
-                                class="form-control @error('insurance_amount') !border-danger-500 @enderror"
-                                wire:model="insurance_amount">
-                            @error('insurance_amount')
-                                <span class="text-danger-500 text-xs">{{ $message }}</span>
-                            @enderror
-                        </div>
-
                         <!-- Academic Qualification -->
                         <div class="input-area">
                             <label for="academic_qualification" class="form-label">Academic Qualification</label>

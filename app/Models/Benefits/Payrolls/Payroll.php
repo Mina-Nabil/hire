@@ -13,5 +13,9 @@ class Payroll extends Model
         'payroll_date',
         'payroll_amount',
     ];
+
+    const EMPLOYEE_SHARE_SOCIAL_INSURANCE = 0.11;
+    const EMPLOYER_SHARE_SOCIAL_INSURANCE = 0.1875;
+    
     
 }

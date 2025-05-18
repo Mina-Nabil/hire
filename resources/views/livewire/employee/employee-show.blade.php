@@ -2920,15 +2920,6 @@
                                         @enderror
                                     </div>
                                     <div class="col-span-12 xl:col-span-6">
-                                        <label for="insurance_amount" class="form-label">Insurance Amount</label>
-                                        <input type="text"
-                                            class="form-control @error('insurance_amount') !border-danger-500 @enderror"
-                                            wire:model="insurance_amount">
-                                        @error('insurance_amount')
-                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                    <div class="col-span-12 xl:col-span-6">
                                         <label for="academic_qualification" class="form-label">Academic
                                             Qualification</label>
                                         <input type="text"

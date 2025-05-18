@@ -85,7 +85,12 @@
                                         If unchecked, the old configuration will be ended and a new one will be created
                                     </p>
                                 </div>
+                                <x-text-input label="Start Date*" type="date" wire:model="packageStartDate"
+                                    errorMessage="{{ $errors->first('packageStartDate') }}" />
+                                <x-text-input label="End Date*" type="date" wire:model="packageEndDate"
+                                    errorMessage="{{ $errors->first('packageEndDate') }}" />
                             </div>
+
                             @foreach ($vacationBenefits as $index => $benefit)
                                 <div class="border rounded-lg p-4">
                                     <div class="grid grid-cols-4">

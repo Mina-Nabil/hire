@@ -511,9 +511,11 @@ class EmployeeConfiguration extends Component
         $this->validate([
             'extraPayment.amount' => 'required|numeric|min:0.01',
             'extraPayment.due_date' => 'required|date',
+            'extraPayment.desc' => 'required|string',
         ], [
             'extraPayment.amount.required' => 'The amount is required.',
             'extraPayment.due_date.required' => 'The due date is required.',
+            'extraPayment.desc.required' => 'The description is required.',
         ]);
 
         try {

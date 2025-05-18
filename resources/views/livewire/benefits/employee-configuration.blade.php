@@ -48,7 +48,11 @@
                                                 dark:hover:text-white cursor-pointer">
                         Add Purchase
                     </li>
-
+                    <li wire:click="addExtraPayment()"
+                        class="text-slate-600 dark:text-white block font-Inter font-normal px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-600
+                                                dark:hover:text-white cursor-pointer">
+                        Add Extra Payment
+                    </li>
                 </ul>
             </div>
         </div>
@@ -974,6 +978,56 @@
                         <x-secondary-button wire:click="closeAddPurchaseModal">Cancel</x-secondary-button>
                         <x-primary-button wire:click.prevent="savePurchase" loadingFunction="savePurchase"
                             :disabled="$purchaseRemainingAmount != 0">
+                            Save
+                        </x-primary-button>
+                    </div>
+                </x-slot>
+            </x-modal>
+        @endif
+    </div>
+
+    <!-- Extra Payment Modal -->
+    <div>
+        @if ($showAddExtraPaymentModal)
+            <x-modal wire:model="showAddExtraPaymentModal">
+                <x-slot name="title">Add Extra Payment</x-slot>
+
+                <div class="space-y-6">
+                    @if ($errors->any())
+                        <div class="alert alert-warning mb-4">
+                            <div class="flex items-center">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                <div>
+                                    <p class="font-medium">Please fix the following errors:</p>
+                                    <ul>
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    <div class="grid grid-cols-1 gap-4">
+                        
+                        <x-text-input label="Amount*" type="number" step="0.01"
+                            wire:model="extraPayment.amount"
+                            errorMessage="{{ $errors->first('extraPayment.amount') }}" />
+
+                        <x-text-input label="Due Date*" type="date"
+                            wire:model="extraPayment.due_date"
+                            errorMessage="{{ $errors->first('extraPayment.due_date') }}" />
+
+                        <x-textarea label="Description" wire:model="extraPayment.desc"
+                            errorMessage="{{ $errors->first('extraPayment.desc') }}" />
+                    </div>
+                </div>
+
+                <x-slot name="footer">
+                    <div class="mt-4 flex justify-end gap-3">
+                        <x-secondary-button wire:click="closeAddExtraPaymentModal">Cancel</x-secondary-button>
+                        <x-primary-button wire:click.prevent="saveExtraPayment" loadingFunction="saveExtraPayment">
                             Save
                         </x-primary-button>
                     </div>

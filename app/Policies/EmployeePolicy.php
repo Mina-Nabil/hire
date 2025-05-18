@@ -26,6 +26,11 @@ class EmployeePolicy
         return $user->is_admin || $user->is_hr;
     }
 
+    public function createExtraPayment(User $user, Employee $employee): bool
+    {
+        return $user->is_admin || $user->is_hr;
+    }
+
     public function createPurchase(User $user, Employee $employee): bool
     {
         return $user->is_admin || $user->is_hr;

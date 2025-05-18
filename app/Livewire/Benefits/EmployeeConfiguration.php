@@ -19,6 +19,8 @@ use Livewire\Component;
 use Carbon\Carbon;
 use Exception;
 use Livewire\WithPagination;
+use Illuminate\Support\Facades\Auth;
+use App\Exceptions\AppException;
 
 class EmployeeConfiguration extends Component
 {
@@ -71,6 +73,16 @@ class EmployeeConfiguration extends Component
     ];
     public $purchasePayments = [];
     public $purchaseRemainingAmount = 0;
+
+    // Add Extra Payment Modal
+    public $showAddExtraPaymentModal = false;
+    public $extraPayment = [
+        'name' => '',
+        'amount' => 0,
+        'due_date' => '',
+        'desc' => '',
+    ];
+
     public $listeners = ['refreshConfiguration'];
 
     public function refreshConfiguration()
@@ -470,6 +482,56 @@ class EmployeeConfiguration extends Component
             $this->alertSuccess('Purchase added successfully.');
         } catch (Exception $e) {
             $this->alertError('Error: ' . $e->getMessage());
+        }
+    }
+
+    public function addExtraPayment()
+    {
+        $this->resetExtraPaymentForm();
+        $this->showAddExtraPaymentModal = true;
+    }
+
+    public function closeAddExtraPaymentModal()
+    {
+        $this->showAddExtraPaymentModal = false;
+    }
+
+    public function resetExtraPaymentForm()
+    {
+        $this->extraPayment = [
+            'name' => '',
+            'amount' => 0,
+            'due_date' => now()->format('Y-m-d'),
+            'desc' => '',
+        ];
+    }
+
+    public function saveExtraPayment()
+    {
+        $this->validate([
+            'extraPayment.amount' => 'required|numeric|min:0.01',
+            'extraPayment.due_date' => 'required|date',
+        ], [
+            'extraPayment.amount.required' => 'The amount is required.',
+            'extraPayment.due_date.required' => 'The due date is required.',
+        ]);
+
+        try {
+            ExtraPayment::createExtraPayment(
+                $this->employee,
+                $this->extraPayment['name'],
+                $this->extraPayment['amount'],
+                $this->extraPayment['due_date'],
+                $this->extraPayment['desc']
+            );
+
+            $this->closeAddExtraPaymentModal();
+            $this->alertSuccess('Extra payment added successfully.');
+        } catch (AppException $e) {
+            $this->alertError($e->getMessage());
+        } catch (Exception $e) {
+            report($e);
+            $this->alertError('Error creating extra payment. Please try again.');
         }
     }
 }

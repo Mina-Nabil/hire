@@ -154,7 +154,7 @@ return new class extends Migration
             $table->foreignIdFor(Payroll::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Employee::class)->constrained()->cascadeOnDelete();
             $table->float('paid');
-            $table->float('vacation_days');
+            $table->float('vacation_days'); //hours
             $table->float('vacation_amount');
             $table->float('base_amount');
             $table->timestamps();

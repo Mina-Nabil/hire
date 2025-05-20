@@ -66,6 +66,11 @@ class BaseBenefit extends Model
         return $this->hasMany(BenefitPayment::class);
     }
 
+    public function packageDetail()
+    {
+        return $this->belongsTo(PackageDetail::class);
+    }
+
     ///model functions
     public function updateBenefit(string $name, float $amount, string $type)
     {

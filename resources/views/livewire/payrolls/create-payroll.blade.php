@@ -24,7 +24,7 @@
                     <table class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700 no-wrap">
                         <thead>
                             <tr>
-                                <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 " rowspan="2">Employee</th>
+                                <th class="table-th border sticky-colomn border-slate-100 dark:bg-slate-800 dark:border-slate-700 " rowspan="2">Employee</th>
                                 <th class=" table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 " rowspan="2">Gross Salary</th>
                                 <th class=" table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 " rowspan="2">Basic Salary</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 " rowspan="2">Other Amount</th>
@@ -32,6 +32,8 @@
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center th-highlight-green" colspan="2">Medical Insurance Details</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center"></th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center th-highlight-yellow" colspan="3">Penalties</th>
+                                <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center th-highlight-red" colspan="2">Extra Payments</th>
+                                <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center th-highlight-blue" colspan="2">Base Benefits</th>
                             </tr>
                             <tr>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Employee</th>
@@ -43,19 +45,23 @@
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Days</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Amount</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Net After Penalty</th>
+                                <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Amount</th>
+                                <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Net After Deductions</th>
+                                <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Paid To Employee</th>
+                                <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Paid To Other</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
                             @foreach($payrollData as $departmentId => $department)
                                 @if($departmentId !== '_totals')
                                     <tr class="bg-slate-50 dark:bg-slate-700">
-                                        <td colspan="7" class="px-6 py-3 text-lg font-semibold">
+                                        <td colspan="10" class="px-6 py-3 text-lg font-semibold depratmnet-name">
                                             {{ $department['name'] }}
                                         </td>
                                     </tr>
                                     @foreach($department['employees'] as $employee)
                                         <tr>
-                                            <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
+                                            <td class="table-td sticky-colomn border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
                                                 <div>
                                                     <h6 class="text-base font-medium text-slate-900 dark:text-white">
                                                         {{ $employee['name'] }}
@@ -77,6 +83,10 @@
                                             <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['penalties_days'], 2) }}</td>
                                             <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['penalties_amount'], 2) }}</td>
                                             <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['net_after_penalty'], 2) }}</td>
+                                            <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['extra_payments'], 2) }}</td>
+                                            <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['net_after_deductions'], 2) }}</td>
+                                            <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['employee_base_benefits'], 2) }}</td>
+                                            <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['other_base_benefits'], 2) }}</td>
                                         </tr>
                                     @endforeach
                                 @endif

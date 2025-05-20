@@ -10,6 +10,8 @@ use App\Models\Hierarchy\Position;
 use App\Traits\AlertFrontEnd;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class CreatePayroll extends Component
 {
@@ -197,6 +199,7 @@ class CreatePayroll extends Component
             'employee_deductions' => 0,
             'penalties_days' => 0,
             'penalties_amount' => 0,
+            'extra_payments' => 0,
         ];
         
         foreach ($employees as $employee) {
@@ -217,6 +220,7 @@ class CreatePayroll extends Component
                         'net_income'=> 0,
                         'penalties_days' => 0,
                         'penalties_amount' => 0,
+                        'extra_payments' => 0,
                     ]
                 ];
             }
@@ -232,6 +236,8 @@ class CreatePayroll extends Component
             $employeeDeductions = $employeeInsurance + $employeeMedical;
             $netIncome = $otherAmount + $insuranceAmount;
             $dayPrice = $netIncome / 30;
+            $employeeBaseBenefits = $employee->getEmployeeBaseBenefits()->sum('amount');
+            $otherBaseBenefits = $employee->getOtherBaseBenefits()->sum('amount');
             
             // Get daily working hours from employee benefit configuration
             $dailyWorkingHours = $employee->benefitConfiguration?->daily_working_hours ?? 8;
@@ -248,6 +254,10 @@ class CreatePayroll extends Component
 
             $netAfterPenalty = $netIncome - $penaltyAmount;
             
+            // Get extra payments
+            $extraPayments = $employee->getNegativeExtraPayments($this->startDate, $this->endDate);
+            $netAfterDeductions = $netAfterPenalty + $extraPayments; // Add because extra payments are already negative
+            
             // Alternatively, use the new penalty calculation function (uncomment if needed)
             // $penaltyAmount = $employee->calculateTotalPenaltyDeduction($this->startDate, $this->endDate);
             
@@ -259,6 +269,7 @@ class CreatePayroll extends Component
             $departmentGroups[$departmentId]['totals']['total_insurance'] += $totalInsurance;
             $departmentGroups[$departmentId]['totals']['penalties_days'] += $totalPenaltyDays;
             $departmentGroups[$departmentId]['totals']['penalties_amount'] += $penaltyAmount;
+            $departmentGroups[$departmentId]['totals']['extra_payments'] += $extraPayments;
                         
             // Add to grand totals
             $totals['gross_salary'] += $grossSalary;
@@ -268,7 +279,9 @@ class CreatePayroll extends Component
             $totals['total_insurance'] += $totalInsurance;
             $totals['penalties_days'] += $totalPenaltyDays;
             $totals['penalties_amount'] += $penaltyAmount;
+            $totals['extra_payments'] += $extraPayments;
             
+            // Explicitly use indexed arrays for employees to ensure we have id as a field
             $departmentGroups[$departmentId]['employees'][] = [
                 'id' => $employee->id,
                 'name' => $employee->name,
@@ -285,7 +298,11 @@ class CreatePayroll extends Component
                 'penalties_days' => $totalPenaltyDays,
                 'penalties_amount' => $penaltyAmount,
                 'net_income' => $netIncome - $penaltyAmount,
-                'net_after_penalty' => $netAfterPenalty
+                'net_after_penalty' => $netAfterPenalty,
+                'extra_payments' => $extraPayments,
+                'net_after_deductions' => $netAfterDeductions,
+                'employee_base_benefits' => $employeeBaseBenefits,
+                'other_base_benefits' => $otherBaseBenefits,
             ];
         }
         
@@ -293,30 +310,114 @@ class CreatePayroll extends Component
         $this->payrollData['_totals'] = $totals;
     }
 
+    /**
+     * Submit the payroll for processing
+     */
     public function submitPayroll()
     {
-        if (empty($this->payrollData)) {
-            $this->alertError('No employees selected for payroll processing.');
-            return;
+        $this->ensureArrays();
+        
+        // Debug: Check the structure of the first employee
+        if (!empty($this->payrollData) && count($this->payrollData) > 0) {
+            $firstDept = collect($this->payrollData)->filter(function($item, $key) {
+                return $key !== '_totals';
+            })->first();
+            
+            if (!empty($firstDept['employees'])) {
+                $firstEmployee = $firstDept['employees'][0] ?? null;
+                \Illuminate\Support\Facades\Log::debug('First employee structure:', ['employee' => $firstEmployee]);
+            }
         }
-
-        $this->validate([
-            'startDate' => 'required|date',
-            'endDate' => 'required|date|after_or_equal:startDate',
-        ]);
-
-        // Here, you would typically call a method to create the payroll
-        // For now, we'll just show a success message
         
-        $this->alertSuccess('Payroll processing initiated for the selected employees.');
-        
-        // In a real implementation, you would:
-        // 1. Create a Payroll record
-        // 2. Create PayrollEmployee records for each employee
-        // 3. Handle benefit payments, etc.
-        
-        // Redirect to a confirmation page or payroll list
-        // return redirect()->route('payrolls.index');
+        try {
+            DB::beginTransaction();
+            
+            // Create the payroll
+            $payroll = \App\Models\Benefits\Payrolls\Payroll::create([
+                'creator_id' => Auth::id(),
+                'start_date' => $this->startDate,
+                'end_date' => $this->endDate,
+                'total_paid' => $this->payrollData['_totals']['net_amount'] ?? 0,
+                'total_vacation_days' => $this->payrollData['_totals']['vacation_days'] ?? 0,
+                'total_vacation_amount' => $this->payrollData['_totals']['vacation_amount'] ?? 0,
+                'total_employees' => count($this->selectedEmployees),
+                'status' => \App\Models\Benefits\Payrolls\Payroll::STATUS_PENDING,
+            ]);
+            
+            // Create payroll employee records
+            foreach ($this->payrollData as $departmentId => $department) {
+                if ($departmentId === '_totals') {
+                    continue;
+                }
+                
+                foreach ($department['employees'] as $index => $employee) {
+                    // Make sure we have a valid employee ID
+                    $employeeId = $employee['id'] ?? 0;
+                    
+                    if (!$employeeId) {
+                        continue; // Skip invalid employee IDs
+                    }
+                    
+                    // Create the payroll employee record
+                    $payrollEmployee = \App\Models\Benefits\Payrolls\PayrollEmployee::create([
+                        'employee_id' => $employeeId,
+                        'payroll_id' => $payroll->id,
+                        'paid' => $employee['net_after_deductions'],
+                        'vacation_days' => $employee['vacation_days'] ?? 0,
+                        'vacation_amount' => $employee['vacation_amount'] ?? 0,
+                        'base_amount' => $employee['gross_salary'],
+                        'gross_salary' => $employee['gross_salary'],
+                        'insurance_amount' => $employee['insurance_amount'],
+                        'other_amount' => $employee['other_amount'],
+                        'employee_insurance' => $employee['employee_insurance'],
+                        'employer_insurance' => $employee['employer_insurance'],
+                        'total_insurance' => $employee['total_insurance'],
+                        'employee_medical' => $employee['employee_medical'],
+                        'total_medical' => $employee['total_medical'],
+                        'employee_deductions' => $employee['employee_deductions'],
+                        'penalties_days' => $employee['penalties_days'],
+                        'penalties_amount' => $employee['penalties_amount'],
+                        'net_after_penalty' => $employee['net_after_penalty'],
+                        'extra_payments' => $employee['extra_payments'],
+                        'net_after_deductions' => $employee['net_after_deductions'],
+                        'employee_base_benefits' => $employee['employee_base_benefits'],
+                        'other_base_benefits' => $employee['other_base_benefits'],
+                        'position' => $employee['position'],
+                        'department' => $department['name'],
+                    ]);
+                    
+                    // Update attendance records with payroll_id
+                    \App\Models\Attendance\Attendance::where('employee_id', $employeeId)
+                        ->whereBetween('date', [$this->startDate, $this->endDate])
+                        ->update(['payroll_id' => $payroll->id]);
+                    
+                    // Link extra payments to this payroll
+                    \App\Models\Benefits\Payrolls\ExtraPayment::where('employee_id', $employeeId)
+                        ->where('status', \App\Models\Benefits\Payrolls\ExtraPayment::STATUS_APPROVED)
+                        ->whereBetween('due_date', [$this->startDate, $this->endDate])
+                        ->whereNull('payroll_id')
+                        ->update(['payroll_id' => $payroll->id, 'status' => \App\Models\Benefits\Payrolls\ExtraPayment::STATUS_PAID]);
+                    
+                    // Create benefit payment records for this employee
+                    $employeeModel = \App\Models\Personel\Employee::find($employeeId);
+                    if ($employeeModel) {
+                        $employeeModel->createBenefitPaymentsForPayroll($payroll, $employee);
+                    }
+                }
+            }
+            
+            DB::commit();
+            
+            // Show success notification
+            session()->flash('success', 'Payroll has been created successfully.');
+            
+            // Redirect to the payroll list
+            return redirect()->route('payroll.index');
+            
+        } catch (\Exception $e) {
+            $this->alertError('Failed to create payroll: ' . $e->getMessage());
+            DB::rollback();
+        }
     }
 
     public function render()

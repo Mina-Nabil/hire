@@ -15,6 +15,8 @@ class BenefitPayment extends Model
         'benefit_id',
         'amount',
         'status',
+        'payroll_id',
+        'desc',
     ];
 
     const STATUS_PENDING = 'pending';
@@ -37,5 +39,10 @@ class BenefitPayment extends Model
     public function baseBenefit()
     {
         return $this->belongsTo(BaseBenefit::class);
+    }
+    
+    public function payroll()
+    {
+        return $this->belongsTo(Payroll::class);
     }
 }

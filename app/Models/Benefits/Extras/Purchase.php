@@ -20,7 +20,6 @@ class Purchase extends Model
         'employee_id',
         'amount',
         'desc',
-        'creator_id',
     ];
 
     public function employee()
@@ -61,7 +60,7 @@ class Purchase extends Model
                 $purchase = new Purchase([
                     'employee_id' => $employee->id,
                     'amount' => $amount,
-                'desc' => $desc,
+                    'desc' => $desc,
                 ]);
                 $purchase->save();
                 $i = 1;
@@ -72,6 +71,7 @@ class Purchase extends Model
                     'amount' => $amount,
                     'due_date' => now(),
                     'desc' => "Actual purchase payment to employee balance",
+                    'creator_id' => Auth::id(),
                 ]);
                 $extraPayment->payable()->associate($purchase);
                 $extraPayment->save();

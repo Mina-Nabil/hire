@@ -19,6 +19,7 @@ class Attendance extends Model
 
     protected $fillable = [
         'employee_id',
+        'creator_id',
         'date',
         'start_time',
         'end_time',
@@ -26,7 +27,7 @@ class Attendance extends Model
         'extra_hours',
         'is_extra_hours_approved',
         'is_approved',
-        'creator_id',
+        'payroll_id',
     ];
 
     protected static function booted()
@@ -82,6 +83,14 @@ class Attendance extends Model
     public function creator()
     {
         return $this->belongsTo(User::class, 'creator_id');
+    }
+
+    /**
+     * Get the payroll this attendance record is associated with
+     */
+    public function payroll()
+    {
+        return $this->belongsTo(\App\Models\Benefits\Payrolls\Payroll::class);
     }
 
     ////static functions

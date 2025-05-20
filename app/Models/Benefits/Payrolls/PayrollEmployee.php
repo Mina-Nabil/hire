@@ -2,6 +2,7 @@
 
 namespace App\Models\Benefits\Payrolls;
 
+use App\Models\Personel\Employee;
 use Illuminate\Database\Eloquent\Model;
 
 class PayrollEmployee extends Model
@@ -11,7 +12,43 @@ class PayrollEmployee extends Model
     protected $fillable = [
         'employee_id',
         'payroll_id',
-        'payroll_date',
-        'payroll_amount',
+        'paid',
+        'vacation_days',
+        'vacation_amount',
+        'base_amount',
+        'gross_salary',
+        'insurance_amount',
+        'other_amount',
+        'employee_insurance',
+        'employer_insurance',
+        'total_insurance',
+        'employee_medical',
+        'total_medical',
+        'employee_deductions',
+        'penalties_days',
+        'penalties_amount',
+        'net_after_penalty',
+        'extra_payments',
+        'net_after_deductions',
+        'employee_base_benefits',
+        'other_base_benefits',
+        'position',
+        'department',
     ];
+    
+    /**
+     * Get the employee for this payroll record
+     */
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class);
+    }
+    
+    /**
+     * Get the payroll this record belongs to
+     */
+    public function payroll()
+    {
+        return $this->belongsTo(Payroll::class);
+    }
 }

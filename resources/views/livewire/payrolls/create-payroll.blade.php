@@ -21,7 +21,7 @@
             <!-- Payroll Data Table -->
             @if(count($payrollData) > 0)
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
+                    <table class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700 no-wrap">
                         <thead>
                             <tr>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 " rowspan="2">Employee</th>
@@ -30,6 +30,8 @@
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 " rowspan="2">Other Amount</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center th-highlight-red" colspan="3">Social Insurance Details</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center th-highlight-green" colspan="2">Medical Insurance Details</th>
+                                <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center"></th>
+                                <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center th-highlight-yellow" colspan="3">Penalties</th>
                             </tr>
                             <tr>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Employee</th>
@@ -37,6 +39,10 @@
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Total</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Employee</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Total</th>
+                                <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Employee Deductions</th>
+                                <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Days</th>
+                                <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Amount</th>
+                                <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Net After Penalty</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
@@ -65,6 +71,12 @@
                                             <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['employee_insurance'], 2) }}</td>
                                             <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['employer_insurance'], 2) }}</td>
                                             <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['total_insurance'], 2) }}</td>
+                                            <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['employee_medical'], 2) }}</td>
+                                            <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['total_medical'], 2) }}</td>
+                                            <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['employee_deductions'], 2) }}</td>
+                                            <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['penalties_days'], 2) }}</td>
+                                            <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['penalties_amount'], 2) }}</td>
+                                            <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['net_after_penalty'], 2) }}</td>
                                         </tr>
                                     @endforeach
                                 @endif

@@ -2897,6 +2897,8 @@ class Employee extends Model
         ];
     }
 
+    
+
     /**
      * Check external medical record status
      *
@@ -3200,4 +3202,529 @@ class Employee extends Model
         }
     }
 
+    public function getMonthlyMedicalBenefitsSum(): float
+    {
+        return $this->baseBenefits()
+            ->where('receiver', PackageDetail::RECEIVER_MEDICAL)
+            ->where('type', BaseBenefit::TYPE_MONTHLY)
+            ->sum('amount');
+    }
+
+    /**
+     * Calculate total worked hours for an employee in a specified date range
+     *
+     * @param Carbon|string $startDate Start date of the range
+     * @param Carbon|string $endDate End date of the range
+     * @param bool $includeExtraHours Whether to include approved extra hours in the calculation
+     * @return float Total worked hours
+     */
+    public function getWorkedHours($startDate, $endDate, $includeExtraHours = true)
+    {
+        $startDate = $startDate instanceof Carbon ? $startDate : Carbon::parse($startDate);
+        $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
+        
+        $attendanceQuery = $this->attendances()
+            ->where('date', '>=', $startDate->format('Y-m-d'))
+            ->where('date', '<=', $endDate->format('Y-m-d'))
+            ->where('is_approved', true);
+            
+        $totalHours = $attendanceQuery->sum('hours');
+        
+        if ($includeExtraHours) {
+            $extraHours = $attendanceQuery
+                ->where('is_extra_hours_approved', true)
+                ->sum('extra_hours');
+            
+            $totalHours += $extraHours;
+        }
+        
+        return $totalHours;
+    }
+    
+    /**
+     * Get attendance records that fell short of daily required hours
+     *
+     * @param Carbon|string $startDate Start date of the range
+     * @param Carbon|string $endDate End date of the range
+     * @return \Illuminate\Support\Collection Collection of attendance records with shortfall data
+     */
+    public function getShortfallHours($startDate, $endDate)
+    {
+        $startDate = $startDate instanceof Carbon ? $startDate : Carbon::parse($startDate);
+        $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
+        
+        $dailyRequired = $this->benefitConfiguration->daily_working_hours ?? 0;
+        
+        $attendances = $this->attendances()
+            ->where('date', '>=', $startDate->format('Y-m-d'))
+            ->where('date', '<=', $endDate->format('Y-m-d'))
+            ->where('is_approved', true)
+            ->get();
+            
+        return $attendances->map(function($attendance) use ($dailyRequired) {
+            $shortfall = max(0, $dailyRequired - $attendance->hours);
+            return [
+                'attendance' => $attendance,
+                'date' => $attendance->date,
+                'actual_hours' => $attendance->hours,
+                'required_hours' => $dailyRequired,
+                'shortfall' => $shortfall
+            ];
+        })->filter(function($item) {
+            return $item['shortfall'] > 0;
+        });
+    }
+    
+    /**
+     * Calculate total shortfall hours for an employee in a specified date range
+     *
+     * @param Carbon|string $startDate Start date of the range
+     * @param Carbon|string $endDate End date of the range
+     * @return float Total hours short of requirement
+     */
+    public function getTotalShortfallHours($startDate, $endDate)
+    {
+        return $this->getShortfallHours($startDate, $endDate)
+            ->sum('shortfall');
+    }
+    
+    /**
+     * Calculate deduction amount based on shortfall hours
+     *
+     * @param Carbon|string $startDate Start date of the range
+     * @param Carbon|string $endDate End date of the range
+     * @param float $hourlyRate The hourly rate for deduction calculation
+     * @return float Deduction amount
+     */
+    public function calculateHourlyDeduction($startDate, $endDate, $hourlyRate = null)
+    {
+        if ($hourlyRate === null) {
+            // Calculate hourly rate based on gross salary
+            $grossSalary = $this->benefitConfiguration->gross_salary ?? 0;
+            $workingDaysPerMonth = $this->workingDays->count() * 4; // Approximate
+            $dailyHours = $this->benefitConfiguration->daily_working_hours ?? 8;
+            
+            $hourlyRate = $grossSalary / ($workingDaysPerMonth * $dailyHours);
+        }
+        
+        $shortfallHours = $this->getTotalShortfallHours($startDate, $endDate);
+        return $shortfallHours * $hourlyRate;
+    }
+    
+    /**
+     * Get missed working days in a date range
+     *
+     * @param Carbon|string $startDate Start date of the range
+     * @param Carbon|string $endDate End date of the range
+     * @return \Illuminate\Support\Collection Collection of dates that were working days but had no attendance
+     */
+    public function getMissedWorkingDays($startDate, $endDate)
+    {
+        $startDate = $startDate instanceof Carbon ? $startDate : Carbon::parse($startDate);
+        $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
+        
+        // Get the working days of the employee
+        $workingDays = $this->workingDays->pluck('type')->toArray();
+        
+        $period = [];
+        $currentDate = $startDate->copy();
+        
+        // Generate all dates in the range
+        while ($currentDate->lte($endDate)) {
+            // Check if the day of the week is a working day
+            if (in_array(strtolower($currentDate->format('l')), array_map('strtolower', $workingDays))) {
+                $period[] = $currentDate->format('Y-m-d');
+            }
+            $currentDate->addDay();
+        }
+        
+        // Get all dates with approved attendance
+        $attendedDates = $this->attendances()
+            ->where('date', '>=', $startDate->format('Y-m-d'))
+            ->where('date', '<=', $endDate->format('Y-m-d'))
+            ->where('is_approved', true)
+            ->pluck('date')
+            ->toArray();
+        
+        // Return the difference - days that should have been worked but weren't
+        return collect(array_diff($period, $attendedDates));
+    }
+    
+    /**
+     * Get missed working hours in a date range
+     *
+     * @param Carbon|string $startDate Start date of the range
+     * @param Carbon|string $endDate End date of the range
+     * @return float Total hours that should have been worked but weren't
+     */
+    public function getMissedWorkingHours($startDate, $endDate)
+    {
+        $missedDays = $this->getMissedWorkingDays($startDate, $endDate);
+        $dailyHours = $this->benefitConfiguration?->daily_working_hours ?? 8;
+        
+        return $missedDays->count() * $dailyHours;
+    }
+    
+    /**
+     * Calculate deduction amount for missed days
+     *
+     * @param Carbon|string $startDate Start date of the range
+     * @param Carbon|string $endDate End date of the range
+     * @param float $hourlyRate The hourly rate for deduction calculation
+     * @return float Deduction amount
+     */
+    public function calculateMissedHoursDeduction($startDate, $endDate, $hourlyRate = null)
+    {
+        if ($hourlyRate === null) {
+            // Calculate hourly rate based on gross salary
+            $grossSalary = $this->benefitConfiguration->gross_salary ?? 0;
+            $workingDaysPerMonth = $this->workingDays->count() * 4; // Approximate
+            $dailyHours = $this->benefitConfiguration->daily_working_hours ?? 8;
+            
+            $hourlyRate = $grossSalary / ($workingDaysPerMonth * $dailyHours);
+        }
+        
+        $missedHours = $this->getMissedWorkingHours($startDate, $endDate);
+        return $missedHours * $hourlyRate;
+    }
+    
+    /**
+     * Get late minutes for a specific date
+     *
+     * @param Carbon|string $date The date to check
+     * @return int|null Minutes late or null if no attendance or no configuration
+     */
+    public function getLateMinutesOnDate($date)
+    {
+        $date = $date instanceof Carbon ? $date : Carbon::parse($date);
+        
+        $attendance = $this->attendances()
+            ->where('date', $date->format('Y-m-d'))
+            ->where('is_approved', true)
+            ->first();
+            
+        if (!$attendance) {
+            return null; // No attendance record
+        }
+        
+        $benefitConfig = $this->benefitConfiguration;
+        if (!$benefitConfig || !$benefitConfig->working_day_start_max) {
+            return null; // No benefit configuration or start time
+        }
+        
+        $attendanceStartTime = Carbon::parse($attendance->start_time);
+        $maxStartTime = Carbon::parse($benefitConfig->working_day_start_max);
+        
+        if ($attendanceStartTime->gt($maxStartTime)) {
+            return $attendanceStartTime->diffInMinutes($maxStartTime);
+        }
+        
+        return 0; // Not late
+    }
+    
+    /**
+     * Get total late hours in a date range
+     *
+     * @param Carbon|string $startDate Start date of the range
+     * @param Carbon|string $endDate End date of the range
+     * @return float Total hours late
+     */
+    public function getTotalLateHours($startDate, $endDate)
+    {
+        $startDate = $startDate instanceof Carbon ? $startDate : Carbon::parse($startDate);
+        $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
+        
+        $totalMinutes = 0;
+        $currentDate = $startDate->copy();
+        
+        while ($currentDate->lte($endDate)) {
+            $lateMinutes = $this->getLateMinutesOnDate($currentDate);
+            if ($lateMinutes !== null) {
+                $totalMinutes += $lateMinutes;
+            }
+            $currentDate->addDay();
+        }
+        
+        return $totalMinutes / 60.0; // Convert minutes to hours
+    }
+    
+    /**
+     * Get early departure minutes for a specific date
+     *
+     * @param Carbon|string $date The date to check
+     * @return int|null Minutes left early or null if no attendance or no configuration
+     */
+    public function getEarlyDepartureMinutesOnDate($date)
+    {
+        $date = $date instanceof Carbon ? $date : Carbon::parse($date);
+        
+        $attendance = $this->attendances()
+            ->where('date', $date->format('Y-m-d'))
+            ->where('is_approved', true)
+            ->first();
+            
+        if (!$attendance) {
+            return null; // No attendance record
+        }
+        
+        $benefitConfig = $this->benefitConfiguration;
+        if (!$benefitConfig || !$benefitConfig->working_day_end_min) {
+            return null; // No benefit configuration or end time
+        }
+        
+        $attendanceEndTime = Carbon::parse($attendance->end_time);
+        $minEndTime = Carbon::parse($benefitConfig->working_day_end_min);
+        
+        if ($attendanceEndTime->lt($minEndTime)) {
+            return $minEndTime->diffInMinutes($attendanceEndTime);
+        }
+        
+        return 0; // Did not leave early
+    }
+    
+    /**
+     * Get total early departure hours in a date range
+     *
+     * @param Carbon|string $startDate Start date of the range
+     * @param Carbon|string $endDate End date of the range
+     * @return float Total hours of early departures
+     */
+    public function getTotalEarlyDepartureHours($startDate, $endDate)
+    {
+        $startDate = $startDate instanceof Carbon ? $startDate : Carbon::parse($startDate);
+        $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
+        
+        $totalMinutes = 0;
+        $currentDate = $startDate->copy();
+        
+        while ($currentDate->lte($endDate)) {
+            $earlyMinutes = $this->getEarlyDepartureMinutesOnDate($currentDate);
+            if ($earlyMinutes !== null) {
+                $totalMinutes += $earlyMinutes;
+            }
+            $currentDate->addDay();
+        }
+        
+        return $totalMinutes / 60.0; // Convert minutes to hours
+    }
+    
+    /**
+     * Get total attendance penalty hours (combination of missed, late, early departure, and shortfall)
+     *
+     * @param Carbon|string $startDate Start date of the range
+     * @param Carbon|string $endDate End date of the range
+     * @return float Total hours to be penalized
+     */
+    public function getTotalPenaltyHours($startDate, $endDate)
+    {
+        // Get missed working hours (full days)
+        $missedHours = $this->getMissedWorkingHours($startDate, $endDate);
+        
+        // Get late hours
+        $lateHours = $this->getTotalLateHours($startDate, $endDate);
+        
+        // Get early departure hours
+        $earlyDepartureHours = $this->getTotalEarlyDepartureHours($startDate, $endDate);
+        
+        // Get shortfall hours (partial days)
+        $shortfallHours = $this->getTotalShortfallHours($startDate, $endDate);
+
+        return $missedHours + $lateHours + $shortfallHours;
+    }
+    
+    /**
+     * Calculate total penalty deduction based on all attendance issues
+     *
+     * @param Carbon|string $startDate Start date of the range
+     * @param Carbon|string $endDate End date of the range
+     * @param float $hourlyRate The hourly rate for deduction calculation
+     * @return float Total deduction amount
+     */
+    public function calculateTotalPenaltyDeduction($startDate, $endDate, $hourlyRate = null)
+    {
+        if ($hourlyRate === null) {
+            // Calculate hourly rate based on gross salary
+            $grossSalary = $this->benefitConfiguration->gross_salary ?? 0;
+            $workingDaysPerMonth = $this->workingDays->count() * 4; // Approximate
+            $dailyHours = $this->benefitConfiguration->daily_working_hours ?? 8;
+            
+            $hourlyRate = $grossSalary / ($workingDaysPerMonth * $dailyHours);
+        }
+        
+        $totalPenaltyHours = $this->getTotalPenaltyHours($startDate, $endDate);
+        return $totalPenaltyHours * $hourlyRate;
+    }
+
+    /**
+     * Get approved overtime hours in a date range
+     *
+     * @param Carbon|string $startDate Start date of the range
+     * @param Carbon|string $endDate End date of the range
+     * @return float Total approved overtime hours
+     */
+    public function getApprovedOvertimeHours($startDate, $endDate)
+    {
+        $startDate = $startDate instanceof Carbon ? $startDate : Carbon::parse($startDate);
+        $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
+        
+        return $this->attendances()
+            ->where('date', '>=', $startDate->format('Y-m-d'))
+            ->where('date', '<=', $endDate->format('Y-m-d'))
+            ->where('is_approved', true)
+            ->where('is_extra_hours_approved', true)
+            ->sum('extra_hours');
+    }
+    
+    /**
+     * Calculate overtime pay for a date range
+     *
+     * @param Carbon|string $startDate Start date of the range
+     * @param Carbon|string $endDate End date of the range
+     * @param float $overtimeRate The overtime rate multiplier (default: from benefit configuration)
+     * @return float Overtime pay amount
+     */
+    public function calculateOvertimePay($startDate, $endDate, $overtimeRate = null)
+    {
+        if ($overtimeRate === null) {
+            $overtimeRate = $this->benefitConfiguration->overtime_rate ?? 1.5;
+        }
+        
+        // Calculate hourly rate based on gross salary
+        $grossSalary = $this->benefitConfiguration->gross_salary ?? 0;
+        $workingDaysPerMonth = $this->workingDays->count() * 4; // Approximate
+        $dailyHours = $this->benefitConfiguration->daily_working_hours ?? 8;
+        
+        $hourlyRate = $grossSalary / ($workingDaysPerMonth * $dailyHours);
+        $overtimeHours = $this->getApprovedOvertimeHours($startDate, $endDate);
+        
+        return $overtimeHours * $hourlyRate * $overtimeRate;
+    }
+    
+    /**
+     * Check if employee was late on a specific date
+     *
+     * @param Carbon|string $date The date to check
+     * @return bool|null True if late, false if on time, null if no attendance
+     */
+    public function wasLateOnDate($date)
+    {
+        $date = $date instanceof Carbon ? $date : Carbon::parse($date);
+        
+        $attendance = $this->attendances()
+            ->where('date', $date->format('Y-m-d'))
+            ->where('is_approved', true)
+            ->first();
+            
+        if (!$attendance) {
+            return null; // No attendance record
+        }
+        
+        $benefitConfig = $this->benefitConfiguration;
+        if (!$benefitConfig) {
+            return null; // No benefit configuration
+        }
+        
+        $startTimeLimit = $benefitConfig->working_day_start_max;
+        if (!$startTimeLimit) {
+            return null; // No start time constraint
+        }
+        
+        $attendanceStartTime = Carbon::parse($attendance->start_time);
+        $maxStartTime = Carbon::parse($startTimeLimit);
+        
+        return $attendanceStartTime->gt($maxStartTime);
+    }
+    
+    /**
+     * Count late days in a date range
+     *
+     * @param Carbon|string $startDate Start date of the range
+     * @param Carbon|string $endDate End date of the range
+     * @return int Number of days employee was late
+     */
+    public function countLateDays($startDate, $endDate)
+    {
+        $startDate = $startDate instanceof Carbon ? $startDate : Carbon::parse($startDate);
+        $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
+        
+        $benefitConfig = $this->benefitConfiguration;
+        if (!$benefitConfig || !$benefitConfig->working_day_start_max) {
+            return 0;
+        }
+        
+        return $this->attendances()
+            ->where('date', '>=', $startDate->format('Y-m-d'))
+            ->where('date', '<=', $endDate->format('Y-m-d'))
+            ->where('is_approved', true)
+            ->where('start_time', '>', $benefitConfig->working_day_start_max)
+            ->count();
+    }
+    
+    /**
+     * Check if employee left early on a specific date
+     *
+     * @param Carbon|string $date The date to check
+     * @return bool|null True if left early, false if on time, null if no attendance
+     */
+    public function leftEarlyOnDate($date)
+    {
+        $date = $date instanceof Carbon ? $date : Carbon::parse($date);
+        
+        $attendance = $this->attendances()
+            ->where('date', $date->format('Y-m-d'))
+            ->where('is_approved', true)
+            ->first();
+            
+        if (!$attendance) {
+            return null; // No attendance record
+        }
+        
+        $benefitConfig = $this->benefitConfiguration;
+        if (!$benefitConfig) {
+            return null; // No benefit configuration
+        }
+        
+        $endTimeLimit = $benefitConfig->working_day_end_min;
+        if (!$endTimeLimit) {
+            return null; // No end time constraint
+        }
+        
+        $attendanceEndTime = Carbon::parse($attendance->end_time);
+        $minEndTime = Carbon::parse($endTimeLimit);
+        
+        return $attendanceEndTime->lt($minEndTime);
+    }
+    
+    /**
+     * Count early departure days in a date range
+     *
+     * @param Carbon|string $startDate Start date of the range
+     * @param Carbon|string $endDate End date of the range
+     * @return int Number of days employee left early
+     */
+    public function countEarlyDepartureDays($startDate, $endDate)
+    {
+        $startDate = $startDate instanceof Carbon ? $startDate : Carbon::parse($startDate);
+        $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
+        
+        $benefitConfig = $this->benefitConfiguration;
+        if (!$benefitConfig || !$benefitConfig->working_day_end_min) {
+            return 0;
+        }
+        
+        return $this->attendances()
+            ->where('date', '>=', $startDate->format('Y-m-d'))
+            ->where('date', '<=', $endDate->format('Y-m-d'))
+            ->where('is_approved', true)
+            ->where('end_time', '<', $benefitConfig->working_day_end_min)
+            ->count();
+    }
+    
+    /**
+     * Relation to attendance records
+     */
+    public function attendances()
+    {
+        return $this->hasMany(\App\Models\Attendance\Attendance::class);
+    }
 }

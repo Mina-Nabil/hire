@@ -192,6 +192,11 @@ class CreatePayroll extends Component
             'employer_insurance' => 0,
             'total_insurance' => 0,
             'other_amount' => 0,
+            'employee_medical' => 0,
+            'total_medical' => 0,
+            'employee_deductions' => 0,
+            'penalties_days' => 0,
+            'penalties_amount' => 0,
         ];
         
         foreach ($employees as $employee) {
@@ -208,7 +213,10 @@ class CreatePayroll extends Component
                         'employee_insurance' => 0,
                         'employer_insurance' => 0,
                         'total_insurance' => 0,
-                        'other_amount' => 0
+                        'other_amount' => 0,
+                        'net_income'=> 0,
+                        'penalties_days' => 0,
+                        'penalties_amount' => 0,
                     ]
                 ];
             }
@@ -219,6 +227,29 @@ class CreatePayroll extends Component
             $employerInsurance = $insuranceAmount * Payroll::EMPLOYER_SHARE_SOCIAL_INSURANCE;
             $totalInsurance = $employeeInsurance + $employerInsurance;
             $otherAmount = $grossSalary - $insuranceAmount - $employerInsurance ?? 0;
+            $employeeMedical = $employee->getMonthlyMedicalBenefitsSum();
+            $totalMedical = $employeeMedical;
+            $employeeDeductions = $employeeInsurance + $employeeMedical;
+            $netIncome = $otherAmount + $insuranceAmount;
+            $dayPrice = $netIncome / 30;
+            
+            // Get daily working hours from employee benefit configuration
+            $dailyWorkingHours = $employee->benefitConfiguration?->daily_working_hours ?? 8;
+            
+            // Calculate penalty hours using the new consolidated function
+            $totalPenaltyHours = $employee->getTotalPenaltyHours($this->startDate, $this->endDate);
+            
+            // Convert total hours to days for display purposes
+            $totalPenaltyDays = $dailyWorkingHours > 0 ? $totalPenaltyHours / $dailyWorkingHours : 0;
+            
+            // Calculate hourly rate and penalty amount
+            $hourlyRate = $dayPrice / $dailyWorkingHours;
+            $penaltyAmount = $totalPenaltyHours * $hourlyRate;
+
+            $netAfterPenalty = $netIncome - $penaltyAmount;
+            
+            // Alternatively, use the new penalty calculation function (uncomment if needed)
+            // $penaltyAmount = $employee->calculateTotalPenaltyDeduction($this->startDate, $this->endDate);
             
             // Add to department totals
             $departmentGroups[$departmentId]['totals']['gross_salary'] += $grossSalary;
@@ -226,6 +257,8 @@ class CreatePayroll extends Component
             $departmentGroups[$departmentId]['totals']['employee_insurance'] += $employeeInsurance;
             $departmentGroups[$departmentId]['totals']['employer_insurance'] += $employerInsurance;
             $departmentGroups[$departmentId]['totals']['total_insurance'] += $totalInsurance;
+            $departmentGroups[$departmentId]['totals']['penalties_days'] += $totalPenaltyDays;
+            $departmentGroups[$departmentId]['totals']['penalties_amount'] += $penaltyAmount;
                         
             // Add to grand totals
             $totals['gross_salary'] += $grossSalary;
@@ -233,6 +266,8 @@ class CreatePayroll extends Component
             $totals['employee_insurance'] += $employeeInsurance;
             $totals['employer_insurance'] += $employerInsurance;
             $totals['total_insurance'] += $totalInsurance;
+            $totals['penalties_days'] += $totalPenaltyDays;
+            $totals['penalties_amount'] += $penaltyAmount;
             
             $departmentGroups[$departmentId]['employees'][] = [
                 'id' => $employee->id,
@@ -243,7 +278,14 @@ class CreatePayroll extends Component
                 'employee_insurance' => $employeeInsurance,
                 'employer_insurance' => $employerInsurance,
                 'total_insurance' => $totalInsurance,
-                'other_amount' => $otherAmount
+                'other_amount' => $otherAmount,
+                'employee_medical' => $employeeMedical,
+                'total_medical' => $totalMedical,
+                'employee_deductions' => $employeeDeductions,
+                'penalties_days' => $totalPenaltyDays,
+                'penalties_amount' => $penaltyAmount,
+                'net_income' => $netIncome - $penaltyAmount,
+                'net_after_penalty' => $netAfterPenalty
             ];
         }
         

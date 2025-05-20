@@ -17969,3 +17969,7 @@ ul.custom-list ul {
 .th-highlight-green {
     background-color: #00ff0047 !important;
 }
+
+.th-highlight-yellow {
+    background-color: #ffa50047 !important;
+}

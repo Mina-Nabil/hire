@@ -136,8 +136,8 @@
 
                                     </td>
                                     <td class="table-td">
-                                        @if ($employee->benefitConfiguration)
-                                            {{ ucfirst($employee->benefitConfiguration->salaryGrade->name) }}
+                                        @if ($employee->benefitConfiguration?->salaryGrade)
+                                            {{ ucfirst($employee->benefitConfiguration?->salaryGrade->name) }}
                                         @else
                                             <span class="badge badge-danger">Not Configured</span>
                                         @endif

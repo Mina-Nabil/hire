@@ -12,7 +12,7 @@ class BenefitPayment extends Model
     protected $table = 'benefit_payments';
     protected $fillable = [
         'employee_id',
-        'benefit_id',
+        'base_benefit_id',
         'amount',
         'status',
         'payroll_id',

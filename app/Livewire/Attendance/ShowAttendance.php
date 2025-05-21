@@ -201,7 +201,7 @@ class ShowAttendance extends Component
                 $query->where('date', '<=', $this->endDate);
             });
 
-        $attendances = $query->latest()->paginate(10);
+        $attendances = $query->latest()->paginate(50);
 
         // Determine which layout to use based on user role
         $user = Auth::user();

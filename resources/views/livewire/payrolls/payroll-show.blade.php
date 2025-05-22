@@ -2,7 +2,23 @@
     <div class="card">
         <div class="card-header">
             <h4 class="card-title">Payroll Details</h4>
-            <div>
+            <div class="flex items-center gap-2">
+                @if ($payroll->status === \App\Models\Benefits\Payrolls\Payroll::STATUS_PENDING)
+                    <div class="flex justify-end gap-2">
+                        <button type="button" class="btn btn-success btn-sm" wire:click="approvePayroll"
+                            wire:loading.attr="disabled">
+                            <span wire:loading.remove wire:target="approvePayroll">
+                                <span class="flex items-center">
+                                    <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2"
+                                        icon="heroicons-outline:check"></iconify-icon>
+                                    Approve Payroll
+                                </span>
+                            </span>
+                            <span wire:loading wire:target="approvePayroll">Processing...</span>
+                        </button>
+                    </div>
+                @endif
+
                 <a href="{{ route('payrolls.index') }}">
                     <button class="btn inline-flex justify-center btn-light btn-sm">Back to Payrolls</button>
                 </a>
@@ -50,21 +66,7 @@
                 </div>
             </div>
 
-            @if ($payroll->status === \App\Models\Benefits\Payrolls\Payroll::STATUS_PENDING)
-                <div class="flex justify-end mb-6">
-                    <button type="button" class="btn btn-success" wire:click="approvePayroll"
-                        wire:loading.attr="disabled">
-                        <span wire:loading.remove wire:target="approvePayroll">
-                            <span class="flex items-center">
-                                <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2"
-                                    icon="heroicons-outline:check"></iconify-icon>
-                                Approve Payroll
-                            </span>
-                        </span>
-                        <span wire:loading wire:target="approvePayroll">Processing...</span>
-                    </button>
-                </div>
-            @endif
+
 
             <div class="flex justify-between items-center mb-6">
                 <div class="flex-1 mr-4">

@@ -25,6 +25,7 @@ class Overtime extends Model
         'status',
         'approved_at',
         'admin_note',
+        'payroll_id',
     ];
 
     const STATUS_PENDING = 'pending';

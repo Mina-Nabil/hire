@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Payrolls;
 
+use App\Models\Attendance\Overtime;
 use App\Models\Benefits\Configurations\BenefitConfiguration;
 use App\Models\Benefits\Payrolls\Payroll;
 use App\Models\Personel\Employee;
@@ -13,7 +14,9 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Title;
 
+#[Title('Create Payroll')]
 class CreatePayroll extends Component
 {
     use AlertFrontEnd, WithPagination;
@@ -268,17 +271,37 @@ class CreatePayroll extends Component
             // $penaltyAmount = $employee->calculateTotalPenaltyDeduction($this->startDate, $this->endDate);
             
             // Calculate overtime
-            $overtimeHours = $employee->overtimes()
-                ->where('status', \App\Models\Attendance\Overtime::STATUS_APPROVED)
-                ->whereBetween('date', [$this->startDate, $this->endDate])
-                ->whereNull('payroll_id')
-                ->sum('hours');
-                
-            // Calculate overtime pay
+            $overtimeHours = 0;
             $overtimeRate = $employee->benefitConfiguration->overtime_rate ?? 1.5;
-            $workingDaysPerMonth = $employee->workingDays->count() * 4; // Approximate
-            $dailyHours = $employee->benefitConfiguration->daily_working_hours ?? 8;
+            $dailyWorkingHours = $employee->benefitConfiguration->daily_working_hours ?? 8;
+            $isAutomaticOvertime = $employee->benefitConfiguration->is_automatic_overtime ?? false;
             
+            if ($isAutomaticOvertime) {
+                // Calculate overtime from attendance records
+                // Get all approved attendance records
+                $attendances = $employee->attendances()
+                    ->where('is_approved', true)
+                    ->whereBetween('date', [$this->startDate, $this->endDate])
+                    ->whereNull('payroll_id')
+                    ->get();
+                
+                // For each attendance, calculate overtime if hours exceed daily working hours
+                foreach ($attendances as $attendance) {
+                    $dailyHours = $attendance->hours;
+                    if ($dailyHours > $dailyWorkingHours) {
+                        $overtimeHours += ($dailyHours - $dailyWorkingHours);
+                    }
+                }
+            } else {
+                // Use explicitly created overtime records
+                $overtimeHours = $employee->overtimes()
+                    ->where('status', Overtime::STATUS_APPROVED)
+                    ->whereBetween('date', [$this->startDate, $this->endDate])
+                    ->whereNull('payroll_id')
+                    ->sum('hours');
+            }
+            
+            // Calculate overtime amount
             $overtimeAmount = $overtimeHours * $hourlyRate * $overtimeRate;
             
             // Calculate net income with overtime

@@ -368,7 +368,7 @@ class Employee extends Model
      * @param int|null $package_detail_id - if null, the benefit is custom
      * @param string|null $name - if not null, the benefit is custom
      */
-    public function addCustomBaseBenefit(string $name, float $amount, string $type, Carbon $start_date)
+    public function addCustomBaseBenefit(string $name, float $amount, string $type, string $receiver, Carbon $start_date)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -376,12 +376,13 @@ class Employee extends Model
             throw new AppException('You dont have permission to set base benefit');
         }
         try {
-            DB::transaction(function () use ($name, $amount, $type, $start_date) {
+            DB::transaction(function () use ($name, $amount, $type, $start_date, $receiver) {
                 $this->baseBenefits()->create([
                     'name' => $name,
                     'amount' => $amount,
                     'type' => $type,
                     'start_date' => $start_date,
+                    'receiver' => $receiver,
                 ]);
                 AppLog::info('Custom Base Benefit Added', 'Custom base benefit added for employee: ' . $this->name, loggable: $this);
             });

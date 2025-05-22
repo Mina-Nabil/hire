@@ -110,7 +110,7 @@
                 <div class="from-group">
                     <div class="input-area">
                         <label for="file" class="form-label">Select File</label>
-                        <input type="file" wire:model="file"
+                        <input type="file" wire:model.live="file"
                             class="form-control @error('file') !border-danger-500 @enderror" accept=".xlsx,.xls">
                         <p class="text-sm text-slate-500 mt-1">Supported formats: XLSX, XLS (Max size: 20MB)</p>
                     </div>

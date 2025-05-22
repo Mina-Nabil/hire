@@ -7,9 +7,9 @@ use App\Traits\AlertFrontEnd;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Title;
 
-
-
+#[Title('Payrolls')]
 class PayrollIndex extends Component
 {
     use AlertFrontEnd, WithPagination;

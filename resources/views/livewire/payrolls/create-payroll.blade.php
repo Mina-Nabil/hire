@@ -9,7 +9,7 @@
                     <h5 class="text-lg font-medium">Payroll Period: {{ \Carbon\Carbon::parse($startDate)->format('d M Y') }} - {{ \Carbon\Carbon::parse($endDate)->format('d M Y') }}</h5>
                 </div>
                 <div>
-                    <button type="button" class="btn btn-primary" wire:click="openDepartmentModal">
+                    <button type="button" class="btn btn-dark btn-sm" wire:click="openDepartmentModal">
                         <span class="flex items-center">
                             <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2" icon="heroicons-outline:plus"></iconify-icon>
                             Add Departments
@@ -137,16 +137,17 @@
                     <div class="grid grid-cols-1 gap-4">
                         <div>
                             <label class="form-label">Departments*</label>
-                            <div class="border rounded-md p-4 mt-1 max-h-60 overflow-y-auto">
+                            <div class="border rounded-md p-4 mt-1 max-h-60 overflow-y-auto grid grid-cols-1 md:grid-cols-4 gap-2">
                                 @foreach($departments as $department)
-                                    <div class="flex items-center mb-2 p-2 rounded-md {{ is_array($this->selectedDepartments) && in_array($department->id, $this->selectedDepartments) ? 'bg-primary-50 dark:bg-primary-900/20' : '' }}">
-                                        <input type="checkbox" id="department-{{ $department->id }}" 
-                                            value="{{ $department->id }}" 
-                                            wire:model.live="selectedDepartments" 
-                                            class="form-checkbox rounded text-primary-500">
-                                        <label for="department-{{ $department->id }}" class="ml-2 text-sm flex-grow">
-                                            {{ $department->name }}
-                                        </label>
+                                    <div class="flex items-center gap-2 mb-2 p-2 rounded-md {{ is_array($this->selectedDepartments) && in_array($department->id, $this->selectedDepartments) ? 'bg-primary-50 dark:bg-primary-900/20' : '' }}">
+                                        <div class="checkbox-area ml-2">
+                                            <label class="inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" id="department-{{ $department->id }}" value="{{ $department->id }}"  class="hidden" name="checkbox" wire:model.live="selectedDepartments">
+                                                <span class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
+                                                    <img src="{{ asset('images/icon/ck-white.svg') }}" alt="" class="h-[10px] w-[10px] block m-auto opacity-0"></span>
+                                                <span class="text-slate-500 dark:text-slate-400 text-sm leading-6">{{ $department->name }}</span>
+                                            </label>
+                                        </div>
                                         @if(is_array($this->selectedDepartments) && in_array($department->id, $this->selectedDepartments))
                                             @php
                                                 $count = \App\Models\Personel\Employee::whereHas('position', function($query) use ($department) {
@@ -161,9 +162,13 @@
                             @error('departmentSelection') <span class="text-danger text-sm">{{ $message }}</span> @enderror
                         </div>
 
-                        <div class="flex items-center space-x-2">
-                            <input type="checkbox" id="selectAllEmployees" wire:model.live="selectAllEmployees" class="form-checkbox rounded text-primary-500">
-                            <label for="selectAllEmployees" class="text-sm font-medium">Select all employees in the selected departments</label>
+                        <div class="checkbox-area ml-2">
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="selectAllEmployees" wire:model.live="selectAllEmployees"  class="hidden" name="checkbox">
+                                <span class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
+                                    <img src="{{ asset('images/icon/ck-white.svg') }}" alt="" class="h-[10px] w-[10px] block m-auto opacity-0"></span>
+                                <span class="text-slate-500 dark:text-slate-400 text-sm leading-6">Select all employees in the selected departments</span>
+                            </label>
                         </div>
 
                         @if(!$selectAllEmployees && is_array($this->selectedDepartments) && !empty($this->selectedDepartments))
@@ -178,13 +183,14 @@
 
                                     @forelse($departmentEmployees as $employee)
                                         <div class="flex items-center">
-                                            <input type="checkbox" id="employee-{{ $employee->id }}" 
-                                                value="{{ $employee->id }}" 
-                                                wire:model="selectedEmployees" 
-                                                class="form-checkbox rounded text-primary-500">
-                                            <label for="employee-{{ $employee->id }}" class="ml-2 text-sm">
-                                                {{ $employee->name }} ({{ $employee->position?->name ?? 'No Position' }})
-                                            </label>
+                                            <div class="checkbox-area ml-2">
+                                                <label class="inline-flex items-center cursor-pointer">
+                                                    <input type="checkbox" id="employee-{{ $employee->id }}" value="{{ $employee->id }}"  class="hidden" name="checkbox" wire:model="selectedEmployees">
+                                                    <span class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
+                                                        <img src="{{ asset('images/icon/ck-white.svg') }}" alt="" class="h-[10px] w-[10px] block m-auto opacity-0"></span>
+                                                    <span class="text-slate-500 dark:text-slate-400 text-sm leading-6">{{ $employee->name }} ({{ $employee->position?->name ?? 'No Position' }})</span>
+                                                </label>
+                                            </div>
                                         </div>
                                     @empty
                                         <div class="text-center text-sm text-slate-500">No employees found</div>

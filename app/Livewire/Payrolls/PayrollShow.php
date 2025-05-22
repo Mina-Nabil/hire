@@ -6,7 +6,9 @@ use App\Models\Benefits\Payrolls\Payroll;
 use App\Traits\AlertFrontEnd;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\Title;
 
+#[Title('Payroll Details')]
 class PayrollShow extends Component
 {
     use AlertFrontEnd, WithPagination;

@@ -331,7 +331,7 @@ class Employee extends Model
                 $dbWorkingDays = [];
                 foreach ($working_days as $working_day) {
                     $dbWorkingDays[] = [
-                        'name' => $working_day,
+                        'type' => $working_day,
                     ];
                 }
 
@@ -3820,7 +3820,7 @@ class Employee extends Model
                             'payroll_id' => $payroll->id,
                             'base_benefit_id' => $baseBenefit->id,
                             'amount' => $baseBenefit->amount ?? 0,
-                            'status' => BenefitPayment::STATUS_PAID,
+                            'status' => BenefitPayment::STATUS_PENDING,
                             'desc' => $baseBenefit->name ?? 'Benefit payment',
                         ]);
                         $benefitPaymentIds[] = $benefitPayment->id;

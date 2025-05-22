@@ -7,6 +7,7 @@ use App\Models\Benefits\Payrolls\Payroll;
 use App\Models\Personel\Employee;
 use App\Models\Hierarchy\Department;
 use App\Models\Hierarchy\Position;
+use App\Models\Users\AppLog;
 use App\Traits\AlertFrontEnd;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -200,6 +201,8 @@ class CreatePayroll extends Component
             'penalties_days' => 0,
             'penalties_amount' => 0,
             'extra_payments' => 0,
+            'overtime_hours' => 0,
+            'overtime_amount' => 0,
         ];
         
         foreach ($employees as $employee) {
@@ -221,7 +224,8 @@ class CreatePayroll extends Component
                         'penalties_days' => 0,
                         'penalties_amount' => 0,
                         'extra_payments' => 0,
-                        
+                        'overtime_hours' => 0,
+                        'overtime_amount' => 0,
                     ]
                 ];
             }
@@ -263,6 +267,23 @@ class CreatePayroll extends Component
             // Alternatively, use the new penalty calculation function (uncomment if needed)
             // $penaltyAmount = $employee->calculateTotalPenaltyDeduction($this->startDate, $this->endDate);
             
+            // Calculate overtime
+            $overtimeHours = $employee->overtimes()
+                ->where('status', \App\Models\Attendance\Overtime::STATUS_APPROVED)
+                ->whereBetween('date', [$this->startDate, $this->endDate])
+                ->whereNull('payroll_id')
+                ->sum('hours');
+                
+            // Calculate overtime pay
+            $overtimeRate = $employee->benefitConfiguration->overtime_rate ?? 1.5;
+            $workingDaysPerMonth = $employee->workingDays->count() * 4; // Approximate
+            $dailyHours = $employee->benefitConfiguration->daily_working_hours ?? 8;
+            
+            $overtimeAmount = $overtimeHours * $hourlyRate * $overtimeRate;
+            
+            // Calculate net income with overtime
+            $netAfterDeductions = $netAfterPenalty + $extraPayments + $overtimeAmount;
+            
             // Add to department totals
             $departmentGroups[$departmentId]['totals']['gross_salary'] += $grossSalary;
             $departmentGroups[$departmentId]['totals']['insurance_amount'] += $insuranceAmount;
@@ -272,6 +293,8 @@ class CreatePayroll extends Component
             $departmentGroups[$departmentId]['totals']['penalties_days'] += $totalPenaltyDays;
             $departmentGroups[$departmentId]['totals']['penalties_amount'] += $penaltyAmount;
             $departmentGroups[$departmentId]['totals']['extra_payments'] += $extraPayments;
+            $departmentGroups[$departmentId]['totals']['overtime_hours'] += $overtimeHours;
+            $departmentGroups[$departmentId]['totals']['overtime_amount'] += $overtimeAmount;
                         
             // Add to grand totals
             $totals['gross_salary'] += $grossSalary;
@@ -282,6 +305,8 @@ class CreatePayroll extends Component
             $totals['penalties_days'] += $totalPenaltyDays;
             $totals['penalties_amount'] += $penaltyAmount;
             $totals['extra_payments'] += $extraPayments;
+            $totals['overtime_hours'] += $overtimeHours;
+            $totals['overtime_amount'] += $overtimeAmount;
 
             $benefits = collect()
                 ->merge($employee->getEmployeeBaseBenefits()->get())
@@ -307,6 +332,8 @@ class CreatePayroll extends Component
                 'net_income' => $netIncome - $penaltyAmount,
                 'net_after_penalty' => $netAfterPenalty,
                 'extra_payments' => $extraPayments,
+                'overtime_hours' => $overtimeHours,
+                'overtime_amount' => $overtimeAmount,
                 'net_after_deductions' => $netAfterDeductions,
                 'employee_base_benefits' => $employeeBaseBenefits,
                 'other_base_benefits' => $otherBaseBenefits,
@@ -326,11 +353,6 @@ class CreatePayroll extends Component
         $this->ensureArrays();
         
         try {
-            // Get all the department IDs (excluding the _totals key)
-            $departmentIds = array_filter(array_keys($this->payrollData), function($key) {
-                return $key !== '_totals';
-            });
-            
             // Prepare employee data for the payroll
             $employeePayrollData = [];
             
@@ -362,6 +384,14 @@ class CreatePayroll extends Component
                         ->pluck('id')
                         ->toArray();
                     
+                    // Get overtime IDs
+                    $overtimeIds = $employee->overtimes()
+                        ->where('status', \App\Models\Attendance\Overtime::STATUS_APPROVED)
+                        ->whereBetween('date', [$this->startDate, $this->endDate])
+                        ->whereNull('payroll_id')
+                        ->pluck('id')
+                        ->toArray();
+                    
                     // No need to manually recreate benefit data - use the actual models collected in loadPayrollData
                     if (!empty($employeeData['benefits'])) {
                         // Pass the benefits collection directly, along with all required fields for PayrollEmployee
@@ -378,6 +408,8 @@ class CreatePayroll extends Component
                             'employee_deductions' => $employeeData['employee_deductions'],
                             'penalties_days' => $employeeData['penalties_days'],
                             'penalties_amount' => $employeeData['penalties_amount'],
+                            'overtime_hours' => $employeeData['overtime_hours'] ?? 0,
+                            'overtime_amount' => $employeeData['overtime_amount'] ?? 0,
                             'net_after_penalty' => $employeeData['net_after_penalty'],
                             'extra_payments' => $employeeData['extra_payments'],
                             'net_after_deductions' => $employeeData['net_after_deductions'],
@@ -392,6 +424,7 @@ class CreatePayroll extends Component
                             'base_amount' => $employeeData['insurance_amount'], // Use insurance amount as base
                             'extra_payment_ids' => $extraPaymentIds,
                             'attendance_ids' => $attendanceIds,
+                            'overtime_ids' => $overtimeIds,
                             'benefits' => $employeeData['benefits']
                         ];
                     }
@@ -399,16 +432,9 @@ class CreatePayroll extends Component
             }
             
             // Create the payroll using the static method with the prepared data
-            $payroll = \App\Models\Benefits\Payrolls\Payroll::createPayroll(
-                Auth::id(),
-                $this->startDate,
-                $this->endDate,
-                $employeePayrollData,
-                $departmentIds
-            );
+            $payroll = Payroll::createPayroll(Auth::id(),$this->startDate,$this->endDate,$employeePayrollData);
             
             if ($payroll) {
-                // Show success notification
                 $this->alertSuccess('Payroll created successfully.');
                 $this->reset();
             } else {
@@ -416,7 +442,7 @@ class CreatePayroll extends Component
             }
         } catch (\Exception $e) {
             $this->alertError('Failed to create payroll: ' . $e->getMessage());
-            \Illuminate\Support\Facades\Log::error('Payroll creation error: ' . $e->getMessage());
+            AppLog::error('Payroll creation error: ' . $e->getMessage());
         }
     }
 

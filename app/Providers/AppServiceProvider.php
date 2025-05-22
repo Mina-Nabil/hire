@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Attendance\Attendance;
 use Illuminate\Support\Facades\Gate;
 use App\Models\Base\Area;
 use App\Models\Base\City;
@@ -145,7 +146,7 @@ class AppServiceProvider extends ServiceProvider
             ExtraPayment::MORPH_NAME => ExtraPayment::class,
             Location::MORPH_NAME => Location::class,
             VacationPackage::MORPH_NAME => VacationPackage::class,
-
+            Attendance::MORPH_NAME => Attendance::class,
         ]);
     }
 }

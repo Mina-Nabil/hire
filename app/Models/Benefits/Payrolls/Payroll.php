@@ -3,6 +3,7 @@
 namespace App\Models\Benefits\Payrolls;
 
 use App\Models\Attendance\Attendance;
+use App\Models\Attendance\Overtime;
 use App\Models\Personel\Employee;
 use App\Models\Users\User;
 use Illuminate\Database\Eloquent\Model;
@@ -83,6 +84,11 @@ class Payroll extends Model
         return $this->hasMany(BenefitPayment::class);
     }
 
+    public function overtimes()
+    {
+        return $this->hasMany(\App\Models\Attendance\Overtime::class);
+    }
+
     /**
      * Create a new payroll with all related records
      * 
@@ -93,7 +99,7 @@ class Payroll extends Model
      * @param array $departmentIds Optional department IDs that were used to filter employees
      * @return Payroll The created payroll
      */
-    public static function createPayroll($creatorId, $startDate, $endDate, $payrollData = [], $departmentIds = [])
+    public static function createPayroll($creatorId, $startDate, $endDate, $payrollData = [])
     {
         $payroll = null;
         $totalPaid = 0;
@@ -108,7 +114,6 @@ class Payroll extends Model
             $startDate, 
             $endDate, 
             $payrollData, 
-            $departmentIds, 
             &$payroll, 
             &$totalPaid, 
             &$totalVacationDays, 
@@ -155,6 +160,8 @@ class Payroll extends Model
                     'employee_deductions' => $employeeData['employee_deductions'] ?? 0,
                     'penalties_days' => $employeeData['penalties_days'] ?? 0,
                     'penalties_amount' => $employeeData['penalties_amount'] ?? 0,
+                    'overtime_hours' => $employeeData['overtime_hours'] ?? 0,
+                    'overtime_amount' => $employeeData['overtime_amount'] ?? 0,
                     'net_after_penalty' => $employeeData['net_after_penalty'] ?? 0,
                     'extra_payments' => $employeeData['extra_payments'] ?? 0,
                     'net_after_deductions' => $employeeData['net_after_deductions'] ?? 0,
@@ -190,10 +197,29 @@ class Payroll extends Model
                 if (isset($employeeData['attendance_ids']) && is_array($employeeData['attendance_ids'])) {
                     Attendance::whereIn('id', $employeeData['attendance_ids'])
                         ->update(['payroll_id' => $payroll->id]);
+                } else {
+                    // Fallback to previous method if IDs not provided
+                    $employee->attendances()
+                        ->whereBetween('date', [$startDate, $endDate])
+                        ->whereNull('payroll_id')
+                        ->update(['payroll_id' => $payroll->id]);
+                }
+                
+                // Link overtime records to this payroll
+                if (isset($employeeData['overtime_ids']) && is_array($employeeData['overtime_ids'])) {
+                    Overtime::whereIn('id', $employeeData['overtime_ids'])
+                        ->update(['payroll_id' => $payroll->id]);
+                } else {
+                    // Fallback to previous method if IDs not provided
+                    $employee->overtimes()
+                        ->where('status', Overtime::STATUS_APPROVED)
+                        ->whereBetween('date', [$startDate, $endDate])
+                        ->whereNull('payroll_id')
+                        ->update(['payroll_id' => $payroll->id]);
                 }
             }
             
-            // 3. Update payroll totals
+            // 3. Update the payroll with the final totals
             $payroll->update([
                 'total_paid' => $totalPaid,
                 'total_vacation_days' => $totalVacationDays,

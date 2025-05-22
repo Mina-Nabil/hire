@@ -30,6 +30,8 @@ class Attendance extends Model
         'payroll_id',
     ];
 
+    const MORPH_NAME = 'attendance';
+
     protected static function booted()
     {
         static::addGlobalScope('managerAccessibleAttendance', function ($builder) {

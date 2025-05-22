@@ -3,6 +3,7 @@
 namespace App\Models\Attendance;
 
 use App\Exceptions\AppException;
+use App\Models\Benefits\Payrolls\Payroll;
 use App\Models\Personel\Employee;
 use App\Models\Users\AppLog;
 use App\Models\Users\User;
@@ -69,5 +70,10 @@ class Overtime extends Model
     public function creator()
     {
         return $this->belongsTo(User::class, 'creator_id');
+    }
+
+    public function payroll()
+    {
+        return $this->belongsTo(Payroll::class);
     }
 }

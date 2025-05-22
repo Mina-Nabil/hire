@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Personel\Employee;
 use App\Models\Base\City;
+use App\Models\Users\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 
@@ -30,9 +31,9 @@ class EmployeeSeeder extends Seeder
             [
                 'user_id' => 1,
                 'created_by' => 1,
-                'name' => 'Ahmet Yılmaz',
-                'name_ar' => 'أحمد يلمز',
-                'email' => 'ahmet.yilmaz@example.com',
+                'name' => 'Sami Al-Haj',
+                'name_ar' => 'سامي الحاج',
+                'email' => 'sami.alhaj@example.com',
                 'phone' => '+90 532 123 4567',
                 'address' => 'Kadıköy, Istanbul',
                 'nationality' => 'Turkish',
@@ -46,7 +47,7 @@ class EmployeeSeeder extends Seeder
             [
                 'user_id' => 1,
                 'created_by' => 1,
-                'name' => 'Ayşe Demir',
+                'name' => 'Sara Al-Haj',
                 'name_ar' => 'أيشا دمر',
                 'email' => 'ayse.demir@example.com',
                 'phone' => '+90 533 234 5678',
@@ -57,7 +58,7 @@ class EmployeeSeeder extends Seeder
                 'birth_place_id' => $city->id,
                 'license_required' => false,
                 'employment_date' => Carbon::createFromDate(2019, 5, 15),
-                'mother_name' => 'Fatma Demir',
+                'mother_name' => 'Fatma Al-Haj',
             ],
             [
                 'user_id' => 1,
@@ -77,25 +78,25 @@ class EmployeeSeeder extends Seeder
             [
                 'user_id' => 1,
                 'created_by' => 1,
-                'name' => 'Zeynep Şahin',
-                'name_ar' => 'زينب شاهين',
-                'email' => 'zeynep.sahin@example.com',
+                'name' => 'Mohamed Al-Haj',
+                'name_ar' => 'محمد الحاج',
+                'email' => 'mohamed.alhaj@example.com',
                 'phone' => '+90 536 456 7890',
                 'address' => 'Şişli, Istanbul',
                 'nationality' => 'Turkish',
-                'gender' => 'female',
+                'gender' => 'male',
                 'birth_date' => Carbon::createFromDate(1992, 11, 5),
                 'birth_place_id' => $city->id,
                 'license_required' => false,
                 'employment_date' => Carbon::createFromDate(2021, 7, 12),
-                'mother_name' => 'Nazlı Şahin',
+                'mother_name' => 'Nazlı Al-Haj',
             ],
             [
                 'user_id' => 1,
                 'created_by' => 1,
-                'name' => 'Ali Öztürk',
-                'name_ar' => 'علي أوزترك',
-                'email' => 'ali.ozturk@example.com',
+                'name' => 'Ali Al-Haj',
+                'name_ar' => 'علي الحاج',
+                'email' => 'ali.alhaj@example.com',
                 'phone' => '+90 537 567 8901',
                 'address' => 'Beyoğlu, Istanbul',
                 'nationality' => 'Turkish',
@@ -104,11 +105,15 @@ class EmployeeSeeder extends Seeder
                 'birth_place_id' => $city->id,
                 'license_required' => true,
                 'employment_date' => Carbon::createFromDate(2017, 9, 5),
-                'mother_name' => 'Ayşe Öztürk',
+                'mother_name' => 'Ayşe Al-Haj',
             ],
         ];
 
+
+
         foreach ($employees as $employeeData) {
+            $user = User::createUser($employeeData['name'], $employeeData['email'], 'password', User::TYPE_EMPLOYEE);
+            $employeeData['user_id'] = $user->id;
             Employee::create($employeeData);
         }
     }

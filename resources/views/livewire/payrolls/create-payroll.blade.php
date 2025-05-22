@@ -33,6 +33,7 @@
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center"></th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center th-highlight-yellow" colspan="3">Penalties</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center th-highlight-red" colspan="2">Extra Payments</th>
+                                <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center th-highlight-green" colspan="2">Overtime</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center th-highlight-blue" colspan="2">Base Benefits</th>
                             </tr>
                             <tr>
@@ -47,6 +48,8 @@
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Net After Penalty</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Amount</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Net After Deductions</th>
+                                <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Hours</th>
+                                <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Amount</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Paid To Employee</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Paid To Other</th>
                             </tr>
@@ -85,6 +88,8 @@
                                             <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['net_after_penalty'], 2) }}</td>
                                             <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['extra_payments'], 2) }}</td>
                                             <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['net_after_deductions'], 2) }}</td>
+                                            <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['overtime_hours'] ?? 0, 2) }}</td>
+                                            <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['overtime_amount'] ?? 0, 2) }}</td>
                                             <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['employee_base_benefits'], 2) }}</td>
                                             <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['other_base_benefits'], 2) }}</td>
                                         </tr>

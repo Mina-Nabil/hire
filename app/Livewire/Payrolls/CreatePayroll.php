@@ -34,6 +34,12 @@ class CreatePayroll extends Component
     public $endDate;
     public $payrollData = [];
     
+    // Properties for adjustment modal
+    public $showAdjustmentModal = false;
+    public $selectedEmployeeForAdjustment = null;
+    public $adjustmentAmount = 0;
+    public $adjustmentDescription = '';
+    
     // Properties for filtering and display
     public $search = '';
     public $perPage = 10;
@@ -179,6 +185,43 @@ class CreatePayroll extends Component
         $this->closeDepartmentModal();
     }
 
+    public function openAdjustmentModal($departmentId, $employeeIndex)
+    {
+        $this->selectedEmployeeForAdjustment = [$departmentId, $employeeIndex];
+        $employee = $this->payrollData[$departmentId]['employees'][$employeeIndex];
+        $this->adjustmentAmount = $employee['adj_amount'] ?? 0;
+        $this->adjustmentDescription = $employee['adj_desc'] ?? '';
+        $this->showAdjustmentModal = true;
+    }
+
+    public function closeAdjustmentModal()
+    {
+        $this->showAdjustmentModal = false;
+        $this->selectedEmployeeForAdjustment = null;
+        $this->adjustmentAmount = 0;
+        $this->adjustmentDescription = '';
+    }
+
+    public function saveAdjustment()
+    {
+        if (!$this->selectedEmployeeForAdjustment) {
+            return;
+        }
+
+        [$departmentId, $employeeIndex] = $this->selectedEmployeeForAdjustment;
+        
+        // Update the employee data with adjustment
+        $this->payrollData[$departmentId]['employees'][$employeeIndex]['adj_amount'] = $this->adjustmentAmount;
+        $this->payrollData[$departmentId]['employees'][$employeeIndex]['adj_desc'] = $this->adjustmentDescription;
+        
+        // Recalculate net after deductions with adjustment
+        $employee = &$this->payrollData[$departmentId]['employees'][$employeeIndex];
+        $employee['net_after_deductions'] = $employee['net_after_penalty'] + $employee['extra_payments'] + $employee['overtime_amount'] + $this->adjustmentAmount;
+        
+        $this->closeAdjustmentModal();
+        $this->alertSuccess('Adjustment saved successfully.');
+    }
+
     public function loadPayrollData()
     {
         $this->ensureArrays();
@@ -206,6 +249,7 @@ class CreatePayroll extends Component
             'extra_payments' => 0,
             'overtime_hours' => 0,
             'overtime_amount' => 0,
+            'adj_amount' => 0,
         ];
         
         foreach ($employees as $employee) {
@@ -229,6 +273,7 @@ class CreatePayroll extends Component
                         'extra_payments' => 0,
                         'overtime_hours' => 0,
                         'overtime_amount' => 0,
+                        'adj_amount' => 0,
                     ]
                 ];
             }
@@ -265,7 +310,6 @@ class CreatePayroll extends Component
             
             // Get extra payments
             $extraPayments = $employee->getNegativeExtraPayments($this->startDate, $this->endDate);
-            $netAfterDeductions = $netAfterPenalty + $extraPayments; // Add because extra payments are already negative
             
             // Alternatively, use the new penalty calculation function (uncomment if needed)
             // $penaltyAmount = $employee->calculateTotalPenaltyDeduction($this->startDate, $this->endDate);
@@ -304,8 +348,12 @@ class CreatePayroll extends Component
             // Calculate overtime amount
             $overtimeAmount = $overtimeHours * $hourlyRate * $overtimeRate;
             
-            // Calculate net income with overtime
-            $netAfterDeductions = $netAfterPenalty + $extraPayments + $overtimeAmount;
+            // Initialize adjustment values (will be 0 initially)
+            $adjAmount = 0;
+            $adjDesc = '';
+            
+            // Calculate net income with overtime and adjustment
+            $netAfterDeductions = $netAfterPenalty + $extraPayments + $overtimeAmount + $adjAmount;
             
             // Add to department totals
             $departmentGroups[$departmentId]['totals']['gross_salary'] += $grossSalary;
@@ -318,6 +366,7 @@ class CreatePayroll extends Component
             $departmentGroups[$departmentId]['totals']['extra_payments'] += $extraPayments;
             $departmentGroups[$departmentId]['totals']['overtime_hours'] += $overtimeHours;
             $departmentGroups[$departmentId]['totals']['overtime_amount'] += $overtimeAmount;
+            $departmentGroups[$departmentId]['totals']['adj_amount'] += $adjAmount;
                         
             // Add to grand totals
             $totals['gross_salary'] += $grossSalary;
@@ -330,6 +379,7 @@ class CreatePayroll extends Component
             $totals['extra_payments'] += $extraPayments;
             $totals['overtime_hours'] += $overtimeHours;
             $totals['overtime_amount'] += $overtimeAmount;
+            $totals['adj_amount'] += $adjAmount;
 
             $benefits = collect()
                 ->merge($employee->getEmployeeBaseBenefits()->get())
@@ -357,6 +407,8 @@ class CreatePayroll extends Component
                 'extra_payments' => $extraPayments,
                 'overtime_hours' => $overtimeHours,
                 'overtime_amount' => $overtimeAmount,
+                'adj_amount' => $adjAmount,
+                'adj_desc' => $adjDesc,
                 'net_after_deductions' => $netAfterDeductions,
                 'employee_base_benefits' => $employeeBaseBenefits,
                 'other_base_benefits' => $otherBaseBenefits,
@@ -435,6 +487,8 @@ class CreatePayroll extends Component
                             'overtime_amount' => $employeeData['overtime_amount'] ?? 0,
                             'net_after_penalty' => $employeeData['net_after_penalty'],
                             'extra_payments' => $employeeData['extra_payments'],
+                            'adj_amount' => $employeeData['adj_amount'] ?? 0,
+                            'adj_desc' => $employeeData['adj_desc'] ?? '',
                             'net_after_deductions' => $employeeData['net_after_deductions'],
                             'employee_base_benefits' => $employeeData['employee_base_benefits'],
                             'other_base_benefits' => $employeeData['other_base_benefits'],

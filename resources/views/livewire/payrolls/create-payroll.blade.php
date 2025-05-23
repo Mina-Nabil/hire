@@ -35,6 +35,8 @@
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center th-highlight-red" colspan="2">Extra Payments</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center th-highlight-green" colspan="2">Overtime</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center th-highlight-blue" colspan="2">Base Benefits</th>
+                                <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center">Adjustment</th>
+                                <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center">Actions</th>
                             </tr>
                             <tr>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Employee</th>
@@ -52,6 +54,8 @@
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Amount</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Paid To Employee</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Paid To Other</th>
+                                <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Amount</th>
+                                <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700"></th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
@@ -62,7 +66,7 @@
                                             {{ $department['name'] }}
                                         </td>
                                     </tr>
-                                    @foreach($department['employees'] as $employee)
+                                    @foreach($department['employees'] as $employeeIndex => $employee)
                                         <tr>
                                             <td class="table-td sticky-colomn border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
                                                 <div>
@@ -92,6 +96,23 @@
                                             <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['overtime_amount'] ?? 0, 2) }}</td>
                                             <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['employee_base_benefits'], 2) }}</td>
                                             <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['other_base_benefits'], 2) }}</td>
+                                            <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
+                                                <div class="flex flex-col">
+                                                    <span class="text-sm">{{ number_format($employee['adj_amount'] ?? 0, 2) }}</span>
+                                                    @if(!empty($employee['adj_desc']))
+                                                        <span class="text-xs text-slate-500">{{ Str::limit($employee['adj_desc'], 20) }}</span>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                            <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
+                                                <button type="button" class="btn btn-sm btn-outline-primary" 
+                                                    wire:click="openAdjustmentModal({{ $departmentId }}, {{ $employeeIndex }})">
+                                                    <span class="flex items-center">
+                                                        <iconify-icon icon="heroicons-outline:pencil" class="text-base ltr:mr-1 rtl:ml-1"></iconify-icon>
+                                                        Adjust
+                                                    </span>
+                                                </button>
+                                            </td>
                                         </tr>
                                     @endforeach
                                 @endif
@@ -224,4 +245,36 @@
             </x-modal>
         @endif
     </div>
+
+    <!-- Adjustment Modal -->
+    @if($showAdjustmentModal)
+        <x-modal wire:model="showAdjustmentModal">
+            <x-slot name="title">Employee Adjustment</x-slot>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="form-label">Adjustment Amount</label>
+                    <input type="number" step="0.01" wire:model="adjustmentAmount" 
+                        class="form-control" placeholder="Enter adjustment amount">
+                    <p class="text-xs text-slate-500 mt-1">Use positive values for additions, negative for deductions</p>
+                </div>
+                
+                <div>
+                    <label class="form-label">Adjustment Description</label>
+                    <textarea wire:model="adjustmentDescription" rows="3" 
+                        class="form-control" placeholder="Enter reason for adjustment"></textarea>
+                </div>
+            </div>
+
+            <x-slot name="footer">
+                <div class="flex justify-end space-x-3">
+                    <x-secondary-button wire:click="closeAdjustmentModal">Cancel</x-secondary-button>
+                    <x-primary-button wire:click="saveAdjustment" wire:loading.attr="disabled">
+                        <span wire:loading.remove wire:target="saveAdjustment">Save Adjustment</span>
+                        <span wire:loading wire:target="saveAdjustment">Saving...</span>
+                    </x-primary-button>
+                </div>
+            </x-slot>
+        </x-modal>
+    @endif
 </div>

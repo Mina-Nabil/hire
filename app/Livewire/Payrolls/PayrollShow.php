@@ -28,6 +28,12 @@ class PayrollShow extends Component
     public $employeeOvertimes = [];
     public $employeeExtraPayments = [];
     
+    // Adjustment editing properties
+    public $showAdjustmentModal = false;
+    public $editingPayrollEmployeeId = null;
+    public $adjustmentAmount = 0;
+    public $adjustmentDescription = '';
+    
     public function mount($id)
     {
         $this->payroll = Payroll::with('creator')->findOrFail($id);
@@ -108,6 +114,71 @@ class PayrollShow extends Component
         $this->employeeBenefitPayments = [];
         $this->employeeOvertimes = [];
         $this->employeeExtraPayments = [];
+    }
+    
+    public function openAdjustmentModal($payrollEmployeeId)
+    {
+        // Check if user can update the payroll
+        $this->authorize('update', $this->payroll);
+        
+        $payrollEmployee = \App\Models\Benefits\Payrolls\PayrollEmployee::findOrFail($payrollEmployeeId);
+        
+        $this->editingPayrollEmployeeId = $payrollEmployeeId;
+        $this->adjustmentAmount = $payrollEmployee->adj_amount;
+        $this->adjustmentDescription = $payrollEmployee->adj_desc;
+        $this->showAdjustmentModal = true;
+    }
+    
+    public function closeAdjustmentModal()
+    {
+        $this->showAdjustmentModal = false;
+        $this->editingPayrollEmployeeId = null;
+        $this->adjustmentAmount = 0;
+        $this->adjustmentDescription = '';
+    }
+    
+    public function saveAdjustment()
+    {
+        // Check if user can update the payroll
+        $this->authorize('update', $this->payroll);
+        
+        if (!$this->editingPayrollEmployeeId) {
+            return;
+        }
+        
+        $payrollEmployee = \App\Models\Benefits\Payrolls\PayrollEmployee::findOrFail($this->editingPayrollEmployeeId);
+        
+        // Store the old net amount for comparison
+        $oldNetAmount = $payrollEmployee->net_after_deductions;
+        $oldAdjAmount = $payrollEmployee->adj_amount;
+        
+        // Update adjustment fields
+        $payrollEmployee->adj_amount = $this->adjustmentAmount;
+        $payrollEmployee->adj_desc = $this->adjustmentDescription;
+        
+        // Recalculate net after deductions
+        $newNetAmount = $payrollEmployee->net_after_penalty + $payrollEmployee->extra_payments + $payrollEmployee->overtime_amount + $this->adjustmentAmount;
+        $payrollEmployee->net_after_deductions = $newNetAmount;
+        $payrollEmployee->paid = $newNetAmount; // Update paid amount as well
+        
+        $payrollEmployee->save();
+        
+        // Update payroll total if needed
+        $adjustmentDifference = $this->adjustmentAmount - $oldAdjAmount;
+        if ($adjustmentDifference != 0) {
+            $this->payroll->total_paid += $adjustmentDifference;
+            $this->payroll->save();
+        }
+        
+        // Log the adjustment
+        \App\Models\Users\AppLog::info(
+            'Payroll Adjustment Updated',
+            'Updated adjustment for employee ' . $payrollEmployee->employee->name . ' from ' . $oldAdjAmount . ' to ' . $this->adjustmentAmount,
+            loggable: $this->payroll
+        );
+        
+        $this->closeAdjustmentModal();
+        $this->alertSuccess('Adjustment updated successfully.');
     }
     
     public function render()

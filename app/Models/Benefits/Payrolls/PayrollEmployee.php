@@ -37,6 +37,8 @@ class PayrollEmployee extends Model
         'net_after_deductions',
         'employee_base_benefits',
         'other_base_benefits',
+        'adj_amount',
+        'adj_desc',
         'position',
         'department',
         'overtime_amount',

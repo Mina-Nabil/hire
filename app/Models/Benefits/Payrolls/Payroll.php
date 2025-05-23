@@ -5,6 +5,7 @@ namespace App\Models\Benefits\Payrolls;
 use App\Models\Attendance\Attendance;
 use App\Models\Attendance\Overtime;
 use App\Models\Personel\Employee;
+use App\Models\Users\AppLog;
 use App\Models\Users\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -164,6 +165,8 @@ class Payroll extends Model
                     'overtime_amount' => $employeeData['overtime_amount'] ?? 0,
                     'net_after_penalty' => $employeeData['net_after_penalty'] ?? 0,
                     'extra_payments' => $employeeData['extra_payments'] ?? 0,
+                    'adj_amount' => $employeeData['adj_amount'] ?? 0,
+                    'adj_desc' => $employeeData['adj_desc'] ?? '',
                     'net_after_deductions' => $employeeData['net_after_deductions'] ?? 0,
                     'employee_base_benefits' => $employeeData['employee_base_benefits'] ?? 0,
                     'other_base_benefits' => $employeeData['other_base_benefits'] ?? 0,
@@ -228,7 +231,7 @@ class Payroll extends Model
             ]);
             
             // Log the creation of the payroll
-            \App\Models\Users\AppLog::info(
+            AppLog::info(
                 'Payroll Created', 
                 'Created payroll for period ' . $startDate . ' to ' . $endDate . ' with ' . $totalEmployees . ' employees', 
                 loggable: $payroll

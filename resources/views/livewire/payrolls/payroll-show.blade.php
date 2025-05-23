@@ -92,6 +92,7 @@
                             <th class="table-th">Penalties</th>
                             <th class="table-th">Extra Payments</th>
                             <th class="table-th">Overtime</th>
+                            <th class="table-th">Adjustment</th>
                             <th class="table-th">Net Amount</th>
                             <th class="table-th">Actions</th>
                         </tr>
@@ -146,21 +147,41 @@
                                             <small>EGP</small></span>
                                     </div>
                                 </td>
+                                <td class="table-td">
+                                    <div class="flex flex-col">
+                                        <span>{{ number_format($payrollEmployee->adj_amount, 2) }} EGP</span>
+                                        @if(!empty($payrollEmployee->adj_desc))
+                                            <span class="text-xs text-slate-500">{{ Str::limit($payrollEmployee->adj_desc, 30) }}</span>
+                                        @endif
+                                    </div>
+                                </td>
                                 <td class="table-td font-semibold">
                                     {{ number_format($payrollEmployee->net_after_deductions, 2) }}</td>
                                 <td class="table-td">
-                                    <button type="button" class="btn btn-sm btn-outline-primary" 
-                                        wire:click="showEmployeeDetails({{ $payrollEmployee->id }})">
-                                        <span class="flex items-center">
-                                            <iconify-icon icon="heroicons-outline:eye" class="text-base ltr:mr-1 rtl:ml-1"></iconify-icon>
-                                            Details
-                                        </span>
-                                    </button>
+                                    <div class="flex space-x-2">
+                                        <button type="button" class="btn btn-sm btn-outline-primary" 
+                                            wire:click="showEmployeeDetails({{ $payrollEmployee->id }})">
+                                            <span class="flex items-center">
+                                                <iconify-icon icon="heroicons-outline:eye" class="text-base ltr:mr-1 rtl:ml-1"></iconify-icon>
+                                                Details
+                                            </span>
+                                        </button>
+                                        
+                                        @if($payroll->status === \App\Models\Benefits\Payrolls\Payroll::STATUS_PENDING)
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" 
+                                                wire:click="openAdjustmentModal({{ $payrollEmployee->id }})">
+                                                <span class="flex items-center">
+                                                    <iconify-icon icon="heroicons-outline:pencil" class="text-base ltr:mr-1 rtl:ml-1"></iconify-icon>
+                                                    Adjust
+                                                </span>
+                                            </button>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="10" class="table-td text-center py-8">
+                                <td colspan="11" class="table-td text-center py-8">
                                     <div class="flex flex-col items-center">
                                         <iconify-icon icon="heroicons-outline:user-group"
                                             class="text-5xl text-slate-400 mb-2"></iconify-icon>
@@ -254,6 +275,15 @@
                     <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-3">
                         <h5 class="text-xs font-medium text-slate-500 dark:text-slate-300 mb-1">Overtime Amount</h5>
                         <div class="text-sm font-semibold text-success-500">+{{ number_format($selectedPayrollEmployee->overtime_amount, 2) }}</div>
+                    </div>
+                    <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-3">
+                        <h5 class="text-xs font-medium text-slate-500 dark:text-slate-300 mb-1">Adjustment Amount</h5>
+                        <div class="text-sm font-semibold @if($selectedPayrollEmployee->adj_amount >= 0) text-success-500 @else text-danger-500 @endif">
+                            @if($selectedPayrollEmployee->adj_amount >= 0)+@endif{{ number_format($selectedPayrollEmployee->adj_amount, 2) }}
+                        </div>
+                        @if(!empty($selectedPayrollEmployee->adj_desc))
+                            <div class="text-xs text-slate-500 mt-1">{{ $selectedPayrollEmployee->adj_desc }}</div>
+                        @endif
                     </div>
                     <div class="bg-primary-50 dark:bg-primary-900/20 rounded-md p-3 md:col-span-6">
                         <h5 class="text-xs font-medium text-primary-500 dark:text-primary-400 mb-1">Net Amount</h5>
@@ -455,5 +485,43 @@
             </div>
         </x-slot>
     </x-modal>
+    @endif
+
+    <!-- Adjustment Edit Modal -->
+    @if($showAdjustmentModal)
+        <x-modal wire:model="showAdjustmentModal">
+            <x-slot name="title">Edit Employee Adjustment</x-slot>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="form-label">Adjustment Amount</label>
+                    <input type="number" step="0.01" wire:model="adjustmentAmount" 
+                        class="form-control" placeholder="Enter adjustment amount">
+                    <p class="text-xs text-slate-500 mt-1">Use positive values for additions, negative for deductions</p>
+                </div>
+                
+                <div>
+                    <label class="form-label">Adjustment Description</label>
+                    <textarea wire:model="adjustmentDescription" rows="3" 
+                        class="form-control" placeholder="Enter reason for adjustment"></textarea>
+                </div>
+                
+                <div class="bg-warning-50 dark:bg-warning-900/20 border border-warning-200 dark:border-warning-800 rounded-md p-3">
+                    <p class="text-sm text-warning-600 dark:text-warning-400">
+                        <strong>Note:</strong> Changing the adjustment will recalculate the employee's net amount and update the payroll total.
+                    </p>
+                </div>
+            </div>
+
+            <x-slot name="footer">
+                <div class="flex justify-end space-x-3">
+                    <x-secondary-button wire:click="closeAdjustmentModal">Cancel</x-secondary-button>
+                    <x-primary-button wire:click="saveAdjustment" wire:loading.attr="disabled">
+                        <span wire:loading.remove wire:target="saveAdjustment">Update Adjustment</span>
+                        <span wire:loading wire:target="saveAdjustment">Updating...</span>
+                    </x-primary-button>
+                </div>
+            </x-slot>
+        </x-modal>
     @endif
 </div>

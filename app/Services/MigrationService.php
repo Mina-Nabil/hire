@@ -29,7 +29,7 @@ class MigrationService
             throw new AppException('Failed to read template file');
         }
         try {
-            DB::transaction(function () use ($template) {
+            DB::transaction(function () use ($template, &$locations, &$departments, &$employees, &$salary_grades, &$positions) {
 
                 //load locations
                 $locations_sheet = $template->getSheet(0);
@@ -192,10 +192,10 @@ class MigrationService
                     $positionName = $positions_sheet->getCell('C' . $row)->getValue();
                     $positionArabicName = $positions_sheet->getCell('D' . $row)->getValue();
                     $positionCode = $positions_sheet->getCell('E' . $row)->getValue();
-                    $parentPositionName = $positions_sheet->getCell('F' . $row)->getValue();
-                    $parentPosition = Position::where('name', $parentPositionName)->first();
-                    $employeeName = $positions_sheet->getCell('G' . $row)->getValue();
-                    $employee = Employee::where('name', $employeeName)->orWhere('name_ar', $employeeName)->first();
+                    $parentPositionCode = $positions_sheet->getCell('F' . $row)->getValue();
+                    $parentPosition = Position::where('code', $parentPositionCode)->first();
+                    $employeeIDNumber = $positions_sheet->getCell('G' . $row)->getValue();
+                    $employee = Employee::where('id_number', $employeeIDNumber)->first();
                     $salaryGradeName = $positions_sheet->getCell('H' . $row)->getValue();
                     $salaryGrade = SalaryGrade::where('name', $salaryGradeName)->first();
 

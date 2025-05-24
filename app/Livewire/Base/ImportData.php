@@ -14,15 +14,27 @@ class ImportData extends Component
 
     public $showUploadModal = false;
     public $file;
+    public $employees = [];
+    public $departments = [];
+    public $locations = [];
+    public $positions = [];
+    public $benefits = [];
+    public $activeTab = 'employees';
 
     public function openFileUpload()
     {
         $this->showUploadModal = true;
     }
+
     public function closeUploadModal()
     {
         $this->showUploadModal = false;
         $this->file = null;
+        $this->employees = [];
+        $this->departments = [];
+        $this->locations = [];
+        $this->positions = [];
+        $this->benefits = [];
     }
 
     public function downloadTemplate()
@@ -36,13 +48,25 @@ class ImportData extends Component
             'file' => 'required|file|mimes:xlsx,xls',
         ]);
         try {
-            MigrationService::migrateFromStartupfile($this->file->getRealPath());
+            MigrationService::migrateFromStartupfile(
+                $this->file->getRealPath(),
+                $this->employees, // employees
+                $this->departments, // departments
+                $this->locations, // locations
+                $this->positions, // positions
+                $this->benefits  // benefits
+            );
+            
             $this->showUploadModal = false;
             $this->file = null;
-            $this->redirect('/hierarchy/locations');
         } catch (Exception $e) {
             $this->alertError($e->getMessage());
         }
+    }
+
+    public function setActiveTab($tab)
+    {
+        $this->activeTab = $tab;
     }
 
     public function render()

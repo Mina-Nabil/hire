@@ -91,31 +91,31 @@
                         <ul class="sidebar-submenu">
                             @can('viewAny', App\Models\Payroll\Payroll::class)
                                 <li>
-                                    <a class="{{ $payrollsIndex ?? '' }}" href="{{ url('/payrolls') }}">Payrolls</a>
+                                    <a class="{{ request()->routeIs('payrolls.index') ? 'active' : '' }}" href="{{ url('/payrolls') }}">Payrolls</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Payroll\Payroll::class)
                                 <li>
-                                    <a class="{{ $payrollTypesIndex ?? '' }}" href="{{ url('/payrolls/create') }}">
+                                    <a class="{{ request()->routeIs('payrolls.create') ? 'active' : '' }}" href="{{ url('/payrolls/create') }}">
                                         Create Payroll</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Payroll\Payroll::class)
                                 <li>
-                                    <a class="{{ $submitAttendanceIndex ?? '' }}"
+                                    <a class="{{ request()->routeIs('payrolls.submit-attendance') ? 'active' : '' }}"
                                         href="{{ url('/payrolls/submit-attendance') }}">
                                         Submit Attendance</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Attendance\Attendance::class)
                                 <li>
-                                    <a class="{{ $attendanceIndex ?? '' }}" href="{{ url('/attendance') }}">
+                                    <a class="{{ request()->routeIs('attendance.index') ? 'active' : '' }}" href="{{ url('/attendance') }}">
                                         Attendance Records</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Attendance\Attendance::class)
                                 <li>
-                                    <a class="{{ $overtimeIndex ?? '' }}" href="{{ url('/attendance/overtime') }}">
+                                    <a class="{{ request()->routeIs('attendance.overtime') ? 'active' : '' }}" href="{{ url('/attendance/overtime') }}">
                                         Overtime Records</a>
                                 </li>
                             @endcan

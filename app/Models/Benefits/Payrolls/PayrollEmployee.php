@@ -2,11 +2,16 @@
 
 namespace App\Models\Benefits\Payrolls;
 
+use App\Models\Attendance\Attendance;
+use App\Models\Attendance\Overtime;
 use App\Models\Personel\Employee;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class PayrollEmployee extends Model
 {
+    use HasFactory;
+
     const MORPH_NAME = 'payroll_employee';
     protected $table = 'payroll_employees';
     protected $fillable = [
@@ -32,8 +37,14 @@ class PayrollEmployee extends Model
         'net_after_deductions',
         'employee_base_benefits',
         'other_base_benefits',
+        'adj_amount',
+        'adj_desc',
         'position',
         'department',
+        'overtime_amount',
+        'overtime_hours',
+        'net_amount',
+        'status',
     ];
     
     /**

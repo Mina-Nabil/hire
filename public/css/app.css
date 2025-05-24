@@ -16756,6 +16756,9 @@ ul.custom-list ul {
     .md\:grid-cols-4 {
         grid-template-columns: repeat(4, minmax(0, 1fr));
     }
+    .md\:grid-cols-6 {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
     .md\:grid-cols-8 {
         grid-template-columns: repeat(8, minmax(0, 1fr));
     }
@@ -16832,6 +16835,24 @@ ul.custom-list ul {
     .md\:text-lg {
         font-size: 1.125rem;
         line-height: 1.75rem;
+    }
+    .md\:col-span-2 {
+        grid-column: span 2 / span 2;
+    }
+    .md\:col-span-8 {
+        grid-column: span 8 / span 8;
+    }
+    .md\:col-span-4 {
+        grid-column: span 4 / span 4;
+    }
+    .md\:col-span-6 {
+        grid-column: span 6 / span 6;
+    }
+    .md\:col-span-3 {
+        grid-column: span 3 / span 3;
+    }
+    .md\:col-span-5 {
+        grid-column: span 5 / span 5;
     }
     .md\:font-bold {
         font-weight: 700;

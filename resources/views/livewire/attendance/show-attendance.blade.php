@@ -231,10 +231,7 @@
                                 </tr>
                             @endforeach
                         </tbody>
-                        <div style="position: sticky; bottom:0;width:100%; z-index:10;"
-                            class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
-                            {{ $attendances->links('vendor.livewire.simple-bootstrap') }}
-                        </div>
+                        
                     </table>
                 @else
                     <div class="card m-5 p-5">
@@ -252,6 +249,11 @@
                     </div>
                 @endif
             </div>
+        </div>
+
+        <div style="position: sticky; bottom:0;width:100%; z-index:10;"
+            class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
+            {{ $attendances->links('vendor.livewire.simple-bootstrap') }}
         </div>
     </div>
 

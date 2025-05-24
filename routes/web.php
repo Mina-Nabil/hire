@@ -46,7 +46,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/payrolls/submit-attendance', App\Livewire\Attendance\AddSheet::class)->name('submit-attendance');
     Route::get('/attendance', App\Livewire\Attendance\ShowAttendance::class)->name('attendance.index');
     Route::get('/attendance/overtime', App\Livewire\Attendance\ShowOvertime::class)->name('overtime.index');
+    Route::get('/payrolls', App\Livewire\Payrolls\PayrollIndex::class)->name('payrolls.index');
     Route::get('/payrolls/create', App\Livewire\Payrolls\CreatePayroll::class)->name('payrolls.create');
+    Route::get('/payrolls/{id}', App\Livewire\Payrolls\PayrollShow::class)->name('payrolls.show');
     
     //benefits routes
     Route::get('/benefits/packages', PackageIndex::class)->name('benefits.packages');

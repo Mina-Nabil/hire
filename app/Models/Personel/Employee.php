@@ -18,6 +18,7 @@ use App\Models\Benefits\Vacations\VacationDetail;
 use App\Models\Benefits\Configurations\BenefitConfiguration;
 use App\Models\Benefits\Configurations\VacationPackage;
 use App\Models\Benefits\Configurations\WorkingDay;
+use App\Models\Benefits\Payrolls\BenefitPayment;
 use App\Models\Hierarchy\Position;
 use App\Models\Personel\Docs\ArmyServicePaper;
 use App\Models\Personel\Docs\BankAccount;
@@ -136,9 +137,16 @@ class Employee extends Model
     }
 
     public function getFullImageUrlAttribute(): string|null
-    {
-        return $this->image_url ? Storage::disk('s3')->url($this->image_url) : null;
+{
+    if (!$this->image_url) {
+        return null;
     }
+    
+    // Use string concatenation since the url method isn't available
+    $baseUrl = config('filesystems.disks.s3.url', 'https://s3.amazonaws.com');
+    $bucket = config('filesystems.disks.s3.bucket');
+    return rtrim($baseUrl, '/') . '/' . $bucket . '/' . ltrim($this->image_url, '/');
+}
 
 
     ////model benefit functions
@@ -324,7 +332,7 @@ class Employee extends Model
                 $dbWorkingDays = [];
                 foreach ($working_days as $working_day) {
                     $dbWorkingDays[] = [
-                        'name' => $working_day,
+                        'type' => $working_day,
                     ];
                 }
 
@@ -361,7 +369,7 @@ class Employee extends Model
      * @param int|null $package_detail_id - if null, the benefit is custom
      * @param string|null $name - if not null, the benefit is custom
      */
-    public function addCustomBaseBenefit(string $name, float $amount, string $type, Carbon $start_date)
+    public function addCustomBaseBenefit(string $name, float $amount, string $type, string $receiver, Carbon $start_date)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -369,12 +377,13 @@ class Employee extends Model
             throw new AppException('You dont have permission to set base benefit');
         }
         try {
-            DB::transaction(function () use ($name, $amount, $type, $start_date) {
+            DB::transaction(function () use ($name, $amount, $type, $start_date, $receiver) {
                 $this->baseBenefits()->create([
                     'name' => $name,
                     'amount' => $amount,
                     'type' => $type,
                     'start_date' => $start_date,
+                    'receiver' => $receiver,
                 ]);
                 AppLog::info('Custom Base Benefit Added', 'Custom base benefit added for employee: ' . $this->name, loggable: $this);
             });
@@ -3200,12 +3209,11 @@ class Employee extends Model
         }
     }
 
-    public function getMonthlyMedicalBenefitsSum(): float
+    public function getMedicalBenefits()
     {
         return $this->baseBenefits()
             ->where('receiver', PackageDetail::RECEIVER_MEDICAL)
-            ->where('type', BaseBenefit::TYPE_MONTHLY)
-            ->sum('amount');
+            ->where('type', BaseBenefit::TYPE_MONTHLY);
     }
 
     /**
@@ -3526,8 +3534,8 @@ class Employee extends Model
 
         // Get shortfall hours (partial days)
         $shortfallHours = $this->getTotalShortfallHours($startDate, $endDate);
-
-        return $missedHours + $lateHours + $shortfallHours;
+        // dd('total: ' . $missedHours + $shortfallHours , 'missed: ' . $missedHours, 'late: ' . $lateHours, 'early: ' . $earlyDepartureHours, 'shortfall: ' . $shortfallHours);
+        return $missedHours + $shortfallHours;
     }
 
     /**
@@ -3786,190 +3794,44 @@ class Employee extends Model
     {
         return $this->belongsToMany(\App\Models\Benefits\Payrolls\Payroll::class, 'payroll_employees');
     }
+    
+    // Method getPayrollDataForPeriod has been removed and the calculation logic
+    // is now handled directly in the CreatePayroll component
 
     /**
-     * Get payroll data for this employee for a specific period
-     */
-    public function getPayrollDataForPeriod($startDate, $endDate)
-    {
-        $grossSalary = $this->benefitConfiguration?->gross_salary ?? 0;
-        $insuranceAmount = $this->benefitConfiguration?->insurance_amount ?? 0;
-        $insuranceRate = \App\Models\Benefits\Payrolls\Payroll::EMPLOYEE_SHARE_SOCIAL_INSURANCE;
-        $employerInsuranceRate = \App\Models\Benefits\Payrolls\Payroll::EMPLOYER_SHARE_SOCIAL_INSURANCE;
-
-        // Calculate employee and employer social insurance
-        $employeeInsurance = $insuranceAmount * $insuranceRate;
-        $employerInsurance = $insuranceAmount * $employerInsuranceRate;
-        $totalInsurance = $employeeInsurance + $employerInsurance;
-
-        // Calculate medical insurance (from base benefits)
-        $employeeMedical = $this->getMonthlyMedicalBenefitsSum();
-        $totalMedical = $employeeMedical; // Assuming no employer contribution to medical
-
-        // Calculate penalties based on attendance
-        $penaltiesDays = $this->getTotalPenaltyHours($startDate, $endDate);
-        $penaltiesAmount = $this->calculateTotalPenaltyDeduction($startDate, $endDate);
-
-        // Calculate other amount (gross salary minus insurance amount)
-        $otherAmount = $grossSalary - $insuranceAmount;
-
-        // Employee deductions (insurance + medical)
-        $employeeDeductions = $employeeInsurance + $employeeMedical;
-
-        // Calculate net after penalty
-        $netAfterPenalty = $grossSalary - $employeeDeductions - $penaltiesAmount;
-
-        // Calculate extra payments 
-        $extraPaymentsAmount = $this->extraPayments()
-            ->where('status', \App\Models\Benefits\Payrolls\ExtraPayment::STATUS_APPROVED)
-            ->whereBetween('due_date', [$startDate, $endDate])
-            ->whereNull('payroll_id')
-            ->sum('amount');
-
-        // Calculate net after deductions (net after penalty + extra payments)
-        $netAfterDeductions = $netAfterPenalty + $extraPaymentsAmount;
-
-        // Calculate employee and other base benefits
-        $employeeBaseBenefits = $this->getEmployeeBaseBenefits()->sum('amount');
-        $otherBaseBenefits = $this->getOtherBaseBenefits()->sum('amount');
-
-        return [
-            'gross_salary' => $grossSalary,
-            'insurance_amount' => $insuranceAmount,
-            'other_amount' => $otherAmount,
-            'employee_insurance' => $employeeInsurance,
-            'employer_insurance' => $employerInsurance,
-            'total_insurance' => $totalInsurance,
-            'employee_medical' => $employeeMedical,
-            'total_medical' => $totalMedical,
-            'employee_deductions' => $employeeDeductions,
-            'penalties_days' => $penaltiesDays,
-            'penalties_amount' => $penaltiesAmount,
-            'net_after_penalty' => $netAfterPenalty,
-            'extra_payments' => $extraPaymentsAmount,
-            'net_after_deductions' => $netAfterDeductions,
-            'employee_base_benefits' => $employeeBaseBenefits,
-            'other_base_benefits' => $otherBaseBenefits,
-            'position' => $this->position?->name ?? 'No Position',
-            'department' => $this->position?->department?->name ?? 'No Department',
-        ];
-    }
-
-    /**
-     * Create benefit payment records for this employee's payroll
+     * Create benefit payment records for this employee's payroll from the passed base benefits
      *
-     * @param \App\Models\Benefits\Payrolls\Payroll $payroll The payroll to create benefit payments for
-     * @param array $payrollData The employee's payroll data
+     * @param \App\Models\Benefits\Payrolls\Payroll $payroll The payroll object
+     * @param array $benefits Array containing 'benefits' collection of BaseBenefit models
      * @return array Array of created benefit payment IDs
      */
-    public function createBenefitPaymentsForPayroll($payroll, $payrollData)
+    public function createBenefitPaymentsForPayroll($payroll, $benefits)
     {
         $benefitPaymentIds = [];
 
         try {
-            \Illuminate\Support\Facades\DB::transaction(function () use ($payroll, $payrollData, &$benefitPaymentIds) {
-                // 1. Create benefit payment for basic salary
-                if ($payrollData['insurance_amount'] > 0) {
-                    $basicSalaryPayment = \App\Models\Benefits\Payrolls\BenefitPayment::create([
-                        'employee_id' => $this->id,
-                        'payroll_id' => $payroll->id,
-                        'benefit_id' => $this->baseBenefits()->where('name', 'basic')->first()?->id,
-                        'amount' => $payrollData['insurance_amount'],
-                        'status' => \App\Models\Benefits\Payrolls\BenefitPayment::STATUS_PAID,
-                        'desc' => 'Basic salary payment',
-                    ]);
-                    $benefitPaymentIds[] = $basicSalaryPayment->id;
-                }
-
-                // 2. Create benefit payment for other amount
-                if ($payrollData['other_amount'] > 0) {
-                    $otherAmountPayment = \App\Models\Benefits\Payrolls\BenefitPayment::create([
-                        'employee_id' => $this->id,
-                        'payroll_id' => $payroll->id,
-                        'benefit_id' => null,
-                        'amount' => $payrollData['other_amount'],
-                        'status' => \App\Models\Benefits\Payrolls\BenefitPayment::STATUS_PAID,
-                        'desc' => 'Other salary components',
-                    ]);
-                    $benefitPaymentIds[] = $otherAmountPayment->id;
-                }
-
-                // 3. Create benefit payment for employee insurance (deduction)
-                if ($payrollData['employee_insurance'] > 0) {
-                    $insurancePayment = \App\Models\Benefits\Payrolls\BenefitPayment::create([
-                        'employee_id' => $this->id,
-                        'payroll_id' => $payroll->id,
-                        'benefit_id' => null,
-                        'amount' => -$payrollData['employee_insurance'], // Negative for deduction
-                        'status' => \App\Models\Benefits\Payrolls\BenefitPayment::STATUS_PAID,
-                        'desc' => 'Employee social insurance deduction',
-                    ]);
-                    $benefitPaymentIds[] = $insurancePayment->id;
-                }
-
-                // 4. Create benefit payment for medical insurance (deduction)
-                if ($payrollData['employee_medical'] > 0) {
-                    $medicalPayment = \App\Models\Benefits\Payrolls\BenefitPayment::create([
-                        'employee_id' => $this->id,
-                        'payroll_id' => $payroll->id,
-                        'benefit_id' => null,
-                        'amount' => -$payrollData['employee_medical'], // Negative for deduction
-                        'status' => \App\Models\Benefits\Payrolls\BenefitPayment::STATUS_PAID,
-                        'desc' => 'Employee medical insurance deduction',
-                    ]);
-                    $benefitPaymentIds[] = $medicalPayment->id;
-                }
-
-                // 5. Create benefit payment for penalties (deduction)
-                if ($payrollData['penalties_amount'] > 0) {
-                    $penaltyPayment = \App\Models\Benefits\Payrolls\BenefitPayment::create([
-                        'employee_id' => $this->id,
-                        'payroll_id' => $payroll->id,
-                        'benefit_id' => null,
-                        'amount' => -$payrollData['penalties_amount'], // Negative for deduction
-                        'status' => \App\Models\Benefits\Payrolls\BenefitPayment::STATUS_PAID,
-                        'desc' => 'Attendance penalties (' . $payrollData['penalties_days'] . ' days)',
-                    ]);
-                    $benefitPaymentIds[] = $penaltyPayment->id;
-                }
-
-                // 6. Create benefit payments for employee base benefits
-                if ($payrollData['employee_base_benefits'] > 0) {
-                    // Create individual benefit payments for each base benefit
-                    foreach ($this->getEmployeeBaseBenefits()->get() as $baseBenefit) {
-                        $benefitPayment = \App\Models\Benefits\Payrolls\BenefitPayment::create([
+            return DB::transaction(function() use ($payroll, $benefits, &$benefitPaymentIds) {
+                // Create benefit payments using the benefits collection
+                if (isset($benefits) && (is_array($benefits) || $benefits instanceof \Illuminate\Support\Collection)) {
+                    foreach ($benefits as $baseBenefit) {
+                        $benefitPayment = BenefitPayment::create([
                             'employee_id' => $this->id,
                             'payroll_id' => $payroll->id,
-                            'benefit_id' => $baseBenefit->id,
-                            'amount' => $baseBenefit->amount,
-                            'status' => \App\Models\Benefits\Payrolls\BenefitPayment::STATUS_PAID,
-                            'desc' => 'Benefit payment: ' . $baseBenefit->name,
+                            'base_benefit_id' => $baseBenefit->id,
+                            'amount' => $baseBenefit->amount ?? 0,
+                            'status' => BenefitPayment::STATUS_PENDING,
+                            'desc' => $baseBenefit->name ?? 'Benefit payment',
                         ]);
                         $benefitPaymentIds[] = $benefitPayment->id;
                     }
                 }
-
-                // 7. Create benefit payments for other base benefits
-                if ($payrollData['other_base_benefits'] > 0) {
-                    // Create individual benefit payments for each other base benefit
-                    foreach ($this->getOtherBaseBenefits()->get() as $baseBenefit) {
-                        $benefitPayment = \App\Models\Benefits\Payrolls\BenefitPayment::create([
-                            'employee_id' => $this->id,
-                            'payroll_id' => $payroll->id,
-                            'benefit_id' => $baseBenefit->id,
-                            'amount' => $baseBenefit->amount,
-                            'status' => \App\Models\Benefits\Payrolls\BenefitPayment::STATUS_PAID,
-                            'desc' => 'Other benefit payment: ' . $baseBenefit->name,
-                        ]);
-                        $benefitPaymentIds[] = $benefitPayment->id;
-                    }
-                }
+                
+                return $benefitPaymentIds;
             });
         } catch (\Exception $e) {
             report($e);
             AppLog::error('Error creating benefit payments', $e->getMessage(), loggable: $this);
+            return $benefitPaymentIds;
         }
-
-        return $benefitPaymentIds;
     }
 }

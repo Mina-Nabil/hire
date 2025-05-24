@@ -254,6 +254,7 @@ class EmployeeConfiguration extends Component
                 $this->baseBenefit['name'],
                 $this->baseBenefit['amount'],
                 $this->baseBenefit['type'],
+                $this->baseBenefit['receiver'],
                 Carbon::parse($this->baseBenefit['start_date'])
             );
 

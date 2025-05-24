@@ -9,7 +9,7 @@
                     <h5 class="text-lg font-medium">Payroll Period: {{ \Carbon\Carbon::parse($startDate)->format('d M Y') }} - {{ \Carbon\Carbon::parse($endDate)->format('d M Y') }}</h5>
                 </div>
                 <div>
-                    <button type="button" class="btn btn-primary" wire:click="openDepartmentModal">
+                    <button type="button" class="btn btn-dark btn-sm" wire:click="openDepartmentModal">
                         <span class="flex items-center">
                             <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2" icon="heroicons-outline:plus"></iconify-icon>
                             Add Departments
@@ -33,7 +33,10 @@
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center"></th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center th-highlight-yellow" colspan="3">Penalties</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center th-highlight-red" colspan="2">Extra Payments</th>
+                                <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center th-highlight-green" colspan="2">Overtime</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center th-highlight-blue" colspan="2">Base Benefits</th>
+                                <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center">Adjustment</th>
+                                <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center">Actions</th>
                             </tr>
                             <tr>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Employee</th>
@@ -47,8 +50,12 @@
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Net After Penalty</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Amount</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Net After Deductions</th>
+                                <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Hours</th>
+                                <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Amount</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Paid To Employee</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Paid To Other</th>
+                                <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Amount</th>
+                                <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700"></th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
@@ -59,7 +66,7 @@
                                             {{ $department['name'] }}
                                         </td>
                                     </tr>
-                                    @foreach($department['employees'] as $employee)
+                                    @foreach($department['employees'] as $employeeIndex => $employee)
                                         <tr>
                                             <td class="table-td sticky-colomn border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
                                                 <div>
@@ -85,8 +92,27 @@
                                             <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['net_after_penalty'], 2) }}</td>
                                             <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['extra_payments'], 2) }}</td>
                                             <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['net_after_deductions'], 2) }}</td>
+                                            <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['overtime_hours'] ?? 0, 2) }}</td>
+                                            <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['overtime_amount'] ?? 0, 2) }}</td>
                                             <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['employee_base_benefits'], 2) }}</td>
                                             <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['other_base_benefits'], 2) }}</td>
+                                            <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
+                                                <div class="flex flex-col">
+                                                    <span class="text-sm">{{ number_format($employee['adj_amount'] ?? 0, 2) }}</span>
+                                                    @if(!empty($employee['adj_desc']))
+                                                        <span class="text-xs text-slate-500">{{ Str::limit($employee['adj_desc'], 20) }}</span>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                            <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
+                                                <button type="button" class="btn btn-sm btn-outline-primary" 
+                                                    wire:click="openAdjustmentModal({{ $departmentId }}, {{ $employeeIndex }})">
+                                                    <span class="flex items-center">
+                                                        <iconify-icon icon="heroicons-outline:pencil" class="text-base ltr:mr-1 rtl:ml-1"></iconify-icon>
+                                                        Adjust
+                                                    </span>
+                                                </button>
+                                            </td>
                                         </tr>
                                     @endforeach
                                 @endif
@@ -132,16 +158,17 @@
                     <div class="grid grid-cols-1 gap-4">
                         <div>
                             <label class="form-label">Departments*</label>
-                            <div class="border rounded-md p-4 mt-1 max-h-60 overflow-y-auto">
+                            <div class="border rounded-md p-4 mt-1 max-h-60 overflow-y-auto grid grid-cols-1 md:grid-cols-4 gap-2">
                                 @foreach($departments as $department)
-                                    <div class="flex items-center mb-2 p-2 rounded-md {{ is_array($this->selectedDepartments) && in_array($department->id, $this->selectedDepartments) ? 'bg-primary-50 dark:bg-primary-900/20' : '' }}">
-                                        <input type="checkbox" id="department-{{ $department->id }}" 
-                                            value="{{ $department->id }}" 
-                                            wire:model.live="selectedDepartments" 
-                                            class="form-checkbox rounded text-primary-500">
-                                        <label for="department-{{ $department->id }}" class="ml-2 text-sm flex-grow">
-                                            {{ $department->name }}
-                                        </label>
+                                    <div class="flex items-center gap-2 mb-2 p-2 rounded-md {{ is_array($this->selectedDepartments) && in_array($department->id, $this->selectedDepartments) ? 'bg-primary-50 dark:bg-primary-900/20' : '' }}">
+                                        <div class="checkbox-area ml-2">
+                                            <label class="inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" id="department-{{ $department->id }}" value="{{ $department->id }}"  class="hidden" name="checkbox" wire:model.live="selectedDepartments">
+                                                <span class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
+                                                    <img src="{{ asset('images/icon/ck-white.svg') }}" alt="" class="h-[10px] w-[10px] block m-auto opacity-0"></span>
+                                                <span class="text-slate-500 dark:text-slate-400 text-sm leading-6">{{ $department->name }}</span>
+                                            </label>
+                                        </div>
                                         @if(is_array($this->selectedDepartments) && in_array($department->id, $this->selectedDepartments))
                                             @php
                                                 $count = \App\Models\Personel\Employee::whereHas('position', function($query) use ($department) {
@@ -156,9 +183,13 @@
                             @error('departmentSelection') <span class="text-danger text-sm">{{ $message }}</span> @enderror
                         </div>
 
-                        <div class="flex items-center space-x-2">
-                            <input type="checkbox" id="selectAllEmployees" wire:model.live="selectAllEmployees" class="form-checkbox rounded text-primary-500">
-                            <label for="selectAllEmployees" class="text-sm font-medium">Select all employees in the selected departments</label>
+                        <div class="checkbox-area ml-2">
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="selectAllEmployees" wire:model.live="selectAllEmployees"  class="hidden" name="checkbox">
+                                <span class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
+                                    <img src="{{ asset('images/icon/ck-white.svg') }}" alt="" class="h-[10px] w-[10px] block m-auto opacity-0"></span>
+                                <span class="text-slate-500 dark:text-slate-400 text-sm leading-6">Select all employees in the selected departments</span>
+                            </label>
                         </div>
 
                         @if(!$selectAllEmployees && is_array($this->selectedDepartments) && !empty($this->selectedDepartments))
@@ -173,13 +204,14 @@
 
                                     @forelse($departmentEmployees as $employee)
                                         <div class="flex items-center">
-                                            <input type="checkbox" id="employee-{{ $employee->id }}" 
-                                                value="{{ $employee->id }}" 
-                                                wire:model="selectedEmployees" 
-                                                class="form-checkbox rounded text-primary-500">
-                                            <label for="employee-{{ $employee->id }}" class="ml-2 text-sm">
-                                                {{ $employee->name }} ({{ $employee->position?->name ?? 'No Position' }})
-                                            </label>
+                                            <div class="checkbox-area ml-2">
+                                                <label class="inline-flex items-center cursor-pointer">
+                                                    <input type="checkbox" id="employee-{{ $employee->id }}" value="{{ $employee->id }}"  class="hidden" name="checkbox" wire:model="selectedEmployees">
+                                                    <span class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
+                                                        <img src="{{ asset('images/icon/ck-white.svg') }}" alt="" class="h-[10px] w-[10px] block m-auto opacity-0"></span>
+                                                    <span class="text-slate-500 dark:text-slate-400 text-sm leading-6">{{ $employee->name }} ({{ $employee->position?->name ?? 'No Position' }})</span>
+                                                </label>
+                                            </div>
                                         </div>
                                     @empty
                                         <div class="text-center text-sm text-slate-500">No employees found</div>
@@ -213,4 +245,36 @@
             </x-modal>
         @endif
     </div>
+
+    <!-- Adjustment Modal -->
+    @if($showAdjustmentModal)
+        <x-modal wire:model="showAdjustmentModal">
+            <x-slot name="title">Employee Adjustment</x-slot>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="form-label">Adjustment Amount</label>
+                    <input type="number" step="0.01" wire:model="adjustmentAmount" 
+                        class="form-control" placeholder="Enter adjustment amount">
+                    <p class="text-xs text-slate-500 mt-1">Use positive values for additions, negative for deductions</p>
+                </div>
+                
+                <div>
+                    <label class="form-label">Adjustment Description</label>
+                    <textarea wire:model="adjustmentDescription" rows="3" 
+                        class="form-control" placeholder="Enter reason for adjustment"></textarea>
+                </div>
+            </div>
+
+            <x-slot name="footer">
+                <div class="flex justify-end space-x-3">
+                    <x-secondary-button wire:click="closeAdjustmentModal">Cancel</x-secondary-button>
+                    <x-primary-button wire:click="saveAdjustment" wire:loading.attr="disabled">
+                        <span wire:loading.remove wire:target="saveAdjustment">Save Adjustment</span>
+                        <span wire:loading wire:target="saveAdjustment">Saving...</span>
+                    </x-primary-button>
+                </div>
+            </x-slot>
+        </x-modal>
+    @endif
 </div>

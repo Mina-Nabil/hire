@@ -58,7 +58,7 @@ class ApplyAttendanceModal extends Component
     {
         $this->selectedEmployee = Employee::with('benefitConfiguration', 'workingDays')->findOrFail($employeeId);
 
-        $this->workingDays = $this->selectedEmployee->workingDays->pluck('name')->toArray();
+        $this->workingDays = $this->selectedEmployee->workingDays->pluck('type')->toArray();
 
         $this->attendanceCalculation = $this->selectedEmployee->benefitConfiguration?->attendance_calculation ?? BenefitConfiguration::ATTENDANCE_CALCULATION_FIXED;
         $this->workingDayStartMin = $this->selectedEmployee->benefitConfiguration?->working_day_start_min;

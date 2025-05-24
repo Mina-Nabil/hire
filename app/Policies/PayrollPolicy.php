@@ -29,7 +29,7 @@ class PayrollPolicy
      */
     public function create(User $user): bool
     {
-        return $user->is_admin;
+        return $user->is_admin && $user->is_hr;
     }
 
     /**
@@ -37,7 +37,7 @@ class PayrollPolicy
      */
     public function update(User $user, Payroll $payroll): bool
     {
-        return $user->is_admin;
+        return $user->is_admin && $payroll->status === Payroll::STATUS_PENDING;
     }
 
     /**
@@ -45,6 +45,6 @@ class PayrollPolicy
      */
     public function delete(User $user, Payroll $payroll): bool
     {
-        return $user->is_admin;
+        return $user->is_admin && $payroll->status === Payroll::STATUS_PENDING;
     }
 }

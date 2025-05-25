@@ -3351,6 +3351,7 @@ class Employee extends Model
             ->where('date', '>=', $startDate->format('Y-m-d'))
             ->where('date', '<=', $endDate->format('Y-m-d'))
             ->where('is_approved', true)
+            ->whereNull('payroll_id')
             ->pluck('date')
             ->toArray();
         
@@ -3409,6 +3410,7 @@ class Employee extends Model
         $attendance = $this->attendances()
             ->where('date', $date->format('Y-m-d'))
             ->where('is_approved', true)
+            ->whereNull('payroll_id')
             ->first();
             
         if (!$attendance) {
@@ -3469,6 +3471,7 @@ class Employee extends Model
         $attendance = $this->attendances()
             ->where('date', $date->format('Y-m-d'))
             ->where('is_approved', true)
+            ->whereNull('payroll_id')
             ->first();
             
         if (!$attendance) {
@@ -3579,6 +3582,7 @@ class Employee extends Model
             ->where('date', '>=', $startDate->format('Y-m-d'))
             ->where('date', '<=', $endDate->format('Y-m-d'))
             ->where('is_approved', true)
+            ->whereNull('payroll_id')
             ->where('is_extra_hours_approved', true)
             ->sum('extra_hours');
     }
@@ -3621,6 +3625,7 @@ class Employee extends Model
         $attendance = $this->attendances()
             ->where('date', $date->format('Y-m-d'))
             ->where('is_approved', true)
+            ->whereNull('payroll_id')
             ->first();
             
         if (!$attendance) {
@@ -3681,6 +3686,7 @@ class Employee extends Model
         $attendance = $this->attendances()
             ->where('date', $date->format('Y-m-d'))
             ->where('is_approved', true)
+            ->whereNull('payroll_id')
             ->first();
             
         if (!$attendance) {

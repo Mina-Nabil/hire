@@ -3539,7 +3539,7 @@ class Employee extends Model
         
         // Get shortfall hours (partial days)
         $shortfallHours = $this->getTotalShortfallHours($startDate, $endDate);
-        // dd('total: ' . $missedHours + $shortfallHours , 'missed: ' . $missedHours, 'late: ' . $lateHours, 'early: ' . $earlyDepartureHours, 'shortfall: ' . $shortfallHours);
+        
         return $missedHours + $shortfallHours;
     }
     

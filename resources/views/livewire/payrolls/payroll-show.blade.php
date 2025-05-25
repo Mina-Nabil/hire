@@ -68,12 +68,10 @@
                 </div>
             </div>
 
-
-
             <div class="flex justify-between items-center mb-6">
                 <div class="flex-1 mr-4">
                     <div class="relative">
-                        <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search employees..."
+                        <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search..." 
                             class="form-control py-2 !pl-12">
                         <span class="absolute left-2 top-2 text-lg">
                             <iconify-icon icon="heroicons-outline:search"></iconify-icon>
@@ -82,128 +80,58 @@
                 </div>
             </div>
 
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700 no-wrap">
-                    <thead>
-                        <tr>
-                            <th class="table-th">Employee</th>
-                            <th class="table-th">Position</th>
-                            <th class="table-th">Gross Salary</th>
-                            <th class="table-th">Insurance Amount</th>
-                            <th class="table-th">Other Amount</th>
-                            <th class="table-th">Penalties</th>
-                            <th class="table-th">Extra Payments</th>
-                            <th class="table-th">Overtime</th>
-                            <th class="table-th">Adjustment</th>
-                            <th class="table-th">Net Amount</th>
-                            <th class="table-th">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
-                        @forelse($payrollEmployees as $payrollEmployee)
-                            <tr wire:key="employee-{{ $payrollEmployee->id }}">
-                                <td class="table-td">
-                                    <div class="flex items-center">
-                                        <div class="flex-none">
-                                            <div
-                                                class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
-                                                <span class="text-slate-600 dark:text-slate-300 text-sm font-medium">
-                                                    {{ substr($payrollEmployee->employee->name ?? 'N/A', 0, 2) }}
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="ml-3">
-                                            <h6 class="text-sm font-medium text-slate-900 dark:text-white">
-                                                {{ $payrollEmployee->employee->name ?? 'N/A' }}
-                                            </h6>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="table-td">
-                                    <div class="flex-1 text-start">
-                                        <h4 class="text-sm font-medium text-slate-600 whitespace-nowrap">
-                                            {{ $payrollEmployee->position }}
-                                        </h4>
-                                        <div class="text-xs font-normal text-slate-600 dark:text-slate-400">
-                                            {{ $payrollEmployee->department }}
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="table-td">{{ number_format($payrollEmployee->gross_salary, 2) }}</td>
-                                <td class="table-td">{{ number_format($payrollEmployee->insurance_amount, 2) }}</td>
-                                <td class="table-td">{{ number_format($payrollEmployee->other_amount, 2) }}</td>
-                                <td class="table-td">
-                                    <div class="flex flex-col">
-                                        <span>{{ number_format($payrollEmployee->penalties_days, 2) }} days</span>
-                                        <span
-                                            class="text-xs text-danger-500">-{{ number_format($payrollEmployee->penalties_amount, 2) }}
-                                            <small>EGP</small></span>
-                                    </div>
-                                </td>
-                                <td class="table-td">{{ number_format($payrollEmployee->extra_payments, 2) }}</td>
-                                <td class="table-td">
-                                    <div class="flex flex-col">
-                                        <span>{{ number_format($payrollEmployee->overtime_hours, 2) }} hours</span>
-                                        <span
-                                            class="text-xs text-success-500">+{{ number_format($payrollEmployee->overtime_amount, 2) }}
-                                            <small>EGP</small></span>
-                                    </div>
-                                </td>
-                                <td class="table-td">
-                                    <div class="flex flex-col">
-                                        <span>{{ number_format($payrollEmployee->adj_amount, 2) }} EGP</span>
-                                        @if (!empty($payrollEmployee->adj_desc))
-                                            <span
-                                                class="text-xs text-slate-500">{{ Str::limit($payrollEmployee->adj_desc, 30) }}</span>
-                                        @endif
-                                    </div>
-                                </td>
-                                <td class="table-td font-semibold">
-                                    {{ number_format($payrollEmployee->net_after_deductions, 2) }}</td>
-                                <td class="table-td">
-                                    <div class="flex space-x-2">
-                                        <button type="button" class="btn btn-sm btn-outline-primary"
-                                            wire:click="showEmployeeDetails({{ $payrollEmployee->id }})">
-                                            <span class="flex items-center">
-                                                <iconify-icon icon="heroicons-outline:eye"
-                                                    class="text-base ltr:mr-1 rtl:ml-1"></iconify-icon>
-                                                Details
-                                            </span>
-                                        </button>
-
-                                        @if ($payroll->status === \App\Models\Benefits\Payrolls\Payroll::STATUS_PENDING)
-                                            <button type="button" class="btn btn-sm btn-outline-secondary"
-                                                wire:click="openAdjustmentModal({{ $payrollEmployee->id }})">
-                                                <span class="flex items-center">
-                                                    <iconify-icon icon="heroicons-outline:pencil"
-                                                        class="text-base ltr:mr-1 rtl:ml-1"></iconify-icon>
-                                                    Adjust
-                                                </span>
-                                            </button>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="11" class="table-td text-center py-8">
-                                    <div class="flex flex-col items-center">
-                                        <iconify-icon icon="heroicons-outline:user-group"
-                                            class="text-5xl text-slate-400 mb-2"></iconify-icon>
-                                        <h5 class="text-xl font-medium text-slate-400">No employees found</h5>
-                                        <p class="text-sm text-slate-400 mt-1">This payroll doesn't have any employee
-                                            records</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+            <!-- Tabs Navigation -->
+            <div class="border-b border-slate-200 dark:border-slate-700 mb-6">
+                <ul class="flex flex-wrap -mb-px">
+                    <li class="mr-2">
+                        <button wire:click="setActiveTab('overview')" 
+                            class="inline-block py-2 px-4 text-sm font-medium border-b-2 {{ $activeTab === 'overview' ? 'border-primary-500 text-primary-500' : 'border-transparent text-slate-500 hover:text-slate-600 hover:border-slate-300' }}">
+                            <span class="flex items-center">
+                                <iconify-icon icon="heroicons-outline:users" class="text-base ltr:mr-2 rtl:ml-2"></iconify-icon>
+                                Overview
+                            </span>
+                        </button>
+                    </li>
+                    <li class="mr-2">
+                        <button wire:click="setActiveTab('benefits')"
+                            class="inline-block py-2 px-4 text-sm font-medium border-b-2 {{ $activeTab === 'benefits' ? 'border-primary-500 text-primary-500' : 'border-transparent text-slate-500 hover:text-slate-600 hover:border-slate-300' }}">
+                            <span class="flex items-center">
+                                <iconify-icon icon="heroicons-outline:gift" class="text-base ltr:mr-2 rtl:ml-2"></iconify-icon>
+                                Benefit Payments
+                            </span>
+                        </button>
+                    </li>
+                    <li class="mr-2">
+                        <button wire:click="setActiveTab('overtime')"
+                            class="inline-block py-2 px-4 text-sm font-medium border-b-2 {{ $activeTab === 'overtime' ? 'border-primary-500 text-primary-500' : 'border-transparent text-slate-500 hover:text-slate-600 hover:border-slate-300' }}">
+                            <span class="flex items-center">
+                                <iconify-icon icon="heroicons-outline:clock" class="text-base ltr:mr-2 rtl:ml-2"></iconify-icon>
+                                Overtime
+                            </span>
+                        </button>
+                    </li>
+                    <li>
+                        <button wire:click="setActiveTab('extra-payments')"
+                            class="inline-block py-2 px-4 text-sm font-medium border-b-2 {{ $activeTab === 'extra-payments' ? 'border-primary-500 text-primary-500' : 'border-transparent text-slate-500 hover:text-slate-600 hover:border-slate-300' }}">
+                            <span class="flex items-center">
+                                <iconify-icon icon="heroicons-outline:currency-dollar" class="text-base ltr:mr-2 rtl:ml-2"></iconify-icon>
+                                Extra Payments
+                            </span>
+                        </button>
+                    </li>
+                </ul>
             </div>
 
-            <div class="mt-6">
-                {{ $payrollEmployees->links() }}
-            </div>
+            <!-- Tab Content -->
+            @if($activeTab === 'overview')
+                @include('livewire.payrolls.partials.overview-tab')
+            @elseif($activeTab === 'benefits')
+                @include('livewire.payrolls.partials.benefits-tab')
+            @elseif($activeTab === 'overtime')
+                @include('livewire.payrolls.partials.overtime-tab')
+            @elseif($activeTab === 'extra-payments')
+                @include('livewire.payrolls.partials.extra-payments-tab')
+            @endif
         </div>
     </div>
 

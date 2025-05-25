@@ -18,7 +18,12 @@ class PayrollShow extends Component
     public $perPage = 10;
     public $sortField = 'created_at';
     public $sortDirection = 'desc';
-
+    
+    // Tab management
+    public $activeTab = 'overview';
+    
+    protected $queryString = ['activeTab'];
+    
     protected $listeners = ['approvePayroll'];
     
     // Modal properties
@@ -42,6 +47,12 @@ class PayrollShow extends Component
         
         // Verify the user has permission to view this payroll
         $this->authorize('view', $this->payroll);
+    }
+    
+    public function setActiveTab($tab)
+    {
+        $this->activeTab = $tab;
+        $this->resetPage(); // Reset pagination when switching tabs
     }
     
     public function sortBy($field)
@@ -181,20 +192,89 @@ class PayrollShow extends Component
     
     public function render()
     {
-        $payrollEmployees = $this->payroll->payrollEmployees()
-            ->with('employee')
-            ->when($this->search, function ($query) {
-                return $query->whereHas('employee', function ($q) {
-                    $q->where('name', 'like', '%' . $this->search . '%')
-                      ->orWhere('position', 'like', '%' . $this->search . '%')
-                      ->orWhere('department', 'like', '%' . $this->search . '%');
-                });
-            })
-            ->orderBy($this->sortField, $this->sortDirection)
-            ->paginate($this->perPage);
+        $data = [];
         
-        return view('livewire.payrolls.payroll-show', [
-            'payrollEmployees' => $payrollEmployees
-        ]);
+        if ($this->activeTab === 'overview') {
+            $payrollEmployees = $this->payroll->payrollEmployees()
+                ->with('employee')
+                ->when($this->search, function ($query) {
+                    return $query->whereHas('employee', function ($q) {
+                        $q->where('name', 'like', '%' . $this->search . '%')
+                            ->orWhere('position', 'like', '%' . $this->search . '%')
+                            ->orWhere('department', 'like', '%' . $this->search . '%');
+                    });
+                })
+                ->orderBy($this->sortField, $this->sortDirection)
+                ->paginate($this->perPage);
+            
+            // Calculate totals for all employees (not just paginated ones)
+            $totalsQuery = $this->payroll->payrollEmployees()
+                ->when($this->search, function ($query) {
+                    return $query->whereHas('employee', function ($q) {
+                        $q->where('name', 'like', '%' . $this->search . '%')
+                            ->orWhere('position', 'like', '%' . $this->search . '%')
+                            ->orWhere('department', 'like', '%' . $this->search . '%');
+                    });
+                });
+            
+            $totals = [
+                'total_employees' => $totalsQuery->count(),
+                'gross_salary' => $totalsQuery->sum('gross_salary'),
+                'insurance_amount' => $totalsQuery->sum('insurance_amount'),
+                'other_amount' => $totalsQuery->sum('other_amount'),
+                'penalties_days' => $totalsQuery->sum('penalties_days'),
+                'penalties_amount' => $totalsQuery->sum('penalties_amount'),
+                'extra_payments' => $totalsQuery->sum('extra_payments'),
+                'overtime_hours' => $totalsQuery->sum('overtime_hours'),
+                'overtime_amount' => $totalsQuery->sum('overtime_amount'),
+                'adj_amount' => $totalsQuery->sum('adj_amount'),
+                'net_after_deductions' => $totalsQuery->sum('net_after_deductions'),
+            ];
+            
+            $data = [
+                'payrollEmployees' => $payrollEmployees,
+                'totals' => $totals
+            ];
+        } elseif ($this->activeTab === 'benefits') {
+            $benefitPayments = $this->payroll->benefitPayments()
+                ->with(['employee', 'baseBenefit'])
+                ->when($this->search, function ($query) {
+                    return $query->whereHas('employee', function ($q) {
+                        $q->where('name', 'like', '%' . $this->search . '%');
+                    })->orWhereHas('baseBenefit', function ($q) {
+                        $q->where('name', 'like', '%' . $this->search . '%');
+                    });
+                })
+                ->orderBy($this->sortField, $this->sortDirection)
+                ->paginate($this->perPage);
+            
+            $data['benefitPayments'] = $benefitPayments;
+        } elseif ($this->activeTab === 'overtime') {
+            $overtimes = $this->payroll->overtimes()
+                ->with('employee')
+                ->when($this->search, function ($query) {
+                    return $query->whereHas('employee', function ($q) {
+                        $q->where('name', 'like', '%' . $this->search . '%');
+                    });
+                })
+                ->orderBy($this->sortField, $this->sortDirection)
+                ->paginate($this->perPage);
+            
+            $data['overtimes'] = $overtimes;
+        } elseif ($this->activeTab === 'extra-payments') {
+            $extraPayments = $this->payroll->extraPayments()
+                ->with('employee')
+                ->when($this->search, function ($query) {
+                    return $query->whereHas('employee', function ($q) {
+                        $q->where('name', 'like', '%' . $this->search . '%');
+                    })->orWhere('name', 'like', '%' . $this->search . '%');
+                })
+                ->orderBy($this->sortField, $this->sortDirection)
+                ->paginate($this->perPage);
+            
+            $data['extraPayments'] = $extraPayments;
+        }
+        
+        return view('livewire.payrolls.payroll-show', $data);
     }
 } 

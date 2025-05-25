@@ -18,6 +18,8 @@ class PayrollShow extends Component
     public $perPage = 10;
     public $sortField = 'created_at';
     public $sortDirection = 'desc';
+
+    protected $listeners = ['approvePayroll'];
     
     // Modal properties
     public $showEmployeeDetailsModal = false;
@@ -54,21 +56,17 @@ class PayrollShow extends Component
     
     public function approvePayroll()
     {
-        // Verify the user has permission to update this payroll
         $this->authorize('update', $this->payroll);
         
-        $this->payroll->update([
-            'status' => Payroll::STATUS_APPROVED
-        ]);
-        
-        \App\Models\Users\AppLog::info(
-            'Payroll Approved', 
-            'Approved payroll for period ' . $this->payroll->start_date . ' to ' . $this->payroll->end_date, 
-            loggable: $this->payroll
-        );
-        
-        $this->alertSuccess('Payroll approved successfully.');
-        $this->payroll->refresh();
+        $res = $this->payroll->approve();
+
+        if($res){
+            $this->payroll->refresh();
+            $this->alertSuccess('Payroll approved successfully.');
+        }else{
+                $this->alertError('Failed to approve payroll');
+        }
+
     }
     
     public function showEmployeeDetails($payrollEmployeeId)

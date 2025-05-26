@@ -69,6 +69,7 @@ class CreatePayroll extends Component
     {
         if(count($this->departments) > 0){
             $this->selectedDepartments = $this->departments->pluck('id')->toArray();
+            $this->loadEmployeesFromMultipleDepartments($this->selectedDepartments);
         }
     }
 

@@ -71,6 +71,14 @@
                             <iconify-icon class="mr-1" icon="mdi:information-outline"></iconify-icon>
                             Employee & Benefits</a>
                     </li>
+                    <li class="nav-item" role="presentation" wire:click="setActiveTab('payrolls')">
+                        <a href="#tabs-payrolls"
+                            class="nav-link w-full flex items-center font-medium text-sm font-Inter leading-tight capitalize border-x-0 border-t-0 border-b border-transparent px-4 pb-2 my-2 hover:border-transparent focus:border-transparent  @if ($activeTab === 'payrolls') active @endif dark:text-slate-300"
+                            id="tabs-payrolls-tab" data-bs-toggle="pill" data-bs-target="#tabs-payrolls" role="tab"
+                            aria-controls="tabs-payrolls" aria-selected="false">
+                            <iconify-icon class="mr-1" icon="mdi:currency-usd"></iconify-icon>
+                            Payrolls</a>
+                    </li>
                     <li class="nav-item" role="presentation" wire:click="setActiveTab('payments')">
                         <a href="#tabs-payments"
                             class="nav-link w-full flex items-center font-medium text-sm font-Inter leading-tight capitalize border-x-0 border-t-0 border-b border-transparent px-4 pb-2 my-2 hover:border-transparent focus:border-transparent  @if ($activeTab === 'payments') active @endif dark:text-slate-300"
@@ -98,8 +106,8 @@
                 </ul>
                 <div>
                     <h4>
-                        <iconify-icon class="ml-3" style="position: absolute" wire:loading wire:target="setActiveTab"
-                            icon="svg-spinners:180-ring"></iconify-icon>
+                        <iconify-icon class="ml-3" style="position: absolute" wire:loading
+                            wire:target="setActiveTab" icon="svg-spinners:180-ring"></iconify-icon>
                     </h4>
                 </div>
             </div>
@@ -109,8 +117,8 @@
     <!-- Tab Content -->
     <div class="tab-content" id="tabs-tabContent">
         <!-- Employee Info & Benefits Tab -->
-        <div class="tab-pane fade @if ($activeTab === 'info') show active @endif" id="tabs-info" role="tabpanel"
-            aria-labelledby="tabs-info-tab">
+        <div class="tab-pane fade @if ($activeTab === 'info') show active @endif" id="tabs-info"
+            role="tabpanel" aria-labelledby="tabs-info-tab">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <!-- Employee Info Card -->
@@ -418,20 +426,26 @@
                                                         <tr>
                                                             <td class="table-td">
                                                                 {{ $payment->created_at->format('d/m/Y') }}</td>
-                                                                <td class="table-td">{{ $payment->amount }}</td>
-                                                                <td class="table-td"> @if($payment->payable_id) {{ $payment->payable_type }} @else - @endif</td>
-                                                                <td class="table-td">
-                                                                    @if ($payment->status == 'pending')
+                                                            <td class="table-td">{{ $payment->amount }}</td>
+                                                            <td class="table-td">
+                                                                @if ($payment->payable_id)
+                                                                    {{ $payment->payable_type }}
+                                                                @else
+                                                                    -
+                                                                @endif
+                                                            </td>
+                                                            <td class="table-td">
+                                                                @if ($payment->status == 'pending')
                                                                     <span class="badge bg-warning">Pending</span>
-                                                                    @elseif($payment->status == 'approved')
+                                                                @elseif($payment->status == 'approved')
                                                                     <span class="badge bg-info">Approved</span>
-                                                                    @elseif($payment->status == 'paid')
+                                                                @elseif($payment->status == 'paid')
                                                                     <span class="badge bg-success">Paid</span>
-                                                                    @elseif($payment->status == 'rejected')
+                                                                @elseif($payment->status == 'rejected')
                                                                     <span class="badge bg-danger">Rejected</span>
-                                                                    @endif
-                                                                </td>
-                                                                <td class="table-td">{{ $payment->desc ?? '-' }}</td>
+                                                                @endif
+                                                            </td>
+                                                            <td class="table-td">{{ $payment->desc ?? '-' }}</td>
                                                         </tr>
                                                     @endforeach
                                                 </tbody>
@@ -445,6 +459,120 @@
                             @else
                                 <div class="alert alert-info mt-5">
                                     No payments found for this employee.
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payrolls Tab -->
+        <div class="tab-pane fade @if ($activeTab === 'payrolls') show active @endif" id="tabs-payrolls"
+            role="tabpanel" aria-labelledby="tabs-payrolls-tab">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Employee Payments</h4>
+                        </div>
+                        <div class="card-body px-6 pb-6">
+                            <div class="overflow-x-auto">
+                                <table
+                                    class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700 no-wrap">
+                                    <thead>
+                                        <tr>
+                                            <th class="table-th">Gross Salary</th>
+                                            <th class="table-th">Insurance Amount</th>
+                                            <th class="table-th">Other Amount</th>
+                                            <th class="table-th">Penalties</th>
+                                            <th class="table-th">Extra Payments</th>
+                                            <th class="table-th">Overtime</th>
+                                            <th class="table-th">Adjustment</th>
+                                            <th class="table-th">Net Amount</th>
+                                            <th class="table-th">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody
+                                        class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
+                                        @forelse($payrollRecords as $payrollRecord)
+                                            <tr wire:key="employee-{{ $payrollRecord->id }}">
+                                                <td class="table-td">
+                                                    {{ number_format($payrollRecord->gross_salary, 2) }}</td>
+                                                <td class="table-td">
+                                                    {{ number_format($payrollRecord->insurance_amount, 2) }}
+                                                </td>
+                                                <td class="table-td">
+                                                    {{ number_format($payrollRecord->other_amount, 2) }}</td>
+                                                <td class="table-td">
+                                                    <div class="flex flex-col">
+                                                        <span>{{ number_format($payrollRecord->penalties_days, 2) }}
+                                                            days</span>
+                                                        <span
+                                                            class="text-xs text-danger-500">-{{ number_format($payrollRecord->penalties_amount, 2) }}
+                                                            <small>EGP</small></span>
+                                                    </div>
+                                                </td>
+                                                <td class="table-td">
+                                                    {{ number_format($payrollRecord->extra_payments, 2) }}</td>
+                                                <td class="table-td">
+                                                    <div class="flex flex-col">
+                                                        <span>{{ number_format($payrollRecord->overtime_hours, 2) }}
+                                                            hours</span>
+                                                        <span
+                                                            class="text-xs text-success-500">+{{ number_format($payrollRecord->overtime_amount, 2) }}
+                                                            <small>EGP</small></span>
+                                                    </div>
+                                                </td>
+                                                <td class="table-td">
+                                                    <div class="flex flex-col">
+                                                        <span>{{ number_format($payrollRecord->adj_amount, 2) }}
+                                                            EGP</span>
+                                                        @if (!empty($payrollRecord->adj_desc))
+                                                            <span
+                                                                class="text-xs text-slate-500">{{ Str::limit($payrollRecord->adj_desc, 30) }}</span>
+                                                        @endif
+                                                    </div>
+                                                </td>
+                                                <td class="table-td font-semibold">
+                                                    {{ number_format($payrollRecord->net_after_deductions, 2) }}</td>
+                                                <td class="table-td">
+                                                    <div class="flex space-x-2">
+                                                        <button type="button" class="btn btn-sm btn-outline-primary"
+                                                            wire:click="showEmployeeDetails({{ $payrollRecord->id }})">
+                                                            <span class="flex items-center">
+                                                                <iconify-icon icon="heroicons-outline:eye"
+                                                                    class="text-base ltr:mr-1 rtl:ml-1"></iconify-icon>
+                                                                Details
+                                                            </span>
+                                                        </button>
+
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="11" class="table-td text-center py-8">
+                                                    <div class="flex flex-col items-center">
+                                                        <iconify-icon icon="heroicons-outline:document-text"
+                                                            class="text-5xl text-slate-400 mb-2"></iconify-icon>
+                                                        <h5 class="text-xl font-medium text-slate-400">No payroll
+                                                            records found
+                                                        </h5>
+                                                        <p class="text-sm text-slate-400 mt-1">This employee doesn't
+                                                            have any
+                                                            payroll records</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            @if (isset($payrollRecords))
+                                <div class="mt-6">
+                                    {{ $payrollRecords->links() }}
                                 </div>
                             @endif
                         </div>
@@ -1011,15 +1139,19 @@
 
                     <div class="grid grid-cols-1 gap-4">
 
-                        <x-text-input label="Amount*" class="@error('extraPayment.amount') !border-danger-500 @enderror" type="number" step="0.01"
-                            wire:model="extraPayment.amount"
+                        <x-text-input label="Amount*"
+                            class="@error('extraPayment.amount') !border-danger-500 @enderror" type="number"
+                            step="0.01" wire:model="extraPayment.amount"
                             errorMessage="{{ $errors->first('extraPayment.amount') }}" />
 
-                        <x-text-input label="Due Date*" class="@error('extraPayment.due_date') !border-danger-500 @enderror" type="date"
+                        <x-text-input label="Due Date*"
+                            class="@error('extraPayment.due_date') !border-danger-500 @enderror" type="date"
                             wire:model="extraPayment.due_date"
                             errorMessage="{{ $errors->first('extraPayment.due_date') }}" />
 
-                        <x-textarea label="Description" class="@error('extraPayment.desc') !border-danger-500 @enderror" wire:model="extraPayment.desc"
+                        <x-textarea label="Description"
+                            class="@error('extraPayment.desc') !border-danger-500 @enderror"
+                            wire:model="extraPayment.desc"
                             errorMessage="{{ $errors->first('extraPayment.desc') }}" />
                     </div>
                 </div>
@@ -1035,4 +1167,362 @@
             </x-modal>
         @endif
     </div>
+
+    <!-- Employee Details Modal -->
+    @if ($showEmployeeDetailsModal && $selectedPayrollEmployee)
+        <x-modal wire:model="showEmployeeDetailsModal" size="xl">
+            <x-slot name="title">
+                <div class="flex items-center">
+                    <div class="flex-none">
+                        <div class="w-10 h-10 rounded-full bg-primary-500 flex items-center justify-center text-white">
+                            {{ substr($selectedPayrollEmployee->employee->name ?? 'N/A', 0, 2) }}
+                        </div>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-lg font-medium text-slate-100 dark:text-white">
+                            {{ $selectedPayrollEmployee->employee->name ?? 'N/A' }}
+                        </h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">
+                            {{ $selectedPayrollEmployee->position }} - {{ $selectedPayrollEmployee->department }}
+                        </p>
+                    </div>
+                </div>
+            </x-slot>
+
+            <div class="space-y-5">
+                <!-- Payroll Summary Section -->
+                <div>
+                    <h4 class="text-base font-medium mb-3 border-b pb-2">Payroll Summary</h4>
+                    <div class="grid  md:grid-cols-6 sm:grid-cols-1 gap-4">
+                        <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-3">
+                            <h5 class="text-xs font-medium text-slate-500 dark:text-slate-300 mb-1">Gross Salary</h5>
+                            <div class="text-sm font-semibold">
+                                {{ number_format($selectedPayrollEmployee->gross_salary, 2) }}</div>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-3">
+                            <h5 class="text-xs font-medium text-slate-500 dark:text-slate-300 mb-1">Insurance Amount
+                            </h5>
+                            <div class="text-sm font-semibold">
+                                {{ number_format($selectedPayrollEmployee->insurance_amount, 2) }}</div>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-3">
+                            <h5 class="text-xs font-medium text-slate-500 dark:text-slate-300 mb-1">Other Amount</h5>
+                            <div class="text-sm font-semibold">
+                                {{ number_format($selectedPayrollEmployee->other_amount, 2) }}</div>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-3">
+                            <h5 class="text-xs font-medium text-slate-500 dark:text-slate-300 mb-1">Employee Insurance
+                            </h5>
+                            <div class="text-sm font-semibold">
+                                {{ number_format($selectedPayrollEmployee->employee_insurance, 2) }}</div>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-3">
+                            <h5 class="text-xs font-medium text-slate-500 dark:text-slate-300 mb-1">Employer Insurance
+                            </h5>
+                            <div class="text-sm font-semibold">
+                                {{ number_format($selectedPayrollEmployee->employer_insurance, 2) }}</div>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-3">
+                            <h5 class="text-xs font-medium text-slate-500 dark:text-slate-300 mb-1">Total Insurance
+                            </h5>
+                            <div class="text-sm font-semibold">
+                                {{ number_format($selectedPayrollEmployee->total_insurance, 2) }}</div>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-3">
+                            <h5 class="text-xs font-medium text-slate-500 dark:text-slate-300 mb-1">Penalty Days</h5>
+                            <div class="text-sm font-semibold">
+                                {{ number_format($selectedPayrollEmployee->penalties_days, 2) }}</div>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-3">
+                            <h5 class="text-xs font-medium text-slate-500 dark:text-slate-300 mb-1">Penalty Amount</h5>
+                            <div class="text-sm font-semibold text-danger-500">
+                                -{{ number_format($selectedPayrollEmployee->penalties_amount, 2) }}</div>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-3">
+                            <h5 class="text-xs font-medium text-slate-500 dark:text-slate-300 mb-1">Net After Penalty
+                            </h5>
+                            <div class="text-sm font-semibold">
+                                {{ number_format($selectedPayrollEmployee->net_after_penalty, 2) }}</div>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-3">
+                            <h5 class="text-xs font-medium text-slate-500 dark:text-slate-300 mb-1">Extra Payments</h5>
+                            <div class="text-sm font-semibold">
+                                {{ number_format($selectedPayrollEmployee->extra_payments, 2) }}</div>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-3">
+                            <h5 class="text-xs font-medium text-slate-500 dark:text-slate-300 mb-1">Overtime Hours</h5>
+                            <div class="text-sm font-semibold">
+                                {{ number_format($selectedPayrollEmployee->overtime_hours, 2) }}</div>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-3">
+                            <h5 class="text-xs font-medium text-slate-500 dark:text-slate-300 mb-1">Overtime Amount
+                            </h5>
+                            <div class="text-sm font-semibold text-success-500">
+                                +{{ number_format($selectedPayrollEmployee->overtime_amount, 2) }}</div>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-3">
+                            <h5 class="text-xs font-medium text-slate-500 dark:text-slate-300 mb-1">Adjustment Amount
+                            </h5>
+                            <div
+                                class="text-sm font-semibold @if ($selectedPayrollEmployee->adj_amount >= 0) text-success-500 @else text-danger-500 @endif">
+                                @if ($selectedPayrollEmployee->adj_amount >= 0)
+                                    +
+                                @endif
+                                {{ number_format($selectedPayrollEmployee->adj_amount, 2) }}
+                            </div>
+                            @if (!empty($selectedPayrollEmployee->adj_desc))
+                                <div class="text-xs text-slate-500 mt-1">{{ $selectedPayrollEmployee->adj_desc }}
+                                </div>
+                            @endif
+                        </div>
+                        <div class="bg-primary-50 dark:bg-primary-900/20 rounded-md p-3 md:col-span-6">
+                            <h5 class="text-xs font-medium text-primary-500 dark:text-primary-400 mb-1">Net Amount</h5>
+                            <div class="text-lg font-semibold text-primary-600 dark:text-primary-400">
+                                {{ number_format($selectedPayrollEmployee->net_after_deductions, 2) }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs for different sections -->
+                <div x-data="{ activeTab: 'attendance' }">
+                    <div class="border-b border-slate-200 dark:border-slate-700">
+                        <ul class="flex flex-wrap -mb-px">
+                            <li class="mr-2">
+                                <button @click="activeTab = 'attendance'"
+                                    :class="activeTab === 'attendance' ? 'border-primary-500 text-primary-500' :
+                                        'border-transparent text-slate-500 hover:text-slate-600 hover:border-slate-300'"
+                                    class="inline-block py-2 px-4 text-sm font-medium border-b-2">
+                                    Attendance Records
+                                </button>
+                            </li>
+                            <li class="mr-2">
+                                <button @click="activeTab = 'benefits'"
+                                    :class="activeTab === 'benefits' ? 'border-primary-500 text-primary-500' :
+                                        'border-transparent text-slate-500 hover:text-slate-600 hover:border-slate-300'"
+                                    class="inline-block py-2 px-4 text-sm font-medium border-b-2">
+                                    Benefit Payments
+                                </button>
+                            </li>
+                            <li class="mr-2">
+                                <button @click="activeTab = 'overtime'"
+                                    :class="activeTab === 'overtime' ? 'border-primary-500 text-primary-500' :
+                                        'border-transparent text-slate-500 hover:text-slate-600 hover:border-slate-300'"
+                                    class="inline-block py-2 px-4 text-sm font-medium border-b-2">
+                                    Overtime
+                                </button>
+                            </li>
+                            <li>
+                                <button @click="activeTab = 'extras'"
+                                    :class="activeTab === 'extras' ? 'border-primary-500 text-primary-500' :
+                                        'border-transparent text-slate-500 hover:text-slate-600 hover:border-slate-300'"
+                                    class="inline-block py-2 px-4 text-sm font-medium border-b-2">
+                                    Extra Payments
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Attendance Records Tab -->
+                    <div x-show="activeTab === 'attendance'" class="mt-4">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
+                                <thead>
+                                    <tr>
+                                        <th class="table-th">Day</th>
+                                        <th class="table-th">Date</th>
+                                        <th class="table-th">Check In</th>
+                                        <th class="table-th">Check Out</th>
+                                        <th class="table-th">Total Hours</th>
+                                        <th class="table-th">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody
+                                    class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
+                                    @forelse($employeeAttendance as $attendance)
+                                        <tr>
+                                            <td class="table-td">
+                                                {{ \Carbon\Carbon::parse($attendance->date)->format('l') }}</td>
+                                            <td class="table-td">
+                                                {{ \Carbon\Carbon::parse($attendance->date)->format('d/m/Y') }}</td>
+                                            <td class="table-td">
+                                                {{ $attendance->start_time ? \Carbon\Carbon::parse($attendance->start_time)->format('H:i A') : 'N/A' }}
+                                            </td>
+                                            <td class="table-td">
+                                                {{ $attendance->end_time ? \Carbon\Carbon::parse($attendance->end_time)->format('H:i A') : 'N/A' }}
+                                            </td>
+                                            <td class="table-td">
+                                                <span
+                                                    class="
+                                            @if ($attendance->hours < $attendance->employee->benefitConfiguration->daily_working_hours) text-danger-500 @endif
+                                            @if ($attendance->hours > $attendance->employee->benefitConfiguration->daily_working_hours) text-success-500 @endif
+                                            ">
+                                                    {{ $attendance->hours ?? 'N/A' }}
+                                                    <small>Hours</small>
+                                                </span>
+                                            </td>
+                                            <td class="table-td">
+                                                @if ($attendance->status === 'present')
+                                                    <span class="badge bg-success-500 text-white">Present</span>
+                                                @elseif($attendance->status === 'absent')
+                                                    <span class="badge bg-danger-500 text-white">Absent</span>
+                                                @elseif($attendance->status === 'late')
+                                                    <span class="badge bg-warning-500 text-white">Late</span>
+                                                @else
+                                                    <span
+                                                        class="badge @if ($attendance->is_approved) bg-success-500 @else bg-slate-500 @endif text-white">
+                                                        {{ ucfirst($attendance->is_approved ? 'Approved' : 'Pending') }}
+                                                    </span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="5" class="table-td text-center py-4">No attendance records
+                                                found</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Benefit Payments Tab -->
+                    <div x-show="activeTab === 'benefits'" class="mt-4">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
+                                <thead>
+                                    <tr>
+                                        <th class="table-th">Benefit</th>
+                                        <th class="table-th">Type</th>
+                                        <th class="table-th">Amount</th>
+                                        <th class="table-th">Status</th>
+                                        <th class="table-th">Created At</th>
+                                    </tr>
+                                </thead>
+                                <tbody
+                                    class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
+                                    @forelse($employeeBenefitPayments as $benefit)
+                                        <tr>
+                                            <td class="table-td">{{ $benefit->baseBenefit->name ?? 'N/A' }}</td>
+                                            <td class="table-td">{{ ucfirst($benefit->baseBenefit->type ?? 'N/A') }}
+                                            </td>
+                                            <td class="table-td">{{ number_format($benefit->amount, 2) }}</td>
+                                            <td class="table-td">
+                                                @if ($benefit->status === 'pending')
+                                                    <span class="badge bg-warning-500 text-white">Pending</span>
+                                                @elseif($benefit->status === 'approved')
+                                                    <span class="badge bg-info-500 text-white">Approved</span>
+                                                @elseif($benefit->status === 'paid')
+                                                    <span class="badge bg-success-500 text-white">Paid</span>
+                                                @elseif($benefit->status === 'rejected')
+                                                    <span class="badge bg-danger-500 text-white">Rejected</span>
+                                                @else
+                                                    <span
+                                                        class="badge bg-warning-500 text-white">{{ ucfirst($benefit->status) }}</span>
+                                                @endif
+                                            </td>
+                                            <td class="table-td">{{ $benefit->created_at->format('d M Y') }}</td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="4" class="table-td text-center py-4">No benefit payments
+                                                found</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Overtime Tab -->
+                    <div x-show="activeTab === 'overtime'" class="mt-4">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
+                                <thead>
+                                    <tr>
+                                        <th class="table-th">Date</th>
+                                        <th class="table-th">Hours</th>
+                                        <th class="table-th">Rate</th>
+                                        <th class="table-th">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody
+                                    class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
+                                    @forelse($employeeOvertimes as $overtime)
+                                        <tr>
+                                            <td class="table-td">
+                                                {{ \Carbon\Carbon::parse($overtime->date)->format('d M Y') }}</td>
+                                            <td class="table-td">{{ $overtime->hours }}</td>
+                                            <td class="table-td">{{ $overtime->rate ?? 'Standard' }}</td>
+                                            <td class="table-td">
+                                                <span
+                                                    class="badge bg-success-500 text-white">{{ ucfirst($overtime->status) }}</span>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="4" class="table-td text-center py-4">No overtime records
+                                                found</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Extra Payments Tab -->
+                    <div x-show="activeTab === 'extras'" class="mt-4">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
+                                <thead>
+                                    <tr>
+                                        <th class="table-th">Description</th>
+                                        <th class="table-th">Amount</th>
+                                        <th class="table-th">Due Date</th>
+                                        <th class="table-th">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody
+                                    class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
+                                    @forelse($employeeExtraPayments as $payment)
+                                        <tr>
+                                            <td class="table-td">{{ $payment->name }}</td>
+                                            <td class="table-td">{{ number_format($payment->amount, 2) }}</td>
+                                            <td class="table-td">
+                                                {{ \Carbon\Carbon::parse($payment->due_date)->format('d M Y') }}</td>
+                                            <td class="table-td">
+                                                @if ($payment->status === 'pending')
+                                                    <span class="badge bg-warning-500 text-white">Pending</span>
+                                                @elseif($payment->status === 'approved')
+                                                    <span class="badge bg-info-500 text-white">Approved</span>
+                                                @elseif($payment->status === 'paid')
+                                                    <span class="badge bg-success-500 text-white">Paid</span>
+                                                @elseif($payment->status === 'rejected')
+                                                    <span class="badge bg-danger-500 text-white">Rejected</span>
+                                                @else
+                                                    <span
+                                                        class="badge bg-warning-500 text-white">{{ ucfirst($payment->status) }}</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="4" class="table-td text-center py-4">No extra payments
+                                                found</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <x-slot name="footer">
+                <div class="flex justify-end">
+                    <x-secondary-button wire:click="closeEmployeeDetailsModal">Close</x-secondary-button>
+                </div>
+            </x-slot>
+        </x-modal>
+    @endif
 </div>

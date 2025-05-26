@@ -4056,4 +4056,246 @@ class Employee extends Model
             return $benefitPaymentIds;
         }
     }
+
+    /**
+     * Calculate penalty offset using vacation benefits and direct deduction
+     * This method handles penalties by first using approved applied vacations,
+     * then returns available vacation benefits for manual selection, and finally
+     * calculates direct deduction for remaining penalties
+     *
+     * @param Carbon|string $startDate Start date of the range
+     * @param Carbon|string $endDate End date of the range
+     * @param float $hourlyRate The hourly rate for deduction calculation
+     * @return array Array containing penalty breakdown and available vacation benefits
+     */
+    public function calculatePenaltyWithVacationOffset($startDate, $endDate, $hourlyRate = null)
+    {
+        $startDate = $startDate instanceof Carbon ? $startDate : Carbon::parse($startDate);
+        $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
+
+        if ($hourlyRate === null) {
+            // Calculate hourly rate based on gross salary
+            $grossSalary = $this->benefitConfiguration->gross_salary ?? 0;
+            $workingDaysPerMonth = $this->workingDays->count() * 4; // Approximate
+            $dailyHours = $this->benefitConfiguration->daily_working_hours ?? 8;
+
+            $hourlyRate = $grossSalary / ($workingDaysPerMonth * $dailyHours);
+        }
+
+        // Get total penalty hours
+        $totalPenaltyHours = $this->getTotalPenaltyHours($startDate, $endDate);
+        
+        if ($totalPenaltyHours <= 0) {
+            return [
+                'total_penalty_hours' => 0,
+                'vacation_offset_hours' => 0,
+                'remaining_penalty_hours' => 0,
+                'direct_deduction_amount' => 0,
+                'used_approved_vacations' => [],
+                'available_vacation_benefits' => []
+            ];
+        }
+
+        $remainingPenaltyHours = $totalPenaltyHours;
+        $vacationOffsetHours = 0;
+        $usedApprovedVacations = [];
+
+        // Step 1: Check for existing approved applied vacations in the period
+        $approvedVacations = $this->appliedVacations()
+            ->where('status', AppliedVacation::STATUS_APPROVED)
+            ->whereHas('vacationDays', function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('vacation_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')]);
+            })
+            ->with('vacationDays')
+            ->get();
+
+        foreach ($approvedVacations as $appliedVacation) {
+            if ($remainingPenaltyHours <= 0) break;
+
+            $vacationHoursInPeriod = $appliedVacation->vacationDays()
+                ->whereBetween('vacation_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+                ->sum('hours');
+
+            $hoursToUse = min($remainingPenaltyHours, $vacationHoursInPeriod);
+            
+            if ($hoursToUse > 0) {
+                $vacationOffsetHours += $hoursToUse;
+                $remainingPenaltyHours -= $hoursToUse;
+                
+                $usedApprovedVacations[] = [
+                    'applied_vacation_id' => $appliedVacation->id,
+                    'vacation_benefit_name' => $appliedVacation->vacationBenefit->name ?? 'Unknown',
+                    'hours_used' => $hoursToUse
+                ];
+            }
+        }
+
+        // Step 2: Get available vacation benefits for manual selection (if there are remaining penalty hours)
+        $availableVacationBenefits = [];
+        if ($remainingPenaltyHours > 0) {
+            $vacationBenefits = $this->vacationBenefits()
+                ->whereNull('end_date')
+                ->where('current_balance', '>', 0)
+                ->orderBy('current_balance', 'desc')
+                ->get();
+
+            foreach ($vacationBenefits as $vacationBenefit) {
+                $availableVacationBenefits[] = [
+                    'vacation_benefit_id' => $vacationBenefit->id,
+                    'vacation_benefit_name' => $vacationBenefit->name,
+                    'type' => $vacationBenefit->type,
+                    'current_balance' => $vacationBenefit->current_balance,
+                    'max_applicable_hours' => min($remainingPenaltyHours, $vacationBenefit->current_balance)
+                ];
+            }
+        }
+
+        // Step 3: Calculate direct deduction for remaining penalty hours
+        $directDeductionAmount = $remainingPenaltyHours * $hourlyRate;
+
+        return [
+            'total_penalty_hours' => $totalPenaltyHours,
+            'vacation_offset_hours' => $vacationOffsetHours,
+            'remaining_penalty_hours' => $remainingPenaltyHours,
+            'direct_deduction_amount' => $directDeductionAmount,
+            'used_approved_vacations' => $usedApprovedVacations,
+            'available_vacation_benefits' => $availableVacationBenefits
+        ];
+    }
+
+    /**
+     * Apply vacation benefit for penalty offset
+     * This method creates a vacation application for the specified hours to offset penalties
+     *
+     * @param int $vacationBenefitId The vacation benefit ID to use
+     * @param float $hours Hours to apply for vacation
+     * @param Carbon|string $startDate Start date of the penalty period
+     * @param Carbon|string $endDate End date of the penalty period
+     * @return array Result of the vacation application
+     */
+    public function applyVacationForPenaltyOffset($vacationBenefitId, $hours, $startDate, $endDate)
+    {
+        $startDate = $startDate instanceof Carbon ? $startDate : Carbon::parse($startDate);
+        $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
+
+        try {
+            $vacationBenefit = $this->vacationBenefits()
+                ->whereNull('end_date')
+                ->where('id', $vacationBenefitId)
+                ->first();
+
+            if (!$vacationBenefit) {
+                throw new \Exception('Vacation benefit not found or inactive');
+            }
+
+            if ($vacationBenefit->current_balance < $hours) {
+                throw new \Exception('Insufficient vacation balance. Available: ' . $vacationBenefit->current_balance . ' hours, Requested: ' . $hours . ' hours');
+            }
+
+            // Generate vacation days for the penalty period
+            $vacationDays = $this->generateVacationDaysForPenalty($startDate, $endDate, $hours);
+            
+            if (empty($vacationDays)) {
+                throw new \Exception('No valid working days found in the penalty period for vacation application');
+            }
+
+            // Create the applied vacation record directly since applyForVacation doesn't return the object
+            $appliedVacation = DB::transaction(function () use ($vacationBenefit, $hours, $vacationDays) {
+                $appliedVacation = $this->appliedVacations()->create([
+                    'vacation_benefit_id' => $vacationBenefit->id,
+                    'hours' => $hours,
+                    'new_balance' => $vacationBenefit->current_balance - $hours,
+                    'status' => AppliedVacation::STATUS_APPROVED,
+                    'admin_note' => 'Auto-created for penalty offset during payroll processing'
+                ]);
+                
+                // Create vacation days
+                if (count($vacationDays) > 0) {
+                    $appliedVacation->vacationDays()->createMany($vacationDays);
+                }
+                
+                // Update vacation benefit balance
+                $vacationBenefit->update([
+                    'current_balance' => $vacationBenefit->current_balance - $hours,
+                ]);
+                
+                return $appliedVacation;
+            });
+
+            AppLog::info(
+                'Manual Vacation Application for Penalty Offset',
+                "Applied {$hours} hours of {$vacationBenefit->name} vacation for employee {$this->name} to offset penalties",
+                loggable: $this
+            );
+
+            return [
+                'success' => true,
+                'applied_vacation_id' => $appliedVacation->id,
+                'vacation_benefit_name' => $vacationBenefit->name,
+                'hours_applied' => $hours,
+                'vacation_days_count' => count($vacationDays),
+                'message' => "Successfully applied {$hours} hours of {$vacationBenefit->name} vacation"
+            ];
+
+        } catch (\Exception $e) {
+            AppLog::error(
+                'Error applying vacation for penalty offset',
+                "Failed to apply vacation for penalty offset: " . $e->getMessage(),
+                loggable: $this
+            );
+
+            return [
+                'success' => false,
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Generate vacation days for penalty offset
+     * This method creates vacation day entries that correspond to the penalty period
+     *
+     * @param Carbon $startDate Start date of the penalty period
+     * @param Carbon $endDate End date of the penalty period
+     * @param float $totalHours Total hours to distribute across vacation days
+     * @return array Array of vacation day data
+     */
+    private function generateVacationDaysForPenalty($startDate, $endDate, $totalHours)
+    {
+        $vacationDays = [];
+        $remainingHours = $totalHours;
+        $dailyWorkingHours = $this->benefitConfiguration?->daily_working_hours ?? 8;
+        
+        // Get working days configuration
+        $workingDays = $this->workingDays->pluck('type')->map(function ($day) {
+            return strtolower($day);
+        })->toArray();
+
+        $currentDate = $startDate->copy();
+        
+        while ($currentDate->lte($endDate) && $remainingHours > 0) {
+            $dayName = strtolower($currentDate->format('l'));
+            
+            // Only add vacation days for working days
+            if (in_array($dayName, $workingDays)) {
+                // Check if this is not a public holiday
+                $isPublicHoliday = \App\Models\Attendance\PublicHoliday::where('date', $currentDate->format('Y-m-d'))->exists();
+                
+                if (!$isPublicHoliday) {
+                    $hoursForDay = min($remainingHours, $dailyWorkingHours);
+                    
+                    $vacationDays[] = [
+                        'vacation_date' => $currentDate->format('Y-m-d'),
+                        'hours' => $hoursForDay
+                    ];
+                    
+                    $remainingHours -= $hoursForDay;
+                }
+            }
+            
+            $currentDate->addDay();
+        }
+
+        return $vacationDays;
+    }
 }

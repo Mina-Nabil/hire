@@ -7,7 +7,7 @@
                 <th class="table-th">Gross Salary</th>
                 <th class="table-th">Insurance Amount</th>
                 <th class="table-th">Other Amount</th>
-                <th class="table-th">Penalties</th>
+                <th class="table-th">Absence</th>
                 <th class="table-th">Extra Payments</th>
                 <th class="table-th">Overtime</th>
                 <th class="table-th">Adjustment</th>
@@ -49,11 +49,46 @@
                     <td class="table-td">{{ number_format($payrollEmployee->insurance_amount, 2) }}</td>
                     <td class="table-td">{{ number_format($payrollEmployee->other_amount, 2) }}</td>
                     <td class="table-td">
-                        <div class="flex flex-col">
-                            <span>{{ number_format($payrollEmployee->penalties_days, 2) }} days</span>
-                            <span
-                                class="text-xs text-danger-500">-{{ number_format($payrollEmployee->penalties_amount, 2) }}
-                                <small>EGP</small></span>
+                        <div class="flex flex-col space-y-1">
+                            @if(($payrollEmployee->total_penalty_hours ?? 0) > 0)
+                                <!-- Total Penalty Hours -->
+                                <div class="text-xs text-slate-600 flex item-center gap-2">
+                                    Total: {{ number_format($payrollEmployee->total_penalty_hours ?? 0, 1) }}h
+                                </div>
+                                
+                                <!-- Vacation Offset -->
+                                @if(($payrollEmployee->vacation_offset_hours ?? 0) > 0)
+                                    <div class="text-xs text-info-500 flex item-center gap-2">
+                                        <iconify-icon icon="heroicons-outline:calendar" class="inline w-3 h-3"></iconify-icon>
+                                        Vacation: {{ number_format($payrollEmployee->vacation_offset_hours, 1) }}h
+                                    </div>
+                                @endif
+                                
+                                <!-- New Vacation Applied -->
+                                @if(($payrollEmployee->new_vacation_hours ?? 0) > 0)
+                                    <div class="text-xs text-success-500 flex item-center gap-2">
+                                        <iconify-icon icon="heroicons-outline:plus-circle" class="inline w-3 h-3"></iconify-icon>
+                                        New Vacation: {{ number_format($payrollEmployee->new_vacation_hours, 1) }}h
+                                    </div>
+                                @endif
+                                
+                                <!-- Direct Deduction -->
+                                @if(($payrollEmployee->direct_deduction_hours ?? 0) > 0)
+                                    <div class="text-xs text-danger-500 flex item-center gap-2">
+                                        <iconify-icon icon="heroicons-outline:minus-circle" class="inline w-3 h-3"></iconify-icon>
+                                        Deduction: {{ number_format($payrollEmployee->direct_deduction_hours, 1) }}h
+                                        (-{{ number_format($payrollEmployee->direct_deduction_amount ?? 0, 2) }} EGP)
+                                    </div>
+                                @endif
+                                
+                                <!-- Legacy penalty display for backward compatibility -->
+                                @if(($payrollEmployee->penalties_days ?? 0) > 0 && ($payrollEmployee->total_penalty_hours ?? 0) == 0)
+                                    <span>{{ number_format($payrollEmployee->penalties_days, 2) }} days</span>
+                                    <span class="text-xs text-danger-500">-{{ number_format($payrollEmployee->penalties_amount, 2) }} EGP</span>
+                                @endif
+                            @else
+                                <span class="text-xs text-success-500">No penalties</span>
+                            @endif
                         </div>
                     </td>
                     <td class="table-td">{{ number_format($payrollEmployee->extra_payments, 2) }}</td>
@@ -86,6 +121,17 @@
                                     Details
                                 </span>
                             </button>
+
+                            @if(($payrollEmployee->total_penalty_hours ?? 0) > 0)
+                                <button type="button" class="btn btn-sm btn-outline-info"
+                                    wire:click="showPenaltyBreakdown({{ $payrollEmployee->id }})">
+                                    <span class="flex items-center">
+                                        <iconify-icon icon="heroicons-outline:chart-bar"
+                                            class="text-base ltr:mr-1 rtl:ml-1"></iconify-icon>
+                                        Penalties
+                                    </span>
+                                </button>
+                            @endif
 
                             @if ($payroll->status === \App\Models\Benefits\Payrolls\Payroll::STATUS_PENDING)
                                 <button type="button" class="btn btn-sm btn-outline-secondary"

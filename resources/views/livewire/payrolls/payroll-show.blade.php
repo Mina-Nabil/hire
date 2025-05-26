@@ -195,16 +195,61 @@
                             <div class="text-sm font-semibold">
                                 {{ number_format($selectedPayrollEmployee->total_insurance, 2) }}</div>
                         </div>
-                        <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-3">
-                            <h5 class="text-xs font-medium text-slate-500 dark:text-slate-300 mb-1">Penalty Days</h5>
-                            <div class="text-sm font-semibold">
-                                {{ number_format($selectedPayrollEmployee->penalties_days, 2) }}</div>
-                        </div>
-                        <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-3">
-                            <h5 class="text-xs font-medium text-slate-500 dark:text-slate-300 mb-1">Penalty Amount</h5>
-                            <div class="text-sm font-semibold text-danger-500">
-                                -{{ number_format($selectedPayrollEmployee->penalties_amount, 2) }}</div>
-                        </div>
+                        
+                        <!-- Enhanced Penalty Information -->
+                        @if(($selectedPayrollEmployee->total_penalty_hours ?? 0) > 0)
+                            <div class="bg-warning-50 dark:bg-warning-900/20 rounded-md p-3 md:col-span-2">
+                                <h5 class="text-xs font-medium text-warning-600 dark:text-warning-400 mb-2">Penalty Breakdown</h5>
+                                <div class="space-y-1">
+                                    <div class="flex justify-between text-xs">
+                                        <span>Total Abscence Hours:</span>
+                                        <span class="font-semibold">{{ number_format($selectedPayrollEmployee->total_penalty_hours ?? 0, 1) }}h</span>
+                                    </div>
+                                    @if(($selectedPayrollEmployee->vacation_offset_hours ?? 0) > 0)
+                                        <div class="flex justify-between text-xs text-info-600">
+                                            <span>Vacation Offset:</span>
+                                            <span class="font-semibold">{{ number_format($selectedPayrollEmployee->vacation_offset_hours, 1) }}h</span>
+                                        </div>
+                                    @endif
+                                    @if(($selectedPayrollEmployee->new_vacation_hours ?? 0) > 0)
+                                        <div class="flex justify-between text-xs text-success-600">
+                                            <span>New Vacation Applied:</span>
+                                            <span class="font-semibold">{{ number_format($selectedPayrollEmployee->new_vacation_hours, 1) }}h</span>
+                                        </div>
+                                    @endif
+                                    @if(($selectedPayrollEmployee->direct_deduction_hours ?? 0) > 0)
+                                        <div class="flex justify-between text-xs text-danger-600">
+                                            <span>Deduction:</span>
+                                            <span class="font-semibold">{{ number_format($selectedPayrollEmployee->direct_deduction_hours, 1) }}h</span>
+                                        </div>
+                                        <div class="flex justify-between text-xs text-danger-600 border-t pt-1">
+                                            <span>Amount Deducted:</span>
+                                            <span class="font-semibold">{{ number_format($selectedPayrollEmployee->direct_deduction_amount ?? 0, 2) }} EGP</span>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        @else
+                            <!-- Legacy penalty display for backward compatibility -->
+                            @if(($selectedPayrollEmployee->penalties_days ?? 0) > 0)
+                                <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-3">
+                                    <h5 class="text-xs font-medium text-slate-500 dark:text-slate-300 mb-1">Penalty Days</h5>
+                                    <div class="text-sm font-semibold">
+                                        {{ number_format($selectedPayrollEmployee->penalties_days, 2) }}</div>
+                                </div>
+                                <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-3">
+                                    <h5 class="text-xs font-medium text-slate-500 dark:text-slate-300 mb-1">Penalty Amount</h5>
+                                    <div class="text-sm font-semibold text-danger-500">
+                                        -{{ number_format($selectedPayrollEmployee->penalties_amount, 2) }}</div>
+                                </div>
+                            @else
+                                <div class="bg-success-50 dark:bg-success-900/20 rounded-md p-3 md:col-span-2">
+                                    <h5 class="text-xs font-medium text-success-600 dark:text-success-400 mb-1">Penalties</h5>
+                                    <div class="text-sm font-semibold text-success-600">No penalties applied</div>
+                                </div>
+                            @endif
+                        @endif
+                        
                         <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-3">
                             <h5 class="text-xs font-medium text-slate-500 dark:text-slate-300 mb-1">Net After Penalty
                             </h5>
@@ -275,6 +320,14 @@
                                         'border-transparent text-slate-500 hover:text-slate-600 hover:border-slate-300'"
                                     class="inline-block py-2 px-4 text-sm font-medium border-b-2">
                                     Overtime
+                                </button>
+                            </li>
+                            <li class="mr-2">
+                                <button @click="activeTab = 'penalties'"
+                                    :class="activeTab === 'penalties' ? 'border-primary-500 text-primary-500' :
+                                        'border-transparent text-slate-500 hover:text-slate-600 hover:border-slate-300'"
+                                    class="inline-block py-2 px-4 text-sm font-medium border-b-2">
+                                    Penalties
                                 </button>
                             </li>
                             <li>
@@ -435,6 +488,150 @@
                         </div>
                     </div>
 
+                    <!-- Penalties Tab -->
+                    <div x-show="activeTab === 'penalties'" class="mt-4">
+                        @if(($selectedPayrollEmployee->total_penalty_hours ?? 0) > 0)
+                            <!-- Penalty Summary Cards -->
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                <div class="bg-warning-50 dark:bg-warning-900/20 rounded-lg p-4 text-center">
+                                    <div class="text-2xl font-bold text-warning-600 dark:text-warning-400">
+                                        {{ number_format($selectedPayrollEmployee->total_penalty_hours ?? 0, 1) }}
+                                    </div>
+                                    <div class="text-xs text-slate-500 dark:text-slate-400">Total Abscence Hours</div>
+                                </div>
+                                <div class="bg-info-50 dark:bg-info-900/20 rounded-lg p-4 text-center">
+                                    <div class="text-2xl font-bold text-info-600 dark:text-info-400">
+                                        {{ number_format($selectedPayrollEmployee->vacation_offset_hours ?? 0, 1) }}
+                                    </div>
+                                    <div class="text-xs text-slate-500 dark:text-slate-400">Vacation Offset</div>
+                                </div>
+                                <div class="bg-success-50 dark:bg-success-900/20 rounded-lg p-4 text-center">
+                                    <div class="text-2xl font-bold text-success-600 dark:text-success-400">
+                                        {{ number_format($selectedPayrollEmployee->new_vacation_hours ?? 0, 1) }}
+                                    </div>
+                                    <div class="text-xs text-slate-500 dark:text-slate-400">New Vacation</div>
+                                </div>
+                                <div class="bg-danger-50 dark:bg-danger-900/20 rounded-lg p-4 text-center">
+                                    <div class="text-2xl font-bold text-danger-600 dark:text-danger-400">
+                                        {{ number_format($selectedPayrollEmployee->direct_deduction_hours ?? 0, 1) }}
+                                    </div>
+                                    <div class="text-xs text-slate-500 dark:text-slate-400">Deduction</div>
+                                </div>
+                            </div>
+
+                            <!-- Penalty Flow Explanation -->
+                            <div class="bg-info-50 dark:bg-info-900/20 border border-info-200 dark:border-info-800 rounded-lg p-4 mb-6">
+                                <h5 class="text-base font-medium mb-3 text-info-800 dark:text-info-200">How Penalties Were Processed</h5>
+                                <div class="space-y-3">
+                                    <div class="flex items-start">
+                                        <div class="w-6 h-6 rounded-full bg-warning-500 text-white flex items-center justify-center text-xs font-bold mr-3 mt-0.5">1</div>
+                                        <div>
+                                            <div class="font-medium text-sm">Penalty Hours Calculated</div>
+                                            <div class="text-xs text-slate-600 dark:text-slate-400">
+                                                {{ number_format($selectedPayrollEmployee->total_penalty_hours ?? 0, 1) }} hours based on attendance issues (late arrivals, early departures, missed days)
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    @if(($selectedPayrollEmployee->vacation_offset_hours ?? 0) > 0)
+                                        <div class="flex items-start">
+                                            <div class="w-6 h-6 rounded-full bg-info-500 text-white flex items-center justify-center text-xs font-bold mr-3 mt-0.5">2</div>
+                                            <div>
+                                                <div class="font-medium text-sm">Existing Vacations Applied</div>
+                                                <div class="text-xs text-slate-600 dark:text-slate-400">
+                                                    {{ number_format($selectedPayrollEmployee->vacation_offset_hours, 1) }} hours offset using previously approved vacation applications
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                    
+                                    @if(($selectedPayrollEmployee->new_vacation_hours ?? 0) > 0)
+                                        <div class="flex items-start">
+                                            <div class="w-6 h-6 rounded-full bg-success-500 text-white flex items-center justify-center text-xs font-bold mr-3 mt-0.5">3</div>
+                                            <div>
+                                                <div class="font-medium text-sm">New Vacation Applications Created</div>
+                                                <div class="text-xs text-slate-600 dark:text-slate-400">
+                                                    {{ number_format($selectedPayrollEmployee->new_vacation_hours, 1) }} hours automatically applied from available vacation benefits
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                    
+                                    @if(($selectedPayrollEmployee->direct_deduction_hours ?? 0) > 0)
+                                        <div class="flex items-start">
+                                            <div class="w-6 h-6 rounded-full bg-danger-500 text-white flex items-center justify-center text-xs font-bold mr-3 mt-0.5">4</div>
+                                            <div>
+                                                <div class="font-medium text-sm">Direct Deduction</div>
+                                                <div class="text-xs text-slate-600 dark:text-slate-400">
+                                                    {{ number_format($selectedPayrollEmployee->direct_deduction_hours, 1) }} hours 
+                                                    ({{ number_format($selectedPayrollEmployee->direct_deduction_amount ?? 0, 2) }} EGP) deducted from net salary
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <!-- Detailed Breakdown Table -->
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-slate-100 dark:divide-slate-700">
+                                    <thead>
+                                        <tr>
+                                            <th class="table-th">Penalty Type</th>
+                                            <th class="table-th">Hours</th>
+                                            <th class="table-th">Handling Method</th>
+                                            <th class="table-th">Amount Impact</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
+                                        @if(($selectedPayrollEmployee->vacation_offset_hours ?? 0) > 0)
+                                            <tr>
+                                                <td class="table-td">Vacation Offset</td>
+                                                <td class="table-td">{{ number_format($selectedPayrollEmployee->vacation_offset_hours, 1) }}</td>
+                                                <td class="table-td">
+                                                    <span class="badge bg-info-500 text-white">Existing Vacation Used</span>
+                                                </td>
+                                                <td class="table-td text-info-600">No deduction</td>
+                                            </tr>
+                                        @endif
+                                        
+                                        @if(($selectedPayrollEmployee->new_vacation_hours ?? 0) > 0)
+                                            <tr>
+                                                <td class="table-td">New Vacation Applied</td>
+                                                <td class="table-td">{{ number_format($selectedPayrollEmployee->new_vacation_hours, 1) }}</td>
+                                                <td class="table-td">
+                                                    <span class="badge bg-success-500 text-white">Auto Vacation Created</span>
+                                                </td>
+                                                <td class="table-td text-success-600">No deduction</td>
+                                            </tr>
+                                        @endif
+                                        
+                                        @if(($selectedPayrollEmployee->direct_deduction_hours ?? 0) > 0)
+                                            <tr>
+                                                <td class="table-td">Direct Deduction</td>
+                                                <td class="table-td">{{ number_format($selectedPayrollEmployee->direct_deduction_hours, 1) }}</td>
+                                                <td class="table-td">
+                                                    <span class="badge bg-danger-500 text-white">Deduction</span>
+                                                </td>
+                                                <td class="table-td text-danger-600">
+                                                    -{{ number_format($selectedPayrollEmployee->direct_deduction_amount ?? 0, 2) }} EGP
+                                                </td>
+                                            </tr>
+                                        @endif
+                                    </tbody>
+                                </table>
+                            </div>
+                        @else
+                            <div class="text-center py-8">
+                                <div class="flex flex-col items-center">
+                                    <iconify-icon icon="heroicons-outline:check-circle" class="text-5xl text-success-400 mb-2"></iconify-icon>
+                                    <h5 class="text-xl font-medium text-success-600">No Penalties Applied</h5>
+                                    <p class="text-sm text-slate-500 mt-1">This employee had perfect attendance during the payroll period</p>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+
                     <!-- Extra Payments Tab -->
                     <div x-show="activeTab === 'extras'" class="mt-4">
                         <div class="overflow-x-auto">
@@ -490,6 +687,270 @@
         </x-modal>
     @endif
 
+    <!-- Penalty Breakdown Modal -->
+    @if ($showPenaltyBreakdownModal && $selectedPenaltyEmployee)
+        <x-modal wire:model="showPenaltyBreakdownModal" size="xl">
+            <x-slot name="title">
+                <div class="flex items-center">
+                    <div class="flex-none">
+                        <div class="w-10 h-10 rounded-full bg-warning-500 flex items-center justify-center text-white">
+                            <iconify-icon icon="heroicons-outline:exclamation-triangle" class="text-lg"></iconify-icon>
+                        </div>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-lg font-medium text-slate-100 dark:text-white">
+                            Penalty Breakdown - {{ $selectedPenaltyEmployee->employee->name ?? 'N/A' }}
+                        </h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">
+                            {{ $selectedPenaltyEmployee->position }} - {{ $selectedPenaltyEmployee->department }}
+                        </p>
+                    </div>
+                </div>
+            </x-slot>
+
+            <div class="space-y-6">
+                <!-- Penalty Summary -->
+                <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="text-base font-medium text-slate-800 dark:text-slate-200">Penalty Summary</h4>
+                        @if(($penaltyBreakdownData['remaining_penalty_hours'] ?? 0) > 0 && !empty($penaltyBreakdownData['available_vacation_benefits'] ?? []))
+                            @can('update', $payroll)
+                                <button wire:click="openVacationApplicationModal" class="btn btn-sm btn-primary">
+                                    <iconify-icon icon="heroicons-outline:plus" class="mr-1"></iconify-icon>
+                                    Apply Vacation
+                                </button>
+                            @endcan
+                        @endif
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-warning-600 dark:text-warning-400">
+                                {{ number_format($penaltyBreakdownData['total_penalty_hours'] ?? 0, 1) }}
+                            </div>
+                            <div class="text-xs text-slate-500 dark:text-slate-400">Total Absence Hours</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-info-600 dark:text-info-400">
+                                {{ number_format($penaltyBreakdownData['vacation_offset_hours'] ?? 0, 1) }}
+                            </div>
+                            <div class="text-xs text-slate-500 dark:text-slate-400">Vacation Offset Hours</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-danger-600 dark:text-danger-400">
+                                {{ number_format($penaltyBreakdownData['remaining_penalty_hours'] ?? 0, 1) }}
+                            </div>
+                            <div class="text-xs text-slate-500 dark:text-slate-400">Remaining Penalty Hours</div>
+                        </div>
+                    </div>
+                    
+                    @if(($penaltyBreakdownData['direct_deduction_amount'] ?? 0) > 0)
+                        <div class="mt-4 p-3 bg-danger-50 dark:bg-danger-900/20 border border-danger-200 dark:border-danger-800 rounded-md">
+                            <div class="flex items-center">
+                                <iconify-icon icon="heroicons-outline:currency-dollar" class="text-danger-500 mr-2"></iconify-icon>
+                                <span class="text-sm font-medium text-danger-700 dark:text-danger-300">
+                                    Direct Deduction: {{ number_format($penaltyBreakdownData['direct_deduction_amount'], 2) }} EGP
+                                </span>
+                            </div>
+                        </div>
+                    @endif
+                    
+                    @if(($penaltyBreakdownData['remaining_penalty_hours'] ?? 0) > 0 && !empty($penaltyBreakdownData['available_vacation_benefits'] ?? []))
+                        <div class="mt-4 p-3 bg-warning-50 dark:bg-warning-900/20 border border-warning-200 dark:border-warning-800 rounded-md">
+                            <div class="flex items-center">
+                                <iconify-icon icon="heroicons-outline:exclamation-triangle" class="text-warning-500 mr-2"></iconify-icon>
+                                <span class="text-sm font-medium text-warning-700 dark:text-warning-300">
+                                    {{ number_format($penaltyBreakdownData['remaining_penalty_hours'], 1) }} hours can be offset using available vacation benefits
+                                </span>
+                            </div>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Vacation Benefits Status -->
+                <div>
+                    <h4 class="text-base font-medium mb-3 border-b pb-2">Available Vacation Benefits</h4>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-slate-100 dark:divide-slate-700">
+                            <thead>
+                                <tr>
+                                    <th class="table-th">Benefit Name</th>
+                                    <th class="table-th">Type</th>
+                                    <th class="table-th">Current Balance</th>
+                                    <th class="table-th">Max Balance</th>
+                                    <th class="table-th">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
+                                @forelse($employeeVacationBenefits as $benefit)
+                                    <tr>
+                                        <td class="table-td">{{ $benefit->name }}</td>
+                                        <td class="table-td">{{ ucfirst($benefit->type) }}</td>
+                                        <td class="table-td">
+                                            <span class="@if($benefit->current_balance > 0) text-success-500 @else text-danger-500 @endif">
+                                                {{ number_format($benefit->current_balance, 1) }} hours
+                                            </span>
+                                        </td>
+                                        <td class="table-td">{{ number_format($benefit->max_balance, 1) }} hours</td>
+                                        <td class="table-td">
+                                            @if($benefit->current_balance > 0)
+                                                <span class="badge bg-success-500 text-white">Available</span>
+                                            @else
+                                                <span class="badge bg-danger-500 text-white">Exhausted</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="table-td text-center py-4">No vacation benefits found</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Applied Vacations in Period -->
+                <div>
+                    <h4 class="text-base font-medium mb-3 border-b pb-2">Applied Vacations in Payroll Period</h4>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-slate-100 dark:divide-slate-700">
+                            <thead>
+                                <tr>
+                                    <th class="table-th">Vacation Benefit</th>
+                                    <th class="table-th">Total Hours</th>
+                                    <th class="table-th">Days Count</th>
+                                    <th class="table-th">Status</th>
+                                    <th class="table-th">Used for Penalty</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
+                                @forelse($employeeAppliedVacations as $appliedVacation)
+                                    @php
+                                        $totalHoursInPeriod = $appliedVacation->vacationDays->sum('hours');
+                                        $daysCount = $appliedVacation->vacationDays->count();
+                                    @endphp
+                                    <tr>
+                                        <td class="table-td">{{ $appliedVacation->vacationBenefit->name ?? 'N/A' }}</td>
+                                        <td class="table-td">{{ number_format($totalHoursInPeriod, 1) }} hours</td>
+                                        <td class="table-td">{{ $daysCount }} days</td>
+                                        <td class="table-td">
+                                            @if($appliedVacation->status === 'approved')
+                                                <span class="badge bg-success-500 text-white">Approved</span>
+                                            @elseif($appliedVacation->status === 'pending')
+                                                <span class="badge bg-warning-500 text-white">Pending</span>
+                                            @else
+                                                <span class="badge bg-slate-500 text-white">{{ ucfirst($appliedVacation->status) }}</span>
+                                            @endif
+                                        </td>
+                                        <td class="table-td">
+                                            @if(str_contains($appliedVacation->admin_note ?? '', 'Auto-created from attendance during payroll creation'))
+                                                <span class="badge bg-info-500 text-white">Auto-Applied</span>
+                                            @else
+                                                <span class="badge bg-slate-500 text-white">Manual</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="table-td text-center py-4">No applied vacations in this period</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Available Vacation Benefits for Manual Application -->
+                @if(!empty($penaltyBreakdownData['available_vacation_benefits'] ?? []))
+                    <div>
+                        <h4 class="text-base font-medium mb-3 border-b pb-2">Available Vacation Benefits for Penalty Offset</h4>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-slate-100 dark:divide-slate-700">
+                                <thead>
+                                    <tr>
+                                        <th class="table-th">Benefit Name</th>
+                                        <th class="table-th">Type</th>
+                                        <th class="table-th">Current Balance</th>
+                                        <th class="table-th">Max Applicable Hours</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
+                                    @foreach($penaltyBreakdownData['available_vacation_benefits'] as $benefit)
+                                        <tr>
+                                            <td class="table-td">{{ $benefit['vacation_benefit_name'] }}</td>
+                                            <td class="table-td">{{ ucfirst($benefit['type']) }}</td>
+                                            <td class="table-td">
+                                                <span class="text-success-500">
+                                                    {{ number_format($benefit['current_balance'], 1) }} hours
+                                                </span>
+                                            </td>
+                                            <td class="table-td">
+                                                <span class="text-info-500">
+                                                    {{ number_format($benefit['max_applicable_hours'], 1) }} hours
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                @endif
+
+                <!-- Penalty Offset Flow -->
+                <div class="bg-info-50 dark:bg-info-900/20 border border-info-200 dark:border-info-800 rounded-lg p-4">
+                    <h4 class="text-base font-medium mb-3 text-info-800 dark:text-info-200">How Penalties Were Handled</h4>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-warning-500 text-white flex items-center justify-center text-sm font-bold mr-3">1</div>
+                            <div>
+                                <div class="font-medium">Total Absence Hours Calculated</div>
+                                <div class="text-sm text-slate-600 dark:text-slate-400">
+                                    {{ number_format($penaltyBreakdownData['total_penalty_hours'] ?? 0, 1) }} hours based on attendance issues
+                                </div>
+                            </div>
+                        </div>
+                        
+                        @if(($penaltyBreakdownData['vacation_offset_hours'] ?? 0) > 0)
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-info-500 text-white flex items-center justify-center text-sm font-bold mr-3">2</div>
+                                <div>
+                                    <div class="font-medium">Existing Approved Vacations Used</div>
+                                    <div class="text-sm text-slate-600 dark:text-slate-400">
+                                        {{ number_format($penaltyBreakdownData['vacation_offset_hours'], 1) }} hours from previously approved vacation applications
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                        
+                        @if(($penaltyBreakdownData['remaining_penalty_hours'] ?? 0) > 0)
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-warning-500 text-white flex items-center justify-center text-sm font-bold mr-3">3</div>
+                                <div>
+                                    <div class="font-medium">Remaining Penalty Hours</div>
+                                    <div class="text-sm text-slate-600 dark:text-slate-400">
+                                        {{ number_format($penaltyBreakdownData['remaining_penalty_hours'], 1) }} hours 
+                                        @if(!empty($penaltyBreakdownData['available_vacation_benefits'] ?? []))
+                                            - can be offset using vacation benefits or will be deducted 
+                                        @else
+                                            - will be deducted ({{ number_format($penaltyBreakdownData['direct_deduction_amount'] ?? 0, 2) }} EGP)
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            <x-slot name="footer">
+                <div class="flex justify-end">
+                    <x-secondary-button wire:click="closePenaltyBreakdownModal">Close</x-secondary-button>
+                </div>
+            </x-slot>
+        </x-modal>
+    @endif
+
     <!-- Adjustment Edit Modal -->
     @if ($showAdjustmentModal)
         <x-modal wire:model="showAdjustmentModal">
@@ -526,6 +987,72 @@
                         <span wire:loading.remove wire:target="saveAdjustment">Update Adjustment</span>
                         <span wire:loading wire:target="saveAdjustment">Updating...</span>
                     </x-primary-button>
+                </div>
+            </x-slot>
+        </x-modal>
+    @endif
+
+    <!-- Vacation Application Modal -->
+    @if ($showVacationApplicationModal)
+        <x-modal wire:model="showVacationApplicationModal">
+            <x-slot name="title">Apply Vacation for Penalty Offset</x-slot>
+
+            <div class="space-y-4">
+                <div class="bg-info-50 dark:bg-info-900/20 border border-info-200 dark:border-info-800 rounded-md p-3">
+                    <p class="text-sm text-info-600 dark:text-info-400">
+                        <strong>Employee:</strong> {{ $selectedPenaltyEmployee->employee->name ?? 'N/A' }}<br>
+                        <strong>Remaining Penalty Hours:</strong> {{ number_format($remainingPenaltyHours, 1) }} hours<br>
+                        <strong>Payroll Period:</strong> {{ \Carbon\Carbon::parse($payroll->start_date)->format('M d, Y') }} - {{ \Carbon\Carbon::parse($payroll->end_date)->format('M d, Y') }}
+                    </p>
+                </div>
+
+                <div>
+                    <label class="form-label">Select Vacation Benefit</label>
+                    <select wire:model.live="selectedVacationBenefitId" class="form-control">
+                        <option value="">Choose a vacation benefit...</option>
+                        @foreach($availableVacationBenefits as $benefit)
+                            <option value="{{ $benefit['vacation_benefit_id'] }}">
+                                {{ $benefit['vacation_benefit_name'] }} 
+                                ({{ ucfirst($benefit['type']) }}) - 
+                                Available: {{ number_format($benefit['current_balance'], 1) }}h
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                @if($selectedVacationBenefitId)
+                    <div>
+                        <label class="form-label">Hours to Apply</label>
+                        <input type="number" 
+                               wire:model="vacationHoursToApply" 
+                               class="form-control"
+                               min="0.5" 
+                               max="{{ $maxApplicableHours }}" 
+                               step="0.5"
+                               placeholder="Enter hours to apply">
+                        <p class="text-xs text-slate-500 mt-1">
+                            Maximum applicable: {{ number_format($maxApplicableHours, 1) }} hours
+                        </p>
+                    </div>
+
+                    <div class="bg-warning-50 dark:bg-warning-900/20 border border-warning-200 dark:border-warning-800 rounded-md p-3">
+                        <p class="text-sm text-warning-600 dark:text-warning-400">
+                            <strong>Note:</strong> This will create an approved vacation application for the specified hours during the payroll period. 
+                            The vacation will be automatically distributed across working days in the period.
+                        </p>
+                    </div>
+                @endif
+            </div>
+
+            <x-slot name="footer">
+                <div class="flex justify-end space-x-3">
+                    <x-secondary-button wire:click="closeVacationApplicationModal">Cancel</x-secondary-button>
+                    @if($selectedVacationBenefitId && $vacationHoursToApply > 0)
+                        <x-primary-button wire:click="applyVacationForPenalty" wire:loading.attr="disabled">
+                            <span wire:loading.remove wire:target="applyVacationForPenalty">Apply Vacation</span>
+                            <span wire:loading wire:target="applyVacationForPenalty">Applying...</span>
+                        </x-primary-button>
+                    @endif
                 </div>
             </x-slot>
         </x-modal>

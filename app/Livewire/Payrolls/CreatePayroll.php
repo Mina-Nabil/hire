@@ -10,6 +10,7 @@ use App\Models\Hierarchy\Department;
 use App\Models\Hierarchy\Position;
 use App\Models\Users\AppLog;
 use App\Traits\AlertFrontEnd;
+use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\DB;
@@ -319,30 +320,53 @@ class CreatePayroll extends Component
             $overtimeRate = $employee->benefitConfiguration->overtime_rate ?? 1.5;
             $dailyWorkingHours = $employee->benefitConfiguration->daily_working_hours ?? 8;
             $isAutomaticOvertime = $employee->benefitConfiguration->is_automatic_overtime ?? false;
+            $createdOvertimeIds = [];
+            $potentialOvertimeData = [];
             
             if ($isAutomaticOvertime) {
-                // Calculate overtime from attendance records
-                // Get all approved attendance records
+                // Calculate potential overtime from attendance without creating records yet
                 $attendances = $employee->attendances()
                     ->where('is_approved', true)
                     ->whereBetween('date', [$this->startDate, $this->endDate])
                     ->whereNull('payroll_id')
                     ->get();
                 
-                // For each attendance, calculate overtime if hours exceed daily working hours
                 foreach ($attendances as $attendance) {
                     $dailyHours = $attendance->hours;
+                    
+                    // Check if this day has overtime
                     if ($dailyHours > $dailyWorkingHours) {
                         $overtimeHours += ($dailyHours - $dailyWorkingHours);
+                        
+                        // Store potential overtime data for later creation
+                        $potentialOvertimeData[] = [
+                            'attendance_id' => $attendance->id,
+                            'date' => $attendance->date,
+                            'hours' => $dailyHours - $dailyWorkingHours,
+                            'start_time' => $attendance->start_time,
+                            'end_time' => $attendance->end_time,
+                        ];
                     }
                 }
-            } else {
-                // Use explicitly created overtime records
-                $overtimeHours = $employee->overtimes()
+                
+                // Also include existing approved overtime records for this period
+                $existingOvertimeHours = $employee->overtimes()
                     ->where('status', Overtime::STATUS_APPROVED)
                     ->whereBetween('date', [$this->startDate, $this->endDate])
                     ->whereNull('payroll_id')
                     ->sum('hours');
+                
+                $overtimeHours += $existingOvertimeHours;
+            } else {
+                // Use only explicitly created and approved overtime records
+                $overtimeHours = $employee->overtimes()
+                    ->where('status', Overtime::STATUS_APPROVED)
+                    ->whereBetween('approved_at', [$this->startDate, $this->endDate])
+                    ->whereNull('payroll_id')
+                    ->sum('hours');
+                
+                // No new overtime records are created in manual mode
+                $createdOvertimeIds = [];
             }
             
             // Calculate overtime amount
@@ -413,6 +437,8 @@ class CreatePayroll extends Component
                 'employee_base_benefits' => $employeeBaseBenefits,
                 'other_base_benefits' => $otherBaseBenefits,
                 'benefits' => $benefits,
+                'potential_overtime_data' => $potentialOvertimeData, // Store potential overtime data for later creation
+                'is_automatic_overtime' => $isAutomaticOvertime, // Store the automatic overtime flag
             ];
         }
         
@@ -444,6 +470,72 @@ class CreatePayroll extends Component
                         continue;
                     }
                     
+                    // Create overtime records if automatic overtime is enabled and we have potential overtime data
+                    $createdOvertimeIds = [];
+                    if ($employeeData['is_automatic_overtime'] && !empty($employeeData['potential_overtime_data'])) {
+                        foreach ($employeeData['potential_overtime_data'] as $overtimeData) {
+                            // Check if overtime record already exists for this date and employee
+                            $existingOvertime = Overtime::where('employee_id', $employee->id)
+                                ->where('date', $overtimeData['date'])
+                                ->first();
+                            
+                            if (!$existingOvertime) {
+                                // Calculate overtime start and end times
+                                $overtimeStartTime = null;
+                                $overtimeEndTime = null;
+                                
+                                if ($overtimeData['start_time'] && $overtimeData['end_time']) {
+                                    $dailyWorkingHours = $employee->benefitConfiguration->daily_working_hours ?? 8;
+                                    
+                                    // Parse the attendance times
+                                    $attendanceStart = Carbon::parse($overtimeData['date'] . ' ' . $overtimeData['start_time']);
+                                    $attendanceEnd = Carbon::parse($overtimeData['date'] . ' ' . $overtimeData['end_time']);
+                                    
+                                    // If end time is before start time, it means it crossed midnight
+                                    if ($attendanceEnd->lt($attendanceStart)) {
+                                        $attendanceEnd->addDay();
+                                    }
+                                    
+                                    // Calculate when normal working hours should end
+                                    $normalWorkingEnd = $attendanceStart->copy()->addHours($dailyWorkingHours);
+                                    
+                                    // Overtime starts when normal working hours end
+                                    $overtimeStartTime = $normalWorkingEnd->format('H:i:s');
+                                    $overtimeEndTime = $attendanceEnd->format('H:i:s');
+                                    
+                                    // If overtime crosses midnight, adjust the end time
+                                    if ($attendanceEnd->day != $attendanceStart->day) {
+                                        $overtimeEndTime = $attendanceEnd->format('H:i:s');
+                                    }
+                                }
+                                
+                                // Create new overtime record with pending status
+                                $overtime = Overtime::updateOrCreate([
+                                    'employee_id' => $employee->id,
+                                    'date' => $overtimeData['date'],
+                                ], [
+                                    'creator_id' => Auth::id(),
+                                    'start_time' => $overtimeStartTime,
+                                    'end_time' => $overtimeEndTime,
+                                    'hours' => $overtimeData['hours'],
+                                    'status' => Overtime::STATUS_APPROVED,
+                                    'approved_at' => null,
+                                    'admin_note' => 'Auto-created from attendance during payroll creation',
+                                    'payroll_id' => null, // Will be set when payroll is created
+                                ]);
+                                
+                                $createdOvertimeIds[] = $overtime->id;
+                                
+                                // Log the creation
+                                AppLog::info(
+                                    'Overtime Record Auto-Created',
+                                    "Created overtime record for {$employee->name} on {$overtimeData['date']}. Hours: {$overtimeData['hours']}, Start: {$overtimeStartTime}, End: {$overtimeEndTime}",
+                                    loggable: $overtime
+                                );
+                            }
+                        }
+                    }
+                    
                     // Get extra payment IDs
                     $extraPaymentIds = $employee->extraPayments()
                         ->where('status', \App\Models\Benefits\Payrolls\ExtraPayment::STATUS_APPROVED)
@@ -459,13 +551,24 @@ class CreatePayroll extends Component
                         ->pluck('id')
                         ->toArray();
                     
-                    // Get overtime IDs
-                    $overtimeIds = $employee->overtimes()
+                    // Get overtime IDs - include both existing approved ones and newly created pending ones
+                    $existingOvertimeIds = $employee->overtimes()
                         ->where('status', \App\Models\Attendance\Overtime::STATUS_APPROVED)
                         ->whereBetween('date', [$this->startDate, $this->endDate])
                         ->whereNull('payroll_id')
                         ->pluck('id')
                         ->toArray();
+                    
+                    // Check if automatic overtime is enabled for this employee
+                    $isAutomaticOvertime = $employeeData['is_automatic_overtime'] ?? false;
+                    
+                    if ($isAutomaticOvertime) {
+                        // Include both existing approved and newly created overtime records
+                        $overtimeIds = array_merge($existingOvertimeIds, $createdOvertimeIds);
+                    } else {
+                        // Only include existing approved overtime records
+                        $overtimeIds = $existingOvertimeIds;
+                    }
                     
                     // No need to manually recreate benefit data - use the actual models collected in loadPayrollData
                     if (!empty($employeeData['benefits'])) {
@@ -501,7 +604,7 @@ class CreatePayroll extends Component
                             'base_amount' => $employeeData['insurance_amount'], // Use insurance amount as base
                             'extra_payment_ids' => $extraPaymentIds,
                             'attendance_ids' => $attendanceIds,
-                            'overtime_ids' => $overtimeIds,
+                            'overtime_ids' => $overtimeIds, // Include both existing and newly created overtime IDs
                             'benefits' => $employeeData['benefits']
                         ];
                     }

@@ -127,6 +127,26 @@ class Payroll extends Model
                 'status' => ExtraPayment::STATUS_PAID,
             ]);
 
+            // Approve all pending overtime records that were auto-created during payroll generation
+            $pendingOvertimes = $this->overtimes()
+                ->where('status', Overtime::STATUS_PENDING)
+                ->where('admin_note', 'LIKE', '%Auto-created from attendance during payroll creation%')
+                ->get();
+            
+            foreach ($pendingOvertimes as $overtime) {
+                $overtime->update([
+                    'status' => Overtime::STATUS_APPROVED,
+                    'approved_at' => now(),
+                    'admin_note' => $overtime->admin_note . ' - Auto-approved with payroll approval',
+                ]);
+                
+                AppLog::info(
+                    'Overtime Auto-Approved',
+                    "Auto-approved overtime for {$overtime->employee->name} on {$overtime->date} during payroll approval",
+                    loggable: $overtime
+                );
+            }
+
             // Log the approval
             AppLog::info(
                 'Payroll Approved',

@@ -15,6 +15,8 @@ class Overtime extends Model
 
     protected $table = 'overtimes';
 
+    const MORPH_NAME = 'overtime';
+
     protected $fillable = [
         'employee_id',
         'creator_id',

@@ -2,12 +2,14 @@
 
 namespace App\Models\Benefits\Payrolls;
 
+use App\Exceptions\AppException;
 use App\Models\Attendance\Attendance;
 use App\Models\Attendance\Overtime;
 use App\Models\Personel\Employee;
 use App\Models\Users\AppLog;
 use App\Models\Users\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class Payroll extends Model
@@ -88,6 +90,57 @@ class Payroll extends Model
     public function overtimes()
     {
         return $this->hasMany(\App\Models\Attendance\Overtime::class);
+    }
+
+    /**
+     * Approve the payroll and update related records
+     * 
+     * @param int|null $approverId ID of the user approving the payroll
+     * @return bool
+     */
+    public function approve()
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('update', $this)) {
+            throw new AppException('You dont have permission to update payroll');
+        }
+
+        if ($this->status === self::STATUS_APPROVED) {
+            return true; // Already approved
+        }
+        
+        try {
+            return DB::transaction(function () use ($loggedInUser) {
+                // Update payroll status
+                $this->update([
+                'status' => self::STATUS_APPROVED,
+            ]);
+
+            // Update all related benefit payments to paid status
+            $this->benefitPayments()->update([
+                'status' => BenefitPayment::STATUS_PAID,
+            ]);
+
+            // Update all related extra payments to paid status
+            $this->extraPayments()->update([
+                'status' => ExtraPayment::STATUS_PAID,
+            ]);
+
+            // Log the approval
+            AppLog::info(
+                'Payroll Approved',
+                'Approved payroll for period ' . $this->start_date . ' to ' . $this->end_date . 
+                ' with ' . $this->total_employees . ' employees. Total amount: ' . $this->total_paid,
+                loggable: $this
+            );
+
+                return true;
+            });
+        } catch (\Exception $e) {
+            AppLog::error('Error approving payroll', $e->getMessage());
+            throw new AppException('Error approving payroll');
+        }
     }
 
     /**
@@ -185,7 +238,7 @@ class Payroll extends Model
                 
                 // Link extra payments to this payroll
                 if (isset($employeeData['extra_payment_ids']) && is_array($employeeData['extra_payment_ids'])) {
-                    ExtraPayment::whereIn('id', $employeeData['extra_payment_ids'])
+                    ExtraPayment::whereIn('id', $employeeData['extra_payment_ids'])->where('amount', '<', 0)
                         ->update(['payroll_id' => $payroll->id]);
                 } else {
                     // Fallback to previous method if IDs not provided

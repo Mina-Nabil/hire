@@ -298,7 +298,7 @@ class CreatePayroll extends Component
             
             // Calculate penalty hours using the new consolidated function
             $totalPenaltyHours = $employee->getTotalPenaltyHours($this->startDate, $this->endDate);
-            
+
             // Convert total hours to days for display purposes
             $totalPenaltyDays = $dailyWorkingHours > 0 ? $totalPenaltyHours / $dailyWorkingHours : 0;
             

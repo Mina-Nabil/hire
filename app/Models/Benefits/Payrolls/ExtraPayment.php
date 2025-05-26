@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 class ExtraPayment extends Model
 {
     const MORPH_NAME = 'extra_payment';
+    
     const STATUS_PENDING = 'pending';
     const STATUS_APPROVED = 'approved';
     const STATUS_PAID = 'paid';

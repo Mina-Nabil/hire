@@ -43,7 +43,7 @@ class Overtime extends Model
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
         if (!$loggedInUser->can('updateOvertime', $this->employee)) {
-            throw new AppException('You dont have permission to approve overtime');
+            throw new AppException('You dont have permission to set overtime status');
         }
 
         try {
@@ -58,8 +58,8 @@ class Overtime extends Model
             return true;
         } catch (\Exception $e) {
             report($e);
-            AppLog::error('Error approving overtime', $e->getMessage());
-            throw new AppException('Error approving overtime');
+            AppLog::error('Error setting overtime status', $e->getMessage());
+            throw new AppException('Error setting overtime status');
         }
     }
 

@@ -2,6 +2,12 @@
     <div class="card">
         <div class="card-header">
             <h4 class="card-title">Payrolls</h4>
+            <a href="{{ route('payrolls.create') }}" class="btn btn-primary btn-sm">
+                <span class="flex items-center">
+                    <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2" icon="heroicons-outline:plus"></iconify-icon>
+                    Create Payroll
+                </span>
+            </a>
         </div>
         <div class="card-body p-6">
             <div class="flex justify-between items-center mb-6">
@@ -10,20 +16,11 @@
                         <input type="text" 
                             wire:model.live.debounce.300ms="search" 
                             placeholder="Search payrolls..." 
-                            class="form-control py-2 pl-10">
+                            class="form-control py-2 !pl-12">
                         <span class="absolute left-2 top-2 text-lg">
                             <iconify-icon icon="heroicons-outline:search"></iconify-icon>
                         </span>
                     </div>
-                </div>
-                
-                <div>
-                    <a href="{{ route('payrolls.create') }}" class="btn btn-primary">
-                        <span class="flex items-center">
-                            <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2" icon="heroicons-outline:plus"></iconify-icon>
-                            Create Payroll
-                        </span>
-                    </a>
                 </div>
             </div>
 

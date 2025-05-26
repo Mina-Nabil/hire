@@ -4,6 +4,7 @@ namespace App\Livewire\Components;
 
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
+use Livewire\Attributes\On;
 
 class ConfirmationModal extends Component
 {

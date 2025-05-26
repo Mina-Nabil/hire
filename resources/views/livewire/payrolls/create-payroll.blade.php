@@ -5,8 +5,15 @@
         </div>
         <div class="card-body p-6">
             <div class="flex justify-between mb-5">
-                <div>
-                    <h5 class="text-lg font-medium">Payroll Period: {{ \Carbon\Carbon::parse($startDate)->format('d M Y') }} - {{ \Carbon\Carbon::parse($endDate)->format('d M Y') }}</h5>
+                <div class="flex items-center space-x-4">
+                    <div>
+                        <label class="form-label">Start Date</label>
+                        <input type="date" wire:model="startDate" class="form-control">
+                    </div>
+                    <div>
+                        <label class="form-label">End Date</label>
+                        <input type="date" wire:model="endDate" class="form-control">
+                    </div>
                 </div>
                 <div>
                     <button type="button" class="btn btn-dark btn-sm" wire:click="openDepartmentModal">

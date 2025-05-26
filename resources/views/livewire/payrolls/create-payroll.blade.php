@@ -20,7 +20,7 @@
                     <option value="12">December</option>
                 </x-select>
                 <div>
-                    <h5 class="text-lg font-medium">Payroll Period:
+                    <h5 class="text-lg font-medium">Attendance Period:
                         {{ \Carbon\Carbon::parse($startDate)->format('d M Y') }} -
                         {{ \Carbon\Carbon::parse($endDate)->format('d M Y') }}</h5>
                 </div>

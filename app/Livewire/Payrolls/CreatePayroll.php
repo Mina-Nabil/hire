@@ -74,6 +74,13 @@ class CreatePayroll extends Component
         }
     }
 
+    public function updatedPayrollMonth($value)
+    {
+        $newMonth = Carbon::now()->setMonth((int)$value);
+        $this->startDate = $newMonth->clone()->setDay(25)->subMonth()->format('Y-m-d');
+        $this->endDate = $newMonth->clone()->setDay(25)->format('Y-m-d');
+    }
+
     public function mount()
     {
         $this->payrollMonth = Carbon::now()->month;

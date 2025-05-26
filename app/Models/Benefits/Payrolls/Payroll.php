@@ -36,6 +36,11 @@ class Payroll extends Model
         'status',
     ];
 
+    protected $casts = [
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
+    ];
+
     const EMPLOYEE_SHARE_SOCIAL_INSURANCE = 0.11;
     const EMPLOYER_SHARE_SOCIAL_INSURANCE = 0.1875;
     

@@ -314,8 +314,8 @@ class CreatePayroll extends Component
             $employeeDeductions = $employeeInsurance + $employeeMedical;
             $netIncome = $otherAmount + $insuranceAmount;
             $dayPrice = $netIncome / 30;
-            $employeeBaseBenefits = $employee->getEmployeeBaseBenefits()->sum('amount');
-            $otherBaseBenefits = $employee->getOtherBaseBenefits()->sum('amount');
+            $employeeBaseBenefits = $employee->getEmployeeBaseBenefitsCalculation(Carbon::parse($this->startDate), Carbon::parse($this->endDate));
+            $otherBaseBenefits = $employee->getOtherBaseBenefitsCalculation(Carbon::parse($this->startDate), Carbon::parse($this->endDate));
 
 
             // Get daily working hours from employee benefit configuration

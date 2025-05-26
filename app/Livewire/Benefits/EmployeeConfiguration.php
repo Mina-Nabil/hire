@@ -163,12 +163,14 @@ class EmployeeConfiguration extends Component
     {
         // Load base benefits
         $employeeBenefits = BaseBenefit::where('employee_id', $this->employee->id)
-            ->whereNull('end_date')
+            ->orderBy('start_date', 'asc')
+            ->orderBy('id', 'desc')
             ->get();
 
         // Load vacation benefits - using VacationBenefit instead of VacationDetail
         $employeeVacations = VacationBenefit::where('employee_id', $this->employee->id)
-            ->whereNull('end_date')
+            ->orderBy('start_date', 'asc')
+            ->orderBy('id', 'desc')
             ->get();
 
         // Load payments

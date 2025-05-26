@@ -99,26 +99,35 @@
                                                 <p class="font-bold">{{ $benefit['name'] }}</p>
                                             </div>
                                             <div class="grid grid-cols-3 gap-4">
-                                                <x-text-input label="Increment Rate*" type="number"
-                                                    wire:change="updateCurrentBalance({{ $index }})"
-                                                    wire:model="vacationBenefits.{{ $index }}.inc_rate"
-                                                    errorMessage="{{ $errors->first('vacationBenefits.' . $index . '.inc_rate') }}"
-                                                    min="{{ $benefit['inc_rate_min'] }}"
-                                                    max="{{ $benefit['inc_rate_max'] }}" />
-                                                <x-text-input label="Max Balance*" type="number"
-                                                    wire:model="vacationBenefits.{{ $index }}.max_balance"
-                                                    errorMessage="{{ $errors->first('vacationBenefits.' . $index . '.max_balance') }}"
-                                                    min="{{ $benefit['max_balance_min'] }}"
-                                                    max="{{ $benefit['max_balance_max'] }}" />
-                                                <x-text-input label="Current Balance*" type="number"
+                                                @if (!$benefit['is_disabled'])
+                                                    <x-text-input label="Increment Rate* (in hours)" type="number"
+                                                        wire:change="updateCurrentBalance({{ $index }})"
+                                                        wire:model="vacationBenefits.{{ $index }}.inc_rate"
+                                                        errorMessage="{{ $errors->first('vacationBenefits.' . $index . '.inc_rate') }}"
+                                                        min="{{ $benefit['inc_rate_min'] }}"
+                                                        max="{{ $benefit['inc_rate_max'] }}" />
+                                                @endif
+                                                @if (!$benefit['is_disabled'])
+                                                    <x-text-input label="Max Balance* (in hours)" type="number"
+                                                        wire:model="vacationBenefits.{{ $index }}.max_balance"
+                                                        errorMessage="{{ $errors->first('vacationBenefits.' . $index . '.max_balance') }}"
+                                                        min="{{ $benefit['max_balance_min'] }}"
+                                                        max="{{ $benefit['max_balance_max'] }}"
+                                                        />
+                                                @endif
+
+                                                <x-text-input label="Current Balance* (in hours)" type="number"
                                                     wire:model="vacationBenefits.{{ $index }}.current_balance"
                                                     errorMessage="{{ $errors->first('vacationBenefits.' . $index . '.current_balance') }}"
                                                     disabled />
-                                                <x-text-input label="Hour Price*" type="number"
-                                                    wire:model="vacationBenefits.{{ $index }}.hour_price"
-                                                    errorMessage="{{ $errors->first('vacationBenefits.' . $index . '.hour_price') }}"
-                                                    min="{{ $benefit['hour_price_min'] }}"
-                                                    max="{{ $benefit['hour_price_max'] }}" />
+
+                                                @if (!$benefit['is_disabled'])
+                                                    <x-text-input label="Hour Price*" type="number"
+                                                        wire:model="vacationBenefits.{{ $index }}.hour_price"
+                                                        errorMessage="{{ $errors->first('vacationBenefits.' . $index . '.hour_price') }}"
+                                                        min="{{ $benefit['hour_price_min'] }}"
+                                                        max="{{ $benefit['hour_price_max'] }}" />
+                                                @endif
                                             </div>
                                         </div>
                                         <div class="col-span-1">

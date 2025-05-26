@@ -162,4 +162,14 @@ class BaseBenefit extends Model
             ->join('package_details', 'base_benefits.package_detail_id', '=', 'package_details.id')
             ->where('package_details.salary_grade_id', $salary_grade_id);
     }
+
+    public function scopeCurrent($query, $onDate)
+    {
+        return $query->where(function ($query) use ($onDate) {
+            $query->where(function ($q) use ($onDate) {
+                $q->where('base_benefits.end_date', '>=', $onDate)
+                    ->where('base_benefits.end_date', '<=', $onDate);
+            })->orWhereNull('base_benefits.end_date');
+        });
+    }
 }

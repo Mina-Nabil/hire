@@ -30,6 +30,11 @@ class VacationBenefit extends Model
         'end_date',
     ];
 
+    protected $casts = [
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
+    ];
+
     public function employee()
     {
         return $this->belongsTo(Employee::class);
@@ -180,7 +185,18 @@ class VacationBenefit extends Model
     public function scopeByPackage($query, $package_id)
     {
         return $query
-        ->join('vacation_details', 'vacation_benefits.vacation_detail_id', '=', 'vacation_details.id')
-        ->where('vacation_details.vacation_package_id', $package_id);
+            ->join('vacation_details', 'vacation_benefits.vacation_detail_id', '=', 'vacation_details.id')
+            ->where('vacation_details.vacation_package_id', $package_id);
+    }
+
+
+    public function scopeCurrent($query, $onDate)
+    {
+        return $query->where(function ($query) use ($onDate) {
+            $query->where(function ($q) use ($onDate) {
+                $q->where('vacation_benefits.end_date', '>=', $onDate)
+                    ->where('vacation_benefits.end_date', '<=', $onDate);
+            })->orWhereNull('vacation_benefits.end_date');
+        });
     }
 }

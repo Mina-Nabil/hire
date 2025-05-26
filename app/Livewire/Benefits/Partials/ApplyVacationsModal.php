@@ -62,8 +62,9 @@ class ApplyVacationsModal extends Component
                 'max_balance_max' => $tmpVacationDetail->max_balance_max,
                 'hour_price_min' => $tmpVacationDetail->hour_price_min,
                 'hour_price_max' => $tmpVacationDetail->hour_price_max,
+                'is_disabled' => true,
             ];
-        });
+        })->toArray();
 
         if (count($this->vacationBenefits)) {
             if ($this->vacationBenefits[0]['start_date']) {
@@ -115,6 +116,7 @@ class ApplyVacationsModal extends Component
                 'hour_price' => $detail->hour_price_min,
                 'hour_price_min' => $detail->hour_price_min,
                 'hour_price_max' => $detail->hour_price_max,
+                'is_disabled' => false,
                 'type' => $detail->type
             ];
         })->toArray();
@@ -128,12 +130,13 @@ class ApplyVacationsModal extends Component
     public function updateCurrentBalance($key)
     {
         $value = $this->vacationBenefits[$key]['inc_rate'];
+        $currentBalance = $this->vacationBenefits[$key]['current_balance'] ?? 0;
         switch ($this->vacationBenefits[$key]['type']) {
             case VacationDetail::TYPE_YEARLY:
                 $startDate = Carbon::parse($this->vacationBenefits[$key]['start_date']);
                 $startOfYear = Carbon::parse($startDate)->startOfYear();
                 $leftRatio = $startOfYear->diffInDays($startDate, true) / 365;
-                $this->vacationBenefits[$key]['current_balance'] = $value * $leftRatio;
+                $this->vacationBenefits[$key]['current_balance'] = $currentBalance + $value * $leftRatio;
                 break;
             case VacationDetail::TYPE_MONTHLY:
                 $startDate = Carbon::parse($this->vacationBenefits[$key]['start_date']);

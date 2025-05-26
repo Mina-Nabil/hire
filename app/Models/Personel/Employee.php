@@ -1162,13 +1162,12 @@ class Employee extends Model
 
 
     //scopes
-    public function scopeCurrent($query, $start_date = null, $end_date = null)
+    public function scopeCurrent($query, $start_date = null)
     {
-        return $query->where(function ($q) use ($start_date, $end_date) {
+        return $query->where(function ($q) use ($start_date) {
             $q->whereNull('termination_date')
-                ->orWhere(function ($q) use ($start_date, $end_date) {
-                    $q->where('termination_date', '>=', $start_date)
-                        ->where('termination_date', '<=', $end_date);
+                ->orWhere(function ($q) use ($start_date) {
+                    $q->where('termination_date', '>=', $start_date);
                 });
         });
     }
@@ -3220,6 +3219,50 @@ class Employee extends Model
         }
     }
 
+
+    public function getEmployeeBaseBenefitsCalculation(Carbon $startDate, Carbon $endDate)
+    {
+        $activeBenefits = $this->baseBenefits()
+            ->where('receiver', PackageDetail::RECEIVER_EMPLOYEE)
+            ->current($startDate)
+            ->get();
+
+            $amount = 0;
+            $noOfDays = $startDate->diffInDays($endDate, true);
+            foreach ($activeBenefits as $benefit) {
+                $amountRatio = 100;
+                if ($benefit->end_date) {
+                    $amountRatio = $benefit->end_date->diffInDays($startDate, true) / $noOfDays;
+                } else if ($benefit->start_date->isAfter($startDate)) {
+                    $amountRatio = $benefit->start_date->diffInDays($startDate, true) / $noOfDays;
+                }
+                $amount += $benefit->amount * ($amountRatio / 100);
+            }
+            return $amount;
+    }
+
+    public function getOtherBaseBenefitsCalculation($startDate, $endDate)
+    {
+        $activeBenefits = $this->baseBenefits()
+            ->where('receiver', PackageDetail::RECEIVER_OTHER)
+            ->current($startDate)
+            ->get();
+
+            $amount = 0;
+            $noOfDays = $startDate->diffInDays($endDate, true);
+            foreach ($activeBenefits as $benefit) {
+                $amountRatio = 100;
+                if ($benefit->end_date) {
+                    $amountRatio = $benefit->end_date->diffInDays($startDate, true) / $noOfDays;
+                } else if ($benefit->start_date->isAfter($startDate)) {
+                    $amountRatio = $benefit->start_date->diffInDays($startDate, true) / $noOfDays;
+                }
+                $amount += $benefit->amount * ($amountRatio / 100);
+            }
+            return $amount;
+    }
+
+
     public function getMedicalBenefits()
     {
         return $this->baseBenefits()
@@ -3956,17 +3999,19 @@ class Employee extends Model
         return $this->hasMany(\App\Models\Attendance\Attendance::class);
     }
 
-    public function getEmployeeBaseBenefits()
+    public function getActiveEmployeeBaseBenefits($startDate)
     {
         return $this->baseBenefits()
+            ->current($startDate)
             ->whereHas('packageDetail', function ($query) {
                 $query->where('receiver', PackageDetail::RECEIVER_EMPLOYEE);
             });
     }
 
-    public function getOtherBaseBenefits()
+    public function getActiveOtherBaseBenefits($startDate)
     {
         return $this->baseBenefits()
+            ->current($startDate)
             ->whereHas('packageDetail', function ($query) {
                 $query->where('receiver', PackageDetail::RECEIVER_OTHER);
             });
@@ -4036,11 +4081,19 @@ class Employee extends Model
                 // Create benefit payments using the benefits collection
                 if (isset($benefits) && (is_array($benefits) || $benefits instanceof \Illuminate\Support\Collection)) {
                     foreach ($benefits as $baseBenefit) {
+                        $amountRatio = 100;
+                        $noOfDays = $payroll->start_date->diffInDays($payroll->end_date, true);
+                        if ($baseBenefit->end_date) {
+                            $amountRatio = $baseBenefit->end_date->diffInDays($payroll->start_date, true) / $noOfDays;
+                        } else if ($baseBenefit->start_date->isAfter($payroll->start_date)) {
+                            $amountRatio = $baseBenefit->start_date->diffInDays($payroll->start_date, true) / $noOfDays;
+                        }
+                        $amount = $baseBenefit->amount * ($amountRatio / 100);
                         $benefitPayment = BenefitPayment::create([
                             'employee_id' => $this->id,
                             'payroll_id' => $payroll->id,
                             'base_benefit_id' => $baseBenefit->id,
-                            'amount' => $baseBenefit->amount ?? 0,
+                            'amount' => $amount,
                             'status' => BenefitPayment::STATUS_PENDING,
                             'desc' => $baseBenefit->name ?? 'Benefit payment',
                         ]);

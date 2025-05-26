@@ -77,11 +77,12 @@ class Employee extends Model
         self::STATUS_TERMINATED,
         self::STATUS_RESIGNED,
     ];
-    
+
     // Employee statuses
     protected $fillable = [
         'user_id',
         'created_by',
+        'id_number',
         'name',
         'name_ar',
         'email',
@@ -103,26 +104,27 @@ class Employee extends Model
     protected $casts = [
         'employment_date' => 'date',
         'birth_date' => 'date',
+        'termination_date' => 'date'
     ];
 
     protected static function booted()
     {
         static::addGlobalScope('hrAccessibleEmployees', function ($builder) {
             $user = Auth::user();
-            
+
             // If no user is logged in or if they are admin, don't restrict
             if (!$user || $user->is_admin) {
                 return;
             }
-            
+
             // If user is HR, restrict to employees in their assigned locations
             if ($user->is_hr) {
                 // Get the HR user's assigned location IDs
                 $locationIds = $user->assignedLocations()->pluck('locations.id')->toArray();
-                
+
                 // Only apply filter if the user has assigned locations
                 if (!empty($locationIds)) {
-                    $builder->whereHas('positions', function($query) use ($locationIds) {
+                    $builder->whereHas('positions', function ($query) use ($locationIds) {
                         $query->whereIn('location_id', $locationIds);
                     });
                 }
@@ -137,16 +139,16 @@ class Employee extends Model
     }
 
     public function getFullImageUrlAttribute(): string|null
-{
-    if (!$this->image_url) {
-        return null;
+    {
+        if (!$this->image_url) {
+            return null;
+        }
+
+        // Use string concatenation since the url method isn't available
+        $baseUrl = config('filesystems.disks.s3.url', 'https://s3.amazonaws.com');
+        $bucket = config('filesystems.disks.s3.bucket');
+        return rtrim($baseUrl, '/') . '/' . $bucket . '/' . ltrim($this->image_url, '/');
     }
-    
-    // Use string concatenation since the url method isn't available
-    $baseUrl = config('filesystems.disks.s3.url', 'https://s3.amazonaws.com');
-    $bucket = config('filesystems.disks.s3.bucket');
-    return rtrim($baseUrl, '/') . '/' . $bucket . '/' . ltrim($this->image_url, '/');
-}
 
 
     ////model benefit functions
@@ -328,7 +330,7 @@ class Employee extends Model
         try {
             DB::transaction(function () use ($attendace_calculation, $working_day_start_min, $working_day_start_max, $working_day_end_min, $working_day_end_max, $daily_working_hours, $overtime_rate, $is_automatic_overtime, $working_days, $is_require_attendance_approval) {
                 $this->workingDays()->delete();
-                
+
                 $dbWorkingDays = [];
                 foreach ($working_days as $working_day) {
                     $dbWorkingDays[] = [
@@ -1075,7 +1077,7 @@ class Employee extends Model
      * @return Employee
      * @throws AppException
      */
-    public function updateBaseInfo(string $name, string $name_ar, string $email, string $phone, string $address, string $nationality, string $gender, $birth_date, $employment_date, ?string $mother_name = null)
+    public function updateBaseInfo(string $name, string $name_ar, string $email, string $phone, string $address, string $nationality, string $gender, $birth_date, $employment_date, string $id_number, ?string $mother_name = null, ?Carbon $termination_date = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -1089,12 +1091,14 @@ class Employee extends Model
                 'name_ar' => $name_ar,
                 'email' => $email,
                 'phone' => $phone,
+                'id_number' => $id_number,
                 'address' => $address,
                 'nationality' => $nationality,
                 'gender' => $gender,
                 'birth_date' => $birth_date,
                 'employment_date' => $employment_date,
                 'mother_name' => $mother_name,
+                'termination_date' => $termination_date,
             ]);
             AppLog::info('Employee Base Info Updated', 'Employee base info updated for employee: ' . $this->name, loggable: $this);
             return $this->fresh();
@@ -1155,11 +1159,14 @@ class Employee extends Model
 
 
     //scopes
-    public function scopeCurrent($query)
+    public function scopeCurrent($query, $start_date = null, $end_date = null)
     {
-        $now = now();
-        return $query->where(function ($query) use ($now) {
-            $query->whereNull('termination_date');
+        return $query->where(function ($q) use ($start_date, $end_date) {
+            $q->whereNull('termination_date')
+                ->orWhere(function ($q) use ($start_date, $end_date) {
+                    $q->where('termination_date', '>=', $start_date)
+                        ->where('termination_date', '<=', $end_date);
+                });
         });
     }
 
@@ -2907,7 +2914,7 @@ class Employee extends Model
         ];
     }
 
-    
+
 
     /**
      * Check external medical record status
@@ -3093,11 +3100,7 @@ class Employee extends Model
         return $summary;
     }
 
-    public function importEmployeesFromCSV($file_path)
-    {
-    
-        
-    }
+    public function importEmployeesFromCSV($file_path) {}
 
     /**
      * Create a new employee with basic information and optional employee info
@@ -3143,12 +3146,12 @@ class Employee extends Model
         }
 
         try {
-                $employee = self::create([
-                    'user_id' => $user_id,
-                    'created_by' => $loggedInUser->id,
-                    'name' => $name,
-                    'name_ar' => $name_ar,
-                    'email' => $email,
+            $employee = self::create([
+                'user_id' => $user_id,
+                'created_by' => $loggedInUser->id,
+                'name' => $name,
+                'name_ar' => $name_ar,
+                'email' => $email,
                 'phone' => $phone,
                 'address' => $address,
                 'nationality' => $nationality,
@@ -3163,12 +3166,14 @@ class Employee extends Model
                 'status' => $status,
             ]);
 
-            $employee->setIDCard(
-                $id_card_file_path,
-                Carbon::parse($id_issue_date),
-                Carbon::parse($id_expiry_date),
-                $id_number
-            );
+            if ($id_card_file_path) {
+                $employee->setIDCard(
+                    $id_card_file_path,
+                    Carbon::parse($id_issue_date),
+                    Carbon::parse($id_expiry_date),
+                    $id_number
+                );
+            }
 
             // Create employee info if data is provided
             if (!empty($employeeInfoData) && isset($employeeInfoData['insurance_office_id'])) {
@@ -3178,7 +3183,7 @@ class Employee extends Model
                 ));
             }
 
-            AppLog::info('Employee Created', 'Employee ' . $name .' created successfully', loggable: $employee);
+            AppLog::info('Employee Created', 'Employee ' . $name . ' created successfully', loggable: $employee);
             return $employee;
         } catch (Exception $e) {
             report($e);
@@ -3231,25 +3236,25 @@ class Employee extends Model
     {
         $startDate = $startDate instanceof Carbon ? $startDate : Carbon::parse($startDate);
         $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
-        
+
         $attendanceQuery = $this->attendances()
             ->where('date', '>=', $startDate->format('Y-m-d'))
             ->where('date', '<=', $endDate->format('Y-m-d'))
             ->where('is_approved', true);
-            
+
         $totalHours = $attendanceQuery->sum('hours');
-        
+
         if ($includeExtraHours) {
             $extraHours = $attendanceQuery
                 ->where('is_extra_hours_approved', true)
                 ->sum('extra_hours');
-            
+
             $totalHours += $extraHours;
         }
-        
+
         return $totalHours;
     }
-    
+
     /**
      * Get attendance records that fell short of daily required hours
      *
@@ -3261,7 +3266,7 @@ class Employee extends Model
     {
         $startDate = $startDate instanceof Carbon ? $startDate : Carbon::parse($startDate);
         $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
-        
+
         $dailyRequired = $this->benefitConfiguration->daily_working_hours ?? 0;
         
         // Get public holidays in the date range
@@ -3278,12 +3283,7 @@ class Employee extends Model
             ->where('is_approved', true)
             ->get();
             
-        return $attendances->map(function($attendance) use ($dailyRequired, $publicHolidays) {
-            // Skip shortfall calculation for public holidays
-            if (in_array($attendance->date, $publicHolidays)) {
-                return null;
-            }
-            
+        return $attendances->map(function($attendance) use ($dailyRequired) {
             $shortfall = max(0, $dailyRequired - $attendance->hours);
             return [
                 'attendance' => $attendance,
@@ -3293,10 +3293,10 @@ class Employee extends Model
                 'shortfall' => $shortfall
             ];
         })->filter(function($item) {
-            return $item !== null && $item['shortfall'] > 0;
+            return $item['shortfall'] > 0;
         });
     }
-    
+
     /**
      * Calculate total shortfall hours for an employee in a specified date range
      *
@@ -3309,7 +3309,7 @@ class Employee extends Model
         return $this->getShortfallHours($startDate, $endDate)
             ->sum('shortfall');
     }
-    
+
     /**
      * Calculate deduction amount based on shortfall hours
      *
@@ -3325,14 +3325,14 @@ class Employee extends Model
             $grossSalary = $this->benefitConfiguration->gross_salary ?? 0;
             $workingDaysPerMonth = $this->workingDays->count() * 4; // Approximate
             $dailyHours = $this->benefitConfiguration->daily_working_hours ?? 8;
-            
+
             $hourlyRate = $grossSalary / ($workingDaysPerMonth * $dailyHours);
         }
-        
+
         $shortfallHours = $this->getTotalShortfallHours($startDate, $endDate);
         return $shortfallHours * $hourlyRate;
     }
-    
+
     /**
      * Get missed working days in a date range
      *
@@ -3344,7 +3344,7 @@ class Employee extends Model
     {
         $startDate = $startDate instanceof Carbon ? $startDate : Carbon::parse($startDate);
         $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
-        
+
         // Get the working days of the employee
         $workingDays = $this->workingDays->pluck('type')->toArray();
         
@@ -3358,7 +3358,7 @@ class Employee extends Model
         
         $period = [];
         $currentDate = $startDate->copy();
-        
+
         // Generate all dates in the range
         while ($currentDate->lte($endDate)) {
             $dateString = $currentDate->format('Y-m-d');
@@ -3370,7 +3370,7 @@ class Employee extends Model
             }
             $currentDate->addDay();
         }
-        
+
         // Get all dates with approved attendance
         $attendedDates = $this->attendances()
             ->where('date', '>=', $startDate->format('Y-m-d'))
@@ -3379,11 +3379,11 @@ class Employee extends Model
             ->whereNull('payroll_id')
             ->pluck('date')
             ->toArray();
-        
+
         // Return the difference - days that should have been worked but weren't
         return collect(array_diff($period, $attendedDates));
     }
-    
+
     /**
      * Get missed working hours in a date range
      *
@@ -3395,10 +3395,10 @@ class Employee extends Model
     {
         $missedDays = $this->getMissedWorkingDays($startDate, $endDate);
         $dailyHours = $this->benefitConfiguration?->daily_working_hours ?? 8;
-        
+
         return $missedDays->count() * $dailyHours;
     }
-    
+
     /**
      * Calculate deduction amount for missed days
      *
@@ -3414,14 +3414,14 @@ class Employee extends Model
             $grossSalary = $this->benefitConfiguration->gross_salary ?? 0;
             $workingDaysPerMonth = $this->workingDays->count() * 4; // Approximate
             $dailyHours = $this->benefitConfiguration->daily_working_hours ?? 8;
-            
+
             $hourlyRate = $grossSalary / ($workingDaysPerMonth * $dailyHours);
         }
-        
+
         $missedHours = $this->getMissedWorkingHours($startDate, $endDate);
         return $missedHours * $hourlyRate;
     }
-    
+
     /**
      * Get late minutes for a specific date
      *
@@ -3443,26 +3443,26 @@ class Employee extends Model
             ->where('is_approved', true)
             ->whereNull('payroll_id')
             ->first();
-            
+
         if (!$attendance) {
             return null; // No attendance record
         }
-        
+
         $benefitConfig = $this->benefitConfiguration;
         if (!$benefitConfig || !$benefitConfig->working_day_start_max) {
             return null; // No benefit configuration or start time
         }
-        
+
         $attendanceStartTime = Carbon::parse($attendance->start_time);
         $maxStartTime = Carbon::parse($benefitConfig->working_day_start_max);
-        
+
         if ($attendanceStartTime->gt($maxStartTime)) {
             return $attendanceStartTime->diffInMinutes($maxStartTime);
         }
-        
+
         return 0; // Not late
     }
-    
+
     /**
      * Get total late hours in a date range
      *
@@ -3474,10 +3474,10 @@ class Employee extends Model
     {
         $startDate = $startDate instanceof Carbon ? $startDate : Carbon::parse($startDate);
         $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
-        
+
         $totalMinutes = 0;
         $currentDate = $startDate->copy();
-        
+
         while ($currentDate->lte($endDate)) {
             $lateMinutes = $this->getLateMinutesOnDate($currentDate);
             if ($lateMinutes !== null) {
@@ -3485,10 +3485,10 @@ class Employee extends Model
             }
             $currentDate->addDay();
         }
-        
+
         return $totalMinutes / 60.0; // Convert minutes to hours
     }
-    
+
     /**
      * Get early departure minutes for a specific date
      *
@@ -3510,26 +3510,26 @@ class Employee extends Model
             ->where('is_approved', true)
             ->whereNull('payroll_id')
             ->first();
-            
+
         if (!$attendance) {
             return null; // No attendance record
         }
-        
+
         $benefitConfig = $this->benefitConfiguration;
         if (!$benefitConfig || !$benefitConfig->working_day_end_min) {
             return null; // No benefit configuration or end time
         }
-        
+
         $attendanceEndTime = Carbon::parse($attendance->end_time);
         $minEndTime = Carbon::parse($benefitConfig->working_day_end_min);
-        
+
         if ($attendanceEndTime->lt($minEndTime)) {
             return $minEndTime->diffInMinutes($attendanceEndTime);
         }
-        
+
         return 0; // Did not leave early
     }
-    
+
     /**
      * Get total early departure hours in a date range
      *
@@ -3541,10 +3541,10 @@ class Employee extends Model
     {
         $startDate = $startDate instanceof Carbon ? $startDate : Carbon::parse($startDate);
         $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
-        
+
         $totalMinutes = 0;
         $currentDate = $startDate->copy();
-        
+
         while ($currentDate->lte($endDate)) {
             $earlyMinutes = $this->getEarlyDepartureMinutesOnDate($currentDate);
             if ($earlyMinutes !== null) {
@@ -3552,10 +3552,10 @@ class Employee extends Model
             }
             $currentDate->addDay();
         }
-        
+
         return $totalMinutes / 60.0; // Convert minutes to hours
     }
-    
+
     /**
      * Get total attendance penalty hours (combination of missed, late, early departure, and shortfall)
      * Enhanced to consider working time ranges from benefit configuration
@@ -3727,7 +3727,7 @@ class Employee extends Model
         
         return $validHours;
     }
-    
+
     /**
      * Calculate total penalty deduction based on all attendance issues
      *
@@ -3743,10 +3743,10 @@ class Employee extends Model
             $grossSalary = $this->benefitConfiguration->gross_salary ?? 0;
             $workingDaysPerMonth = $this->workingDays->count() * 4; // Approximate
             $dailyHours = $this->benefitConfiguration->daily_working_hours ?? 8;
-            
+
             $hourlyRate = $grossSalary / ($workingDaysPerMonth * $dailyHours);
         }
-        
+
         $totalPenaltyHours = $this->getTotalPenaltyHours($startDate, $endDate);
         return $totalPenaltyHours * $hourlyRate;
     }
@@ -3762,7 +3762,7 @@ class Employee extends Model
     {
         $startDate = $startDate instanceof Carbon ? $startDate : Carbon::parse($startDate);
         $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
-        
+
         return $this->attendances()
             ->where('date', '>=', $startDate->format('Y-m-d'))
             ->where('date', '<=', $endDate->format('Y-m-d'))
@@ -3771,7 +3771,7 @@ class Employee extends Model
             ->where('is_extra_hours_approved', true)
             ->sum('extra_hours');
     }
-    
+
     /**
      * Calculate overtime pay for a date range
      *
@@ -3785,18 +3785,18 @@ class Employee extends Model
         if ($overtimeRate === null) {
             $overtimeRate = $this->benefitConfiguration->overtime_rate ?? 1.5;
         }
-        
+
         // Calculate hourly rate based on gross salary
         $grossSalary = $this->benefitConfiguration->gross_salary ?? 0;
         $workingDaysPerMonth = $this->workingDays->count() * 4; // Approximate
         $dailyHours = $this->benefitConfiguration->daily_working_hours ?? 8;
-        
+
         $hourlyRate = $grossSalary / ($workingDaysPerMonth * $dailyHours);
         $overtimeHours = $this->getApprovedOvertimeHours($startDate, $endDate);
-        
+
         return $overtimeHours * $hourlyRate * $overtimeRate;
     }
-    
+
     /**
      * Check if employee was late on a specific date
      *
@@ -3818,27 +3818,27 @@ class Employee extends Model
             ->where('is_approved', true)
             ->whereNull('payroll_id')
             ->first();
-            
+
         if (!$attendance) {
             return null; // No attendance record
         }
-        
+
         $benefitConfig = $this->benefitConfiguration;
         if (!$benefitConfig) {
             return null; // No benefit configuration
         }
-        
+
         $startTimeLimit = $benefitConfig->working_day_start_max;
         if (!$startTimeLimit) {
             return null; // No start time constraint
         }
-        
+
         $attendanceStartTime = Carbon::parse($attendance->start_time);
         $maxStartTime = Carbon::parse($startTimeLimit);
-        
+
         return $attendanceStartTime->gt($maxStartTime);
     }
-    
+
     /**
      * Count late days in a date range
      *
@@ -3850,7 +3850,7 @@ class Employee extends Model
     {
         $startDate = $startDate instanceof Carbon ? $startDate : Carbon::parse($startDate);
         $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
-        
+
         $benefitConfig = $this->benefitConfiguration;
         if (!$benefitConfig || !$benefitConfig->working_day_start_max) {
             return 0;
@@ -3869,7 +3869,7 @@ class Employee extends Model
             ->whereNotIn('date', $publicHolidays) // Exclude public holidays
             ->count();
     }
-    
+
     /**
      * Check if employee left early on a specific date
      *
@@ -3891,27 +3891,27 @@ class Employee extends Model
             ->where('is_approved', true)
             ->whereNull('payroll_id')
             ->first();
-            
+
         if (!$attendance) {
             return null; // No attendance record
         }
-        
+
         $benefitConfig = $this->benefitConfiguration;
         if (!$benefitConfig) {
             return null; // No benefit configuration
         }
-        
+
         $endTimeLimit = $benefitConfig->working_day_end_min;
         if (!$endTimeLimit) {
             return null; // No end time constraint
         }
-        
+
         $attendanceEndTime = Carbon::parse($attendance->end_time);
         $minEndTime = Carbon::parse($endTimeLimit);
-        
+
         return $attendanceEndTime->lt($minEndTime);
     }
-    
+
     /**
      * Count early departure days in a date range
      *
@@ -3923,7 +3923,7 @@ class Employee extends Model
     {
         $startDate = $startDate instanceof Carbon ? $startDate : Carbon::parse($startDate);
         $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
-        
+
         $benefitConfig = $this->benefitConfiguration;
         if (!$benefitConfig || !$benefitConfig->working_day_end_min) {
             return 0;
@@ -3942,7 +3942,7 @@ class Employee extends Model
             ->whereNotIn('date', $publicHolidays) // Exclude public holidays
             ->count();
     }
-    
+
     /**
      * Relation to attendance records
      */
@@ -3994,16 +3994,16 @@ class Employee extends Model
         $query = self::where('status', self::STATUS_ACTIVE)
             ->whereNotNull('employment_date')
             ->where('employment_date', '<=', $endDate);
-            
+
         if (!empty($departmentIds)) {
-            $query->whereHas('position', function($query) use ($departmentIds) {
+            $query->whereHas('position', function ($query) use ($departmentIds) {
                 $query->whereIn('department_id', $departmentIds);
             });
         }
-        
+
         return $query->get();
     }
-    
+
     /**
      * Get all payrolls this employee is part of
      */
@@ -4011,7 +4011,7 @@ class Employee extends Model
     {
         return $this->belongsToMany(\App\Models\Benefits\Payrolls\Payroll::class, 'payroll_employees');
     }
-    
+
     // Method getPayrollDataForPeriod has been removed and the calculation logic
     // is now handled directly in the CreatePayroll component
 
@@ -4025,9 +4025,9 @@ class Employee extends Model
     public function createBenefitPaymentsForPayroll($payroll, $benefits)
     {
         $benefitPaymentIds = [];
-        
+
         try {
-            return DB::transaction(function() use ($payroll, $benefits, &$benefitPaymentIds) {
+            return DB::transaction(function () use ($payroll, $benefits, &$benefitPaymentIds) {
                 // Create benefit payments using the benefits collection
                 if (isset($benefits) && (is_array($benefits) || $benefits instanceof \Illuminate\Support\Collection)) {
                     foreach ($benefits as $baseBenefit) {
@@ -4042,7 +4042,7 @@ class Employee extends Model
                         $benefitPaymentIds[] = $benefitPayment->id;
                     }
                 }
-                
+
                 return $benefitPaymentIds;
             });
         } catch (\Exception $e) {

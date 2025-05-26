@@ -10,7 +10,9 @@ use App\Models\Hierarchy\Department;
 use App\Models\Hierarchy\Location;
 use App\Models\Hierarchy\Position;
 use App\Models\Personel\Employee;
+use App\Models\Users\AppLog;
 use App\Models\Users\User;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -24,21 +26,28 @@ class MigrationService
 
     public static function migrateFromStartupfile($file, &$locations, &$departments, &$employees, &$salary_grades, &$positions)
     {
+        $locations = [];
+        $departments = [];
+        $employees = [];
+        $salary_grades = [];
+        $positions = [];
+
         $template = IOFactory::load($file);
         if (!$template) {
             throw new AppException('Failed to read template file');
         }
         try {
-            DB::transaction(function () use ($template) {
+            DB::transaction(function () use ($template, &$locations, &$departments, &$employees, &$salary_grades, &$positions) {
 
                 //load locations
                 $locations_sheet = $template->getSheet(0);
                 $highestRow = $locations_sheet->getHighestRow();
                 for ($row = 2; $row <= $highestRow; $row++) {
                     $locationName = $locations_sheet->getCell('A' . $row)->getValue();
+                    if (!$locationName) continue;
                     $locations[] = [
                         'name' => $locationName,
-                        'warning' => !$locationName,
+                        'not_valid' => !$locationName,
                     ];
                 }
 
@@ -49,12 +58,12 @@ class MigrationService
                     $departmentCode = $departments_sheet->getCell('A' . $row)->getValue();
                     $departmentName = $departments_sheet->getCell('B' . $row)->getValue();
                     $departmentDescription = $departments_sheet->getCell('C' . $row)->getValue();
-
+                    if (!$departmentName) continue;
                     $departments[] = [
                         'code' => $departmentCode,
                         'name' => $departmentName,
                         'description' => $departmentDescription,
-                        'warning' => !$departmentCode || !$departmentName,
+                        'not_valid' => !$departmentCode || !$departmentName,
                     ];
                 }
 
@@ -75,7 +84,7 @@ class MigrationService
                     $city_name = $employees_sheet->getCell('J' . $row)->getValue();
                     $city = City::where('name', $city_name)->first();
                     if (!$city) {
-                        throw new AppException('City not found on row ' . $row);
+                        throw new AppException('Emploees Sheet: City name is not valid on row ' . $row);
                     }
                     $employment_date = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($employees_sheet->getCell('K' . $row)->getValue());
 
@@ -104,36 +113,17 @@ class MigrationService
                         'address' => $employeeAddress,
                         'nationality' => $nationality,
                         'gender' => $gender,
-                        'birth_date' => $birthDate,
+                        'birth_date' => Carbon::parse($birthDate)->format('Y-m-d'),
                         'id_number' => $id_number,
-                        'employment_date' => $employment_date,
+                        'employment_date' => Carbon::parse($employment_date)->format('Y-m-d'),
                         'city_id' => $city->id,
                         'city_name' => $city_name,
 
                         'base_username' => $baseUsername,
                         'base_password' => "pass@123",
                         'type' => User::TYPE_EMPLOYEE,
-                        'warning' => !$employeeName || !$employeeNameAr || !$id_number || !$employeeEmail || !$employeePhone || !$employeeAddress || !$nationality || !$gender || !$birthDate || !$city_name,
+                        'not_valid' => !$employeeName || !$employeeNameAr || !$id_number || !$employeeEmail || !$employeePhone || !$employeeAddress || !$nationality || !$gender || !$birthDate || !$city_name,
                     ];
-
-
-                    // $tmpUser = User::createUser($employeeName, $baseUsername, "pass@123", User::TYPE_EMPLOYEE);
-
-                    // Employee::createEmployee(
-                    //     $tmpUser->id,
-                    //     $employeeName,
-                    //     $employeeNameAr,
-                    //     $employeeEmail,
-                    //     $employeePhone,
-                    //     $employeeAddress,
-                    //     $nationality,
-                    //     $gender,
-                    //     $birthDate,
-                    //     $id_number,
-                    //     false,
-                    //     $employment_date,
-                    //     $city->id
-                    // );
                 }
 
                 //load salary grades
@@ -161,7 +151,7 @@ class MigrationService
                             'max' => $max,
                             'to' => $to,
                             'type' => $type,
-                            'warning' => !$name || !$min || !$max || !$to || !$type,
+                            'not_valid' => !$name || !$min || !$max || !$to || !$type,
                         ];
                         $k++;
                         $benefits_row = $salary_grades_sheet->getCell('B' . $k)->getValue();
@@ -174,10 +164,8 @@ class MigrationService
                         'gross_min' => $salaryGradeGrossMin,
                         'gross_max' => $salaryGradeGrossMax,
                         'extra_benefits' => $extraBenefits,
-                        'warning' => !$salaryGradeName || !$salaryGradeGrossMin || !$salaryGradeGrossMax,
+                        'not_valid' => !$salaryGradeName || !$salaryGradeGrossMin || !$salaryGradeGrossMax,
                     ];
-
-                    // SalaryGrade::createSalaryGrade($salaryGradeName, $salaryGradeGrossMin, $salaryGradeGrossMax);
                 }
 
                 //load positions
@@ -186,50 +174,160 @@ class MigrationService
                 for ($row = 2; $row <= $highestRow; $row++) {
 
                     $locationName = $positions_sheet->getCell('A' . $row)->getValue();
-                    $location = Location::where('name', $locationName)->first();
                     $departmentName = $positions_sheet->getCell('B' . $row)->getValue();
-                    $department = Department::where('name', $departmentName)->first();
                     $positionName = $positions_sheet->getCell('C' . $row)->getValue();
                     $positionArabicName = $positions_sheet->getCell('D' . $row)->getValue();
                     $positionCode = $positions_sheet->getCell('E' . $row)->getValue();
-                    $parentPositionName = $positions_sheet->getCell('F' . $row)->getValue();
-                    $parentPosition = Position::where('name', $parentPositionName)->first();
-                    $employeeName = $positions_sheet->getCell('G' . $row)->getValue();
-                    $employee = Employee::where('name', $employeeName)->orWhere('name_ar', $employeeName)->first();
+                    $parentPositionCode = $positions_sheet->getCell('F' . $row)->getValue();
+                    $employeeIDNumber = $positions_sheet->getCell('G' . $row)->getValue();
                     $salaryGradeName = $positions_sheet->getCell('H' . $row)->getValue();
-                    $salaryGrade = SalaryGrade::where('name', $salaryGradeName)->first();
 
                     if (!$departmentName || !$positionName || !$positionArabicName) continue;
+                    $invalid = false;
+                    $invalid_reason = null;
 
-                    if (!$department || !$location) {
-                        throw new AppException('Department or Location not found on row ' . $row);
+                    if (!array_filter($departments, fn($department) => $department['name'] == $departmentName) || !array_filter($locations, fn($location) => $location['name'] == $locationName)) {
+                        $invalid = true;
+                        $invalid_reason = 'Department or Location not found';
+                    }
+
+                    if (!array_filter($salary_grades, fn($salary_grade) => $salary_grade['name'] == $salaryGradeName)) {
+                        $invalid = true;
+                        $invalid_reason = 'Salary Grade not found';
+                    }
+
+                    if (!array_filter($employees, fn($employee) => $employee['id_number'] == $employeeIDNumber)) {
+                        $invalid = true;
+                        $invalid_reason = 'Employee not found';
                     }
 
                     $positions[] = [
-                        'location_id' => $location->id,
-                        'department_id' => $department->id,
+                        'location_id' => $locationName,
+                        'department_id' => $departmentName,
                         'name' => $positionName,
                         'arabic_name' => $positionArabicName,
-                        'parent_id' => $parentPosition->id ?? null,
+                        'parent' => $parentPositionCode,
                         'code' => $positionCode,
-                        'employee_id' => $employee->id ?? null,
-                        'salary_grade_id' => $salaryGrade->id ?? null,
-                        'warning' => !$location || !$department || !$positionName || !$positionArabicName,
+                        'employee_id' => $employeeIDNumber,
+                        'salary_grade' => $salaryGradeName,
+                        'not_valid' => $invalid,
+                        'invalid_reason' => $invalid_reason,
                     ];
-                    // $position = Position::createPosition(
-                    //     locationId: $location->id,
-                    //     departmentId: $department->id,
-                    //     name: $positionName,
-                    //     arabicName: $positionArabicName,
-                    //     parentId: $parentPosition->id ?? null,
-                    //     code: $positionCode,
-                    //     employeeId: $employee->id ?? null,
-                    //     salaryGradeId: $salaryGrade->id ?? null,
-                    // );
                 }
             });
         } catch (Exception $e) {
             throw new AppException('Failed to migrate: ' . $e->getMessage());
+        }
+    }
+
+    public static function importData($locations, $departments, $employees, $salary_grades, $positions)
+    {
+        try {
+
+            DB::transaction(function () use ($locations, $departments, $employees, $salary_grades, $positions) {
+
+                foreach ($locations as $location) {
+                    if (!$location['not_valid']) {
+                        Location::create([
+                            'name' => $location['name'],
+                        ]);
+                    }
+                }
+
+                foreach ($departments as $department) {
+                    if (!$department['not_valid']) {
+                        Department::create([
+                            'name' => $department['name'],
+                            'prefix_code' => $department['code'],
+                            'description' => $department['description'],
+                        ]);
+                    }
+                }
+
+                foreach ($employees as $employee) {
+                    if (!$employee['not_valid']) {
+                        $user = User::create([
+                            'name' => $employee['name'],
+                            'username' => $employee['base_username'],
+                            'password' => $employee['base_password'],
+                            'type' => User::TYPE_EMPLOYEE,
+                        ]);
+
+                        Employee::create([
+                            'user_id' => $user->id,
+                            'name' => $employee['name'],
+                            'name_ar' => $employee['name_ar'],
+                            'email' => $employee['email'],
+                            'phone' => $employee['phone'],
+                            'address' => $employee['address'],
+                            'nationality' => $employee['nationality'],
+                            'gender' => $employee['gender'],
+                            'birth_date' => Carbon::parse($employee['birth_date'])->format('Y-m-d'),
+                            'id_number' => $employee['id_number'],
+                            'employment_date' => Carbon::parse($employee['employment_date'])->format('Y-m-d'),
+                            'birth_place_id' => $employee['city_id'],
+                            'created_by' => 1,
+                        ]);
+                    }
+                }
+
+                foreach ($salary_grades as $salary_grade) {
+                    if (!$salary_grade['not_valid']) {
+                        $extra_benefits = [];
+                        foreach ($salary_grade['extra_benefits'] as $eb) {
+                            if (!$eb['not_valid']) {
+                                $extra_benefits[] = [
+                                    'name' => $eb['name'],
+                                    'amount_min' => $eb['min'],
+                                    'amount_max' => $eb['max'],
+                                    'amount_to' => $eb['to'],
+                                    'type' => $eb['type'],
+                                ];
+                            }
+                        }
+
+                        $salary_grade = SalaryGrade::create([
+                            'name' => $salary_grade['name'],
+                            'gross_min' => $salary_grade['gross_min'],
+                            'gross_max' => $salary_grade['gross_max'],
+                        ]);
+
+                        $salary_grade->packageDetails()->createMany($extra_benefits);
+                    }
+                }
+
+                foreach ($positions as $position) {
+                    if (!$position['not_valid']) {
+                        $location = Location::where('name', $position['location_id'])->first();
+                        $department = Department::where('name', $position['department_id'])->first();
+                        if ($position['salary_grade']) {
+                            $salary_grade = SalaryGrade::where('name', $position['salary_grade'])->first();
+                        }
+                        if ($position['employee_id']) {
+                            $employee = Employee::where('id_number', $position['employee_id'])->first();
+                        }
+                        if ($position['parent']) {
+                            $parent_position = Position::where('code', $position['parent'])->first();
+                        }
+
+                        Position::create([
+                            'location_id' => $location->id,
+                            'department_id' => $department->id,
+                            'name' => $position['name'],
+                            'arabic_name' => $position['arabic_name'],
+                            'parent_id' => isset($parent_position) ? $parent_position->id : null,
+                            'code' => $position['code'],
+                            'employee_id' => isset($employee) ? $employee->id : null,
+                            'salary_grade_id' => isset($salary_grade) ? $salary_grade->id : null,
+                        ]);
+                    }
+                }
+            });
+            AppLog::info('Data imported successfully');
+        } catch (Exception $e) {
+            report($e);
+            AppLog::error('Failed to import data', $e->getMessage());
+            throw new AppException('Failed to import data');
         }
     }
 }

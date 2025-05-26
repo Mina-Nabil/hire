@@ -22,6 +22,7 @@ return new class extends Migration
             $table->foreignIdFor(User::class, 'created_by')->constrained('users');
             $table->string('name');
             $table->string('name_ar');
+            $table->string('id_number');
             $table->string('email');
             $table->string('phone');
             $table->string('address');

@@ -154,7 +154,7 @@ class EmployeeCreate extends Component
         $this->nationality = $applicant->nationality ?? 'Egyptian';
         $this->gender = $applicant->gender;
         $this->birth_date = $applicant->birth_date?->format('Y-m-d');
-        
+        $this->id_number = $applicant->social_number;
         // Try to find a matching city for birth place
         if ($applicant->city_id) {
             $this->birth_place_id = $applicant->city_id;

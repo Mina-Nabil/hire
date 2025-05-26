@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Base;
 
+use App\Jobs\StartMigrationJob;
 use App\Services\MigrationService;
 use App\Traits\AlertFrontEnd;
 use Exception;
@@ -18,7 +19,7 @@ class ImportData extends Component
     public $departments = [];
     public $locations = [];
     public $positions = [];
-    public $benefits = [];
+    public $salary_grades = [];
     public $activeTab = 'employees';
 
     public function openFileUpload()
@@ -34,7 +35,7 @@ class ImportData extends Component
         $this->departments = [];
         $this->locations = [];
         $this->positions = [];
-        $this->benefits = [];
+        $this->salary_grades = [];
     }
 
     public function downloadTemplate()
@@ -50,15 +51,30 @@ class ImportData extends Component
         try {
             MigrationService::migrateFromStartupfile(
                 $this->file->getRealPath(),
-                $this->employees, // employees
-                $this->departments, // departments
                 $this->locations, // locations
+                $this->departments, // departments
+                $this->employees, // employees
+                $this->salary_grades, // salary grades
                 $this->positions, // positions
-                $this->benefits  // benefits
             );
             
             $this->showUploadModal = false;
             $this->file = null;
+        } catch (Exception $e) {
+            $this->alertError($e->getMessage());
+        }
+    }
+
+    public function importData()
+    {
+        try {   
+            StartMigrationJob::dispatch($this->locations, $this->departments, $this->employees, $this->salary_grades, $this->positions);
+            $this->alertSuccess('Data imported started, please check the logs for more details');
+            $this->locations = [];
+            $this->departments = [];
+            $this->employees = [];
+            $this->salary_grades = [];
+            $this->positions = [];
         } catch (Exception $e) {
             $this->alertError($e->getMessage());
         }
@@ -69,8 +85,21 @@ class ImportData extends Component
         $this->activeTab = $tab;
     }
 
+    public function getMigrationResults()
+    {
+        return [
+            'locations' => $this->locations,
+            'departments' => $this->departments,
+            'salary_grades' => $this->salary_grades,
+            'positions' => $this->positions,
+            'employees' => $this->employees,
+        ];
+    }
+
     public function render()
     {
-        return view('livewire.base.import-data');
+        return view('livewire.base.import-data', [
+            'migrationResults' => $this->getMigrationResults()
+        ]);
     }
 }

@@ -137,16 +137,16 @@ class Employee extends Model
     }
 
     public function getFullImageUrlAttribute(): string|null
-{
-    if (!$this->image_url) {
-        return null;
+    {
+        if (!$this->image_url) {
+            return null;
+        }
+
+        // Use string concatenation since the url method isn't available
+        $baseUrl = config('filesystems.disks.s3.url', 'https://s3.amazonaws.com');
+        $bucket = config('filesystems.disks.s3.bucket');
+        return rtrim($baseUrl, '/') . '/' . $bucket . '/' . ltrim($this->image_url, '/');
     }
-    
-    // Use string concatenation since the url method isn't available
-    $baseUrl = config('filesystems.disks.s3.url', 'https://s3.amazonaws.com');
-    $bucket = config('filesystems.disks.s3.bucket');
-    return rtrim($baseUrl, '/') . '/' . $bucket . '/' . ltrim($this->image_url, '/');
-}
 
 
     ////model benefit functions
@@ -3160,12 +3160,14 @@ class Employee extends Model
                 'status' => $status,
             ]);
 
-            $employee->setIDCard(
-                $id_card_file_path,
-                Carbon::parse($id_issue_date),
-                Carbon::parse($id_expiry_date),
-                $id_number
-            );
+            if ($id_card_file_path) {
+                $employee->setIDCard(
+                    $id_card_file_path,
+                    Carbon::parse($id_issue_date),
+                    Carbon::parse($id_expiry_date),
+                    $id_number
+                );
+            }
 
             // Create employee info if data is provided
             if (!empty($employeeInfoData) && isset($employeeInfoData['insurance_office_id'])) {
@@ -3794,7 +3796,7 @@ class Employee extends Model
     {
         return $this->belongsToMany(\App\Models\Benefits\Payrolls\Payroll::class, 'payroll_employees');
     }
-    
+
     // Method getPayrollDataForPeriod has been removed and the calculation logic
     // is now handled directly in the CreatePayroll component
 
@@ -3810,7 +3812,7 @@ class Employee extends Model
         $benefitPaymentIds = [];
 
         try {
-            return DB::transaction(function() use ($payroll, $benefits, &$benefitPaymentIds) {
+            return DB::transaction(function () use ($payroll, $benefits, &$benefitPaymentIds) {
                 // Create benefit payments using the benefits collection
                 if (isset($benefits) && (is_array($benefits) || $benefits instanceof \Illuminate\Support\Collection)) {
                     foreach ($benefits as $baseBenefit) {
@@ -3825,7 +3827,7 @@ class Employee extends Model
                         $benefitPaymentIds[] = $benefitPayment->id;
                     }
                 }
-                
+
                 return $benefitPaymentIds;
             });
         } catch (\Exception $e) {

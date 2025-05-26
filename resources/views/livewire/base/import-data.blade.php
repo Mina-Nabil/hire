@@ -1,21 +1,28 @@
 <div>
     <div class="flex justify-between flex-wrap items-center">
-        <div class="md:mb-6 mb-4 flex space-x-3 rtl:space-x-reverse">
+        <div class="md:mb-6 mb-4 flex space-x-3 rtl:space-x-reverse flex-col items-start">
             <h4 class="font-medium lg:text-2xl text-xl capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
                 Import Data using Excel Sheet
             </h4>
+            <p class="text-sm text-gray-500">
+                Only valid data will be imported, invalid data will be highlighted in yellow.
+            </p>
         </div>
         <div class="flex sm:space-x-4 space-x-2 sm:justify-end items-center md:mb-6 mb-4 rtl:space-x-reverse">
-            <button wire:click="openFileUpload"
-                class="btn inline-flex justify-center btn-dark dark:bg-slate-700 dark:text-slate-300 m-1">
+            <x-primary-button wire:click="openFileUpload" loadingFunction="openFileUpload" class="m-1">
                 <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2" icon="ph:upload-bold"></iconify-icon>
                 Upload Sheet
-            </button>
-            <button wire:click="downloadTemplate"
-                class="btn inline-flex justify-center btn-light dark:bg-slate-700 dark:text-slate-300 m-1">
+            </x-primary-button>
+            <x-primary-button wire:click="downloadTemplate" class="m-1">
                 <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2" icon="ph:download-bold"></iconify-icon>
                 Download Template
-            </button>
+            </x-primary-button>
+            @if (!empty($migrationResults))
+                <x-primary-button wire:click="importData" loadingFunction="importData" class="m-1">
+                    <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2" icon="ph:check-bold"></iconify-icon>
+                    Save Data
+                </x-primary-button>
+            @endif
         </div>
     </div>
     @if ($showUploadModal)
@@ -32,7 +39,9 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Select Excel File</label>
                         <input type="file" wire:model="file" class="mt-1 block w-full" accept=".xlsx,.xls">
-                        @error('file') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        @error('file')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                        @enderror
                     </div>
                 </div>
             </div>
@@ -46,8 +55,8 @@
     @endif
 
     @if (!empty($migrationResults))
-        <div class="mt-8">
-            <div class="border-b border-gray-200">
+        <div class="card mt-8">
+            <div class="card-header border-b border-gray-200">
                 <nav class="-mb-px flex space-x-8" aria-label="Tabs">
                     @foreach ($migrationResults as $key => $results)
                         <button wire:click="setActiveTab('{{ $key }}')"
@@ -61,7 +70,7 @@
                 </nav>
             </div>
 
-            <div class="mt-4">
+            <div class="card-body">
                 @foreach ($migrationResults as $key => $results)
                     <div x-show="$wire.activeTab === '{{ $key }}'" class="space-y-4">
                         <div class="overflow-x-auto">
@@ -70,20 +79,41 @@
                                     <tr>
                                         @if (!empty($results))
                                             @foreach (array_keys($results[0]) as $header)
-                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    {{ ucfirst(str_replace('_', ' ', $header)) }}
-                                                </th>
+                                                @if ($header !== 'not_valid')
+                                                    <th scope="col"
+                                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        {{ ucfirst(str_replace('_', ' ', $header)) }}
+                                                    </th>
+                                                @endif
                                             @endforeach
                                         @endif
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
                                     @foreach ($results as $row)
-                                        <tr class="{{ isset($row['is_warning']) && $row['is_warning'] ? 'bg-yellow-50' : '' }}">
+                                        <tr
+                                            class="{{ isset($row['not_valid']) && $row['not_valid'] ? 'bg-warning-500' : '' }}">
                                             @foreach ($row as $key => $value)
-                                                @if ($key !== 'is_warning')
+                                                @if ($key !== 'not_valid')
                                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                        {{ is_array($value) ? json_encode($value) : $value }}
+                                                        @if (is_array($value))
+                                                            <ul>
+                                                                @foreach ($value as $item)
+                                                                    @if (!$item['not_valid'])
+                                                                        <li>
+                                                                            <strong>{{ $item['name'] }} </strong> :
+                                                                            <strong>Min: </strong> {{ $item['min'] }} -
+                                                                            <strong>Max: </strong> {{ $item['max'] }}
+                                                                            <strong>Paid to: </strong>
+                                                                            {{ $item['to'] }} -
+                                                                            <strong>Type: </strong> {{ $item['type'] }}
+                                                                        </li>
+                                                                    @endif
+                                                                @endforeach
+                                                            </ul>
+                                                        @else
+                                                            {{ $value }}
+                                                        @endif
                                                     </td>
                                                 @endif
                                             @endforeach

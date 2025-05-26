@@ -6,6 +6,7 @@ namespace Database\Seeders;
 
 use App\Models\Benefits\Configurations\VacationPackage;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\App;
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,18 +15,24 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        if(App::environment('local')) {
         $this->call([
             UsersSeeder::class,
             ChannelSeeder::class,
             OrganizationSeeder::class,
-            ChannelSeeder::class,
             VacancySeeder::class,
             ApplicantSeeder::class,
             InterviewSeeder::class,
             SalaryGradeSeeder::class,
             VacationPackageSeeder::class,
             EmployeeSeeder::class,
-            BenefitPackageSeeder::class,
         ]);
+        } else if(App::environment('production')) {
+            $this->call([
+                UsersSeeder::class,
+                ChannelSeeder::class,
+                VacationPackageSeeder::class,
+            ]);
+        }
     }
 }

@@ -6,6 +6,18 @@
                 @if ($payroll->status === \App\Models\Benefits\Payrolls\Payroll::STATUS_PENDING)
                     <div class="flex justify-end gap-2">
 
+                        @can('delete', $payroll)
+                            <button type="button" class="btn btn-danger btn-sm"
+                            wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to delete this payroll? This action cannot be undone.',color:'danger',callback:'deletePayroll'})">
+                            <span>
+                                <span class="flex items-center">
+                                    <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2"
+                                        icon="heroicons-outline:trash"></iconify-icon>
+                                    Delete Payroll
+                                </span>
+                            </span>
+                        </button>
+                        @endcan
                         @can('update', $payroll)
                             <button type="button" class="btn btn-success btn-sm"
                             wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to approve this payroll?',color:'success',callback:'approvePayroll'})">

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Benefits\Payrolls\BenefitPayment;
 use App\Models\Users\AppLog;
+use Carbon\Carbon;
 
 class BaseBenefit extends Model
 {
@@ -161,5 +162,15 @@ class BaseBenefit extends Model
         return $query
             ->join('package_details', 'base_benefits.package_detail_id', '=', 'package_details.id')
             ->where('package_details.salary_grade_id', $salary_grade_id);
+    }
+
+    public function scopeCurrent($query, Carbon $onDate)
+    {
+        return $query->where(function ($query) use ($onDate) {
+            $query->where(function ($q) use ($onDate) {
+                $q->where('base_benefits.end_date', '>=', $onDate->format('Y-m-d'))
+                    ->where('base_benefits.end_date', '<=', $onDate->format('Y-m-d'));
+            })->orWhereNull('base_benefits.end_date');
+        });
     }
 }

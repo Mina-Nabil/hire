@@ -24,7 +24,7 @@ class PayrollShow extends Component
     
     protected $queryString = ['activeTab'];
     
-    protected $listeners = ['approvePayroll'];
+    protected $listeners = ['approvePayroll', 'deletePayroll'];
     
     // Modal properties
     public $showEmployeeDetailsModal = false;
@@ -93,6 +93,16 @@ class PayrollShow extends Component
                 $this->alertError('Failed to approve payroll');
         }
 
+    }
+
+    public function deletePayroll()
+    {
+        $this->authorize('delete', $this->payroll);
+        
+        $this->payroll->deletePayroll();
+        $this->alertSuccess('Payroll deleted successfully.');
+        //route to payrolls index
+        return redirect()->route('payrolls.index');
     }
     
     public function showEmployeeDetails($payrollEmployeeId)

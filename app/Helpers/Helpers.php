@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Benefits\Configurations\BaseBenefit;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 
@@ -116,6 +117,32 @@ if (!function_exists('id_hash')) {
     function id_hash($id)
     {
         return encrypt($id);
+    }
+}
+
+if (!function_exists('days_coefficient')) {
+    function days_coefficient($noOfDays, $type)
+    {
+        if (25 <= $noOfDays && $noOfDays <= 35) {
+            $daysCoefficient = match ($type) {
+                BaseBenefit::TYPE_MONTHLY => 1,
+                BaseBenefit::TYPE_DAILY => 30,
+                BaseBenefit::TYPE_WEEKLY => 4,
+            };
+        } else if ($noOfDays == 7) {
+            $daysCoefficient = match ($type) {
+                BaseBenefit::TYPE_MONTHLY => 0.25,
+                BaseBenefit::TYPE_DAILY => 7,
+                BaseBenefit::TYPE_WEEKLY => 1,
+            };
+        } else {
+            $daysCoefficient = match ($type) {
+                BaseBenefit::TYPE_MONTHLY => $noOfDays / 30,
+                BaseBenefit::TYPE_DAILY => $noOfDays,
+                BaseBenefit::TYPE_WEEKLY => $noOfDays / 7,
+            };
+        }
+        return $daysCoefficient;
     }
 }
 

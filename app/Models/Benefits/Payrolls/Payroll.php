@@ -15,15 +15,15 @@ use Illuminate\Support\Facades\DB;
 class Payroll extends Model
 {
     const MORPH_NAME = 'payroll';
-    
+
     const STATUS_PENDING = 'pending';
     const STATUS_APPROVED = 'approved';
-    
+
     const STATUS_LIST = [
         self::STATUS_PENDING,
         self::STATUS_APPROVED,
     ];
-    
+
     protected $table = 'payrolls';
     protected $fillable = [
         'creator_id',
@@ -43,7 +43,7 @@ class Payroll extends Model
 
     const EMPLOYEE_SHARE_SOCIAL_INSURANCE = 0.11;
     const EMPLOYER_SHARE_SOCIAL_INSURANCE = 0.1875;
-    
+
     /**
      * Get the employee records for this payroll
      */
@@ -51,7 +51,7 @@ class Payroll extends Model
     {
         return $this->hasMany(PayrollEmployee::class);
     }
-    
+
     /**
      * Get the employees for this payroll
      */
@@ -59,7 +59,7 @@ class Payroll extends Model
     {
         return $this->belongsToMany(Employee::class, 'payroll_employees');
     }
-    
+
     /**
      * Get the attendance records for this payroll
      */
@@ -67,7 +67,7 @@ class Payroll extends Model
     {
         return $this->hasMany(Attendance::class);
     }
-    
+
     /**
      * Get the extra payments for this payroll
      */
@@ -75,7 +75,7 @@ class Payroll extends Model
     {
         return $this->hasMany(ExtraPayment::class);
     }
-    
+
     /**
      * Get the creator of this payroll
      */
@@ -114,51 +114,51 @@ class Payroll extends Model
         if ($this->status === self::STATUS_APPROVED) {
             return true; // Already approved
         }
-        
+
         try {
             return DB::transaction(function () use ($loggedInUser) {
                 // Update payroll status
                 $this->update([
-                'status' => self::STATUS_APPROVED,
-            ]);
-
-            // Update all related benefit payments to paid status
-            $this->benefitPayments()->update([
-                'status' => BenefitPayment::STATUS_PAID,
-            ]);
-
-            // Update all related extra payments to paid status
-            $this->extraPayments()->update([
-                'status' => ExtraPayment::STATUS_PAID,
-            ]);
-
-            // Approve all pending overtime records that were auto-created during payroll generation
-            $pendingOvertimes = $this->overtimes()
-                ->where('status', Overtime::STATUS_PENDING)
-                ->where('admin_note', 'LIKE', '%Auto-created from attendance during payroll creation%')
-                ->get();
-            
-            foreach ($pendingOvertimes as $overtime) {
-                $overtime->update([
-                    'status' => Overtime::STATUS_APPROVED,
-                    'approved_at' => now(),
-                    'admin_note' => $overtime->admin_note . ' - Auto-approved with payroll approval',
+                    'status' => self::STATUS_APPROVED,
                 ]);
-                
-                AppLog::info(
-                    'Overtime Auto-Approved',
-                    "Auto-approved overtime for {$overtime->employee->name} on {$overtime->date} during payroll approval",
-                    loggable: $overtime
-                );
-            }
 
-            // Log the approval
-            AppLog::info(
-                'Payroll Approved',
-                'Approved payroll for period ' . $this->start_date . ' to ' . $this->end_date . 
-                ' with ' . $this->total_employees . ' employees. Total amount: ' . $this->total_paid,
-                loggable: $this
-            );
+                // Update all related benefit payments to paid status
+                $this->benefitPayments()->update([
+                    'status' => BenefitPayment::STATUS_PAID,
+                ]);
+
+                // Update all related extra payments to paid status
+                $this->extraPayments()->update([
+                    'status' => ExtraPayment::STATUS_PAID,
+                ]);
+
+                // Approve all pending overtime records that were auto-created during payroll generation
+                $pendingOvertimes = $this->overtimes()
+                    ->where('status', Overtime::STATUS_PENDING)
+                    ->where('admin_note', 'LIKE', '%Auto-created from attendance during payroll creation%')
+                    ->get();
+
+                foreach ($pendingOvertimes as $overtime) {
+                    $overtime->update([
+                        'status' => Overtime::STATUS_APPROVED,
+                        'approved_at' => now(),
+                        'admin_note' => $overtime->admin_note . ' - Auto-approved with payroll approval',
+                    ]);
+
+                    AppLog::info(
+                        'Overtime Auto-Approved',
+                        "Auto-approved overtime for {$overtime->employee->name} on {$overtime->date} during payroll approval",
+                        loggable: $overtime
+                    );
+                }
+
+                // Log the approval
+                AppLog::info(
+                    'Payroll Approved',
+                    'Approved payroll for period ' . $this->start_date . ' to ' . $this->end_date .
+                        ' with ' . $this->total_employees . ' employees. Total amount: ' . $this->total_paid,
+                    loggable: $this
+                );
 
                 return true;
             });
@@ -188,15 +188,15 @@ class Payroll extends Model
         $benefitPaymentIds = [];
 
         // Use DB::transaction as described with a function that uses the variables
-        DB::transaction(function() use (
-            $creatorId, 
-            $startDate, 
-            $endDate, 
-            $payrollData, 
-            &$payroll, 
-            &$totalPaid, 
-            &$totalVacationDays, 
-            &$totalVacationAmount, 
+        DB::transaction(function () use (
+            $creatorId,
+            $startDate,
+            $endDate,
+            $payrollData,
+            &$payroll,
+            &$totalPaid,
+            &$totalVacationDays,
+            &$totalVacationAmount,
             &$totalEmployees,
             &$benefitPaymentIds
         ) {
@@ -216,11 +216,11 @@ class Payroll extends Model
             foreach ($payrollData as $employeeData) {
                 $employeeId = $employeeData['employee_id'];
                 $employee = Employee::find($employeeId);
-                
+
                 if (!$employee) {
                     continue; // Skip if employee not found
                 }
-                
+
                 // Create payroll_employee record with fields that exist in the database schema
                 $payrollEmployee = $payroll->payrollEmployees()->create([
                     'employee_id' => $employeeId,
@@ -257,10 +257,10 @@ class Payroll extends Model
                     $employeeBenefitPaymentIds = $employee->createBenefitPaymentsForPayroll($payroll,  $employeeData['benefits']);
                     $benefitPaymentIds = array_merge($benefitPaymentIds, $employeeBenefitPaymentIds);
                 }
-                
+
                 // Add employee's net payment to the total
                 $totalPaid += $employeeData['net_after_deductions'] ?? 0;
-                
+
                 // Link extra payments to this payroll
                 if (isset($employeeData['extra_payment_ids']) && is_array($employeeData['extra_payment_ids'])) {
                     ExtraPayment::whereIn('id', $employeeData['extra_payment_ids'])->where('amount', '<', 0)
@@ -273,7 +273,7 @@ class Payroll extends Model
                         ->whereNull('payroll_id')
                         ->update(['payroll_id' => $payroll->id]);
                 }
-                
+
                 // Link attendance records to this payroll if requested
                 if (isset($employeeData['attendance_ids']) && is_array($employeeData['attendance_ids'])) {
                     Attendance::whereIn('id', $employeeData['attendance_ids'])
@@ -285,7 +285,7 @@ class Payroll extends Model
                         ->whereNull('payroll_id')
                         ->update(['payroll_id' => $payroll->id]);
                 }
-                
+
                 // Link overtime records to this payroll
                 if (isset($employeeData['overtime_ids']) && is_array($employeeData['overtime_ids'])) {
                     Overtime::whereIn('id', $employeeData['overtime_ids'])
@@ -299,7 +299,7 @@ class Payroll extends Model
                         ->update(['payroll_id' => $payroll->id]);
                 }
             }
-            
+
             // 3. Update the payroll with the final totals
             $payroll->update([
                 'total_paid' => $totalPaid,
@@ -307,16 +307,30 @@ class Payroll extends Model
                 'total_vacation_amount' => $totalVacationAmount,
                 'total_employees' => $totalEmployees,
             ]);
-            
+
             // Log the creation of the payroll
             AppLog::info(
-                'Payroll Created', 
-                'Created payroll for period ' . $startDate . ' to ' . $endDate . ' with ' . $totalEmployees . ' employees', 
+                'Payroll Created',
+                'Created payroll for period ' . $startDate . ' to ' . $endDate . ' with ' . $totalEmployees . ' employees',
                 loggable: $payroll
             );
         });
-        
+
         // Return the created payroll instance
         return $payroll;
+    }
+
+
+    public function deletePayroll()
+    {
+        try {
+            DB::transaction(function () {
+                $this->payrollEmployees()->delete();
+                $this->delete();
+            });
+        } catch (\Exception $e) {
+            AppLog::error('Error deleting payroll', $e->getMessage());
+            throw new AppException('Error deleting payroll');
+        }
     }
 }

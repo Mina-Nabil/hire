@@ -309,7 +309,7 @@ class CreatePayroll extends Component
             $employerInsurance = $insuranceAmount * Payroll::EMPLOYER_SHARE_SOCIAL_INSURANCE;
             $totalInsurance = $employeeInsurance + $employerInsurance;
             $otherAmount = $grossSalary - $insuranceAmount - $employerInsurance ?? 0;
-            $employeeMedical = $employee->getMedicalBenefits()->sum('amount');
+            $employeeMedical = $employee->activeMedicalBenefits(Carbon::parse($this->startDate))->sum('amount');
             $totalMedical = $employeeMedical;
             $employeeDeductions = $employeeInsurance + $employeeMedical;
             $netIncome = $otherAmount + $insuranceAmount;
@@ -430,9 +430,9 @@ class CreatePayroll extends Component
             $totals['adj_amount'] += $adjAmount;
 
             $benefits = collect()
-                ->merge($employee->getEmployeeBaseBenefits()->get())
-                ->merge($employee->getOtherBaseBenefits()->get())
-                ->merge($employee->getMedicalBenefits()->get());
+                ->merge($employee->activeEmployeeBaseBenefits(Carbon::parse($this->startDate))->get())
+                ->merge($employee->activeOtherBaseBenefits(Carbon::parse($this->startDate))->get())
+                ->merge($employee->activeMedicalBenefits(Carbon::parse($this->startDate))->get());
 
             // Explicitly use indexed arrays for employees to ensure we have id as a field
             $departmentGroups[$departmentId]['employees'][] = [

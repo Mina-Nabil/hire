@@ -103,6 +103,7 @@ class Employee extends Model
     protected $casts = [
         'employment_date' => 'date',
         'birth_date' => 'date',
+        'termination_date' => 'date'
     ];
 
     protected static function booted()
@@ -1075,7 +1076,7 @@ class Employee extends Model
      * @return Employee
      * @throws AppException
      */
-    public function updateBaseInfo(string $name, string $name_ar, string $email, string $phone, string $address, string $nationality, string $gender, $birth_date, $employment_date, string $id_number, ?string $mother_name = null,)
+    public function updateBaseInfo(string $name, string $name_ar, string $email, string $phone, string $address, string $nationality, string $gender, $birth_date, $employment_date, string $id_number, ?string $mother_name = null, ?Carbon $termination_date = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -1096,6 +1097,7 @@ class Employee extends Model
                 'birth_date' => $birth_date,
                 'employment_date' => $employment_date,
                 'mother_name' => $mother_name,
+                'termination_date' => $termination_date,
             ]);
             AppLog::info('Employee Base Info Updated', 'Employee base info updated for employee: ' . $this->name, loggable: $this);
             return $this->fresh();
@@ -1156,11 +1158,14 @@ class Employee extends Model
 
 
     //scopes
-    public function scopeCurrent($query)
+    public function scopeCurrent($query, $start_date = null, $end_date = null)
     {
-        $now = now();
-        return $query->where(function ($query) use ($now) {
-            $query->whereNull('termination_date');
+        return $query->where(function ($q) use ($start_date, $end_date) {
+            $q->whereNull('termination_date')
+                ->orWhere(function ($q) use ($start_date, $end_date) {
+                    $q->where('termination_date', '>=', $start_date)
+                        ->where('termination_date', '<=', $end_date);
+                });
         });
     }
 
@@ -3539,7 +3544,7 @@ class Employee extends Model
 
         // Get shortfall hours (partial days)
         $shortfallHours = $this->getTotalShortfallHours($startDate, $endDate);
-        
+
         return $missedHours + $shortfallHours;
     }
 

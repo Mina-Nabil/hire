@@ -8,6 +8,7 @@ use App\Models\Personel\Employee;
 use App\Models\Hierarchy\Department;
 use App\Models\Users\AppLog;
 use App\Traits\AlertFrontEnd;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -18,7 +19,7 @@ use Livewire\Attributes\Title;
 class CreatePayroll extends Component
 {
     use AlertFrontEnd, WithPagination;
-    
+
     // Properties for the department selection modal
     public $showDepartmentModal = false;
     public $selectedDepartment = null;
@@ -31,13 +32,13 @@ class CreatePayroll extends Component
     public $startDate;
     public $endDate;
     public $payrollData = [];
-    
+
     // Properties for adjustment modal
     public $showAdjustmentModal = false;
     public $selectedEmployeeForAdjustment = null;
     public $adjustmentAmount = 0;
     public $adjustmentDescription = '';
-    
+
     // Properties for filtering and display
     public $search = '';
     public $perPage = 10;
@@ -50,11 +51,11 @@ class CreatePayroll extends Component
         if (!is_array($this->selectedDepartments)) {
             $this->selectedDepartments = !empty($this->selectedDepartments) ? [$this->selectedDepartments] : [];
         }
-        
+
         if (!is_array($this->selectedEmployees)) {
             $this->selectedEmployees = !empty($this->selectedEmployees) ? [$this->selectedEmployees] : [];
         }
-        
+
         if (!is_array($this->payrollData)) {
             $this->payrollData = [];
         }
@@ -67,7 +68,7 @@ class CreatePayroll extends Component
 
     public function selectAllDepartments()
     {
-        if(count($this->departments) > 0){
+        if (count($this->departments) > 0) {
             $this->selectedDepartments = $this->departments->pluck('id')->toArray();
             $this->loadEmployeesFromMultipleDepartments($this->selectedDepartments);
         }
@@ -113,7 +114,7 @@ class CreatePayroll extends Component
     public function updatedSelectedDepartments($value)
     {
         $this->ensureArrays();
-        
+
         if ($this->selectAllEmployees && !empty($this->selectedDepartments)) {
             $this->loadEmployeesFromMultipleDepartments($this->selectedDepartments);
         } else {
@@ -124,7 +125,7 @@ class CreatePayroll extends Component
     public function updatedSelectAllEmployees($value)
     {
         $this->ensureArrays();
-        
+
         if ($value) {
             if ($this->selectedDepartment) {
                 $this->loadEmployeesFromDepartment($this->selectedDepartment);
@@ -139,7 +140,7 @@ class CreatePayroll extends Component
     public function loadEmployeesFromMultipleDepartments($departmentIds)
     {
         $this->ensureArrays();
-        
+
         if (empty($departmentIds)) {
             $this->selectedEmployees = [];
             return;
@@ -150,9 +151,11 @@ class CreatePayroll extends Component
             $departmentIds = [$departmentIds];
         }
 
-        $employees = Employee::whereHas('position', function($query) use ($departmentIds) {
+        $employees = Employee::whereHas('position', function ($query) use ($departmentIds) {
             $query->whereIn('department_id', $departmentIds);
-        })->get();
+        })
+        ->current(Carbon::parse($this->startDate), Carbon::parse($this->endDate))
+        ->get();
 
         $this->selectedEmployees = $employees->pluck('id')->toArray();
     }
@@ -160,15 +163,17 @@ class CreatePayroll extends Component
     public function loadEmployeesFromDepartment($departmentId)
     {
         $this->ensureArrays();
-        
+
         if (!$departmentId) {
             $this->selectedEmployees = [];
             return;
         }
 
-        $employees = Employee::whereHas('position', function($query) use ($departmentId) {
+        $employees = Employee::whereHas('position', function ($query) use ($departmentId) {
             $query->where('department_id', $departmentId);
-        })->get();
+        })
+        ->current(Carbon::parse($this->startDate), Carbon::parse($this->endDate))
+        ->get();
 
         $this->selectedEmployees = $employees->pluck('id')->toArray();
     }
@@ -176,7 +181,7 @@ class CreatePayroll extends Component
     public function submitDepartmentSelection()
     {
         $this->ensureArrays();
-        
+
         if (empty($this->selectedDepartments) && !$this->selectedDepartment) {
             $this->addError('departmentSelection', 'Please select at least one department.');
             return;
@@ -215,15 +220,15 @@ class CreatePayroll extends Component
         }
 
         [$departmentId, $employeeIndex] = $this->selectedEmployeeForAdjustment;
-        
+
         // Update the employee data with adjustment
         $this->payrollData[$departmentId]['employees'][$employeeIndex]['adj_amount'] = $this->adjustmentAmount;
         $this->payrollData[$departmentId]['employees'][$employeeIndex]['adj_desc'] = $this->adjustmentDescription;
-        
+
         // Recalculate net after deductions with adjustment
         $employee = &$this->payrollData[$departmentId]['employees'][$employeeIndex];
         $employee['net_after_deductions'] = $employee['net_after_penalty'] + $employee['extra_payments'] + $employee['overtime_amount'] + $this->adjustmentAmount;
-        
+
         $this->closeAdjustmentModal();
         $this->alertSuccess('Adjustment saved successfully.');
     }
@@ -231,14 +236,15 @@ class CreatePayroll extends Component
     public function loadPayrollData()
     {
         $this->ensureArrays();
-        
+
         $this->payrollData = [];
-        
+
         $employees = Employee::with(['position', 'position.department', 'benefitConfiguration'])
+            ->current(Carbon::parse($this->startDate), Carbon::parse($this->endDate))
             ->whereIn('id', $this->selectedEmployees)
             ->get()
             ->sortBy('position.department.name');
-        
+
         $departmentGroups = [];
         $totals = [
             'gross_salary' => 0,
@@ -257,11 +263,11 @@ class CreatePayroll extends Component
             'overtime_amount' => 0,
             'adj_amount' => 0,
         ];
-        
+
         foreach ($employees as $employee) {
             $departmentName = $employee->position?->department?->name ?? 'No Department';
             $departmentId = $employee->position?->department?->id ?? 0;
-            
+
             if (!isset($departmentGroups[$departmentId])) {
                 $departmentGroups[$departmentId] = [
                     'name' => $departmentName,
@@ -273,7 +279,7 @@ class CreatePayroll extends Component
                         'employer_insurance' => 0,
                         'total_insurance' => 0,
                         'other_amount' => 0,
-                        'net_income'=> 0,
+                        'net_income' => 0,
                         'penalties_days' => 0,
                         'penalties_amount' => 0,
                         'extra_payments' => 0,
@@ -283,8 +289,17 @@ class CreatePayroll extends Component
                     ]
                 ];
             }
-            
-            $grossSalary = $employee->benefitConfiguration?->gross_salary ?? 0;
+
+            $employeeTerminationDate = Carbon::parse($employee->termination_date);
+            $grossPercentage = 100;
+
+            if ($employeeTerminationDate->isAfter($this->startDate) && $employeeTerminationDate->isBefore($this->endDate)) {
+                // Calculate the percentage of the gross salary based on the included days
+                $includedDays = $employeeTerminationDate->diffInDays($this->startDate);
+                $grossPercentage = (min($includedDays, 30) / 30) * 100;
+            }
+
+            $grossSalary = ($employee->benefitConfiguration?->gross_salary ?? 0) * $grossPercentage / 100;
             $insuranceAmount = $employee->benefitConfiguration?->insurance_amount ?? 0;
             $employeeInsurance = $insuranceAmount * Payroll::EMPLOYEE_SHARE_SOCIAL_INSURANCE;
             $employerInsurance = $insuranceAmount * Payroll::EMPLOYER_SHARE_SOCIAL_INSURANCE;
@@ -297,35 +312,35 @@ class CreatePayroll extends Component
             $dayPrice = $netIncome / 30;
             $employeeBaseBenefits = $employee->getEmployeeBaseBenefits()->sum('amount');
             $otherBaseBenefits = $employee->getOtherBaseBenefits()->sum('amount');
-            
-            
+
+
             // Get daily working hours from employee benefit configuration
             $dailyWorkingHours = $employee->benefitConfiguration?->daily_working_hours ?? 8;
-            
+
             // Calculate penalty hours using the new consolidated function
             $totalPenaltyHours = $employee->getTotalPenaltyHours($this->startDate, $this->endDate);
 
             // Convert total hours to days for display purposes
             $totalPenaltyDays = $dailyWorkingHours > 0 ? $totalPenaltyHours / $dailyWorkingHours : 0;
-            
+
             // Calculate hourly rate and penalty amount
             $hourlyRate = $dayPrice / $dailyWorkingHours;
             $penaltyAmount = $totalPenaltyHours * $hourlyRate;
 
             $netAfterPenalty = $netIncome - $penaltyAmount;
-            
+
             // Get extra payments
             $extraPayments = $employee->getNegativeExtraPayments($this->startDate, $this->endDate);
-            
+
             // Alternatively, use the new penalty calculation function (uncomment if needed)
             // $penaltyAmount = $employee->calculateTotalPenaltyDeduction($this->startDate, $this->endDate);
-            
+
             // Calculate overtime
             $overtimeHours = 0;
             $overtimeRate = $employee->benefitConfiguration->overtime_rate ?? 1.5;
             $dailyWorkingHours = $employee->benefitConfiguration->daily_working_hours ?? 8;
             $isAutomaticOvertime = $employee->benefitConfiguration->is_automatic_overtime ?? false;
-            
+
             if ($isAutomaticOvertime) {
                 // Calculate overtime from attendance records
                 // Get all approved attendance records
@@ -334,7 +349,7 @@ class CreatePayroll extends Component
                     ->whereBetween('date', [$this->startDate, $this->endDate])
                     ->whereNull('payroll_id')
                     ->get();
-                
+
                 // For each attendance, calculate overtime if hours exceed daily working hours
                 foreach ($attendances as $attendance) {
                     $dailyHours = $attendance->hours;
@@ -350,17 +365,17 @@ class CreatePayroll extends Component
                     ->whereNull('payroll_id')
                     ->sum('hours');
             }
-            
+
             // Calculate overtime amount
             $overtimeAmount = $overtimeHours * $hourlyRate * $overtimeRate;
-            
+
             // Initialize adjustment values (will be 0 initially)
             $adjAmount = 0;
             $adjDesc = '';
-            
+
             // Calculate net income with overtime and adjustment
             $netAfterDeductions = $netAfterPenalty + $extraPayments + $overtimeAmount + $adjAmount;
-            
+
             // Add to department totals
             $departmentGroups[$departmentId]['totals']['gross_salary'] += $grossSalary;
             $departmentGroups[$departmentId]['totals']['insurance_amount'] += $insuranceAmount;
@@ -373,7 +388,7 @@ class CreatePayroll extends Component
             $departmentGroups[$departmentId]['totals']['overtime_hours'] += $overtimeHours;
             $departmentGroups[$departmentId]['totals']['overtime_amount'] += $overtimeAmount;
             $departmentGroups[$departmentId]['totals']['adj_amount'] += $adjAmount;
-                        
+
             // Add to grand totals
             $totals['gross_salary'] += $grossSalary;
             $totals['insurance_amount'] += $insuranceAmount;
@@ -421,7 +436,7 @@ class CreatePayroll extends Component
                 'benefits' => $benefits,
             ];
         }
-        
+
         $this->payrollData = $departmentGroups;
         $this->payrollData['_totals'] = $totals;
     }
@@ -432,24 +447,24 @@ class CreatePayroll extends Component
     public function submitPayroll()
     {
         $this->ensureArrays();
-        
+
         try {
             // Prepare employee data for the payroll
             $employeePayrollData = [];
-            
+
             foreach ($this->payrollData as $deptId => $departmentData) {
                 // Skip the _totals entry
                 if ($deptId === '_totals') {
                     continue;
                 }
-                
+
                 foreach ($departmentData['employees'] as $employeeData) {
                     $employee = Employee::find($employeeData['id']);
-                    
+
                     if (!$employee) {
                         continue;
                     }
-                    
+
                     // Get extra payment IDs
                     $extraPaymentIds = $employee->extraPayments()
                         ->where('status', \App\Models\Benefits\Payrolls\ExtraPayment::STATUS_APPROVED)
@@ -457,14 +472,14 @@ class CreatePayroll extends Component
                         ->whereNull('payroll_id')
                         ->pluck('id')
                         ->toArray();
-                    
+
                     // Get attendance IDs
                     $attendanceIds = $employee->attendances()
                         ->whereBetween('date', [$this->startDate, $this->endDate])
                         ->whereNull('payroll_id')
                         ->pluck('id')
                         ->toArray();
-                    
+
                     // Get overtime IDs
                     $overtimeIds = $employee->overtimes()
                         ->where('status', \App\Models\Attendance\Overtime::STATUS_APPROVED)
@@ -472,7 +487,7 @@ class CreatePayroll extends Component
                         ->whereNull('payroll_id')
                         ->pluck('id')
                         ->toArray();
-                    
+
                     // No need to manually recreate benefit data - use the actual models collected in loadPayrollData
                     if (!empty($employeeData['benefits'])) {
                         // Pass the benefits collection directly, along with all required fields for PayrollEmployee
@@ -513,10 +528,10 @@ class CreatePayroll extends Component
                     }
                 }
             }
-            
+
             // Create the payroll using the static method with the prepared data
-            $payroll = Payroll::createPayroll(Auth::id(),$this->startDate,$this->endDate,$employeePayrollData);
-            
+            $payroll = Payroll::createPayroll(Auth::id(), $this->startDate, $this->endDate, $employeePayrollData);
+
             if ($payroll) {
                 $this->alertSuccess('Payroll created successfully.');
                 $this->reset();

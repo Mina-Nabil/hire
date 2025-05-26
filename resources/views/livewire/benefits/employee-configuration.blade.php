@@ -53,6 +53,11 @@
                                                 dark:hover:text-white cursor-pointer">
                         Add Extra Payment
                     </li>
+                    <li wire:click="openEditBaseInfoModal()"
+                        class="text-slate-600 dark:text-white block font-Inter font-normal px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-600
+                                                dark:hover:text-white cursor-pointer">
+                        Edit Employee Base Info
+                    </li>
                 </ul>
             </div>
         </div>
@@ -162,6 +167,14 @@
                                 <div class="row mb-3">
                                     <div class="col-md-4 font-weight-bold">Address:</div>
                                     <div class="col-md-8">{{ $employee->address }}</div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4 font-weight-bold">ID Number:</div>
+                                    <div class="col-md-8">{{ $employee->id_number }}</div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4 font-weight-bold">Termination Date:</div>
+                                    <div class="col-md-8">{{ $employee->termination_date ? $employee->termination_date->format('d/m/Y') : '-' }}</div>
                                 </div>
                             </div>
                         </div>
@@ -1524,5 +1537,174 @@
                 </div>
             </x-slot>
         </x-modal>
+    @endif
+
+
+    <!-- Base Information Edit Modal -->
+    @if ($editBaseInfoModal)
+        <div>
+            <div id="editBaseInfoModal"
+                class="modal fade fixed top-0 left-0 show w-full h-full outline-none overflow-x-hidden overflow-y-auto"
+                tabindex="-1" aria-labelledby="editBaseInfoModalLabel" aria-hidden="true" wire:ignore.self>
+                <div class="modal-dialog relative w-auto pointer-events-none">
+                    <div
+                        class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
+                        <div class="relative bg-white rounded-lg shadow dark:bg-slate-700">
+                            <!-- Modal header -->
+                            <div
+                                class="flex items-center justify-between p-5 border-b rounded-t dark:border-slate-600 bg-black-500">
+                                <h3 class="text-xl font-medium text-white dark:text-white capitalize">
+                                    Edit Base Information
+                                </h3>
+                                <button type="button"
+                                    class="text-slate-400 bg-transparent hover:text-slate-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-slate-600 dark:hover:text-white"
+                                    wire:click="closeEditBaseInfoModal">
+                                    <svg aria-hidden="true" class="w-5 h-5" fill="#ffffff" viewBox="0 0 20 20"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd"
+                                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span class="sr-only">Close modal</span>
+                                </button>
+                            </div>
+                            <!-- Modal body -->
+                            <div class="p-6 space-y-4">
+                                <div class="grid grid-cols-12 gap-4">
+                                    <div class="col-span-12 xl:col-span-6">
+                                        <label for="name" class="form-label">Name</label>
+                                        <input type="text"
+                                            class="form-control @error('name') !border-danger-500 @enderror"
+                                            wire:model="name">
+                                        @error('name')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-span-12 xl:col-span-6">
+                                        <label for="name_ar" class="form-label">Arabic Name</label>
+                                        <input type="text"
+                                            class="form-control @error('name_ar') !border-danger-500 @enderror"
+                                            wire:model="name_ar">
+                                        @error('name_ar')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-span-12 xl:col-span-6">
+                                        <label for="email" class="form-label">Email</label>
+                                        <input type="email"
+                                            class="form-control @error('email') !border-danger-500 @enderror"
+                                            wire:model="email">
+                                        @error('email')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-span-12 xl:col-span-6">
+                                        <label for="phone" class="form-label">Phone</label>
+                                        <input type="text"
+                                            class="form-control @error('phone') !border-danger-500 @enderror"
+                                            wire:model="phone">
+                                        @error('phone')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-span-12 xl:col-span-6">
+                                        <label for="address" class="form-label">Address</label>
+                                        <input type="text"
+                                            class="form-control @error('address') !border-danger-500 @enderror"
+                                            wire:model="address">
+                                        @error('address')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-span-12 xl:col-span-6">
+                                        <label for="id_number" class="form-label">ID Number</label>
+                                        <input type="text"
+                                            class="form-control @error('id_number') !border-danger-500 @enderror"
+                                            wire:model="id_number">
+                                        @error('id_number')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-span-12 xl:col-span-6">
+                                        <label for="mother_name" class="form-label">Mother Name</label>
+                                        <input type="text"
+                                            class="form-control @error('mother_name') !border-danger-500 @enderror"
+                                            wire:model="mother_name">
+                                        @error('mother_name')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-span-12 xl:col-span-6">
+                                        <label for="nationality" class="form-label">Nationality</label>
+                                        <input type="text"
+                                            class="form-control @error('nationality') !border-danger-500 @enderror"
+                                            wire:model="nationality">
+                                        @error('nationality')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-span-12 xl:col-span-6">
+                                        <label for="gender" class="form-label">Gender</label>
+                                        <select class="form-control @error('gender') !border-danger-500 @enderror"
+                                            wire:model="gender">
+                                            <option value="">Select Gender</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                        </select>
+                                        @error('gender')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-span-12 xl:col-span-6">
+                                        <label for="birth_date" class="form-label">Birth Date</label>
+                                        <input type="date"
+                                            class="form-control @error('birth_date') !border-danger-500 @enderror"
+                                            wire:model="birth_date">
+                                        @error('birth_date')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-span-12 xl:col-span-6">
+                                        <label for="employment_date" class="form-label">Employment Date</label>
+                                        <input type="date"
+                                            class="form-control @error('employment_date') !border-danger-500 @enderror"
+                                            wire:model="employment_date">
+                                        @error('employment_date')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+
+                                    <div class="col-span-12 xl:col-span-6">
+                                        <label for="termination_date" class="form-label">Termination Date</label>
+                                        <input type="date"
+                                            class="form-control @error('termination_date') !border-danger-500 @enderror"
+                                            wire:model="termination_date">
+                                        @error('termination_date')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+
+
+                                </div>
+                            </div>
+                            <!-- Modal footer -->
+                            <div
+                                class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
+                                <button wire:click="closeEditBaseInfoModal" type="button"
+                                    class="btn inline-flex justify-center btn-outline-dark">Cancel</button>
+                                <button wire:click="updateBaseInfo" type="button" wire:target='updateBaseInfo'
+                                    wire:loading.remove class="btn inline-flex justify-center btn-dark">Update</button>
+                                <button wire:loading wire:target="updateBaseInfo" type="button"
+                                    class="btn inline-flex justify-center btn-dark">
+                                    <span class="flex items-center">
+                                        <iconify-icon icon="line-md:loading-twotone-loop" width="25"
+                                            height="25"></iconify-icon>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
     @endif
 </div>

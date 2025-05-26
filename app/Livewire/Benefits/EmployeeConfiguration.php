@@ -599,4 +599,84 @@ class EmployeeConfiguration extends Component
         $this->employeeOvertimes = [];
         $this->employeeExtraPayments = [];
     }
+
+    // Base Info Edit Modal
+    public $editBaseInfoModal = false;
+    public $name;
+    public $name_ar;
+    public $id_number;
+    public $mother_name;
+    public $email;
+    public $phone;
+    public $address;
+    public $nationality;
+    public $gender;
+    public $birth_date;
+    public $employment_date;
+    public $termination_date;
+
+
+    public function openEditBaseInfoModal()
+    {
+        $this->resetValidation();
+        $this->name = $this->employee->name;
+        $this->name_ar = $this->employee->name_ar;
+        $this->id_number = $this->employee->id_number;
+        $this->mother_name = $this->employee->mother_name;
+        $this->email = $this->employee->email;
+        $this->phone = $this->employee->phone;
+        $this->address = $this->employee->address;
+        $this->nationality = $this->employee->nationality;
+        $this->gender = $this->employee->gender;
+        $this->birth_date = $this->employee->birth_date ? $this->employee->birth_date->format('Y-m-d') : null;
+        $this->employment_date = $this->employee->employment_date ? $this->employee->employment_date->format('Y-m-d') : null;
+
+        $this->editBaseInfoModal = true;
+    }
+
+    public function closeEditBaseInfoModal()
+    {
+        $this->editBaseInfoModal = false;
+    }
+
+    public function updateBaseInfo()
+    {
+        $this->validate([
+            'name' => 'required|string|max:255',
+            'name_ar' => 'required|string|max:255',
+            'mother_name' => 'nullable|string|max:255',
+            'id_number' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:20',
+            'address' => 'required|string|max:255',
+            'nationality' => 'required|string|max:50',
+            'gender' => 'required|in:Male,Female',
+            'birth_date' => 'required|date',
+            'employment_date' => 'required|date',
+            'termination_date' => 'nullable|date',
+        ]);
+
+
+        $res = $this->employee->updateBaseInfo(
+            $this->name,
+            $this->name_ar,
+            $this->email,
+            $this->phone,
+            $this->address,
+            $this->nationality,
+            $this->gender,
+            $this->birth_date,
+            $this->employment_date,
+            $this->id_number,
+            $this->mother_name,
+            $this->termination_date ? Carbon::parse($this->termination_date) : null
+        );
+
+        if ($res) {
+            $this->closeEditBaseInfoModal();
+            $this->alert('success', 'Employee updated successfully!');
+        } else {
+            $this->alertError();
+        }
+    }
 }

@@ -3,7 +3,8 @@
         <div class="flex justify-between flex-wrap items-center">
             <div class="md:mb-6 mb-4 flex space-x-3 rtl:space-x-reverse">
                 <div>
-                    <h4 class="font-medium flex items-center lg:text-2xl text-xl capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
+                    <h4
+                        class="font-medium flex items-center lg:text-2xl text-xl capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
                         <span class="flex items-center gap-2">
                             {{ $employee->name }}
                             @switch($employee->status)
@@ -608,39 +609,39 @@
                         </h4>
 
                         <div class="flex items-center gap-5">
-                        <div class="dropdown relative">
-                            <button
-                                class="btn inline-flex justify-center btn-dark items-center btn-sm"
-                                type="button"
-                                id="statusDropdown"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false">
-                                Change Status
-                                <iconify-icon icon="heroicons-outline:chevron-down" class="text-xl ltr:ml-2 rtl:mr-2"></iconify-icon>
-                            </button>
-                            <ul class="dropdown-menu min-w-max absolute text-sm text-slate-700 dark:text-white hidden bg-white dark:bg-slate-700 shadow z-[2] float-left overflow-hidden list-none text-left rounded-lg mt-1 m-0 bg-clip-padding border-none">
-                                @foreach($statuses as $statusValue)
-                                    @if($statusValue !== $employee->status)
-                                        <li>
-                                            <a href="#" 
-                                                wire:click.prevent="changeStatus('{{ $statusValue }}')"
-                                                class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent hover:bg-slate-100 dark:hover:bg-slate-600 dark:hover:text-white">
-                                                Set as {{ ucfirst($statusValue) }}
-                                            </a>
-                                        </li>
-                                    @endif
-                                @endforeach
-                            </ul>
-                        </div>
-
-                        @can('setDocs', $employee)
-                            @if (!$employee->idCard)
-                                <button type="button" class="text-slate-900 dark:text-white"
-                                    wire:click="openEditBaseInfoModal">
-                                    <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
+                            <div class="dropdown relative">
+                                <button class="btn inline-flex justify-center btn-dark items-center btn-sm"
+                                    type="button" id="statusDropdown" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                    Change Status
+                                    <iconify-icon icon="heroicons-outline:chevron-down"
+                                        class="text-xl ltr:ml-2 rtl:mr-2"></iconify-icon>
                                 </button>
-                            @endif
-                        @endcan
+                                <ul
+                                    class="dropdown-menu min-w-max absolute text-sm text-slate-700 dark:text-white hidden bg-white dark:bg-slate-700 shadow z-[2] float-left overflow-hidden list-none text-left rounded-lg mt-1 m-0 bg-clip-padding border-none">
+                                    @foreach ($statuses as $statusValue)
+                                        @if ($statusValue !== $employee->status)
+                                            <li>
+                                                <a href="#"
+                                                    wire:click.prevent="changeStatus('{{ $statusValue }}')"
+                                                    class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent hover:bg-slate-100 dark:hover:bg-slate-600 dark:hover:text-white">
+                                                    Set as {{ ucfirst($statusValue) }}
+                                                </a>
+                                            </li>
+                                        @endif
+                                    @endforeach
+                                </ul>
+                            </div>
+
+                            @can('setDocs', $employee)
+                                @if (!$employee->idCard)
+                                    <button type="button" class="text-slate-900 dark:text-white"
+                                        wire:click="openEditBaseInfoModal">
+                                        <iconify-icon icon="mingcute:edit-line" width="25"
+                                            height="25"></iconify-icon>
+                                    </button>
+                                @endif
+                            @endcan
                         </div>
                     </div>
                     <div class="card-body p-6">
@@ -671,6 +672,16 @@
                                     <div class="text-base text-slate-900 dark:text-white arabic-font">
                                         {{ $employee->mother_name }}</div>
                                 </div>
+
+                                <div class="mb-5 text-wrap">
+                                    <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Termination
+                                        Date</label>
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
+                                        {{ $employee->termination_date?->format('d/m/Y') }}
+                                    </div>
+                                </div>
+
+
                             </div>
                             <div class="xl:col-span-6 lg:col-span-6 md:col-span-6 col-span-12">
                                 <div class="mb-5 text-wrap">
@@ -2794,6 +2805,15 @@
                                         @enderror
                                     </div>
                                     <div class="col-span-12 xl:col-span-6">
+                                        <label for="id_number" class="form-label">ID Number</label>
+                                        <input type="text"
+                                            class="form-control @error('id_number') !border-danger-500 @enderror"
+                                            wire:model="id_number">
+                                        @error('id_number')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-span-12 xl:col-span-6">
                                         <label for="mother_name" class="form-label">Mother Name</label>
                                         <input type="text"
                                             class="form-control @error('mother_name') !border-danger-500 @enderror"
@@ -2841,6 +2861,18 @@
                                             <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
                                         @enderror
                                     </div>
+
+                                    <div class="col-span-12 xl:col-span-6">
+                                        <label for="termination_date" class="form-label">Termination Date</label>
+                                        <input type="date"
+                                            class="form-control @error('termination_date') !border-danger-500 @enderror"
+                                            wire:model="termination_date">
+                                        @error('termination_date')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+
+
                                 </div>
                             </div>
                             <!-- Modal footer -->

@@ -1,5 +1,5 @@
 <div class="overflow-x-auto">
-    <table class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
+    <table class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700 no-wrap">
         <thead>
             <tr>
                 <th class="table-th">Employee</th>

@@ -92,7 +92,38 @@
                                             <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['net_after_penalty'], 2) }}</td>
                                             <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['extra_payments'], 2) }}</td>
                                             <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['net_after_deductions'], 2) }}</td>
-                                            <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['overtime_hours'] ?? 0, 2) }}</td>
+                                            <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
+                                                <div class="flex flex-col">
+                                                    <span class="text-sm">{{ number_format($employee['overtime_hours'] ?? 0, 2) }}</span>
+                                                    {{-- @if($employee['is_automatic_overtime'])
+                                                        @if(!empty($employee['potential_overtime_data']))
+                                                            <span class="text-xs text-warning-500" title="Will be auto-created when payroll is submitted">
+                                                                <iconify-icon icon="heroicons-outline:clock" class="text-xs"></iconify-icon>
+                                                                {{ count($employee['potential_overtime_data']) }} from attendance
+                                                            </span>
+                                                        @endif
+                                                        @php
+                                                            // Calculate existing approved overtime hours for this employee
+                                                            $existingOvertimeHours = \App\Models\Attendance\Overtime::where('employee_id', $employee['id'])
+                                                                ->where('status', \App\Models\Attendance\Overtime::STATUS_APPROVED)
+                                                                ->whereBetween('date', [$this->startDate, $this->endDate])
+                                                                ->whereNull('payroll_id')
+                                                                ->sum('hours');
+                                                        @endphp
+                                                        @if($existingOvertimeHours > 0)
+                                                            <span class="text-xs text-success-500" title="Existing approved overtime records">
+                                                                <iconify-icon icon="heroicons-outline:check-circle" class="text-xs"></iconify-icon>
+                                                                {{ number_format($existingOvertimeHours, 2) }}h approved
+                                                            </span>
+                                                        @endif
+                                                    @elseif($employee['overtime_hours'] > 0)
+                                                        <span class="text-xs text-success-500" title="Manually approved overtime records">
+                                                            <iconify-icon icon="heroicons-outline:check-circle" class="text-xs"></iconify-icon>
+                                                            Manual overtime
+                                                        </span>
+                                                    @endif --}}
+                                                </div>
+                                            </td>
                                             <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['overtime_amount'] ?? 0, 2) }}</td>
                                             <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['employee_base_benefits'], 2) }}</td>
                                             <td class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">{{ number_format($employee['other_base_benefits'], 2) }}</td>

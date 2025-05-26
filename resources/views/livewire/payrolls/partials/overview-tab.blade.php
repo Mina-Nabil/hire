@@ -2,7 +2,7 @@
     <table class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700 no-wrap">
         <thead>
             <tr>
-                <th class="table-th">Employee</th>
+                <th class="table-th border sticky-colomn border-slate-100 dark:bg-slate-800 dark:border-slate-700">Employee</th>
                 <th class="table-th">Position</th>
                 <th class="table-th">Gross Salary</th>
                 <th class="table-th">Insurance Amount</th>
@@ -18,7 +18,7 @@
         <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
             @forelse($payrollEmployees as $payrollEmployee)
                 <tr wire:key="employee-{{ $payrollEmployee->id }}">
-                    <td class="table-td">
+                    <td class="table-td sticky-colomn border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
                         <div class="flex items-center">
                             <div class="flex-none">
                                 <div
@@ -116,7 +116,7 @@
         </tbody>
         <tfoot class="bg-slate-100 dark:bg-slate-700">
             <tr class="font-semibold">
-                <td class="table-td border-t-2 border-slate-200 dark:border-slate-600">
+                <td class="table-td sticky-colomn border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
                     <div class="text-sm font-bold">
                         Total ({{ $totals['total_employees'] }} employees)
                     </div>

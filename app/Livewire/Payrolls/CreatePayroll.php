@@ -3,16 +3,14 @@
 namespace App\Livewire\Payrolls;
 
 use App\Models\Attendance\Overtime;
-use App\Models\Benefits\Configurations\BenefitConfiguration;
 use App\Models\Benefits\Payrolls\Payroll;
 use App\Models\Personel\Employee;
 use App\Models\Hierarchy\Department;
-use App\Models\Hierarchy\Position;
 use App\Models\Users\AppLog;
 use App\Traits\AlertFrontEnd;
+use Illuminate\Database\Eloquent\Collection;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Title;
 
@@ -27,7 +25,7 @@ class CreatePayroll extends Component
     public $selectedDepartments = [];
     public $selectAllEmployees = true;
     public $selectedEmployees = [];
-    public $departments = [];
+    public $departments;
 
     // Properties for the payroll data
     public $startDate;
@@ -67,11 +65,18 @@ class CreatePayroll extends Component
         $this->ensureArrays();
     }
 
+    public function selectAllDepartments()
+    {
+        if(count($this->departments) > 0){
+            $this->selectedDepartments = $this->departments->pluck('id')->toArray();
+        }
+    }
+
     public function mount()
     {
+        $this->loadDepartments();
         $this->startDate = now()->startOfMonth()->format('Y-m-d');
         $this->endDate = now()->endOfMonth()->format('Y-m-d');
-        $this->loadDepartments();
         $this->ensureArrays();
     }
 

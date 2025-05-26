@@ -206,7 +206,7 @@
                                         <div class="flex items-center">
                                             <div class="checkbox-area ml-2">
                                                 <label class="inline-flex items-center cursor-pointer">
-                                                    <input type="checkbox" id="employee-{{ $employee->id }}" value="{{ $employee->id }}"  class="hidden" name="checkbox" wire:model="selectedEmployees">
+                                                    <input type="checkbox" id="employee-{{ $employee->id }}" value="{{ $employee->id }}"  class="hidden" name="checkbox" wire:model.live="selectedEmployees">
                                                     <span class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
                                                         <img src="{{ asset('images/icon/ck-white.svg') }}" alt="" class="h-[10px] w-[10px] block m-auto opacity-0"></span>
                                                     <span class="text-slate-500 dark:text-slate-400 text-sm leading-6">{{ $employee->name }} ({{ $employee->position?->name ?? 'No Position' }})</span>
@@ -235,6 +235,7 @@
 
                 <x-slot name="footer">
                     <div class="flex justify-end space-x-3">
+                        <x-secondary-button wire:click="selectAllDepartments">Select All Departments</x-secondary-button>
                         <x-secondary-button wire:click="closeDepartmentModal">Cancel</x-secondary-button>
                         <x-primary-button wire:click="submitDepartmentSelection" wire:loading.attr="disabled">
                             <span wire:loading.remove wire:target="submitDepartmentSelection">Add Employees</span>

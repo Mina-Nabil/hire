@@ -203,7 +203,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Employee::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(VacationBenefit::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(Payroll::class)->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Payroll::class)->nullable()->constrained()->nullOnDelete();
             $table->enum('status', AppliedVacation::STATUS_LIST)->default(AppliedVacation::STATUS_PENDING);
             $table->unsignedInteger('hours');
             $table->float('new_balance');

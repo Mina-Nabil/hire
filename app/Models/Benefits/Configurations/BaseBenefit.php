@@ -44,8 +44,8 @@ class BaseBenefit extends Model
     const TYPE_LIST = [
         self::TYPE_MONTHLY,
         self::TYPE_WEEKLY,
-        self::TYPE_QUARTERLY,
-        self::TYPE_YEARLY,
+        // self::TYPE_QUARTERLY,
+        // self::TYPE_YEARLY,
         self::TYPE_DAILY,
     ];
 

@@ -4,6 +4,7 @@ namespace App\Models\Personel;
 
 use App\Exceptions\AppException;
 use App\Models\Attendance\Overtime;
+use App\Models\Attendance\PublicHoliday;
 use App\Models\Base\City;
 use App\Models\Base\InsuranceOffice;
 use App\Models\Benefits\Payrolls\AppliedVacation;
@@ -3267,14 +3268,22 @@ class Employee extends Model
         $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
 
         $dailyRequired = $this->benefitConfiguration->daily_working_hours ?? 0;
-
+        
+        // Get public holidays in the date range
+        $publicHolidays = PublicHoliday::whereBetween('date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->pluck('date')
+            ->map(function($date) {
+                return Carbon::parse($date)->format('Y-m-d');
+            })
+            ->toArray();
+        
         $attendances = $this->attendances()
             ->where('date', '>=', $startDate->format('Y-m-d'))
             ->where('date', '<=', $endDate->format('Y-m-d'))
             ->where('is_approved', true)
             ->get();
-
-        return $attendances->map(function ($attendance) use ($dailyRequired) {
+            
+        return $attendances->map(function($attendance) use ($dailyRequired) {
             $shortfall = max(0, $dailyRequired - $attendance->hours);
             return [
                 'attendance' => $attendance,
@@ -3283,7 +3292,7 @@ class Employee extends Model
                 'required_hours' => $dailyRequired,
                 'shortfall' => $shortfall
             ];
-        })->filter(function ($item) {
+        })->filter(function($item) {
             return $item['shortfall'] > 0;
         });
     }
@@ -3338,15 +3347,26 @@ class Employee extends Model
 
         // Get the working days of the employee
         $workingDays = $this->workingDays->pluck('type')->toArray();
-
+        
+        // Get public holidays in the date range
+        $publicHolidays = PublicHoliday::whereBetween('date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->pluck('date')
+            ->map(function($date) {
+                return Carbon::parse($date)->format('Y-m-d');
+            })
+            ->toArray();
+        
         $period = [];
         $currentDate = $startDate->copy();
 
         // Generate all dates in the range
         while ($currentDate->lte($endDate)) {
-            // Check if the day of the week is a working day
-            if (in_array(strtolower($currentDate->format('l')), array_map('strtolower', $workingDays))) {
-                $period[] = $currentDate->format('Y-m-d');
+            $dateString = $currentDate->format('Y-m-d');
+            
+            // Check if the day of the week is a working day AND it's not a public holiday
+            if (in_array(strtolower($currentDate->format('l')), array_map('strtolower', $workingDays)) 
+                && !in_array($dateString, $publicHolidays)) {
+                $period[] = $dateString;
             }
             $currentDate->addDay();
         }
@@ -3406,12 +3426,18 @@ class Employee extends Model
      * Get late minutes for a specific date
      *
      * @param Carbon|string $date The date to check
-     * @return int|null Minutes late or null if no attendance or no configuration
+     * @return int|null Minutes late or null if no attendance or no configuration or public holiday
      */
     public function getLateMinutesOnDate($date)
     {
         $date = $date instanceof Carbon ? $date : Carbon::parse($date);
-
+        
+        // Check if this date is a public holiday - no penalty on public holidays
+        $isPublicHoliday = PublicHoliday::where('date', $date->format('Y-m-d'))->exists();
+        if ($isPublicHoliday) {
+            return null; // No penalty on public holidays
+        }
+        
         $attendance = $this->attendances()
             ->where('date', $date->format('Y-m-d'))
             ->where('is_approved', true)
@@ -3467,12 +3493,18 @@ class Employee extends Model
      * Get early departure minutes for a specific date
      *
      * @param Carbon|string $date The date to check
-     * @return int|null Minutes left early or null if no attendance or no configuration
+     * @return int|null Minutes left early or null if no attendance or no configuration or public holiday
      */
     public function getEarlyDepartureMinutesOnDate($date)
     {
         $date = $date instanceof Carbon ? $date : Carbon::parse($date);
-
+        
+        // Check if this date is a public holiday - no penalty on public holidays
+        $isPublicHoliday = PublicHoliday::where('date', $date->format('Y-m-d'))->exists();
+        if ($isPublicHoliday) {
+            return null; // No penalty on public holidays
+        }
+        
         $attendance = $this->attendances()
             ->where('date', $date->format('Y-m-d'))
             ->where('is_approved', true)
@@ -3526,6 +3558,8 @@ class Employee extends Model
 
     /**
      * Get total attendance penalty hours (combination of missed, late, early departure, and shortfall)
+     * Enhanced to consider working time ranges from benefit configuration
+     * Excludes public holidays from penalty calculations
      *
      * @param Carbon|string $startDate Start date of the range
      * @param Carbon|string $endDate End date of the range
@@ -3533,19 +3567,165 @@ class Employee extends Model
      */
     public function getTotalPenaltyHours($startDate, $endDate)
     {
-        // Get missed working hours (full days)
+        $startDate = $startDate instanceof Carbon ? $startDate : Carbon::parse($startDate);
+        $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
+        
+        $benefitConfig = $this->benefitConfiguration;
+        if (!$benefitConfig) {
+            return 0; // No benefit configuration
+        }
+        
+        $dailyWorkingHours = $benefitConfig->daily_working_hours ?? 8;
+        $workingDayStartMin = $benefitConfig->working_day_start_min;
+        $workingDayStartMax = $benefitConfig->working_day_start_max;
+        $workingDayEndMin = $benefitConfig->working_day_end_min;
+        $workingDayEndMax = $benefitConfig->working_day_end_max;
+        
+        // Get public holidays in the date range
+        $publicHolidays = PublicHoliday::whereBetween('date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->pluck('date')
+            ->map(function($date) {
+                return Carbon::parse($date)->format('Y-m-d');
+            })
+            ->toArray();
+        
+        // Get missed working hours (full days with no attendance) - already excludes public holidays
         $missedHours = $this->getMissedWorkingHours($startDate, $endDate);
-
-        // Get late hours
-        $lateHours = $this->getTotalLateHours($startDate, $endDate);
-
-        // Get early departure hours
-        $earlyDepartureHours = $this->getTotalEarlyDepartureHours($startDate, $endDate);
-
-        // Get shortfall hours (partial days)
-        $shortfallHours = $this->getTotalShortfallHours($startDate, $endDate);
-
-        return $missedHours + $shortfallHours;
+        
+        // Get all attendance records for the period
+        $attendances = $this->attendances()
+            ->where('date', '>=', $startDate->format('Y-m-d'))
+            ->where('date', '<=', $endDate->format('Y-m-d'))
+            ->where('is_approved', true)
+            ->whereNull('payroll_id')
+            ->get();
+        
+        $totalPenaltyHours = $missedHours;
+        
+        // Process each attendance record to calculate penalty hours
+        foreach ($attendances as $attendance) {
+            // Skip penalty calculations for public holidays
+            if (in_array($attendance->date, $publicHolidays)) {
+                continue;
+            }
+            
+            $penaltyHoursForDay = 0;
+            
+            // Skip if no start/end times
+            if (!$attendance->start_time || !$attendance->end_time) {
+                // If no times recorded, consider it as missing the full day
+                $penaltyHoursForDay = $dailyWorkingHours;
+            } else {
+                $attendanceStart = Carbon::parse($attendance->date . ' ' . $attendance->start_time);
+                $attendanceEnd = Carbon::parse($attendance->date . ' ' . $attendance->end_time);
+                
+                // Handle midnight crossover
+                if ($attendanceEnd->lt($attendanceStart)) {
+                    $attendanceEnd->addDay();
+                }
+                
+                // Calculate valid working hours within the allowed time range
+                $validWorkingHours = $this->calculateValidWorkingHours(
+                    $attendanceStart,
+                    $attendanceEnd,
+                    $attendance->date,
+                    $workingDayStartMin,
+                    $workingDayStartMax,
+                    $workingDayEndMin,
+                    $workingDayEndMax
+                );
+                
+                // Calculate penalty hours for this day
+                $penaltyHoursForDay = max(0, $dailyWorkingHours - $validWorkingHours);
+            }
+            
+            $totalPenaltyHours += $penaltyHoursForDay;
+        }
+        
+        return $totalPenaltyHours;
+    }
+    
+    /**
+     * Calculate valid working hours within the allowed time range
+     *
+     * @param Carbon $attendanceStart Actual start time
+     * @param Carbon $attendanceEnd Actual end time
+     * @param string $date Date of attendance
+     * @param string|null $workingDayStartMin Earliest allowed start time
+     * @param string|null $workingDayStartMax Latest allowed start time
+     * @param string|null $workingDayEndMin Earliest allowed end time
+     * @param string|null $workingDayEndMax Latest allowed end time
+     * @return float Valid working hours
+     */
+    private function calculateValidWorkingHours(
+        Carbon $attendanceStart,
+        Carbon $attendanceEnd,
+        string $date,
+        ?string $workingDayStartMin,
+        ?string $workingDayStartMax,
+        ?string $workingDayEndMin,
+        ?string $workingDayEndMax
+    ): float {
+        // If no time constraints are set, use the actual hours worked
+        if (!$workingDayStartMin || !$workingDayStartMax || !$workingDayEndMin || !$workingDayEndMax) {
+            return $attendanceStart->diffInHours($attendanceEnd, true);
+        }
+        
+        // Parse the allowed time ranges
+        $allowedStartMin = Carbon::parse($date . ' ' . $workingDayStartMin);
+        $allowedStartMax = Carbon::parse($date . ' ' . $workingDayStartMax);
+        $allowedEndMin = Carbon::parse($date . ' ' . $workingDayEndMin);
+        $allowedEndMax = Carbon::parse($date . ' ' . $workingDayEndMax);
+        
+        // Handle midnight crossover for end times
+        if ($allowedEndMin->lt($allowedStartMin)) {
+            $allowedEndMin->addDay();
+        }
+        if ($allowedEndMax->lt($allowedStartMax)) {
+            $allowedEndMax->addDay();
+        }
+        if ($attendanceEnd->lt($attendanceStart)) {
+            $attendanceEnd->addDay();
+        }
+        
+        // Determine the effective working period within allowed ranges
+        $effectiveStart = $attendanceStart;
+        $effectiveEnd = $attendanceEnd;
+        
+        // Adjust start time if employee arrived too early or too late
+        if ($attendanceStart->lt($allowedStartMin)) {
+            // Arrived too early - start counting from allowed start min
+            $effectiveStart = $allowedStartMin;
+        } elseif ($attendanceStart->gt($allowedStartMax)) {
+            // Arrived too late - start counting from actual arrival (penalty will be applied)
+            $effectiveStart = $attendanceStart;
+        }
+        
+        // Adjust end time if employee left too early or too late
+        if ($attendanceEnd->lt($allowedEndMin)) {
+            // Left too early - end counting at actual departure (penalty will be applied)
+            $effectiveEnd = $attendanceEnd;
+        } elseif ($attendanceEnd->gt($allowedEndMax)) {
+            // Left too late - end counting at allowed end max (overtime not counted as penalty)
+            $effectiveEnd = $allowedEndMax;
+        }
+        
+        // Calculate valid hours, ensuring it's not negative
+        $validHours = max(0, $effectiveStart->diffInHours($effectiveEnd, true));
+        
+        // Additional penalty for arriving late (after allowed start max)
+        if ($attendanceStart->gt($allowedStartMax)) {
+            $lateHours = $attendanceStart->diffInHours($allowedStartMax, true);
+            $validHours = max(0, $validHours - $lateHours);
+        }
+        
+        // Additional penalty for leaving early (before allowed end min)
+        if ($attendanceEnd->lt($allowedEndMin)) {
+            $earlyHours = $allowedEndMin->diffInHours($attendanceEnd, true);
+            $validHours = max(0, $validHours - $earlyHours);
+        }
+        
+        return $validHours;
     }
 
     /**
@@ -3621,12 +3801,18 @@ class Employee extends Model
      * Check if employee was late on a specific date
      *
      * @param Carbon|string $date The date to check
-     * @return bool|null True if late, false if on time, null if no attendance
+     * @return bool|null True if late, false if on time, null if no attendance or public holiday
      */
     public function wasLateOnDate($date)
     {
         $date = $date instanceof Carbon ? $date : Carbon::parse($date);
-
+        
+        // Check if this date is a public holiday - no penalty on public holidays
+        $isPublicHoliday = PublicHoliday::where('date', $date->format('Y-m-d'))->exists();
+        if ($isPublicHoliday) {
+            return null; // No penalty on public holidays
+        }
+        
         $attendance = $this->attendances()
             ->where('date', $date->format('Y-m-d'))
             ->where('is_approved', true)
@@ -3658,7 +3844,7 @@ class Employee extends Model
      *
      * @param Carbon|string $startDate Start date of the range
      * @param Carbon|string $endDate End date of the range
-     * @return int Number of days employee was late
+     * @return int Number of days employee was late (excluding public holidays)
      */
     public function countLateDays($startDate, $endDate)
     {
@@ -3669,12 +3855,18 @@ class Employee extends Model
         if (!$benefitConfig || !$benefitConfig->working_day_start_max) {
             return 0;
         }
-
+        
+        // Get public holidays in the date range
+        $publicHolidays = PublicHoliday::whereBetween('date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->pluck('date')
+            ->toArray();
+        
         return $this->attendances()
             ->where('date', '>=', $startDate->format('Y-m-d'))
             ->where('date', '<=', $endDate->format('Y-m-d'))
             ->where('is_approved', true)
             ->where('start_time', '>', $benefitConfig->working_day_start_max)
+            ->whereNotIn('date', $publicHolidays) // Exclude public holidays
             ->count();
     }
 
@@ -3682,12 +3874,18 @@ class Employee extends Model
      * Check if employee left early on a specific date
      *
      * @param Carbon|string $date The date to check
-     * @return bool|null True if left early, false if on time, null if no attendance
+     * @return bool|null True if left early, false if on time, null if no attendance or public holiday
      */
     public function leftEarlyOnDate($date)
     {
         $date = $date instanceof Carbon ? $date : Carbon::parse($date);
-
+        
+        // Check if this date is a public holiday - no penalty on public holidays
+        $isPublicHoliday = PublicHoliday::where('date', $date->format('Y-m-d'))->exists();
+        if ($isPublicHoliday) {
+            return null; // No penalty on public holidays
+        }
+        
         $attendance = $this->attendances()
             ->where('date', $date->format('Y-m-d'))
             ->where('is_approved', true)
@@ -3719,7 +3917,7 @@ class Employee extends Model
      *
      * @param Carbon|string $startDate Start date of the range
      * @param Carbon|string $endDate End date of the range
-     * @return int Number of days employee left early
+     * @return int Number of days employee left early (excluding public holidays)
      */
     public function countEarlyDepartureDays($startDate, $endDate)
     {
@@ -3730,12 +3928,18 @@ class Employee extends Model
         if (!$benefitConfig || !$benefitConfig->working_day_end_min) {
             return 0;
         }
-
+        
+        // Get public holidays in the date range
+        $publicHolidays = PublicHoliday::whereBetween('date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->pluck('date')
+            ->toArray();
+        
         return $this->attendances()
             ->where('date', '>=', $startDate->format('Y-m-d'))
             ->where('date', '<=', $endDate->format('Y-m-d'))
             ->where('is_approved', true)
             ->where('end_time', '<', $benefitConfig->working_day_end_min)
+            ->whereNotIn('date', $publicHolidays) // Exclude public holidays
             ->count();
     }
 

@@ -5,31 +5,43 @@
         </div>
         <div class="card-body p-6">
             <div class="flex justify-between mb-5">
-                <x-select wire:model.live="payrollMonth">
-                    <option value="1">January</option>
-                    <option value="2">February</option>
-                    <option value="3">March</option>
-                    <option value="4">April</option>
-                    <option value="5">May</option>
-                    <option value="6">June</option>
-                    <option value="7">July</option>
-                    <option value="8">August</option>
-                    <option value="9">September</option>
-                    <option value="10">October</option>
-                    <option value="11">November</option>
-                    <option value="12">December</option>
-                </x-select>
+                @empty($payrollData)
+                    <x-select wire:model.live="payrollMonth">
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7">July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </x-select>
+                @endempty
                 <div>
                     <h5 class="text-lg font-medium">Attendance Period:
                         {{ \Carbon\Carbon::parse($startDate)->format('d M Y') }} -
                         {{ \Carbon\Carbon::parse($endDate)->format('d M Y') }}</h5>
                 </div>
                 <div>
+                    @empty($payrollData)
                     <button type="button" class="btn btn-dark btn-sm" wire:click="openDepartmentModal">
                         <span class="flex items-center">
                             <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2"
                                 icon="heroicons-outline:plus"></iconify-icon>
                             Add Departments
+                        </span>
+                    </button>
+                    @endempty
+                
+                    <button type="button" class="btn btn-dark btn-sm" wire:click="clearPayrollData">
+                        <span class="flex items-center">
+                            <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2"
+                                icon="heroicons-outline:x-circle"></iconify-icon>
+                            Clear Data
                         </span>
                     </button>
                 </div>
@@ -358,7 +370,8 @@
                                                             class="h-[10px] w-[10px] block m-auto opacity-0"></span>
                                                     <span
                                                         class="text-slate-500 dark:text-slate-400 text-sm leading-6">{{ $employee->name }}
-                                                        ({{ $employee->position?->name ?? 'No Position' }})</span>
+                                                        ({{ $employee->position?->name ?? 'No Position' }})
+                                                    </span>
                                                 </label>
                                             </div>
                                         </div>

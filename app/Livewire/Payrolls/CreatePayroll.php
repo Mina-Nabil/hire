@@ -79,6 +79,7 @@ class CreatePayroll extends Component
         $newMonth = Carbon::now()->setMonth((int)$value);
         $this->startDate = $newMonth->clone()->setDay(25)->subMonth()->format('Y-m-d');
         $this->endDate = $newMonth->clone()->setDay(25)->format('Y-m-d');
+        $this->payrollData = [];
     }
 
     public function mount()
@@ -647,6 +648,11 @@ class CreatePayroll extends Component
             $this->alertError('Failed to create payroll: ' . $e->getMessage());
             AppLog::error('Payroll creation error: ' . $e->getMessage());
         }
+    }
+
+    public function clearPayrollData()
+    {
+        $this->payrollData = [];
     }
 
     public function render()

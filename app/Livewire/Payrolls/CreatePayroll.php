@@ -30,6 +30,7 @@ class CreatePayroll extends Component
     // Properties for the payroll data
     public $startDate;
     public $endDate;
+    public $payrollMonth;
     public $payrollData = [];
 
     // Properties for adjustment modal
@@ -75,15 +76,11 @@ class CreatePayroll extends Component
 
     public function mount()
     {
-        $this->loadDepartments();
-        $this->startDate = now()->startOfMonth()->format('Y-m-d');
-        $this->endDate = now()->endOfMonth()->format('Y-m-d');
-        $this->ensureArrays();
-    }
-
-    public function loadDepartments()
-    {
+        $this->payrollMonth = Carbon::now()->month;
         $this->departments = Department::orderBy('name')->get();
+        $this->startDate = Carbon::now()->setDay(25)->subMonth()->format('Y-m-d');
+        $this->endDate = Carbon::now()->setDay(25)->format('Y-m-d');
+        $this->ensureArrays();
     }
 
     public function refreshPayroll()
@@ -648,7 +645,7 @@ class CreatePayroll extends Component
     public function render()
     {
         return view('livewire.payrolls.create-payroll', [
-            'departments' => $this->departments,
+            'loadedDepartments' => $this->departments,
         ]);
     }
 }

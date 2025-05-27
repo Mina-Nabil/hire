@@ -20,6 +20,7 @@ use App\Models\Benefits\Configurations\BenefitConfiguration;
 use App\Models\Benefits\Configurations\VacationPackage;
 use App\Models\Benefits\Configurations\WorkingDay;
 use App\Models\Benefits\Payrolls\BenefitPayment;
+use App\Models\Benefits\Payrolls\Payroll;
 use App\Models\Hierarchy\Position;
 use App\Models\Personel\Docs\ArmyServicePaper;
 use App\Models\Personel\Docs\BankAccount;
@@ -3370,7 +3371,7 @@ class Employee extends Model
         if ($hourlyRate === null) {
             // Calculate hourly rate based on gross salary
             $grossSalary = $this->benefitConfiguration->gross_salary ?? 0;
-            $workingDaysPerMonth = $this->workingDays->count() * 4; // Approximate
+            $workingDaysPerMonth = $this->getWorkingDaysInPeriod($startDate, $endDate);
             $dailyHours = $this->benefitConfiguration->daily_working_hours ?? 8;
 
             $hourlyRate = $grossSalary / ($workingDaysPerMonth * $dailyHours);
@@ -3461,7 +3462,7 @@ class Employee extends Model
         if ($hourlyRate === null) {
             // Calculate hourly rate based on gross salary
             $grossSalary = $this->benefitConfiguration->gross_salary ?? 0;
-            $workingDaysPerMonth = $this->workingDays->count() * 4; // Approximate
+            $workingDaysPerMonth = $this->getWorkingDaysInPeriod($startDate, $endDate);
             $dailyHours = $this->benefitConfiguration->daily_working_hours ?? 8;
 
             $hourlyRate = $grossSalary / ($workingDaysPerMonth * $dailyHours);
@@ -3790,7 +3791,7 @@ class Employee extends Model
         if ($hourlyRate === null) {
             // Calculate hourly rate based on gross salary
             $grossSalary = $this->benefitConfiguration->gross_salary ?? 0;
-            $workingDaysPerMonth = $this->workingDays->count() * 4; // Approximate
+            $workingDaysPerMonth = $this->getWorkingDaysInPeriod($startDate, $endDate);
             $dailyHours = $this->benefitConfiguration->daily_working_hours ?? 8;
 
             $hourlyRate = $grossSalary / ($workingDaysPerMonth * $dailyHours);
@@ -3822,6 +3823,60 @@ class Employee extends Model
     }
 
     /**
+     * Calculate working days in a date range
+     *
+     * @param Carbon|string $startDate Start date of the range
+     * @param Carbon|string $endDate End date of the range
+     * @return int Number of working days in the period
+     */
+    public function getWorkingDaysInPeriod($startDate, $endDate)
+    {
+        $startDate = $startDate instanceof Carbon ? $startDate : Carbon::parse($startDate);
+        $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
+
+        $workingDaysCount = 0;
+        $currentDate = $startDate->copy();
+
+        // Get employee's working days (e.g., Monday=1, Tuesday=2, etc.)
+        $employeeWorkingDays = $this->workingDays->pluck('type')->toArray();
+
+        while ($currentDate->lte($endDate)) {
+            // Check if current day is a working day for this employee
+            if (in_array($currentDate->dayOfWeek, $employeeWorkingDays)) {
+                // Check if it's not a public holiday
+                $isPublicHoliday = PublicHoliday::where('date', $currentDate->format('Y-m-d'))->exists();
+                if (!$isPublicHoliday) {
+                    $workingDaysCount++;
+                }
+            }
+            $currentDate->addDay();
+        }
+
+        return $workingDaysCount;
+    }
+
+    /**
+     * Calculate hourly rate for an employee based on their benefit configuration
+     *
+     * @param float $grossPercentage Percentage of gross salary to use (default: 100)
+     * @return float Hourly rate
+     */
+    public function calculateHourlyRate($grossPercentage = 100)
+    {
+        $grossPercentage = 100;
+        $grossSalary = ($this->benefitConfiguration?->gross_salary ?? 0) * $grossPercentage / 100;
+        $insuranceAmount = $this->benefitConfiguration?->insurance_amount ?? 0;
+        $employerInsurance = $insuranceAmount * Payroll::EMPLOYER_SHARE_SOCIAL_INSURANCE;
+        $otherAmount = $grossSalary - $insuranceAmount - $employerInsurance ?? 0;
+        $netIncome = $otherAmount + $insuranceAmount;
+        $dayPrice = $netIncome / 30;
+        $dailyWorkingHours = $this->benefitConfiguration?->daily_working_hours ?? 8;
+        $hourlyRate = $dayPrice / $dailyWorkingHours;
+
+        return $hourlyRate;
+    }
+
+    /**
      * Calculate overtime pay for a date range
      *
      * @param Carbon|string $startDate Start date of the range
@@ -3837,10 +3892,10 @@ class Employee extends Model
 
         // Calculate hourly rate based on gross salary
         $grossSalary = $this->benefitConfiguration->gross_salary ?? 0;
-        $workingDaysPerMonth = $this->workingDays->count() * 4; // Approximate
+        $workingDaysInPeriod = $this->getWorkingDaysInPeriod($startDate, $endDate);
         $dailyHours = $this->benefitConfiguration->daily_working_hours ?? 8;
 
-        $hourlyRate = $grossSalary / ($workingDaysPerMonth * $dailyHours);
+        $hourlyRate = $grossSalary / ($workingDaysInPeriod * $dailyHours);
         $overtimeHours = $this->getApprovedOvertimeHours($startDate, $endDate);
 
         return $overtimeHours * $hourlyRate * $overtimeRate;
@@ -4131,10 +4186,10 @@ class Employee extends Model
         if ($hourlyRate === null) {
             // Calculate hourly rate based on gross salary
             $grossSalary = $this->benefitConfiguration->gross_salary ?? 0;
-            $workingDaysPerMonth = $this->workingDays->count() * 4; // Approximate
+            $workingDaysInPeriod = $this->getWorkingDaysInPeriod($startDate, $endDate);
             $dailyHours = $this->benefitConfiguration->daily_working_hours ?? 8;
 
-            $hourlyRate = $grossSalary / ($workingDaysPerMonth * $dailyHours);
+            $hourlyRate = $grossSalary / ($workingDaysInPeriod * $dailyHours);
         }
 
         // Get total penalty hours

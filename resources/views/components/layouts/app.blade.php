@@ -336,6 +336,12 @@
                                         Data</a>
                                 </li>
                             @endif
+                            @can('viewAny', App\Models\Settings\AppLog::class)
+                                <li>
+                                    <a class="{{ $appLogsIndex ?? '' }}" href="{{ url('/settings/app-logs') }}">App
+                                        Logs</a>
+                                </li>
+                            @endcan
                         </ul>
                     </li>
 

@@ -28,8 +28,8 @@ return new class extends Migration
             $table->id();
             $table->string('name'); //S1
             $table->text('desc')->nullable();
-            $table->float('gross_min'); //5000
-            $table->float('gross_max'); //10000
+            $table->decimal('gross_min', 10, 2); //5000
+            $table->decimal('gross_max', 10, 2); //10000
             $table->timestamps();
         });
 
@@ -39,8 +39,8 @@ return new class extends Migration
             $table->enum('receiver', PackageDetail::RECEIVER_LIST); //monthly salary - medical insurance
             $table->string('name')->nullable(); //monthly salary - medical insurance
             $table->enum('type', BaseBenefit::TYPE_LIST);
-            $table->float('amount_min'); //5000
-            $table->float('amount_max'); //10000
+            $table->decimal('amount_min', 10, 2); //5000
+            $table->decimal('amount_max', 10, 2); //10000
             $table->boolean('is_hidden')->default(false);
             $table->timestamps();
         });
@@ -57,12 +57,12 @@ return new class extends Migration
             $table->foreignIdFor(VacationPackage::class)->constrained()->cascadeOnDelete();
             $table->string('name'); //annual vacation or sick leave or ezn
             $table->enum('type', VacationDetail::TYPE_LIST);
-            $table->float('inc_rate_min'); //min 2 hours per type
-            $table->float('inc_rate_max'); //max 12 hours per type
-            $table->float('hour_price_min'); //100
-            $table->float('hour_price_max'); //150
-            $table->float('max_balance_min'); //42 - max hours balance 
-            $table->float('max_balance_max'); //56 - max hours balance 
+            $table->decimal('inc_rate_min', 10, 2); //min 2 hours per type
+            $table->decimal('inc_rate_max', 10, 2); //max 12 hours per type
+            $table->decimal('hour_price_min', 10, 2); //100
+            $table->decimal('hour_price_max', 10, 2); //150
+            $table->decimal('max_balance_min', 10, 2); //42 - max hours balance 
+            $table->decimal('max_balance_max', 10, 2); //56 - max hours balance 
             $table->timestamps();
         });
 
@@ -76,17 +76,17 @@ return new class extends Migration
             $table->foreignIdFor(Employee::class, 'manager_id')->nullable()->constrained('employees')->nullOnDelete();
             $table->boolean('is_automatic_overtime')->default(false);
             $table->boolean('is_require_attendance_approval')->default(false);
-            $table->float('gross_salary')->nullable();
-            $table->float('insurance_amount')->nullable();
-            $table->float('daily_working_hours')->nullable();
-            $table->float('overtime_rate')->default(1);
+            $table->decimal('gross_salary', 10, 2)->nullable();
+            $table->decimal('insurance_amount', 10, 2)->nullable();
+            $table->decimal('daily_working_hours', 10, 2)->nullable();
+            $table->decimal('overtime_rate', 10, 2)->default(1);
             $table->time('working_day_start_min')->nullable();
             $table->time('working_day_start_max')->nullable();
             $table->time('working_day_end_min')->nullable();
             $table->time('working_day_end_max')->nullable();
             $table->timestamps();
         });
-        
+    
         Schema::table('positions', function (Blueprint $table) {
             $table->foreignIdFor(SalaryGrade::class, 'salary_grade_id')->nullable()->constrained()->nullOnDelete();
         });
@@ -107,7 +107,7 @@ return new class extends Migration
             $table->enum('receiver', PackageDetail::RECEIVER_LIST);
 
             //benefit calculation details
-            $table->float('amount');
+            $table->decimal('amount', 10, 2);
             $table->enum('type', BaseBenefit::TYPE_LIST);
 
             $table->boolean('is_hidden')->default(false);
@@ -126,12 +126,12 @@ return new class extends Migration
 
             //vacation calculation details
             $table->enum('type', VacationDetail::TYPE_LIST);
-            $table->float('inc_rate');
-            $table->float('hour_price'); //100
+            $table->decimal('inc_rate', 10, 2);
+            $table->decimal('hour_price', 10, 2); //100
 
             //starting and maximum balance
-            $table->float('max_balance'); //in hours
-            $table->float('current_balance'); //in hours
+            $table->decimal('max_balance', 10, 2); //in hours
+            $table->decimal('current_balance', 10, 2); //in hours
 
             $table->date('start_date');
             $table->date('end_date')->nullable(); //active benefit
@@ -143,9 +143,9 @@ return new class extends Migration
             $table->foreignIdFor(User::class, 'creator_id')->constrained('users')->cascadeOnDelete();
             $table->datetime('start_date');
             $table->datetime('end_date');
-            $table->float('total_paid');
-            $table->float('total_vacation_days');
-            $table->float('total_vacation_amount');
+            $table->decimal('total_paid', 10, 2);
+            $table->decimal('total_vacation_days', 10, 2);
+            $table->decimal('total_vacation_amount', 10, 2);
             $table->unsignedInteger('total_employees');
             $table->timestamps();
         });
@@ -154,10 +154,10 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Payroll::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Employee::class)->constrained()->cascadeOnDelete();
-            $table->float('paid');
-            $table->float('vacation_days'); //hours
-            $table->float('vacation_amount');
-            $table->float('base_amount');
+            $table->decimal('paid', 10, 2);
+            $table->decimal('vacation_days', 10, 2); //hours
+            $table->decimal('vacation_amount', 10, 2);
+            $table->decimal('base_amount', 10, 2);
             $table->timestamps();
         });
 
@@ -166,7 +166,7 @@ return new class extends Migration
             $table->foreignIdFor(Employee::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(BaseBenefit::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Payroll::class)->nullable()->constrained()->cascadeOnDelete();
-            $table->float('amount');
+            $table->decimal('amount', 10, 2);
             $table->enum('status', BenefitPayment::STATUS_LIST);
             $table->text('desc')->nullable();
             $table->timestamps();
@@ -178,8 +178,8 @@ return new class extends Migration
             $table->foreignIdFor(Employee::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(VacationBenefit::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Payroll::class)->nullable()->constrained()->cascadeOnDelete();
-            $table->float('amount');
-            $table->float('new_balance');
+            $table->decimal('amount', 10, 2);
+            $table->decimal('new_balance', 10, 2);
             $table->enum('status', BenefitPayment::STATUS_LIST);
             $table->timestamps();
         });
@@ -190,7 +190,7 @@ return new class extends Migration
             $table->foreignIdFor(User::class, 'creator_id')->constrained('users')->restrictOnDelete();
             $table->foreignIdFor(Payroll::class)->nullable()->constrained()->nullOnDelete();
             $table->string('name');
-            $table->float('amount');
+            $table->decimal('amount', 10, 2);
             $table->date('due_date');
             $table->enum('status', BenefitPayment::STATUS_LIST);
             $table->nullableMorphs('payable');
@@ -206,7 +206,7 @@ return new class extends Migration
             $table->foreignIdFor(Payroll::class)->nullable()->constrained()->nullOnDelete();
             $table->enum('status', AppliedVacation::STATUS_LIST)->default(AppliedVacation::STATUS_PENDING);
             $table->unsignedInteger('hours');
-            $table->float('new_balance');
+            $table->decimal('new_balance', 10, 2);
             $table->timestamps();
         });
 
@@ -214,7 +214,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(AppliedVacation::class)->constrained()->cascadeOnDelete();
             $table->date('vacation_date');
-            $table->float('hours');
+            $table->decimal('hours', 10, 2);
         });
 
         Schema::create('gained_vacations', function (Blueprint $table) {
@@ -222,15 +222,15 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Employee::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(VacationBenefit::class)->constrained()->cascadeOnDelete();
-            $table->float('days');
-            $table->float('new_balance');
+            $table->decimal('days', 10, 2);
+            $table->decimal('new_balance', 10, 2);
             $table->timestamps();
         });
 
         Schema::create('loans', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Employee::class)->constrained()->cascadeOnDelete();
-            $table->float('amount');
+            $table->decimal('amount', 10, 2);
             $table->text('desc')->nullable();
             $table->timestamps();
         });
@@ -238,7 +238,7 @@ return new class extends Migration
         Schema::create('purchases', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Employee::class)->constrained()->cascadeOnDelete();
-            $table->float('amount');
+            $table->decimal('amount', 10, 2);
             $table->text('desc')->nullable();
             $table->timestamps();
         });

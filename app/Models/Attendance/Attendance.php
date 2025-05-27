@@ -11,6 +11,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -130,7 +131,8 @@ class Attendance extends Model
         $attendance = [];
         for ($row = 2; $row <= $highestRow; $row++) {
 
-            $employeeName = $sheet->getCell('A' . $row)->getValue();
+            $employeeName = trim($sheet->getCell('A' . $row)->getValueString());
+            Log::info('Employee name', ['employeeName' => $employeeName]);
             if (!$employeeName) continue;
             $attendanceStartDate = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($sheet->getCell('B' . $row)->getValue());
             $attendanceEndDate = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($sheet->getCell('C' . $row)->getValue());

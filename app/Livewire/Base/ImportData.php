@@ -6,6 +6,7 @@ use App\Jobs\StartMigrationJob;
 use App\Services\MigrationService;
 use App\Traits\AlertFrontEnd;
 use Exception;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
 
@@ -57,6 +58,14 @@ class ImportData extends Component
                 $this->salary_grades, // salary grades
                 $this->positions, // positions
             );
+
+            Log::info('Migration results', [
+                'locations' => $this->locations,
+                'departments' => $this->departments,
+                'employees' => $this->employees,
+                'salary_grades' => $this->salary_grades,
+                'positions' => $this->positions,
+            ]);
             
             $this->showUploadModal = false;
             $this->file = null;

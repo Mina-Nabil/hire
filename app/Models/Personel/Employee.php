@@ -3841,7 +3841,7 @@ class Employee extends Model
 
         while ($currentDate->lte($endDate)) {
             // Check if current day is a working day for this employee
-            if (in_array($currentDate->dayOfWeek, $employeeWorkingDays)) {
+            if (in_array(strtolower($currentDate->format('l')), $employeeWorkingDays)) {
                 // Check if it's not a public holiday
                 $isPublicHoliday = PublicHoliday::where('date', $currentDate->format('Y-m-d'))->exists();
                 if (!$isPublicHoliday) {
@@ -4187,8 +4187,11 @@ class Employee extends Model
             $grossSalary = $this->benefitConfiguration->gross_salary ?? 0;
             $workingDaysInPeriod = $this->getWorkingDaysInPeriod($startDate, $endDate);
             $dailyHours = $this->benefitConfiguration->daily_working_hours ?? 8;
-
-            $hourlyRate = $grossSalary / ($workingDaysInPeriod * $dailyHours);
+            if ($workingDaysInPeriod > 0) {
+                $hourlyRate = $grossSalary / ($workingDaysInPeriod * $dailyHours);
+            } else {
+                $hourlyRate = 0;
+            }
         }
 
         // Get total penalty hours

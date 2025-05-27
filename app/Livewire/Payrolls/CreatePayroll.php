@@ -294,15 +294,15 @@ class CreatePayroll extends Component
                 ];
             }
 
-            $employeeTerminationDate = Carbon::parse($employee->termination_date);
+            $employeeTerminationDate = is_null($employee->termination_date) ? null : Carbon::parse($employee->termination_date);
             $employeeStartDate = Carbon::parse($employee->employment_date);
             $grossPercentage = 100;
 
             // Calculate the percentage of the gross salary based on the included days
-            if ($employeeStartDate->isAfter($this->startDate) && $employeeTerminationDate->isBefore($this->endDate)) {
+            if ($employeeStartDate->isAfter($this->startDate) && $employeeTerminationDate && $employeeTerminationDate->isBefore($this->endDate)) {
                 $includedDays = $employeeTerminationDate->diffInDays($this->employeeStartDate);
                 $grossPercentage = (min($includedDays, 30) / 30) * 100;
-            } else if ($employeeTerminationDate->isAfter($this->startDate) && $employeeTerminationDate->isBefore($this->endDate)) {
+            } else if ($employeeTerminationDate && $employeeTerminationDate->isAfter($this->startDate) && $employeeTerminationDate->isBefore($this->endDate)) {
                 $includedDays = $employeeTerminationDate->diffInDays($this->startDate);
                 $grossPercentage = (min($includedDays, 30) / 30) * 100;
             } else if ($employeeStartDate->isAfter($this->startDate) && $employeeStartDate->isBefore($this->endDate)) {

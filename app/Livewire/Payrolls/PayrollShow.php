@@ -157,10 +157,22 @@ class PayrollShow extends Component
         
         $employee = $this->selectedPenaltyEmployee->employee;
         
-        // Calculate penalty breakdown using the new method
+        // Calculate hourly rate using the same logic as CreatePayroll
+        $grossSalary = $this->selectedPenaltyEmployee->gross_salary;
+        $insuranceAmount = $this->selectedPenaltyEmployee->insurance_amount;
+        $employerInsurance = $this->selectedPenaltyEmployee->employer_insurance;
+        $otherAmount = $grossSalary - $insuranceAmount - $employerInsurance;
+        $netIncome = $otherAmount + $insuranceAmount;
+        $dayPrice = $netIncome / 30;
+        $dailyWorkingHours = $employee->benefitConfiguration?->daily_working_hours ?? 8;
+        $hourlyRate = $dayPrice / $dailyWorkingHours;
+        
+        // Calculate penalty breakdown using the correct hourly rate
         $penaltyCalculation = $employee->calculatePenaltyWithVacationOffset(
             $this->payroll->start_date,
-            $this->payroll->end_date
+            $this->payroll->end_date,
+            $hourlyRate, // use the same hourly rate calculation as CreatePayroll
+            $this->payroll->id // pass the payroll ID to include attendance records
         );
         
         // Get penalty breakdown data
@@ -289,10 +301,22 @@ class PayrollShow extends Component
     {
         $employee = $this->selectedPenaltyEmployee->employee;
         
-        // Recalculate penalty breakdown
+        // Calculate hourly rate using the same logic as CreatePayroll
+        $grossSalary = $this->selectedPenaltyEmployee->gross_salary;
+        $insuranceAmount = $this->selectedPenaltyEmployee->insurance_amount;
+        $employerInsurance = $this->selectedPenaltyEmployee->employer_insurance;
+        $otherAmount = $grossSalary - $insuranceAmount - $employerInsurance;
+        $netIncome = $otherAmount + $insuranceAmount;
+        $dayPrice = $netIncome / 30;
+        $dailyWorkingHours = $employee->benefitConfiguration?->daily_working_hours ?? 8;
+        $hourlyRate = $dayPrice / $dailyWorkingHours;
+        
+        // Recalculate penalty breakdown using the correct hourly rate
         $penaltyCalculation = $employee->calculatePenaltyWithVacationOffset(
             $this->payroll->start_date,
-            $this->payroll->end_date
+            $this->payroll->end_date,
+            $hourlyRate, // use the same hourly rate calculation as CreatePayroll
+            $this->payroll->id // pass the payroll ID to include attendance records
         );
         
         // Update payroll employee record

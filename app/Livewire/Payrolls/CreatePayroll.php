@@ -327,7 +327,11 @@ class CreatePayroll extends Component
             
             // Get daily working hours from employee benefit configuration
             $dailyWorkingHours = $employee->benefitConfiguration?->daily_working_hours ?? 8;
+<<<<<<< HEAD
             // dd('hourly rate: ' . $employee->calculateHourlyRate(), 'day price: ' . $dayPrice / $dailyWorkingHours);
+=======
+
+>>>>>>> 62fb1b0ecb07552113d158eb4ed66e5a1b1ab1be
             // Calculate penalty hours using the new penalty offset method
             $hourlyRate = $dayPrice / $dailyWorkingHours;
             $penaltyData = $employee->calculatePenaltyWithVacationOffset($this->startDate, $this->endDate, $hourlyRate);

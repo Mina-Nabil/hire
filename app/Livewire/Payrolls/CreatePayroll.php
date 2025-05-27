@@ -328,15 +328,23 @@ class CreatePayroll extends Component
             // Get daily working hours from employee benefit configuration
             $dailyWorkingHours = $employee->benefitConfiguration?->daily_working_hours ?? 8;
 
-            // Calculate penalty hours using the new consolidated function
-            $totalPenaltyHours = $employee->getTotalPenaltyHours($this->startDate, $this->endDate);
+            // Calculate penalty hours using the new penalty offset method
+            $hourlyRate = $dayPrice / $dailyWorkingHours;
+            $penaltyData = $employee->calculatePenaltyWithVacationOffset($this->startDate, $this->endDate, $hourlyRate);
+
+            // Extract penalty information
+            $totalPenaltyHours = $penaltyData['total_penalty_hours'];
+            $vacationOffsetHours = $penaltyData['vacation_offset_hours'];
+            $remainingPenaltyHours = $penaltyData['remaining_penalty_hours'];
+            $directDeductionAmount = $penaltyData['direct_deduction_amount'];
+            $usedApprovedVacations = $penaltyData['used_approved_vacations'];
+            $availableVacationBenefits = $penaltyData['available_vacation_benefits'];
 
             // Convert total hours to days for display purposes
             $totalPenaltyDays = $dailyWorkingHours > 0 ? $totalPenaltyHours / $dailyWorkingHours : 0;
 
-            // Calculate hourly rate and penalty amount
-            $hourlyRate = $dayPrice / $dailyWorkingHours;
-            $penaltyAmount = $totalPenaltyHours * $hourlyRate;
+            // The penalty amount is now only the direct deduction amount (after vacation offset)
+            $penaltyAmount = $directDeductionAmount;
 
             $netAfterPenalty = $netIncome - $penaltyAmount;
 
@@ -457,6 +465,12 @@ class CreatePayroll extends Component
                 'employee_deductions' => $employeeDeductions,
                 'penalties_days' => $totalPenaltyDays,
                 'penalties_amount' => $penaltyAmount,
+                'total_penalty_hours' => $totalPenaltyHours,
+                'vacation_offset_hours' => $vacationOffsetHours,
+                'remaining_penalty_hours' => $remainingPenaltyHours,
+                'direct_deduction_amount' => $directDeductionAmount,
+                'used_approved_vacations' => $usedApprovedVacations,
+                'available_vacation_benefits' => $availableVacationBenefits,
                 'net_income' => $netIncome - $penaltyAmount,
                 'net_after_penalty' => $netAfterPenalty,
                 'extra_payments' => $extraPayments,
@@ -617,6 +631,10 @@ class CreatePayroll extends Component
                             'employee_deductions' => $employeeData['employee_deductions'],
                             'penalties_days' => $employeeData['penalties_days'],
                             'penalties_amount' => $employeeData['penalties_amount'],
+                            'total_penalty_hours' => $employeeData['total_penalty_hours'] ?? 0,
+                            'vacation_offset_hours' => $employeeData['vacation_offset_hours'] ?? 0,
+                            'direct_deduction_hours' => $employeeData['remaining_penalty_hours'] ?? 0,
+                            'direct_deduction_amount' => $employeeData['direct_deduction_amount'] ?? 0,
                             'overtime_hours' => $employeeData['overtime_hours'] ?? 0,
                             'overtime_amount' => $employeeData['overtime_amount'] ?? 0,
                             'net_after_penalty' => $employeeData['net_after_penalty'],

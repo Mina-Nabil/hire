@@ -24,35 +24,8 @@
                 </x-primary-button>
             @endif
         </div>
-    </div>
-    @if ($showUploadModal)
-        <x-modal wire:model="showUploadModal">
-            <x-slot name="title">Upload Data</x-slot>
-            <div class="space-y-4">
-                <div class="flex justify-between items-center mb-4">
-                    <button wire:click="downloadTemplate" class="btn btn-secondary">
-                        <i class="fas fa-download mr-2"></i> Download Template
-                    </button>
-                </div>
 
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Select Excel File</label>
-                        <input type="file" wire:model="file" class="mt-1 block w-full" accept=".xlsx,.xls">
-                        @error('file')
-                            <span class="text-red-500 text-sm">{{ $message }}</span>
-                        @enderror
-                    </div>
-                </div>
-            </div>
-            <x-slot name="footer">
-                <div class="flex justify-end space-x-3">
-                    <x-secondary-button wire:click="closeUploadModal">Cancel</x-secondary-button>
-                    <x-primary-button wire:click="uploadSheet" loadingFunction="uploadSheet">Upload</x-primary-button>
-                </div>
-            </x-slot>
-        </x-modal>
-    @endif
+    </div>
 
     @if (!empty($migrationResults))
         <div class="card mt-8">
@@ -102,11 +75,14 @@
                                                                     @if (!$item['not_valid'])
                                                                         <li>
                                                                             <strong>{{ $item['name'] }} </strong> :
-                                                                            <strong>Min: </strong> {{ $item['min'] }} -
-                                                                            <strong>Max: </strong> {{ $item['max'] }}
+                                                                            <strong>Min: </strong>
+                                                                            {{ $item['min'] }} -
+                                                                            <strong>Max: </strong>
+                                                                            {{ $item['max'] }}
                                                                             <strong>Paid to: </strong>
                                                                             {{ $item['to'] }} -
-                                                                            <strong>Type: </strong> {{ $item['type'] }}
+                                                                            <strong>Type: </strong>
+                                                                            {{ $item['type'] }}
                                                                         </li>
                                                                     @endif
                                                                 @endforeach
@@ -126,5 +102,37 @@
                 @endforeach
             </div>
         </div>
+    @endif
+
+
+
+    @if ($showUploadModal)
+        <x-modal wire:model="showUploadModal">
+            <x-slot name="title">Upload Data</x-slot>
+            <div class="space-y-4">
+                <div class="flex justify-between items-center mb-4">
+                </div>
+                <button wire:click="downloadTemplate" class="btn btn-secondary">
+                    <i class="fas fa-download mr-2"></i> Download Template
+                </button>
+
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Select Excel File</label>
+                        <input type="file" wire:model="file" class="mt-1 block w-full" accept=".xlsx,.xls">
+                        @error('file')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+            <x-slot name="footer">
+                <div class="flex justify-end space-x-3">
+                    <x-secondary-button wire:click="closeUploadModal">Cancel</x-secondary-button>
+                    <x-primary-button wire:click="uploadSheet" loadingFunction="uploadSheet">Upload</x-primary-button>
+                </div>
+            </x-slot>
+        </x-modal>
     @endif
 </div>

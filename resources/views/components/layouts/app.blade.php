@@ -338,7 +338,7 @@
                             @endif
                             @can('viewAny', App\Models\Settings\AppLog::class)
                                 <li>
-                                    <a class="{{ $appLogsIndex ?? '' }}" href="{{ url('/settings/app-logs') }}">App
+                                    <a class="{{ $appLogsIndex ?? '' }}" href="{{ url('/app-logs') }}">App
                                         Logs</a>
                                 </li>
                             @endcan

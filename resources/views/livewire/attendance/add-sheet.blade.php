@@ -19,8 +19,8 @@
         </div>
     </div>
 
-    @if (count($uploadedAttendance) > 0)
-        <div class="card">
+    <div class="card">
+        @if (count($uploadedAttendance) > 0)
             <header class="card-header noborder">
                 <div class="flex justify-between items-center w-full">
                     <div class="flex-col space-y-1">
@@ -99,8 +99,8 @@
                     </table>
                 </div>
             </div>
-        </div>
-    @endif
+        @endif
+    </div>
 
     @if ($showUploadModal)
         <x-modal wire:model="showUploadModal">

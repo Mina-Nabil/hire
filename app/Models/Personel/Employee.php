@@ -63,8 +63,8 @@ class Employee extends Model
     const DOC_STATUS_EXPIRED = 'expired';
     const DOC_STATUS_MISSING = 'missing';
 
-    // Default days threshold for near expiry warning (7 days)
-    const NEAR_EXPIRY_DAYS = 7;
+    // Default days threshold for near expiry warning (30 days)
+    const NEAR_EXPIRY_DAYS = 30;
 
     // Employee status constants
     const STATUS_ACTIVE = 'active';
@@ -1166,8 +1166,9 @@ class Employee extends Model
     public function scopeCurrent($query, $start_date = null)
     {
         return $query->where(function ($q) use ($start_date) {
-            $q->whereNull('termination_date')
-                ->orWhere(function ($q) use ($start_date) {
+            $q->whereNull('termination_date');
+            if ($start_date)
+                $q->orWhere(function ($q) use ($start_date) {
                     $q->where('termination_date', '>=', $start_date);
                 });
         });
@@ -4254,11 +4255,11 @@ class Employee extends Model
                 ->sum('hours');
 
             $hoursToUse = min($remainingPenaltyHours, $vacationHoursInPeriod);
-            
+
             if ($hoursToUse > 0) {
                 $vacationOffsetHours += $hoursToUse;
                 $remainingPenaltyHours -= $hoursToUse;
-                
+
                 $usedApprovedVacations[] = [
                     'applied_vacation_id' => $appliedVacation->id,
                     'vacation_benefit_name' => $appliedVacation->vacationBenefit->name ?? 'Unknown',
@@ -4331,7 +4332,7 @@ class Employee extends Model
 
             // Generate vacation days for the penalty period
             $vacationDays = $this->generateVacationDaysForPenalty($startDate, $endDate, $hours);
-            
+
             if (empty($vacationDays)) {
                 throw new \Exception('No valid working days found in the penalty period for vacation application');
             }
@@ -4345,17 +4346,17 @@ class Employee extends Model
                     'status' => AppliedVacation::STATUS_APPROVED,
                     'admin_note' => 'Auto-created for penalty offset during payroll processing'
                 ]);
-                
+
                 // Create vacation days
                 if (count($vacationDays) > 0) {
                     $appliedVacation->vacationDays()->createMany($vacationDays);
                 }
-                
+
                 // Update vacation benefit balance
                 $vacationBenefit->update([
                     'current_balance' => $vacationBenefit->current_balance - $hours,
                 ]);
-                
+
                 return $appliedVacation;
             });
 
@@ -4373,7 +4374,6 @@ class Employee extends Model
                 'vacation_days_count' => count($vacationDays),
                 'message' => "Successfully applied {$hours} hours of {$vacationBenefit->name} vacation"
             ];
-
         } catch (\Exception $e) {
             AppLog::error(
                 'Error applying vacation for penalty offset',
@@ -4402,34 +4402,34 @@ class Employee extends Model
         $vacationDays = [];
         $remainingHours = $totalHours;
         $dailyWorkingHours = $this->benefitConfiguration?->daily_working_hours ?? 8;
-        
+
         // Get working days configuration
         $workingDays = $this->workingDays->pluck('type')->map(function ($day) {
             return strtolower($day);
         })->toArray();
 
         $currentDate = $startDate->copy();
-        
+
         while ($currentDate->lte($endDate) && $remainingHours > 0) {
             $dayName = strtolower($currentDate->format('l'));
-            
+
             // Only add vacation days for working days
             if (in_array($dayName, $workingDays)) {
                 // Check if this is not a public holiday
                 $isPublicHoliday = \App\Models\Attendance\PublicHoliday::where('date', $currentDate->format('Y-m-d'))->exists();
-                
+
                 if (!$isPublicHoliday) {
                     $hoursForDay = min($remainingHours, $dailyWorkingHours);
-                    
+
                     $vacationDays[] = [
                         'vacation_date' => $currentDate->format('Y-m-d'),
                         'hours' => $hoursForDay
                     ];
-                    
+
                     $remainingHours -= $hoursForDay;
                 }
             }
-            
+
             $currentDate->addDay();
         }
 

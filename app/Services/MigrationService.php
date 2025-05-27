@@ -15,6 +15,7 @@ use App\Models\Users\User;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class MigrationService
@@ -43,10 +44,10 @@ class MigrationService
                 $locations_sheet = $template->getSheet(0);
                 $highestRow = $locations_sheet->getHighestRow();
                 for ($row = 2; $row <= $highestRow; $row++) {
-                    $locationName = $locations_sheet->getCell('A' . $row)->getValue();
+                    $locationName = $locations_sheet->getCell('A' . $row)->getValueString();
                     if (!$locationName) continue;
                     $locations[] = [
-                        'name' => $locationName,
+                        'name' => trim($locationName),
                         'not_valid' => !$locationName,
                     ];
                 }
@@ -55,13 +56,13 @@ class MigrationService
                 $departments_sheet = $template->getSheet(1);
                 $highestRow = $departments_sheet->getHighestRow();
                 for ($row = 2; $row <= $highestRow; $row++) {
-                    $departmentCode = $departments_sheet->getCell('A' . $row)->getValue();
-                    $departmentName = $departments_sheet->getCell('B' . $row)->getValue();
-                    $departmentDescription = $departments_sheet->getCell('C' . $row)->getValue();
+                    $departmentCode = $departments_sheet->getCell('A' . $row)->getValueString();
+                    $departmentName = $departments_sheet->getCell('B' . $row)->getValueString();
+                    $departmentDescription = $departments_sheet->getCell('C' . $row)->getValueString();
                     if (!$departmentName) continue;
                     $departments[] = [
-                        'code' => $departmentCode,
-                        'name' => $departmentName,
+                        'code' => trim($departmentCode),
+                        'name' => trim($departmentName),
                         'description' => $departmentDescription,
                         'not_valid' => !$departmentCode || !$departmentName,
                     ];
@@ -71,22 +72,39 @@ class MigrationService
                 $employees_sheet = $template->getSheet(3);
                 $highestRow = $employees_sheet->getHighestRow();
                 for ($row = 2; $row <= $highestRow; $row++) {
-                    $employeeName = $employees_sheet->getCell('A' . $row)->getValue();
-                    $employeeNameAr = $employees_sheet->getCell('B' . $row)->getValue();
-                    $id_number = $employees_sheet->getCell('C' . $row)->getValue();
-                    $employeeEmail = $employees_sheet->getCell('D' . $row)->getValue();
-                    $employeePhone = $employees_sheet->getCell('E' . $row)->getValue();
-                    $employeeAddress = $employees_sheet->getCell('F' . $row)->getValue();
-                    $nationality = $employees_sheet->getCell('G' . $row)->getValue();
-                    $gender = $employees_sheet->getCell('H' . $row)->getValue();
-                    $birthDate = $employees_sheet->getCell('I' . $row)->getValue();
+                    $employeeName = $employees_sheet->getCell('A' . $row)->getValueString();
+                    $employeeNameAr = $employees_sheet->getCell('B' . $row)->getValueString();
+                    $id_number = $employees_sheet->getCell('C' . $row)->getValueString();
+                    $employeeEmail = $employees_sheet->getCell('D' . $row)->getValueString();
+                    $employeePhone = $employees_sheet->getCell('E' . $row)->getValueString();
+                    $employeeAddress = $employees_sheet->getCell('F' . $row)->getValueString();
+                    $nationality = $employees_sheet->getCell('G' . $row)->getValueString();
+                    $gender = $employees_sheet->getCell('H' . $row)->getValueString();
+                    try {
+                        if ($employees_sheet->getCell('I' . $row)->getValue()) {
+                            $birthDate = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($employees_sheet->getCell('I' . $row)->getValue());
+                        } else {
+                            $birthDate = Carbon::parse('1990-01-01');
+                        }
+                    } catch (Exception $e) {
+                        $birthDate = Carbon::parse('1990-01-01');
+                    }
                     if (!$employeeName) continue;
-                    $city_name = $employees_sheet->getCell('J' . $row)->getValue();
+                    $city_name = $employees_sheet->getCell('J' . $row)->getValueString();
                     $city = City::where('name', $city_name)->first();
                     if (!$city) {
                         throw new AppException('Emploees Sheet: City name is not valid on row ' . $row);
                     }
-                    $employment_date = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($employees_sheet->getCell('K' . $row)->getValue());
+
+                    try {
+                        if ($employees_sheet->getCell('K' . $row)->getValue()) {
+                            $employment_date = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($employees_sheet->getCell('K' . $row)->getValue());
+                        } else {
+                            $employment_date = Carbon::parse('2024-01-01');
+                        }
+                    } catch (Exception $e) {
+                        $employment_date = Carbon::parse('2024-01-01');
+                    }
 
                     // Extract first and last name from full name
                     $nameParts = explode(' ', $employeeName);
@@ -105,6 +123,44 @@ class MigrationService
                         $baseUsername = 'employee' . rand(100, 999);
                     }
 
+                    $invalid_reason = match(true){
+                        !$employeeName => 'Employee name is required',
+                        !$employeeNameAr => 'Employee name arabic is required',
+                        !$id_number => 'ID number is required',
+                        !$employeeEmail => 'Employee email is required',
+                        !$employeePhone => 'Employee phone is required',
+                        !$employeeAddress => 'Employee address is required',
+                        !$nationality => 'Nationality is required',
+                        !$gender => 'Gender is required',
+                        !$birthDate => 'Birth date is required',
+                        !$city_name => 'City name is required',
+                        !$employment_date => 'Employment date is required',
+                        true => null,
+                    };
+                    // if (!$employeeName) {
+                    //     $invalid_reason = 'Employee name is required';
+                    // } else if (!$employeeNameAr) {
+                    //     $invalid_reason = 'Employee name arabic is required';
+                    // } else if (!$id_number) {
+                    //     $invalid_reason = 'ID number is required';
+                    // } else if (!$employeeEmail) {
+                    //     $invalid_reason = 'Employee email is required';
+                    // } else if (!$employeePhone) {
+                    //     $invalid_reason = 'Employee phone is required';
+                    // } else if (!$employeeAddress) {
+                    //     $invalid_reason = 'Employee address is required';
+                    // } else if (!$nationality) {
+                    //     $invalid_reason = 'Nationality is required';
+                    // } else if (!$gender) {
+                    //     $invalid_reason = 'Gender is required';
+                    // } else if (!$birthDate) {
+                    //     $invalid_reason = 'Birth date is required';
+                    // } else if (!$city_name) {
+                    //     $invalid_reason = 'City name is required';
+                    // } else if (!$employment_date) {
+                    //     $invalid_reason = 'Employment date is required';
+                    // }
+
                     $employees[] = [
                         'name' => $employeeName,
                         'name_ar' => $employeeNameAr,
@@ -122,7 +178,8 @@ class MigrationService
                         'base_username' => $baseUsername,
                         'base_password' => "pass@123",
                         'type' => User::TYPE_EMPLOYEE,
-                        'not_valid' => !$employeeName || !$employeeNameAr || !$id_number || !$employeeEmail || !$employeePhone || !$employeeAddress || !$nationality || !$gender || !$birthDate || !$city_name,
+                        'not_valid' => $invalid_reason ? true : false,
+                        'invalid_reason' => $invalid_reason,
                     ];
                 }
 
@@ -130,10 +187,10 @@ class MigrationService
                 $salary_grades_sheet = $template->getSheet(4);
                 $highestRow = $salary_grades_sheet->getHighestRow();
                 for ($row = 2; $row <= $highestRow; $row++) {
-                    $salaryGradeName = $salary_grades_sheet->getCell('A' . $row)->getValue();
+                    $salaryGradeName = trim($salary_grades_sheet->getCell('A' . $row)->getValueString());
                     if ($salaryGradeName == 'LEAVE A ROW EMPTY LIKE THIS ONE BETWEEN EACH GRADE LEVEL' || !$salaryGradeName) continue;
-                    $salaryGradeGrossMin = $salary_grades_sheet->getCell('C' . $row)->getValue();
-                    $salaryGradeGrossMax = $salary_grades_sheet->getCell('D' . $row)->getValue();
+                    $salaryGradeGrossMin = $salary_grades_sheet->getCell('C' . $row)->getValueString();
+                    $salaryGradeGrossMax = $salary_grades_sheet->getCell('D' . $row)->getValueString();
                     $extraBenefits = [];
                     $k = ++$row;
                     $benefits_row = $salary_grades_sheet->getCell('B' . $k)->getValue();
@@ -144,14 +201,13 @@ class MigrationService
                         $to = $salary_grades_sheet->getCell('E' . $k)->getValue();
                         $type = $salary_grades_sheet->getCell('F' . $k)->getValue();
 
-
                         $extraBenefits[] = [
                             'name' => $name,
                             'min' => $min,
                             'max' => $max,
                             'to' => $to,
                             'type' => $type,
-                            'not_valid' => !$name || !$min || !$max || !$to || !$type,
+                            'not_valid' => !$name || !$max || !$to || !$type,
                         ];
                         $k++;
                         $benefits_row = $salary_grades_sheet->getCell('B' . $k)->getValue();
@@ -173,14 +229,14 @@ class MigrationService
                 $highestRow = $positions_sheet->getHighestRow();
                 for ($row = 2; $row <= $highestRow; $row++) {
 
-                    $locationName = $positions_sheet->getCell('A' . $row)->getValue();
-                    $departmentName = $positions_sheet->getCell('B' . $row)->getValue();
-                    $positionName = $positions_sheet->getCell('C' . $row)->getValue();
-                    $positionArabicName = $positions_sheet->getCell('D' . $row)->getValue();
-                    $positionCode = $positions_sheet->getCell('E' . $row)->getValue();
-                    $parentPositionCode = $positions_sheet->getCell('F' . $row)->getValue();
-                    $employeeIDNumber = $positions_sheet->getCell('G' . $row)->getValue();
-                    $salaryGradeName = $positions_sheet->getCell('H' . $row)->getValue();
+                    $locationName = $positions_sheet->getCell('A' . $row)->getValueString();
+                    $departmentName = trim($positions_sheet->getCell('B' . $row)->getValueString());
+                    $positionName = trim($positions_sheet->getCell('C' . $row)->getValueString());
+                    $positionArabicName = trim($positions_sheet->getCell('D' . $row)->getValueString());
+                    $positionCode = trim($positions_sheet->getCell('E' . $row)->getValueString());
+                    $parentPositionCode = trim($positions_sheet->getCell('F' . $row)->getValueString());
+                    $employeeIDNumber = trim($positions_sheet->getCell('G' . $row)->getValueString());
+                    $salaryGradeName = trim($positions_sheet->getCell('H' . $row)->getValueString());
 
                     if (!$departmentName || !$positionName || !$positionArabicName) continue;
                     $invalid = false;
@@ -196,7 +252,7 @@ class MigrationService
                         $invalid_reason = 'Salary Grade not found';
                     }
 
-                    if (!array_filter($employees, fn($employee) => $employee['id_number'] == $employeeIDNumber)) {
+                    if ($employeeIDNumber && !array_filter($employees, fn($employee) => $employee['id_number'] == $employeeIDNumber)) {
                         $invalid = true;
                         $invalid_reason = 'Employee not found';
                     }
@@ -280,8 +336,9 @@ class MigrationService
                                     'name' => $eb['name'],
                                     'amount_min' => $eb['min'],
                                     'amount_max' => $eb['max'],
-                                    'amount_to' => $eb['to'],
+                                    'receiver' => $eb['to'],
                                     'type' => $eb['type'],
+                                    
                                 ];
                             }
                         }
@@ -304,7 +361,7 @@ class MigrationService
                             $salary_grade = SalaryGrade::where('name', $position['salary_grade'])->first();
                         }
                         if ($position['employee_id']) {
-                            $employee = Employee::where('id_number', $position['employee_id'])->first();
+                            $position_employee = Employee::where('id_number', $position['employee_id'])->first();
                         }
                         if ($position['parent']) {
                             $parent_position = Position::where('code', $position['parent'])->first();
@@ -317,7 +374,7 @@ class MigrationService
                             'arabic_name' => $position['arabic_name'],
                             'parent_id' => isset($parent_position) ? $parent_position->id : null,
                             'code' => $position['code'],
-                            'employee_id' => isset($employee) ? $employee->id : null,
+                            'employee_id' => isset($position_employee) ? $position_employee->id : null,
                             'salary_grade_id' => isset($salary_grade) ? $salary_grade->id : null,
                         ]);
                     }

@@ -1083,8 +1083,6 @@ window.addEventListener("openNewTab", function (event) {
     window.open(event.detail[0], "_blank");
 });
 
-
-
 // radio btn new
 
 /* ------------------------ Watermark (Please Ignore) ----------------------- */

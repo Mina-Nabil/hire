@@ -37,6 +37,7 @@ use App\Livewire\Employee\RequestHrLetter;
 use App\Livewire\Employee\HrLetterRequests;
 use App\Livewire\Employee\OvertimeRequests;
 use App\Livewire\Employee\EmployeeOvertimeRequests;
+use App\Livewire\Settings\AppLogIndex;
 
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/', Dashboard::class)->name('home');
@@ -88,6 +89,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/settings/areas', AreasIndex::class);
     Route::get('/settings/channels', ChannelIndex::class);
     Route::get('/profile', Profile::class);
+
+    Route::get('/app-logs', AppLogIndex::class);
 
     Route::get('/logout', function () {
         Auth::logout();

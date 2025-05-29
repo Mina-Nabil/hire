@@ -47,6 +47,7 @@ class PayrollShow extends Component
     public $penaltyBreakdownData = [];
     public $employeeVacationBenefits = [];
     public $employeeAppliedVacations = [];
+    public $employeeMissingDays = [];
     
     // Vacation application for penalty offset modal properties
     public $showVacationApplicationModal = false;
@@ -135,6 +136,11 @@ class PayrollShow extends Component
             ->where('payroll_id', $this->payroll->id)
             ->orderBy('due_date')
             ->get();
+
+        $this->employeeMissingDays = \App\Models\Attendance\MissingDay::where('employee_id', $this->selectedEmployeeId)
+            ->betweenDates($this->payroll->start_date, $this->payroll->end_date)
+            ->orderBy('date')
+            ->get();
         
         $this->showEmployeeDetailsModal = true;
     }
@@ -148,6 +154,7 @@ class PayrollShow extends Component
         $this->employeeBenefitPayments = [];
         $this->employeeOvertimes = [];
         $this->employeeExtraPayments = [];
+        $this->employeeMissingDays = [];
     }
     
     public function showPenaltyBreakdown($payrollEmployeeId)

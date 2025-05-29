@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Title;
 
 #[Title('Create Payroll')]
@@ -542,7 +543,8 @@ class CreatePayroll extends Component
                                     }
 
                                     // Calculate when normal working hours should end
-                                    $normalWorkingEnd = $attendanceStart->copy()->addHours($dailyWorkingHours);
+                                    Log::info('dailyWorkingHours', ['dailyWorkingHours' => $dailyWorkingHours]);
+                                    $normalWorkingEnd = $attendanceStart->copy()->addHours((float)$dailyWorkingHours);
 
                                     // Overtime starts when normal working hours end
                                     $overtimeStartTime = $normalWorkingEnd->format('H:i:s');
@@ -650,7 +652,7 @@ class CreatePayroll extends Component
                             'paid' => $employeeData['net_after_deductions'], // Same as net_after_deductions
                             'vacation_days' => 0, // Default to 0
                             'vacation_amount' => 0, // Default to 0
-                            'base_amount' => $employeeData['insurance_amount'], // Use insurance amount as base
+                            'base_amount' => $employeeData['insurance_amount'], // Use Social Insurance Salary as base
                             'extra_payment_ids' => $extraPaymentIds,
                             'attendance_ids' => $attendanceIds,
                             'overtime_ids' => $overtimeIds, // Include both existing and newly created overtime IDs

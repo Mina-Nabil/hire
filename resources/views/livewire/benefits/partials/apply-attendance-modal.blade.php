@@ -112,6 +112,14 @@
                                                 @case('flexible')
                                                     No Start or End time required, any 8 hours per day
                                                 @break
+
+                                                @case('in-only')
+                                                    Only in time required for full day attendance
+                                                @break
+
+                                                @case('bus')
+                                                    In and out will be compared to bus schedule for each day
+                                                @break
                                             @endswitch
                                         </span>
                                     @endif
@@ -125,10 +133,14 @@
                                 <x-text-input label="Working Day Start Max" type="time"
                                     wire:model="workingDayStartMax"
                                     errorMessage="{{ $errors->first('workingDayStartMax') }}" />
-                                <x-text-input label="Working Day End Min" type="time" wire:model="workingDayEndMin"
-                                    errorMessage="{{ $errors->first('workingDayEndMin') }}" />
-                                <x-text-input label="Working Day End Max" type="time" wire:model="workingDayEndMax"
-                                    errorMessage="{{ $errors->first('workingDayEndMax') }}" />
+                                @if ($attendanceCalculation != 'in-only')
+                                    <x-text-input label="Working Day End Min" type="time"
+                                        wire:model="workingDayEndMin"
+                                        errorMessage="{{ $errors->first('workingDayEndMin') }}" />
+                                    <x-text-input label="Working Day End Max" type="time"
+                                        wire:model="workingDayEndMax"
+                                        errorMessage="{{ $errors->first('workingDayEndMax') }}" />
+                                @endif
                                 <x-text-input label="Overtime Rate" type="number" step="0.01"
                                     wire:model="overtimeRate" errorMessage="{{ $errors->first('overtimeRate') }}"
                                     min="1" />
@@ -139,7 +151,8 @@
                                 </label>
 
                                 <label class="flex items-center mt-2 col-span-2">
-                                    <input type="checkbox" wire:model="isRequireAttendanceApproval" class="form-checkbox">
+                                    <input type="checkbox" wire:model="isRequireAttendanceApproval"
+                                        class="form-checkbox">
                                     <span class="ml-2">Require Attendance Approval</span>
                                 </label>
 

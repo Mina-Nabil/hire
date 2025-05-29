@@ -28,19 +28,15 @@ class ApplyAttendanceModal extends Component
     public $isRequireAttendanceApproval;
     public $deleteOldConf = true;
 
-    public $attendanceCalculations = [
-        'fixed',
-        'semi-flexible',
-        'flexible'
-    ];
+    public $attendanceCalculations = BenefitConfiguration::ATTENDANCE_CALCULATION_LIST;
 
     protected $rules = [
         'workingDays' => 'required|array|min:1',
         'attendanceCalculation' => 'required',
         'workingDayStartMin' => 'required',
         'workingDayStartMax' => 'required',
-        'workingDayEndMin' => 'required',
-        'workingDayEndMax' => 'required',
+        'workingDayEndMin' => 'required_unless:attendanceCalculation,in-only',
+        'workingDayEndMax' => 'required_unless:attendanceCalculation,in-only',
         'dailyWorkingHours' => 'required|numeric|min:1|max:24',
         'overtimeRate' => 'required|numeric|min:1',
         'isAutomaticOvertime' => 'boolean',
@@ -102,11 +98,11 @@ class ApplyAttendanceModal extends Component
                 $this->attendanceCalculation,
                 $this->workingDayStartMin,
                 $this->workingDayStartMax,
-                $this->workingDayEndMin,
-                $this->workingDayEndMax,
                 $this->dailyWorkingHours,
                 $this->isAutomaticOvertime,
                 $this->overtimeRate,
+                $this->workingDayEndMin,
+                $this->workingDayEndMax,
                 $this->isRequireAttendanceApproval
             );
 

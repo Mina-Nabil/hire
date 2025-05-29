@@ -227,7 +227,7 @@ class Payroll extends Model
                     'paid' => $employeeData['net_after_deductions'] ?? 0, // Use net after deductions as paid amount
                     'vacation_days' => $employeeData['vacation_days'] ?? 0,
                     'vacation_amount' => $employeeData['vacation_amount'] ?? 0,
-                    'base_amount' => $employeeData['base_amount'] ?? ($employeeData['insurance_amount'] ?? 0), // Use insurance amount as base if not specified
+                    'base_amount' => $employeeData['base_amount'] ?? ($employeeData['insurance_amount'] ?? 0), // Use Social Insurance Salary as base if not specified
                     'gross_salary' => $employeeData['gross_salary'] ?? 0,
                     'insurance_amount' => $employeeData['insurance_amount'] ?? 0,
                     'other_amount' => $employeeData['other_amount'] ?? 0,
@@ -337,5 +337,12 @@ class Payroll extends Model
             AppLog::error('Error deleting payroll', $e->getMessage());
             throw new AppException('Error deleting payroll');
         }
+    }
+
+
+    ///attributes
+    public function getTitleAttribute()
+    {
+        return 'Payroll ' . $this->start_date->format('Y-m-d') . ' -> ' . $this->end_date->format('Y-m-d');
     }
 }

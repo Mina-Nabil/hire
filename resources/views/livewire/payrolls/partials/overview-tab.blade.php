@@ -5,7 +5,7 @@
                 <th class="table-th border sticky-colomn border-slate-100 dark:bg-slate-800 dark:border-slate-700">Employee</th>
                 <th class="table-th">Position</th>
                 <th class="table-th">Gross Salary</th>
-                <th class="table-th">Insurance Amount</th>
+                <th class="table-th">Social Insurance Salary</th>
                 <th class="table-th">Other Amount</th>
                 <th class="table-th">Absence</th>
                 <th class="table-th">Extra Payments</th>

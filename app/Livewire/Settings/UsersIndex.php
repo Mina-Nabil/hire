@@ -244,9 +244,6 @@ class UsersIndex extends Component
             'users' => $users,
             'TYPES' => User::TYPES,
             'usersIndex' => 'active'
-        ])->layout('components.layouts.app', [
-            'title' => 'Users',
-            'usersIndex' => 'active'
         ]);
     }
 }

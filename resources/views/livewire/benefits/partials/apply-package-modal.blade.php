@@ -101,7 +101,7 @@
                                             </div>
 
                                             <div>
-                                                <x-text-input label="Insurance Amount*" type="number"
+                                                <x-text-input label="Social Insurance Salary*" type="number"
                                                     wire:model="insuranceAmount"
                                                     errorMessage="{{ $errors->first('insuranceAmount') }}" />
                                             </div>

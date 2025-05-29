@@ -370,7 +370,7 @@ class PositionIndex extends Component
 
     public function mount()
     {
-        $this->employees = Employee::current()->get();
+        $this->employees = Employee::current()->unemployed()->get();
         $this->locations = Location::all();
         $this->salaryGrades = SalaryGrade::all();
     }
@@ -397,9 +397,6 @@ class PositionIndex extends Component
             'departments' => $departments,
             'positions' => $positions,
             'allPositions' => $allPositions
-        ])->layout('components.layouts.app', [
-            'title' => 'Positions',
-            'positionsIndex' => 'active'
         ]);
     }
 }

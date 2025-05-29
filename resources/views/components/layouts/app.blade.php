@@ -102,7 +102,7 @@
                             @endcan
                             @can('viewAny', App\Models\Payroll\Payroll::class)
                                 <li>
-                                    <a class="{{ request()->routeIs('payrolls.submit-attendance') ? 'active' : '' }}"
+                                    <a class="{{ request()->routeIs('submit-attendance') ? 'active' : '' }}"
                                         href="{{ url('/payrolls/submit-attendance') }}">
                                         Submit Attendance</a>
                                 </li>
@@ -115,11 +115,16 @@
                             @endcan
                             @can('viewAny', App\Models\Attendance\Attendance::class)
                                 <li>
-                                    <a class="{{ request()->routeIs('attendance.overtime') ? 'active' : '' }}" href="{{ url('/attendance/overtime') }}">
+                                    <a class="{{ request()->routeIs('overtime.index') ? 'active' : '' }}" href="{{ url('/attendance/overtime') }}">
                                         Overtime Records</a>
                                 </li>
                             @endcan
-
+                            @can('viewAny', App\Models\Attendance\Attendance::class)
+                                <li>
+                                    <a class="{{ request()->routeIs('applied-vacation.index') ? 'active' : '' }}" href="{{ url('/attendance/applied-vacation') }}">
+                                        Applied Vacation Records</a>
+                                </li>
+                            @endcan
                         </ul>
                     </li>
 
@@ -132,6 +137,7 @@
                             <iconify-icon class="icon-arrow" icon="heroicons-outline:chevron-right"></iconify-icon>
                         </a>
                         <ul class="sidebar-submenu">
+                            
                             <li>
                                 <a href="{{ route('employees.requests.hr-letters.index') }}"
                                     class="navItem {{ request()->routeIs('employees.requests.hr-letters.index') ? 'active' : '' }}">
@@ -165,19 +171,19 @@
                         <ul class="sidebar-submenu">
                             @can('viewAny', App\Models\Benefits\Configurations\SalaryGrade::class)
                                 <li>
-                                    <a class="{{ $configurationsIndex ?? '' }}"
+                                    <a class="{{ request()->routeIs('benefits.configurations') ? 'active' : '' }}"
                                         href="{{ url('/benefits/configurations') }}">Employees</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Benefits\Configurations\SalaryGrade::class)
                                 <li>
-                                    <a class="{{ $packagesIndex ?? '' }}" href="{{ url('/benefits/packages') }}">
+                                    <a class="{{ request()->routeIs('benefits.packages') ? 'active' : '' }}" href="{{ url('/benefits/packages') }}">
                                         Grading System</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Benefits\Configurations\VacationPackage::class)
                                 <li>
-                                    <a class="{{ $vacationPackagesIndex ?? '' }}"
+                                    <a class="{{ request()->routeIs('benefits.vacation-packages') ? 'active' : '' }}"
                                         href="{{ url('/benefits/vacation-packages') }}">
                                         Vacation Packages</a>
                                 </li>
@@ -197,24 +203,24 @@
                         <ul class="sidebar-submenu">
                             @can('viewDashboard', App\Models\Personel\Employee::class)
                                 <li>
-                                    <a class="{{ $employeeDashboard ?? '' }}"
+                                    <a class="{{ request()->routeIs('employees.dashboard') ? 'active' : '' }}"
                                         href="{{ route('employees.dashboard') }}">Dashboard</a>
                                 </li>
                             @endcan
                             @can('viewMissingDocReport', App\Models\Personel\Employee::class)
                                 <li>
-                                    <a class="{{ $missingDocReport ?? '' }}"
+                                    <a class="{{ request()->routeIs('employees.reports.missing-documents') ? 'active' : '' }}"
                                         href="{{ route('employees.reports.missing-documents') }}">Document Status</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Personel\Employee::class)
                                 <li>
-                                    <a class="{{ $employeesIndex ?? '' }}" href="{{ route('employees') }}">Employees</a>
+                                    <a class="{{ request()->routeIs('employees') ? 'active' : '' }}" href="{{ route('employees') }}">Employees</a>
                                 </li>
                             @endcan
                             @can('create', App\Models\Personel\Employee::class)
                                 <li>
-                                    <a class="{{ $employeeCreate ?? '' }}" href="{{ route('employees.create') }}">Create
+                                    <a class="{{ request()->routeIs('employees.create') ? 'active' : '' }}" href="{{ route('employees.create') }}">Create
                                         Employee</a>
                                 </li>
                             @endcan
@@ -231,32 +237,32 @@
                         <ul class="sidebar-submenu">
                             @can('create', App\Models\Recruitment\Applicants\Applicant::class)
                                 <li>
-                                    <a class="{{ $applicantsCreate ?? '' }}"
+                                    <a class="{{ request()->routeIs('applicants.create') ? 'active' : '' }}"
                                         href="{{ url('/recruitment/applicants/create') }}">New Applicant</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Recruitment\Applicants\Applicant::class)
                                 <li>
-                                    <a class="{{ $applicantsIndex ?? '' }}"
+                                    <a class="{{ request()->routeIs('recruitment.applicants') ? 'active' : '' }}"
                                         href="{{ url('/recruitment/applicants') }}">Applicants</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Heirarchy\Position::class)
                                 <li>
-                                    <a class="{{ $vacanciesIndex ?? '' }}"
+                                    <a class="{{ request()->routeIs('recruitment.vacancies') ? 'active' : '' }}"
                                         href="{{ url('/recruitment/vacancies') }}">Vacancies</a>
                                 </li>
                             @endcan
 
                             @can('viewAny', App\Models\Recruitment\BaseQuestion::class)
                                 <li>
-                                    <a class="{{ $baseQuestionsIndex ?? '' }}"
+                                    <a class="{{ request()->routeIs('recruitment.base-questions') ? 'active' : '' }}"
                                         href="{{ url('/recruitment/base-questions') }}">Base Questions</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Recruitment\Applicants\Channel::class)
                                 <li>
-                                    <a class="{{ $channelsIndex ?? '' }}"
+                                    <a class="{{ request()->routeIs('settings.channels') ? 'active' : '' }}"
                                         href="{{ url('/settings/channels') }}">Channels</a>
                                 </li>
                             @endcan
@@ -275,13 +281,13 @@
                         <ul class="sidebar-submenu">
                             @can('viewAny', App\Models\Heirarchy\Position::class)
                                 <li>
-                                    <a class="{{ $positionsIndex ?? '' }}"
+                                    <a class="{{ request()->routeIs('hierarchy.positions') ? 'active' : '' }}"
                                         href="{{ url('/hierarchy/positions') }}">Positions</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Heirarchy\Position::class)
                                 <li>
-                                    <a class="{{ $organizationIndex ?? '' }}"
+                                    <a class="{{ request()->routeIs('hierarchy.tree') ? 'active' : '' }}"
                                         href="{{ url('/hierarchy/tree') }}">Organization</a>
                                 </li>
                             @endcan
@@ -299,46 +305,46 @@
                         <ul class="sidebar-submenu">
                             @can('viewAny', App\Models\Users\User::class)
                                 <li>
-                                    <a class="{{ $usersIndex ?? '' }}" href="{{ url('/settings/users') }}">Users</a>
+                                    <a class="{{ request()->routeIs('settings.users') ? 'active' : '' }}" href="{{ url('/settings/users') }}">Users</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Base\Area::class)
                                 <li>
-                                    <a class="{{ $areasIndex ?? '' }}" href="{{ url('/settings/areas') }}">Areas</a>
+                                    <a class="{{ request()->routeIs('settings.areas') ? 'active' : '' }}" href="{{ url('/settings/areas') }}">Areas</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Base\InsuranceOffice::class)
                                 <li>
-                                    <a class="{{ $insuranceOfficesIndex ?? '' }}"
+                                    <a class="{{ request()->routeIs('insurance-offices') ? 'active' : '' }}"
                                         href="{{ url('/insurance-offices') }}">Insurance Offices</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Base\Bank::class)
                                 <li>
-                                    <a class="{{ $banksIndex ?? '' }}" href="{{ url('/banks') }}">Banks</a>
+                                    <a class="{{ request()->routeIs('banks') ? 'active' : '' }}" href="{{ url('/banks') }}">Banks</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Base\Location::class)
                                 <li>
-                                    <a class="{{ $locationsIndex ?? '' }}"
+                                    <a class="{{ request()->routeIs('hierarchy.locations') ? 'active' : '' }}"
                                         href="{{ url('/hierarchy/locations') }}">Locations</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Attendance\PublicHoliday::class)
                                 <li>
-                                    <a class="{{ $publicHolidaysIndex ?? '' }}"
+                                    <a class="{{ request()->routeIs('public-holidays.index') ? 'active' : '' }}"
                                         href="{{ route('public-holidays.index') }}">Public Holidays</a>
                                 </li>
                             @endcan
                             @if (Auth::user()->is_admin)
                                 <li>
-                                    <a class="{{ $importData ?? '' }}" href="{{ route('import-data') }}">Import
+                                    <a class="{{ request()->routeIs('import-data') ? 'active' : '' }}" href="{{ route('import-data') }}">Import
                                         Data</a>
                                 </li>
                             @endif
                             @can('viewAny', App\Models\Settings\AppLog::class)
                                 <li>
-                                    <a class="{{ $appLogsIndex ?? '' }}" href="{{ url('/app-logs') }}">App
+                                    <a class="{{ request()->routeIs('app-logs') ? 'active' : '' }}" href="{{ url('/app-logs') }}">App
                                         Logs</a>
                                 </li>
                             @endcan

@@ -85,7 +85,7 @@
                                         If unchecked, the old configuration will be ended and a new one will be created
                                     </p>
                                 </div>
-                                <x-text-input label="Start Date*" type="date" wire:model="packageStartDate"
+                                <x-text-input label="Start Date*" type="date" wire:model.live="packageStartDate"
                                     errorMessage="{{ $errors->first('packageStartDate') }}" />
                                 <x-text-input label="End Date*" type="date" wire:model="packageEndDate"
                                     errorMessage="{{ $errors->first('packageEndDate') }}" />

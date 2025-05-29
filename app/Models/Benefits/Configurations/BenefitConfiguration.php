@@ -13,10 +13,14 @@ class BenefitConfiguration extends Model
     const ATTENDANCE_CALCULATION_FLEXIBLE = 'flexible';
     const ATTENDANCE_CALCULATION_SEMI_FLEXIBLE = 'semi-flexible';
     const ATTENDANCE_CALCULATION_FIXED = 'fixed';
+    const ATTENDANCE_CALCULATION_IN_ONLY = 'in-only';
+    const ATTENDANCE_CALCULATION_BUS = 'bus';
     const ATTENDANCE_CALCULATION_LIST = [
         self::ATTENDANCE_CALCULATION_FLEXIBLE,
         self::ATTENDANCE_CALCULATION_SEMI_FLEXIBLE,
         self::ATTENDANCE_CALCULATION_FIXED,
+        self::ATTENDANCE_CALCULATION_IN_ONLY,
+        self::ATTENDANCE_CALCULATION_BUS,
     ];
 
     protected $table = 'benefit_configurations';

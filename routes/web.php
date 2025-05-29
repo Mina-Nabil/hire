@@ -39,7 +39,17 @@ use App\Livewire\Employee\OvertimeRequests;
 use App\Livewire\Employee\EmployeeOvertimeRequests;
 use App\Livewire\Settings\AppLogIndex;
 
-Route::group(['middleware' => 'auth'], function () {
+Route::group(['middleware' => ['auth', 'type:employee|hr|admin']], function () {
+    Route::get('/attendance', App\Livewire\Attendance\ShowAttendance::class)->name('attendance.index');
+    Route::get('/employee/benefits', EmployeeBenefitsView::class)->name('employee.benefits');
+    Route::get('/employee/apply-for-vacation', ApplyForVacation::class)->name('employee.apply-for-vacation');
+    Route::get('/employee/request-hr-letter', RequestHrLetter::class)->name('employee.request-hr-letter');
+    Route::get('/employee/documents', EmployeeDocumentView::class)->name('employee.documents');
+    Route::get('/employee/overtime-requests', EmployeeOvertimeRequests::class)->name('employee.overtime-requests');
+    Route::get('/attendance/applied-vacation', App\Livewire\Attendance\ShowAppliedVacation::class)->name('applied-vacation.index');
+});
+
+Route::group(['middleware' => ['auth', 'type:admin|hr']], function () {
     Route::get('/', Dashboard::class)->name('home');
 
     // Payroll & Attendance routes
@@ -50,25 +60,25 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/payrolls', App\Livewire\Payrolls\PayrollIndex::class)->name('payrolls.index');
     Route::get('/payrolls/create', App\Livewire\Payrolls\CreatePayroll::class)->name('payrolls.create');
     Route::get('/payrolls/{id}', App\Livewire\Payrolls\PayrollShow::class)->name('payrolls.show');
-    
+
     //benefits routes
     Route::get('/benefits/packages', PackageIndex::class)->name('benefits.packages');
     Route::get('/benefits/vacation-packages', VacationPackageIndex::class)->name('benefits.vacation-packages');
     Route::get('/benefits/configurations', ConfigurationIndex::class)->name('benefits.configurations');
     Route::get('/benefits/employee/{employee}', EmployeeConfiguration::class)->name('employee.configuration');
 
-    Route::get('/hierarchy/tree', [OrganizationController::class, 'index']);
-    Route::get('/hierarchy/positions', PositionIndex::class);
-    Route::get('/hierarchy/locations', LocationIndex::class);
+    Route::get('/hierarchy/tree', [OrganizationController::class, 'index'])->name('hierarchy.tree');
+    Route::get('/hierarchy/positions', PositionIndex::class)->name('hierarchy.positions');
+    Route::get('/hierarchy/locations', LocationIndex::class)->name('hierarchy.locations');
 
     Route::get('/recruitment/vacancies/{id}', VacancyShow::class)->name('recruitment.vacancies.show');
     Route::get('/recruitment/vacancies', VacancyIndex::class)->name('recruitment.vacancies');
     Route::get('/recruitment/applicants', ApplicantsIndex::class)->name('recruitment.applicants');
     Route::get('/recruitment/applicants/create', ApplicantsCreate::class)->name('applicants.create');
     Route::get('/recruitment/applicants/{applicant}', ApplicantShow::class)->name('recruitment.applicants.show');
-    Route::get('/recruitment/base-questions', BaseQuestionsIndex::class);
+    Route::get('/recruitment/base-questions', BaseQuestionsIndex::class)->name('recruitment.base-questions');
     Route::get('/recruitment/applicants/success', ApplicantSuccess::class)->name('applicants.success');
-    
+
     Route::get('/banks', BankIndex::class)->name('banks');
     Route::get('/insurance-offices', InsuranceOfficeIndex::class)->name('insurance-offices');
 
@@ -79,15 +89,11 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/employees/dashboard', EmployeeDashboard::class)->name('employees.dashboard');
     Route::get('/employees/reports/missing-documents', MissingDocReport::class)->name('employees.reports.missing-documents');
     Route::get('/employees/{id}', EmployeeShow::class)->name('employees.show');
-    Route::get('/employee/benefits', EmployeeBenefitsView::class)->name('employee.benefits');
-    Route::get('/employee/apply-for-vacation', ApplyForVacation::class)->name('employee.apply-for-vacation');
-    Route::get('/employee/request-hr-letter', RequestHrLetter::class)->name('employee.request-hr-letter');
-    Route::get('/employee/documents', EmployeeDocumentView::class)->name('employee.documents');
-    Route::get('/employee/overtime-requests', EmployeeOvertimeRequests::class)->name('employee.overtime-requests');
-    
-    Route::get('/settings/users', UsersIndex::class);
-    Route::get('/settings/areas', AreasIndex::class);
-    Route::get('/settings/channels', ChannelIndex::class);
+
+
+    Route::get('/settings/users', UsersIndex::class)->name('settings.users');
+    Route::get('/settings/areas', AreasIndex::class)->name('settings.areas');
+    Route::get('/settings/channels', ChannelIndex::class)->name('settings.channels');
     Route::get('/profile', Profile::class);
 
     Route::get('/app-logs', AppLogIndex::class);

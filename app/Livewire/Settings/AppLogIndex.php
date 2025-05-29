@@ -67,8 +67,6 @@ class AppLogIndex extends Component
         
         return view('livewire.settings.app-log-index', [
             'logs' => $logs,
-        ])->layout('components.layouts.app', [
-            'appLogsIndex' => 'active'
         ]);
     }
 }

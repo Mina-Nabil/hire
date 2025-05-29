@@ -82,21 +82,30 @@
                 <ul class="sidebar-menu">
 
                     <li>
-                        <a href="{{ url('/employee/benefits') }}"
-                            class="navItem {{ $benefits ?? '' }}">
+                        <a href="{{ url('/employee/benefits') }}" class="navItem {{ $benefits ?? '' }}">
                             <span class="flex items-center">
                                 <iconify-icon class="nav-icon" icon="heroicons-outline:credit-card"></iconify-icon>
                                 <span>Benefits</span>
                             </span>
                         </a>
                     </li>
-                    
+
                     <li>
                         <a href="{{ route('employee.apply-for-vacation') }}"
                             class="navItem {{ request()->routeIs('employee.apply-for-vacation') ? 'active' : '' }}">
                             <span class="flex items-center">
                                 <iconify-icon class="nav-icon" icon="heroicons-outline:calendar"></iconify-icon>
                                 <span>Apply for Vacation</span>
+                            </span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ route('applied-vacation.index') }}"
+                            class="navItem {{ request()->routeIs('applied-vacation.index') ? 'active' : '' }}">
+                            <span class="flex items-center">
+                                <iconify-icon class="nav-icon" icon="heroicons-outline:calendar"></iconify-icon>
+                                <span>Vacation Requests</span>
                             </span>
                         </a>
                     </li>
@@ -131,7 +140,8 @@
                         </a>
                     </li>
 
-                    @if (Auth::user()->employee->is_manager)
+
+
                     <li>
                         <a href="{{ route('attendance.index') }}"
                             class="navItem {{ request()->routeIs('attendance.index') ? 'active' : '' }}">
@@ -141,7 +151,7 @@
                             </span>
                         </a>
                     </li>
-                    @endif
+
                 </ul>
             </div>
         </div>

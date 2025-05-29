@@ -33,9 +33,6 @@ class InsuranceOfficeIndex extends Component
 
         return view('livewire.base.insurance-office-index', [
             'insuranceOffices' => $insuranceOffices
-        ])->layout('components.layouts.app', [
-            'title' => 'Insurance Offices',
-            'insuranceOfficesIndex' => 'active'
         ]);
     }
 

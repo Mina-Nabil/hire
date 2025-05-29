@@ -297,8 +297,18 @@ class Employee extends Model
      * @param bool $is_automatic_overtime
      * @return void
      */
-    public function setAttendanceConfigurations(array $working_days, $attendace_calculation, $working_day_start_min, $working_day_start_max, $working_day_end_min, $working_day_end_max, $daily_working_hours, $is_automatic_overtime, $overtime_rate, $is_require_attendance_approval = false)
-    {
+    public function setAttendanceConfigurations(
+        array $working_days,
+        $attendace_calculation,
+        $working_day_start_min,
+        $working_day_start_max ,
+        $daily_working_hours,
+        $is_automatic_overtime,
+        $overtime_rate,
+        $working_day_end_max = null,
+        $working_day_end_min = null,
+        $is_require_attendance_approval = false
+    ) {
         if ($attendace_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_FIXED) {
             if ($working_day_start_min !== $working_day_start_max) {
                 throw new AppException('Working day start min and max must be the same for fixed attendance calculation');
@@ -316,16 +326,17 @@ class Employee extends Model
                 throw new AppException('Working day end min and max must be different for semi-flexible attendance calculation');
             }
         }
+        if ($attendace_calculation !== BenefitConfiguration::ATTENDANCE_CALCULATION_IN_ONLY) {
+            $min_duration_diff = Carbon::parse($working_day_start_min)->diffInHours($working_day_end_min);
+            $max_duration_diff = Carbon::parse($working_day_start_max)->diffInHours($working_day_end_max);
 
-        $min_duration_diff = Carbon::parse($working_day_start_min)->diffInHours($working_day_end_min);
-        $max_duration_diff = Carbon::parse($working_day_start_max)->diffInHours($working_day_end_max);
+            if ($min_duration_diff != $max_duration_diff) {
+                throw new AppException('Working day date range is not valid, must be the same between min and max');
+            }
 
-        if ($min_duration_diff != $max_duration_diff) {
-            throw new AppException('Working day date range is not valid, must be the same between min and max');
-        }
-
-        if ($min_duration_diff != $daily_working_hours) {
-            throw new AppException('Working day duration is not valid, must be the same as the daily working hours difference');
+            if ($min_duration_diff != $daily_working_hours) {
+                throw new AppException('Working day duration is not valid, must be the same as the daily working hours difference');
+            }
         }
 
         try {
@@ -1172,6 +1183,11 @@ class Employee extends Model
                     $q->where('termination_date', '>=', $start_date);
                 });
         });
+    }
+
+    public function scopeUnemployed($query)
+    {
+        return $query->whereDoesntHave('position');
     }
 
     /**
@@ -3431,7 +3447,15 @@ class Employee extends Model
             ->toArray();
 
         // Return the difference - days that should have been worked but weren't
-        return collect(array_diff($period, $attendedDates));
+        $missingDays = collect(array_diff($period, $attendedDates));
+        $missingDays->each(function ($date) {
+            $this->missingDays()->updateOrCreate([
+                'date' => $date,
+            ], [
+                'hours' => $this->benefitConfiguration?->daily_working_hours ?? 8,
+            ]);
+        });
+        return $missingDays;
     }
 
     /**
@@ -4053,6 +4077,11 @@ class Employee extends Model
     public function attendances()
     {
         return $this->hasMany(\App\Models\Attendance\Attendance::class);
+    }
+
+    public function missingDays()
+    {
+        return $this->hasMany(\App\Models\Attendance\MissingDay::class);
     }
 
     public function activeEmployeeBaseBenefits($startDate)

@@ -159,10 +159,6 @@ class PackageIndex extends Component
 
     public function render()
     {
-        return view('livewire.benefits.package-index')
-            ->layout('components.layouts.app', [
-                'title' => 'Benefits Packages',
-                'packageIndex' => 'active',
-            ]);
+        return view('livewire.benefits.package-index');
     }
 }

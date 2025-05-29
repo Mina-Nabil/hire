@@ -33,9 +33,6 @@ class BankIndex extends Component
 
         return view('livewire.base.bank-index', [
             'banks' => $banks
-        ])->layout('components.layouts.app', [
-            'title' => 'Banks',
-            'banksIndex' => 'active'
         ]);
     }
 

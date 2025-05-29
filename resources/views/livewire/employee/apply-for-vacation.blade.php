@@ -32,11 +32,11 @@
                         <div class="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-5">
                             <!-- Date Range -->
                             <div>
-                                <x-text-input wire:model="fromDate" label="From Date*" type="date"
+                                <x-text-input wire:model.live="fromDate" label="From Date*" type="date"
                                     errorMessage="{{ $errors->first('fromDate') }}" />
                             </div>
                             <div>
-                                <x-text-input wire:model="toDate" label="To Date*" type="date"
+                                <x-text-input wire:model.live="toDate" label="To Date*" type="date"
                                     errorMessage="{{ $errors->first('toDate') }}" />
                             </div>
                         </div>

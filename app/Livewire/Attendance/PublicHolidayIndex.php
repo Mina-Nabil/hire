@@ -34,9 +34,6 @@ class PublicHolidayIndex extends Component
 
         return view('livewire.attendance.public-holiday-index', [
             'holidays' => $holidays
-        ])->layout('components.layouts.app', [
-            'title' => 'Public Holidays',
-            'publicHolidaysIndex' => 'active'
         ]);
     }
 

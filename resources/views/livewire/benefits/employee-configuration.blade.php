@@ -284,6 +284,12 @@
                                             {{ $employee->benefitConfiguration->is_automatic_overtime ? 'Yes' : 'No' }}
                                         </div>
                                     </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-5 font-weight-bold">Bus:</div>
+                                        <div class="col-md-7">{{ ucfirst($employee->benefitConfiguration->bus?->name ?? '-') }}
+                                        </div>
+                                    </div>
                                 @else
                                     <div class="alert alert-warning">
                                         No benefit configuration found for this employee.

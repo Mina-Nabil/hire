@@ -127,12 +127,23 @@
                                 <x-text-input label="Daily Working Hours" type="number" wire:model="dailyWorkingHours"
                                     errorMessage="{{ $errors->first('dailyWorkingHours') }}" min="1"
                                     max="24" />
-                                <x-text-input label="Working Day Start Min" type="time"
-                                    wire:model="workingDayStartMin"
-                                    errorMessage="{{ $errors->first('workingDayStartMin') }}" />
-                                <x-text-input label="Working Day Start Max" type="time"
-                                    wire:model="workingDayStartMax"
-                                    errorMessage="{{ $errors->first('workingDayStartMax') }}" />
+                                @if ($attendanceCalculation == 'bus')
+                                    <x-select label="Bus Name" wire:model="busId"
+                                        errorMessage="{{ $errors->first('busId') }}">
+                                        <option value="" readonly selected>Select Bus</option>
+                                        @foreach ($buses as $bus)
+                                            <option value="{{ $bus->id }}">{{ $bus->name }}</option>
+                                        @endforeach
+                                    </x-select>
+                                @endif
+                                @if ($attendanceCalculation != 'bus')
+                                    <x-text-input label="Working Day Start Min" type="time"
+                                        wire:model="workingDayStartMin"
+                                        errorMessage="{{ $errors->first('workingDayStartMin') }}" />
+                                    <x-text-input label="Working Day Start Max" type="time"
+                                        wire:model="workingDayStartMax"
+                                        errorMessage="{{ $errors->first('workingDayStartMax') }}" />
+                                @endif
                                 @if ($attendanceCalculation != 'in-only')
                                     <x-text-input label="Working Day End Min" type="time"
                                         wire:model="workingDayEndMin"
@@ -141,6 +152,7 @@
                                         wire:model="workingDayEndMax"
                                         errorMessage="{{ $errors->first('workingDayEndMax') }}" />
                                 @endif
+
                                 <x-text-input label="Overtime Rate" type="number" step="0.01"
                                     wire:model="overtimeRate" errorMessage="{{ $errors->first('overtimeRate') }}"
                                     min="1" />

@@ -300,15 +300,17 @@ class Employee extends Model
     public function setAttendanceConfigurations(
         array $working_days,
         $attendace_calculation,
-        $working_day_start_min,
-        $working_day_start_max ,
         $daily_working_hours,
         $is_automatic_overtime,
         $overtime_rate,
+        $working_day_start_min = null,
+        $working_day_start_max = null,
         $working_day_end_max = null,
         $working_day_end_min = null,
-        $is_require_attendance_approval = false
+        $is_require_attendance_approval = false,
+        $bus_id = null
     ) {
+
         if ($attendace_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_FIXED) {
             if ($working_day_start_min !== $working_day_start_max) {
                 throw new AppException('Working day start min and max must be the same for fixed attendance calculation');
@@ -326,7 +328,10 @@ class Employee extends Model
                 throw new AppException('Working day end min and max must be different for semi-flexible attendance calculation');
             }
         }
-        if ($attendace_calculation !== BenefitConfiguration::ATTENDANCE_CALCULATION_IN_ONLY) {
+
+        if ($attendace_calculation !== BenefitConfiguration::ATTENDANCE_CALCULATION_IN_ONLY
+            && $attendace_calculation !== BenefitConfiguration::ATTENDANCE_CALCULATION_BUS
+        ) {
             $min_duration_diff = Carbon::parse($working_day_start_min)->diffInHours($working_day_end_min);
             $max_duration_diff = Carbon::parse($working_day_start_max)->diffInHours($working_day_end_max);
 
@@ -339,8 +344,14 @@ class Employee extends Model
             }
         }
 
+        if ($attendace_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_BUS) {
+            if (!$bus_id) {
+                throw new AppException('Bus is required for bus attendance calculation');
+            }
+        }
+
         try {
-            DB::transaction(function () use ($attendace_calculation, $working_day_start_min, $working_day_start_max, $working_day_end_min, $working_day_end_max, $daily_working_hours, $overtime_rate, $is_automatic_overtime, $working_days, $is_require_attendance_approval) {
+            DB::transaction(function () use ($attendace_calculation, $working_day_start_min, $working_day_start_max, $working_day_end_min, $working_day_end_max, $daily_working_hours, $overtime_rate, $is_automatic_overtime, $working_days, $is_require_attendance_approval, $bus_id) {
                 $this->workingDays()->delete();
 
                 $dbWorkingDays = [];
@@ -363,6 +374,7 @@ class Employee extends Model
                     'working_day_end_max' => $working_day_end_max,
                     'daily_working_hours' => $daily_working_hours,
                     'overtime_rate' => $overtime_rate,
+                    'bus_id' => $bus_id,
                 ]);
                 AppLog::info('Attendance Configurations Set', 'Attendance configurations set for employee: ' . $this->name, loggable: $this);
             });

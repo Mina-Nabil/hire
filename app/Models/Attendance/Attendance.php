@@ -169,18 +169,7 @@ class Attendance extends Model
             }
 
             
-            // Calculate extra hours based on benefit configuration
-            // $extra_hours = null;
-            // if ($employee) {
-            //     $benefitConfig = $employee->benefitConfiguration;
-            //     if ($benefitConfig && $benefitConfig->daily_working_hours) {
-            //         $standardHours = $benefitConfig->daily_working_hours;
-            //         if($hours > $standardHours){
-            //             $extra_hours = $hours - $standardHours;
-            //         }
-            //     }
-            // }
-            
+          
             // Determine if attendance approval is required
             $isApproved = null;
             if ($employee) {

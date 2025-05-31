@@ -13,6 +13,7 @@ use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\UsersIndex;
 use App\Http\Controllers\Hierarchy\OrganizationController;
 use App\Livewire\Base\BankIndex;
+use App\Livewire\Base\BusIndex;
 use App\Livewire\Base\ImportData;
 use App\Livewire\Base\InsuranceOfficeIndex;
 use App\Livewire\Base\LocationIndex;
@@ -55,6 +56,7 @@ Route::group(['middleware' => ['auth', 'type:admin|hr']], function () {
     // Payroll & Attendance routes
     Route::get('/attendance/public-holidays', App\Livewire\Attendance\PublicHolidayIndex::class)->name('public-holidays.index');
     Route::get('/payrolls/submit-attendance', App\Livewire\Attendance\AddSheet::class)->name('submit-attendance');
+    Route::get('/attendance/bus-arrivals', App\Livewire\Attendance\AddBusArrivals::class)->name('attendance.bus-arrivals');
     Route::get('/attendance', App\Livewire\Attendance\ShowAttendance::class)->name('attendance.index');
     Route::get('/attendance/overtime', App\Livewire\Attendance\ShowOvertime::class)->name('overtime.index');
     Route::get('/payrolls', App\Livewire\Payrolls\PayrollIndex::class)->name('payrolls.index');
@@ -80,6 +82,7 @@ Route::group(['middleware' => ['auth', 'type:admin|hr']], function () {
     Route::get('/recruitment/applicants/success', ApplicantSuccess::class)->name('applicants.success');
 
     Route::get('/banks', BankIndex::class)->name('banks');
+    Route::get('/buses', BusIndex::class)->name('buses');
     Route::get('/insurance-offices', InsuranceOfficeIndex::class)->name('insurance-offices');
 
     // Employee routes

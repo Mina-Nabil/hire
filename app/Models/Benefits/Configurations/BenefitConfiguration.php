@@ -2,6 +2,7 @@
 
 namespace App\Models\Benefits\Configurations;
 
+use App\Models\Attendance\Bus;
 use App\Models\Personel\Employee;
 use App\Models\Benefits\Configurations\SalaryGrade;
 use App\Models\Users\User;
@@ -39,7 +40,8 @@ class BenefitConfiguration extends Model
         'daily_working_hours',
         'overtime_rate',
         'is_automatic_overtime',
-        'is_require_attendance_approval'
+        'is_require_attendance_approval',
+        'bus_id'
     ];
 
     public function employee()
@@ -56,6 +58,12 @@ class BenefitConfiguration extends Model
     {
         return $this->belongsTo(Employee::class, 'manager_id');
     }
+
+    public function bus()
+    {
+        return $this->belongsTo(Bus::class);
+    }
+
     
     
     

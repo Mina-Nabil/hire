@@ -125,6 +125,13 @@
                                         Applied Vacation Records</a>
                                 </li>
                             @endcan
+                            @can('viewAny', App\Models\Attendance\BusArrival::class)
+                            <li>
+                                <a class="{{ request()->routeIs('attendance.bus-arrivals') ? 'active' : '' }}"
+                                    href="{{ url('/attendance/bus-arrivals') }}">
+                                    Bus Arrivals</a>
+                            </li>
+                        @endcan
                         </ul>
                     </li>
 
@@ -322,6 +329,11 @@
                             @can('viewAny', App\Models\Base\Bank::class)
                                 <li>
                                     <a class="{{ request()->routeIs('banks') ? 'active' : '' }}" href="{{ url('/banks') }}">Banks</a>
+                                </li>
+                            @endcan
+                            @can('viewAny', App\Models\Attendance\Bus::class)
+                                <li>
+                                    <a class="{{ request()->routeIs('buses') ? 'active' : '' }}" href="{{ url('/buses') }}">Buses</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Base\Location::class)

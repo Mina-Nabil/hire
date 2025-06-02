@@ -27,9 +27,10 @@ class Attendance extends Model
         'end_time',
         'hours',
         'extra_hours',
+        'penalized_hours',
         'is_extra_hours_approved',
         'is_approved',
-        'payroll_id',
+        'payroll_id',   
     ];
 
     const MORPH_NAME = 'attendance';
@@ -165,7 +166,7 @@ class Attendance extends Model
             if($attendanceType == BenefitConfiguration::ATTENDANCE_CALCULATION_IN_ONLY){
                 $hours = $employee->benefitConfiguration->daily_working_hours;
             } else {
-                $hours = abs(round(Carbon::parse($attendanceEndDate)->diffInHours(Carbon::parse($attendanceStartDate)), 2));
+                $hours = abs(round(Carbon::parse($attendanceEndDate)->diffInDays(Carbon::parse($attendanceStartDate)), 2));
             }
 
             

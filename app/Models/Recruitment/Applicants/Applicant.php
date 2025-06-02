@@ -213,7 +213,7 @@ class Applicant extends Model
         try {
             return DB::transaction(function () use ($areaId, $firstName, $lastName, $email, $phone, $socialNumber, $additionalData) {
                 return self::updateOrCreate([
-                    'socialNumber' => $socialNumber,
+                    'social_number' => $socialNumber,
                 ], array_merge([
                     'area_id' => $areaId,
                     'first_name' => $firstName,

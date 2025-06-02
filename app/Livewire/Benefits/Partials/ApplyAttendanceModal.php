@@ -35,8 +35,8 @@ class ApplyAttendanceModal extends Component
     protected $rules = [
         'workingDays' => 'required|array|min:1',
         'attendanceCalculation' => 'required',
-        'workingDayStartMin' => 'required',
-        'workingDayStartMax' => 'required',
+        'workingDayStartMin' => 'required_unless:attendanceCalculation,bus',
+        'workingDayStartMax' => 'required_unless:attendanceCalculation,bus',
         'workingDayEndMin' => 'required_unless:attendanceCalculation,in-only',
         'workingDayEndMax' => 'required_unless:attendanceCalculation,in-only',
         'dailyWorkingHours' => 'required|numeric|min:1|max:24',

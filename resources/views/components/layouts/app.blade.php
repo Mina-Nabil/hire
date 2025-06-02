@@ -126,10 +126,25 @@
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Attendance\BusArrival::class)
-                            <li>
-                                <a class="{{ request()->routeIs('attendance.bus-arrivals') ? 'active' : '' }}"
-                                    href="{{ url('/attendance/bus-arrivals') }}">
-                                    Bus Arrivals</a>
+                            <li class="">
+                                <a href="javascript:void(0)" class="navItem">
+                                    <span class="flex items-center">
+                                        <span>Bus Arrivals</span>
+                                    </span>
+                                    <iconify-icon class="icon-arrow" icon="heroicons-outline:chevron-right"></iconify-icon>
+                                </a>
+                                <ul class="sidebar-submenu">
+                                    <li>
+                                        <a class="{{ request()->routeIs('attendance.bus-arrivals') ? 'active' : '' }}"
+                                            href="{{ url('/attendance/bus-arrivals') }}">
+                                            Upload Bus Arrivals</a>
+                                    </li>
+                                    <li>
+                                        <a class="{{ request()->routeIs('attendance.bus-arrivals.records') ? 'active' : '' }}"
+                                            href="{{ url('/attendance/bus-arrivals/records') }}">
+                                            Bus Arrival Records</a>
+                                    </li>
+                                </ul>
                             </li>
                         @endcan
                         </ul>

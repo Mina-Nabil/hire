@@ -538,7 +538,12 @@ class ApplicantsCreate extends Component
             }
             $question["object"] = $questionObject;
         }
-        $this->validate($validationRules, $messages);
+
+        if(count($validationRules) > 0){
+            $this->validate($validationRules, $messages);
+        } else { 
+            return true;
+        }
     }
 
     public function validateVacancyAndApplication()

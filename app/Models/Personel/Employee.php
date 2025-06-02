@@ -3,6 +3,7 @@
 namespace App\Models\Personel;
 
 use App\Exceptions\AppException;
+use App\Models\Attendance\BusArrival;
 use App\Models\Attendance\Overtime;
 use App\Models\Attendance\PublicHoliday;
 use App\Models\Base\City;
@@ -329,11 +330,12 @@ class Employee extends Model
             }
         }
 
-        if ($attendace_calculation !== BenefitConfiguration::ATTENDANCE_CALCULATION_IN_ONLY
+        if (
+            $attendace_calculation !== BenefitConfiguration::ATTENDANCE_CALCULATION_IN_ONLY
             && $attendace_calculation !== BenefitConfiguration::ATTENDANCE_CALCULATION_BUS
         ) {
-            $min_duration_diff = Carbon::parse($working_day_start_min)->diffInHours($working_day_end_min);
-            $max_duration_diff = Carbon::parse($working_day_start_max)->diffInHours($working_day_end_max);
+            $min_duration_diff = Carbon::parse($working_day_start_min)->diffInDays($working_day_end_min);
+            $max_duration_diff = Carbon::parse($working_day_start_max)->diffInDays($working_day_end_max);
 
             if ($min_duration_diff != $max_duration_diff) {
                 throw new AppException('Working day date range is not valid, must be the same between min and max');
@@ -3255,6 +3257,7 @@ class Employee extends Model
         $activeBenefits = $this->baseBenefits()
             ->where('receiver', PackageDetail::RECEIVER_EMPLOYEE)
             ->current($startDate)
+            ->includeQuarterOrYearlyOnlyIfNeeded($startDate, $endDate)
             ->get();
 
         $amount = 0;
@@ -3276,6 +3279,7 @@ class Employee extends Model
         $activeBenefits = $this->baseBenefits()
             ->where('receiver', PackageDetail::RECEIVER_OTHER)
             ->current($startDate)
+            ->includeQuarterOrYearlyOnlyIfNeeded($startDate, $endDate)
             ->get();
 
         $amount = 0;
@@ -3293,9 +3297,10 @@ class Employee extends Model
     }
 
 
-    public function activeMedicalBenefits($startDate)
+    public function activeMedicalBenefits($startDate, $endDate)
     {
         return $this->baseBenefits()
+            ->includeQuarterOrYearlyOnlyIfNeeded($startDate, $endDate)
             ->current($startDate)
             ->where('receiver', PackageDetail::RECEIVER_MEDICAL);
     }
@@ -3416,7 +3421,7 @@ class Employee extends Model
      * @param Carbon|string $endDate End date of the range
      * @return \Illuminate\Support\Collection Collection of dates that were working days but had no attendance
      */
-    public function getMissedWorkingDays($startDate, $endDate)
+    public function getMissedWorkingDays($startDate, $endDate, $deleteOldMissedDays = false)
     {
         $startDate = $startDate instanceof Carbon ? $startDate : Carbon::parse($startDate);
         $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
@@ -3449,6 +3454,13 @@ class Employee extends Model
             $currentDate->addDay();
         }
 
+        if ($deleteOldMissedDays) {
+            $this->missingDays()
+                ->where('date', '<=', $endDate->format('Y-m-d'))
+                ->where('date', '>=', $startDate->format('Y-m-d'))
+                ->delete();
+        }
+
         // Get all dates with approved attendance
         $attendedDates = $this->attendances()
             ->where('date', '>=', $startDate->format('Y-m-d'))
@@ -3477,9 +3489,9 @@ class Employee extends Model
      * @param Carbon|string $endDate End date of the range
      * @return float Total hours that should have been worked but weren't
      */
-    public function getMissedWorkingHours($startDate, $endDate)
+    public function getMissedWorkingHours($startDate, $endDate, $deleteOldMissedDays = false)
     {
-        $missedDays = $this->getMissedWorkingDays($startDate, $endDate);
+        $missedDays = $this->getMissedWorkingDays($startDate, $endDate, $deleteOldMissedDays);
         $dailyHours = $this->benefitConfiguration?->daily_working_hours ?? 8;
 
         return $missedDays->count() * $dailyHours;
@@ -3504,7 +3516,7 @@ class Employee extends Model
             $hourlyRate = $grossSalary / ($workingDaysPerMonth * $dailyHours);
         }
 
-        $missedHours = $this->getMissedWorkingHours($startDate, $endDate);
+        $missedHours = $this->getMissedWorkingHours($startDate, $endDate, true);
         return $missedHours * $hourlyRate;
     }
 
@@ -3676,7 +3688,7 @@ class Employee extends Model
             ->toArray();
 
         // Get missed working hours (full days with no attendance) - already excludes public holidays
-        $missedHours = $this->getMissedWorkingHours($startDate, $endDate);
+        $missedHours = $this->getMissedWorkingHours($startDate, $endDate, true);
 
         // Get all attendance records for the period
         $attendances = $this->attendances()
@@ -3709,20 +3721,38 @@ class Employee extends Model
                 if ($attendanceEnd->lt($attendanceStart)) {
                     $attendanceEnd->addDay();
                 }
+                if ($this->benefitConfiguration->attendace_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_BUS && $this->benefitConfiguration->bus_id) {
+                    $penaltyHoursForDay = $this->calculatePenaltyAfterBusArrival(
+                        $attendanceStart,
+                        $attendanceEnd,
+                        $workingDayEndMin,
+                        $workingDayEndMax
+                    );
 
-                // Calculate valid working hours within the allowed time range
-                $validWorkingHours = $this->calculateValidWorkingHours(
-                    $attendanceStart,
-                    $attendanceEnd,
-                    $attendance->date,
-                    $workingDayStartMin,
-                    $workingDayStartMax,
-                    $workingDayEndMin,
-                    $workingDayEndMax
-                );
+                } elseif ($this->benefitConfiguration->attendace_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_IN_ONLY) {
+                    $penaltyHoursForDay = $this->calculatePenaltyAfterInOnly(
+                        $attendanceStart,
+                        $workingDayStartMax
+                    );
+                } else {
+                    // Calculate valid working hours within the allowed time range
+                    $validWorkingHours = $this->calculateValidWorkingHours(
+                        $attendanceStart,
+                        $attendanceEnd,
+                        $attendance->date,
+                        $workingDayStartMin,
+                        $workingDayStartMax,
+                        $workingDayEndMin,
+                        $workingDayEndMax
+                    );
+                    // Calculate penalty hours for this day
+                    $penaltyHoursForDay = max(0, $dailyWorkingHours - $validWorkingHours);
+                }
+            }
 
-                // Calculate penalty hours for this day
-                $penaltyHoursForDay = max(0, $dailyWorkingHours - $validWorkingHours);
+            if($penaltyHoursForDay > 0){
+                $attendance->penalized_hours = $penaltyHoursForDay;
+                $attendance->save();
             }
 
             $totalPenaltyHours += $penaltyHoursForDay;
@@ -3812,6 +3842,61 @@ class Employee extends Model
         }
 
         return $validHours;
+    }
+
+    /**
+     * Calculate valid working hours within the allowed time range
+     *
+     * @param Carbon $attendanceStart Actual start time
+     * @param Carbon $attendanceEnd Actual end time
+     * @param string $date Date of attendance
+     * @param string|null $workingDayStartMin Earliest allowed start time
+     * @param string|null $workingDayStartMax Latest allowed start time
+     * @param string|null $workingDayEndMin Earliest allowed end time
+     * @param string|null $workingDayEndMax Latest allowed end time
+     * @return float Valid working hours
+     */
+    private function calculatePenaltyAfterBusArrival(
+        Carbon $attendanceStart,
+        Carbon $attendanceEnd,
+        ?string $workingDayEndMin,
+    ): float {
+
+        $penaltyDays = 0;
+        $busArrival = BusArrival::where('date', $attendanceStart->format('Y-m-d'))->first();
+        if (!$busArrival) {
+            return 0;
+        }
+
+        $allowedStartMax = Carbon::parse($busArrival->time)->addMinutes(BusArrival::BUS_ARRIVAL_TIME_OFFSET);
+
+        // Calculating penalty for arriving late after bus arrival
+        if ($attendanceStart->gt($allowedStartMax)) {
+            $penaltyDays = $attendanceStart->diffInDays($allowedStartMax, true);
+        }
+
+        $allowedEndMin = Carbon::parse($attendanceStart->format('Y-m-d') . ' ' . $workingDayEndMin);
+
+        // Leaving early penalty
+        if ($attendanceEnd->lt($allowedEndMin)) {
+            $penaltyDays += $allowedEndMin->diffInDays($attendanceEnd, true);
+        }
+
+        return $penaltyDays;
+    }
+
+    private function calculatePenaltyAfterInOnly(
+        Carbon $attendanceStart,
+        ?string $workingDayStartMax,
+    ): float {
+        $penaltyHours = 0;
+        $allowedStartMax = Carbon::parse($workingDayStartMax);
+
+        if ($attendanceStart->gt($allowedStartMax)) {
+            $penaltyHours = $attendanceStart->diffInDays($allowedStartMax, true);
+        }
+
+        return $penaltyHours;
     }
 
     /**
@@ -4096,19 +4181,21 @@ class Employee extends Model
         return $this->hasMany(\App\Models\Attendance\MissingDay::class);
     }
 
-    public function activeEmployeeBaseBenefits($startDate)
+    public function activeEmployeeBaseBenefits($startDate, $endDate)
     {
         return $this->baseBenefits()
             ->current($startDate)
+            ->includeQuarterOrYearlyOnlyIfNeeded($startDate, $endDate)
             ->whereHas('packageDetail', function ($query) {
                 $query->where('receiver', PackageDetail::RECEIVER_EMPLOYEE);
             });
     }
 
-    public function activeOtherBaseBenefits($startDate)
+    public function activeOtherBaseBenefits($startDate, $endDate)
     {
         return $this->baseBenefits()
             ->current($startDate)
+            ->includeQuarterOrYearlyOnlyIfNeeded($startDate, $endDate)
             ->whereHas('packageDetail', function ($query) {
                 $query->where('receiver', PackageDetail::RECEIVER_OTHER);
             });

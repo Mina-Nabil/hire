@@ -15,6 +15,8 @@ class BusArrival extends Model
 {
 
     const MORPH_NAME = 'bus_arrival';
+
+    const BUS_ARRIVAL_TIME_OFFSET = 15;
     
     protected $fillable = ['bus_id', 'date', 'time'];
 
@@ -130,7 +132,7 @@ class BusArrival extends Model
      * @param string $time
      * @return bool
      */
-    public static function createBusArrival($busName, $date, $time)
+    public static function createBusArrival($busID, $date, $time)
     {
 
         /** @var User $loggedInUser */
@@ -139,7 +141,7 @@ class BusArrival extends Model
             throw new AppException('You are not authorized to create bus arrivals');
         }
 
-        $bus = Bus::where('name', $busName)->first();
+        $bus = Bus::where('id', $busID)->first();
         if (!$bus) {
             throw new AppException('Bus not found');
         }

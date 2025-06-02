@@ -384,11 +384,14 @@
                                             <td class="table-td">
                                                 <span
                                                     class="
-                                            @if ($attendance->hours < $attendance->employee->benefitConfiguration->daily_working_hours) text-danger-500 @endif
-                                            @if ($attendance->hours > $attendance->employee->benefitConfiguration->daily_working_hours) text-success-500 @endif
+                                            @if ($attendance->penalized_hours > 0) text-danger-500 @else text-success-500 @endif
                                             ">
-                                                    {{ $attendance->hours ?? 'N/A' }}
-                                                    <small>Hours</small>
+                                                    {{ $attendance->hours ? $attendance->hours . 'h' : 'N/A' }}
+                                                    @if ($attendance->penalized_hours > 0)
+                                                        <span>
+                                                            - ({{ $attendance->penalized_hours }}h)
+                                                        </span>
+                                                    @endif
                                                 </span>
                                             </td>
                                             <td class="table-td">

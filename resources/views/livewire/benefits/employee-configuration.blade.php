@@ -252,7 +252,7 @@
                                     <div class="row mb-3">
                                         <div class="col-md-5 font-weight-bold">Attendance Calculation:</div>
                                         <div class="col-md-7">
-                                            {{ $this->getAttendanceCalculationLabel($employee->benefitConfiguration->attendace_calculation) }}
+                                            {{ $this->getAttendanceCalculationLabel($employee->benefitConfiguration->attendance_calculation) }}
                                         </div>
                                     </div>
                                     <div class="row mb-3">

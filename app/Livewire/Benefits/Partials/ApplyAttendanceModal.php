@@ -70,6 +70,7 @@ class ApplyAttendanceModal extends Component
         $this->isAutomaticOvertime = $this->selectedEmployee->benefitConfiguration?->is_automatic_overtime ? true : false;
         $this->isRequireAttendanceApproval = $this->selectedEmployee->benefitConfiguration?->is_require_attendance_approval ? true : false;
         $this->busId = $this->selectedEmployee->benefitConfiguration?->bus_id;
+
         $this->showApplyAttendanceModal = true;
     }
 

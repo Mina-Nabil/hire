@@ -142,7 +142,8 @@ class UsersIndex extends Component
             'name' => 'required|string|max:255',
             'type' => 'required|in:' . implode(',', User::TYPES),
         ]);
-
+        $imageUrl = null;
+        
         if (!is_url($this->userImage)) {
             $this->validate([
                 'userImage' => 'nullable|image|max:5024',

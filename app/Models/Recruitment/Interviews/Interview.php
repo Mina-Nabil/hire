@@ -317,4 +317,18 @@ class Interview extends Model
             $q->where('vacancy_id', $vacancyId);
         });
     }
+
+    public function scopeUserData($query)
+    {
+        $loggedInUser = Auth::user();
+
+        $query->where(function ($q) use ($loggedInUser) {
+            $q->where('user_id', $loggedInUser->id);
+            $q->orWhereHas('interviewers', function ($q) use ($loggedInUser) {
+                $q->where('user_id', $loggedInUser->id);
+            });
+        });
+
+        return $query;
+    }
 }

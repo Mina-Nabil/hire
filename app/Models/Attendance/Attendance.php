@@ -161,7 +161,7 @@ class Attendance extends Model
                 continue;
             }
 
-            $attendanceType = $employee->benefitConfiguration->attendace_calculation;
+            $attendanceType = $employee->benefitConfiguration->attendance_calculation;
 
             if($attendanceType == BenefitConfiguration::ATTENDANCE_CALCULATION_IN_ONLY){
                 $hours = $employee->benefitConfiguration->daily_working_hours;

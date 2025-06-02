@@ -288,7 +288,7 @@ class Employee extends Model
      * Apply for benefit package
      * @param array $working_days
      * ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday']
-     * @param int $attendace_calculation
+     * @param int $attendance_calculation
      * @param int $working_day_start_min
      * @param int $working_day_start_max
      * @param int $working_day_end_min
@@ -300,7 +300,7 @@ class Employee extends Model
      */
     public function setAttendanceConfigurations(
         array $working_days,
-        $attendace_calculation,
+        $attendance_calculation,
         $daily_working_hours,
         $is_automatic_overtime,
         $overtime_rate,
@@ -312,7 +312,7 @@ class Employee extends Model
         $bus_id = null
     ) {
 
-        if ($attendace_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_FIXED) {
+        if ($attendance_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_FIXED) {
             if ($working_day_start_min !== $working_day_start_max) {
                 throw new AppException('Working day start min and max must be the same for fixed attendance calculation');
             }
@@ -321,7 +321,7 @@ class Employee extends Model
             }
         }
 
-        if ($attendace_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_SEMI_FLEXIBLE) {
+        if ($attendance_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_SEMI_FLEXIBLE) {
             if ($working_day_start_min == $working_day_start_max) {
                 throw new AppException('Working day start min and max must be different for semi-flexible attendance calculation');
             }
@@ -331,8 +331,8 @@ class Employee extends Model
         }
 
         if (
-            $attendace_calculation !== BenefitConfiguration::ATTENDANCE_CALCULATION_IN_ONLY
-            && $attendace_calculation !== BenefitConfiguration::ATTENDANCE_CALCULATION_BUS
+            $attendance_calculation !== BenefitConfiguration::ATTENDANCE_CALCULATION_IN_ONLY
+            && $attendance_calculation !== BenefitConfiguration::ATTENDANCE_CALCULATION_BUS
         ) {
             $min_duration_diff = Carbon::parse($working_day_start_min)->diffInDays($working_day_end_min);
             $max_duration_diff = Carbon::parse($working_day_start_max)->diffInDays($working_day_end_max);
@@ -346,14 +346,24 @@ class Employee extends Model
             }
         }
 
-        if ($attendace_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_BUS) {
+        if ($attendance_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_BUS) {
             if (!$bus_id) {
                 throw new AppException('Bus is required for bus attendance calculation');
             }
+
+        }
+        
+        if($working_day_end_min > $working_day_end_max){
+            throw new AppException('Working day end min must be less than or equal to working day end max');
         }
 
+        if($working_day_start_min > $working_day_start_max){
+            throw new AppException('Working day start min must be less than or equal to working day start max');
+        }
+
+
         try {
-            DB::transaction(function () use ($attendace_calculation, $working_day_start_min, $working_day_start_max, $working_day_end_min, $working_day_end_max, $daily_working_hours, $overtime_rate, $is_automatic_overtime, $working_days, $is_require_attendance_approval, $bus_id) {
+            DB::transaction(function () use ($attendance_calculation, $working_day_start_min, $working_day_start_max, $working_day_end_min, $working_day_end_max, $daily_working_hours, $overtime_rate, $is_automatic_overtime, $working_days, $is_require_attendance_approval, $bus_id) {
                 $this->workingDays()->delete();
 
                 $dbWorkingDays = [];
@@ -369,7 +379,7 @@ class Employee extends Model
                 ], [
                     'is_automatic_overtime' => $is_automatic_overtime,
                     'is_require_attendance_approval' => $is_require_attendance_approval,
-                    'attendace_calculation' => $attendace_calculation,
+                    'attendance_calculation' => $attendance_calculation,
                     'working_day_start_min' => $working_day_start_min,
                     'working_day_start_max' => $working_day_start_max,
                     'working_day_end_min' => $working_day_end_min,
@@ -3721,15 +3731,14 @@ class Employee extends Model
                 if ($attendanceEnd->lt($attendanceStart)) {
                     $attendanceEnd->addDay();
                 }
-                if ($this->benefitConfiguration->attendace_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_BUS && $this->benefitConfiguration->bus_id) {
+                if ($this->benefitConfiguration->attendance_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_BUS && $this->benefitConfiguration->bus_id) {
                     $penaltyHoursForDay = $this->calculatePenaltyAfterBusArrival(
                         $attendanceStart,
                         $attendanceEnd,
-                        $workingDayEndMin,
-                        $workingDayEndMax
+                        $workingDayEndMin
                     );
 
-                } elseif ($this->benefitConfiguration->attendace_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_IN_ONLY) {
+                } elseif ($this->benefitConfiguration->attendance_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_IN_ONLY) {
                     $penaltyHoursForDay = $this->calculatePenaltyAfterInOnly(
                         $attendanceStart,
                         $workingDayStartMax
@@ -3867,15 +3876,15 @@ class Employee extends Model
         if (!$busArrival) {
             return 0;
         }
-
-        $allowedStartMax = Carbon::parse($busArrival->time)->addMinutes(BusArrival::BUS_ARRIVAL_TIME_OFFSET);
-
+        $allowedStartMax = Carbon::parse($busArrival->date . ' ' . $busArrival->time)->addMinutes(BusArrival::BUS_ARRIVAL_TIME_OFFSET);
+        
         // Calculating penalty for arriving late after bus arrival
         if ($attendanceStart->gt($allowedStartMax)) {
             $penaltyDays = $attendanceStart->diffInDays($allowedStartMax, true);
         }
-
+        
         $allowedEndMin = Carbon::parse($attendanceStart->format('Y-m-d') . ' ' . $workingDayEndMin);
+
 
         // Leaving early penalty
         if ($attendanceEnd->lt($allowedEndMin)) {

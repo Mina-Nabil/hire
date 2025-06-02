@@ -32,7 +32,7 @@ class BenefitConfiguration extends Model
         'vacation_package_id',
         'gross_salary',
         'insurance_amount', //الاساسى
-        'attendace_calculation',
+        'attendance_calculation',
         'working_day_start_min',
         'working_day_start_max',
         'working_day_end_min',

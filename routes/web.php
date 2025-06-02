@@ -12,6 +12,7 @@ use App\Livewire\Settings\AreasIndex;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\UsersIndex;
 use App\Http\Controllers\Hierarchy\OrganizationController;
+use App\Livewire\Home\Calendar;
 use App\Livewire\Base\BankIndex;
 use App\Livewire\Base\BusIndex;
 use App\Livewire\Base\ImportData;
@@ -48,6 +49,8 @@ Route::group(['middleware' => ['auth', 'type:employee|hr|admin']], function () {
     Route::get('/employee/documents', EmployeeDocumentView::class)->name('employee.documents');
     Route::get('/employee/overtime-requests', EmployeeOvertimeRequests::class)->name('employee.overtime-requests');
     Route::get('/attendance/applied-vacation', App\Livewire\Attendance\ShowAppliedVacation::class)->name('applied-vacation.index');
+
+    Route::get('/calendar', Calendar::class)->name('calendar');
 });
 
 Route::group(['middleware' => ['auth', 'type:admin|hr']], function () {

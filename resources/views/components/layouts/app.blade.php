@@ -81,6 +81,14 @@
                 id="sidebar_menus">
                 <ul class="sidebar-menu">
 
+                    <li>
+                        <a href="{{ url('/calendar') }}" class="navItem {{ request()->routeIs('calendar') ? 'active' : '' }}">
+                            <span class="flex items-center">
+                                <span>Calendar</span>
+                            </span>
+                        </a>
+                    </li>
+
                     <li class="">
                         <a href="javascript:void(0)" class="navItem">
                             <span class="flex items-center">
@@ -91,12 +99,14 @@
                         <ul class="sidebar-submenu">
                             @can('viewAny', App\Models\Payroll\Payroll::class)
                                 <li>
-                                    <a class="{{ request()->routeIs('payrolls.index') ? 'active' : '' }}" href="{{ url('/payrolls') }}">Payrolls</a>
+                                    <a class="{{ request()->routeIs('payrolls.index') ? 'active' : '' }}"
+                                        href="{{ url('/payrolls') }}">Payrolls</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Payroll\Payroll::class)
                                 <li>
-                                    <a class="{{ request()->routeIs('payrolls.create') ? 'active' : '' }}" href="{{ url('/payrolls/create') }}">
+                                    <a class="{{ request()->routeIs('payrolls.create') ? 'active' : '' }}"
+                                        href="{{ url('/payrolls/create') }}">
                                         Create Payroll</a>
                                 </li>
                             @endcan
@@ -109,44 +119,48 @@
                             @endcan
                             @can('viewAny', App\Models\Attendance\Attendance::class)
                                 <li>
-                                    <a class="{{ request()->routeIs('attendance.index') ? 'active' : '' }}" href="{{ url('/attendance') }}">
+                                    <a class="{{ request()->routeIs('attendance.index') ? 'active' : '' }}"
+                                        href="{{ url('/attendance') }}">
                                         Attendance Records</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Attendance\Attendance::class)
                                 <li>
-                                    <a class="{{ request()->routeIs('overtime.index') ? 'active' : '' }}" href="{{ url('/attendance/overtime') }}">
+                                    <a class="{{ request()->routeIs('overtime.index') ? 'active' : '' }}"
+                                        href="{{ url('/attendance/overtime') }}">
                                         Overtime Records</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Attendance\Attendance::class)
                                 <li>
-                                    <a class="{{ request()->routeIs('applied-vacation.index') ? 'active' : '' }}" href="{{ url('/attendance/applied-vacation') }}">
+                                    <a class="{{ request()->routeIs('applied-vacation.index') ? 'active' : '' }}"
+                                        href="{{ url('/attendance/applied-vacation') }}">
                                         Applied Vacation Records</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Attendance\BusArrival::class)
-                            <li class="">
-                                <a href="javascript:void(0)" class="navItem">
-                                    <span class="flex items-center">
-                                        <span>Bus Arrivals</span>
-                                    </span>
-                                    <iconify-icon class="icon-arrow" icon="heroicons-outline:chevron-right"></iconify-icon>
-                                </a>
-                                <ul class="sidebar-submenu">
-                                    <li>
-                                        <a class="{{ request()->routeIs('attendance.bus-arrivals') ? 'active' : '' }}"
-                                            href="{{ url('/attendance/bus-arrivals') }}">
-                                            Upload Bus Arrivals</a>
-                                    </li>
-                                    <li>
-                                        <a class="{{ request()->routeIs('attendance.bus-arrivals.records') ? 'active' : '' }}"
-                                            href="{{ url('/attendance/bus-arrivals/records') }}">
-                                            Bus Arrival Records</a>
-                                    </li>
-                                </ul>
-                            </li>
-                        @endcan
+                                <li class="">
+                                    <a href="javascript:void(0)" class="navItem">
+                                        <span class="flex items-center">
+                                            <span>Bus Arrivals</span>
+                                        </span>
+                                        <iconify-icon class="icon-arrow"
+                                            icon="heroicons-outline:chevron-right"></iconify-icon>
+                                    </a>
+                                    <ul class="sidebar-submenu">
+                                        <li>
+                                            <a class="{{ request()->routeIs('attendance.bus-arrivals') ? 'active' : '' }}"
+                                                href="{{ url('/attendance/bus-arrivals') }}">
+                                                Upload Bus Arrivals</a>
+                                        </li>
+                                        <li>
+                                            <a class="{{ request()->routeIs('attendance.bus-arrivals.records') ? 'active' : '' }}"
+                                                href="{{ url('/attendance/bus-arrivals/records') }}">
+                                                Bus Arrival Records</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            @endcan
                         </ul>
                     </li>
 
@@ -159,7 +173,7 @@
                             <iconify-icon class="icon-arrow" icon="heroicons-outline:chevron-right"></iconify-icon>
                         </a>
                         <ul class="sidebar-submenu">
-                            
+
                             <li>
                                 <a href="{{ route('employees.requests.hr-letters.index') }}"
                                     class="navItem {{ request()->routeIs('employees.requests.hr-letters.index') ? 'active' : '' }}">
@@ -199,7 +213,8 @@
                             @endcan
                             @can('viewAny', App\Models\Benefits\Configurations\SalaryGrade::class)
                                 <li>
-                                    <a class="{{ request()->routeIs('benefits.packages') ? 'active' : '' }}" href="{{ url('/benefits/packages') }}">
+                                    <a class="{{ request()->routeIs('benefits.packages') ? 'active' : '' }}"
+                                        href="{{ url('/benefits/packages') }}">
                                         Grading System</a>
                                 </li>
                             @endcan
@@ -237,12 +252,14 @@
                             @endcan
                             @can('viewAny', App\Models\Personel\Employee::class)
                                 <li>
-                                    <a class="{{ request()->routeIs('employees') ? 'active' : '' }}" href="{{ route('employees') }}">Employees</a>
+                                    <a class="{{ request()->routeIs('employees') ? 'active' : '' }}"
+                                        href="{{ route('employees') }}">Employees</a>
                                 </li>
                             @endcan
                             @can('create', App\Models\Personel\Employee::class)
                                 <li>
-                                    <a class="{{ request()->routeIs('employees.create') ? 'active' : '' }}" href="{{ route('employees.create') }}">Create
+                                    <a class="{{ request()->routeIs('employees.create') ? 'active' : '' }}"
+                                        href="{{ route('employees.create') }}">Create
                                         Employee</a>
                                 </li>
                             @endcan
@@ -327,12 +344,14 @@
                         <ul class="sidebar-submenu">
                             @can('viewAny', App\Models\Users\User::class)
                                 <li>
-                                    <a class="{{ request()->routeIs('settings.users') ? 'active' : '' }}" href="{{ url('/settings/users') }}">Users</a>
+                                    <a class="{{ request()->routeIs('settings.users') ? 'active' : '' }}"
+                                        href="{{ url('/settings/users') }}">Users</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Base\Area::class)
                                 <li>
-                                    <a class="{{ request()->routeIs('settings.areas') ? 'active' : '' }}" href="{{ url('/settings/areas') }}">Areas</a>
+                                    <a class="{{ request()->routeIs('settings.areas') ? 'active' : '' }}"
+                                        href="{{ url('/settings/areas') }}">Areas</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Base\InsuranceOffice::class)
@@ -343,12 +362,14 @@
                             @endcan
                             @can('viewAny', App\Models\Base\Bank::class)
                                 <li>
-                                    <a class="{{ request()->routeIs('banks') ? 'active' : '' }}" href="{{ url('/banks') }}">Banks</a>
+                                    <a class="{{ request()->routeIs('banks') ? 'active' : '' }}"
+                                        href="{{ url('/banks') }}">Banks</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Attendance\Bus::class)
                                 <li>
-                                    <a class="{{ request()->routeIs('buses') ? 'active' : '' }}" href="{{ url('/buses') }}">Buses</a>
+                                    <a class="{{ request()->routeIs('buses') ? 'active' : '' }}"
+                                        href="{{ url('/buses') }}">Buses</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Base\Location::class)
@@ -365,13 +386,15 @@
                             @endcan
                             @if (Auth::user()->is_admin)
                                 <li>
-                                    <a class="{{ request()->routeIs('import-data') ? 'active' : '' }}" href="{{ route('import-data') }}">Import
+                                    <a class="{{ request()->routeIs('import-data') ? 'active' : '' }}"
+                                        href="{{ route('import-data') }}">Import
                                         Data</a>
                                 </li>
                             @endif
                             @can('viewAny', App\Models\Settings\AppLog::class)
                                 <li>
-                                    <a class="{{ request()->routeIs('app-logs') ? 'active' : '' }}" href="{{ url('/app-logs') }}">App
+                                    <a class="{{ request()->routeIs('app-logs') ? 'active' : '' }}"
+                                        href="{{ url('/app-logs') }}">App
                                         Logs</a>
                                 </li>
                             @endcan

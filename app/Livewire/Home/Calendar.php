@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire;
+namespace App\Livewire\Home;
 
 use App\Models\Recruitment\Interviews\Interview;
 use App\Models\Users\CalendarEvent;

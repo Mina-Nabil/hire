@@ -3,7 +3,7 @@
     <div class="card">
         <header class=" card-header noborder">
             <h4 class="card-title">
-                WISE Calendar
+                HiRe Calendar
             </h4>
             <div class="flex sm:space-x-4 space-x-2 sm:justify-end items-center md:mb-6 rtl:space-x-reverse">
                 <button wire:click="openNewEventSec" class="btn inline-flex justify-center btn-dark dark:bg-slate-700 dark:text-slate-300 m-1">
@@ -311,7 +311,7 @@
                     // Check if the event is a CalendarEvent and trigger the Livewire method
                     if (info.event.id.startsWith('event')) {
                         let eventId = info.event.id.replace('event', '');
-                        Livewire.emit('showEvent', eventId);
+                        Livewire.dispatch('showEvent', [eventId]);
                     } else if (info.event.url) {
                         window.open(info.event.url);
                     }

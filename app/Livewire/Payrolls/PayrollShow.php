@@ -443,6 +443,7 @@ class PayrollShow extends Component
                 'overtime_amount' => $totalsQuery->sum('overtime_amount'),
                 'adj_amount' => $totalsQuery->sum('adj_amount'),
                 'net_after_deductions' => $totalsQuery->sum('net_after_deductions'),
+                'tax_amount' => $totalsQuery->sum('tax_amount'),
             ];
             
             $data = [

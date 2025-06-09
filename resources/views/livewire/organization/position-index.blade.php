@@ -100,7 +100,9 @@
                             <table class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
                                 <thead class="bg-slate-200 dark:bg-slate-700">
                                     <tr>
+                                        <th scope="col" class="table-th">Code</th>
                                         <th scope="col" class="table-th">Name</th>
+                                        <th scope="col" class="table-th">Employee</th>
                                         <th scope="col" class="table-th">Department</th>
                                         <th scope="col" class="table-th">Parent</th>
                                         <th scope="col" class="table-th">Actions</th>
@@ -110,7 +112,9 @@
                                     class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
                                     @forelse($positions as $position)
                                         <tr>
+                                            <td class="table-td">{{ $position->code }}</td>
                                             <td class="table-td">{{ $position->name }}</td>
+                                            <td class="table-td">{{ $position->employee->name }}</td>
                                             <td class="table-td">{{ $position->department->name }}</td>
                                             <td class="table-td">{{ $position->parent ? $position->parent->name : '-' }}
                                             </td>

@@ -19,7 +19,7 @@ class BaseQuestionPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, BaseQuestion $baseQuestion): bool
+    public function view(User $user, BaseQuestion $baseQuestion=null): bool
     {
         return $user->is_admin || $user->is_hr;
     }
@@ -35,7 +35,7 @@ class BaseQuestionPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, BaseQuestion $baseQuestion): bool
+    public function update(User $user, BaseQuestion $baseQuestion=null): bool
     {
         return $user->is_admin || $user->is_hr;
     }

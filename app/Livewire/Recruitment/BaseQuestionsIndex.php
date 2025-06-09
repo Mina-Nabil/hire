@@ -77,7 +77,7 @@ class BaseQuestionsIndex extends Component
         $this->questionId = $baseQuestion->id;
         $this->question = $baseQuestion->question;
         $this->type = $baseQuestion->type;
-        $this->options = $baseQuestion->options ? explode(',', $baseQuestion->options) : [];
+        $this->options = $baseQuestion->options ? implode(',', $baseQuestion->options_array) : '';
         
         $this->editQuestionModal = true;
     }

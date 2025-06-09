@@ -24,7 +24,7 @@ class VacancyQuestion extends Model
 
     public function getOptionsArrayAttribute()
     {
-        return $this->options ? explode(',', $this->options) : [];
+        return $this->options ? json_decode($this->options) : [];
     }
 
     /**

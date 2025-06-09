@@ -24,6 +24,7 @@ class PositionIndex extends Component
     public $employees = [];
     public $locations = [];
     public $salaryGrades = [];
+    public $allDepartments = [];
 
     // Department section
     public $newDepartmentModal = false;
@@ -373,6 +374,7 @@ class PositionIndex extends Component
         $this->employees = Employee::current()->unemployed()->get();
         $this->locations = Location::all();
         $this->salaryGrades = SalaryGrade::all();
+        $this->allDepartments = Department::all();
     }
 
     public function render()

@@ -410,7 +410,7 @@
                                         class="form-control @error('selectedDepartmentId') !border-danger-500 @enderror"
                                         wire:model="selectedDepartmentId">
                                         <option value="">Select a department</option>
-                                        @foreach ($departments as $department)
+                                        @foreach ($allDepartments as $department)
                                             <option value="{{ $department->id }}">{{ $department->name }}</option>
                                         @endforeach
                                     </select>
@@ -604,7 +604,7 @@
                                         class="form-control @error('selectedDepartmentId') !border-danger-500 @enderror"
                                         wire:model="selectedDepartmentId">
                                         <option value="">Select a department</option>
-                                        @foreach ($departments as $department)
+                                        @foreach ($allDepartments as $department)
                                             <option value="{{ $department->id }}">{{ $department->name }}</option>
                                         @endforeach
                                     </select>

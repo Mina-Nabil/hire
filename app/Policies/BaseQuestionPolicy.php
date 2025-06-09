@@ -43,7 +43,7 @@ class BaseQuestionPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, BaseQuestion $baseQuestion): bool
+    public function delete(User $user, BaseQuestion $baseQuestion=null): bool
     {
         return $user->is_admin || $user->is_hr;
     }

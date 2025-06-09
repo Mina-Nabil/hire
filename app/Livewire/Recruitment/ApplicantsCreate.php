@@ -467,7 +467,7 @@ class ApplicantsCreate extends Component
 
         $this->validate([
             'hasHealthIssues' => 'boolean',
-            'healthIssues' => 'required_if:hasHealthIssues,1|nullable|string|max:2000',
+            'healthIssues' => 'required_if:hasHealthIssues,1|string|max:2000',
         ]);
     }
 

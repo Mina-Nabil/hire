@@ -115,7 +115,7 @@ class CalendarEvent extends Model
     }
 
     ///scopes
-    public function scopeUserdata($query, Carbon $from = null, Carbon $to = null)
+    public function scopeUserdata($query, ?Carbon $from = null, ?Carbon $to = null)
     {
         $from = $from ?? Carbon::now();
         $to = $to ?? Carbon::now()->addMonths(2);

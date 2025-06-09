@@ -127,7 +127,7 @@ class BaseQuestion extends Model
             throw new AppException(__('misc.not_authorized'));
         }
         $deleted = $this->delete();
-        AppLog::info('Question Deleted', 'Question deleted for vacancy: ' . $this->vacancy->id, loggable: $this);
+        AppLog::info('Question Deleted', 'Base Question deleted', loggable: $this);
         return $deleted;
     }
 }

@@ -308,6 +308,9 @@ class Position extends Model
             ->orWhere('arabic_name', 'like', '%' . $search . '%')
             ->orWhereHas('department', function ($q) use ($search) {
                 $q->where('name', 'like', '%' . $search . '%');
+            })
+            ->orWhereHas('employee', function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%');
             });
     }
 

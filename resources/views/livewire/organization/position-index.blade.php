@@ -114,7 +114,7 @@
                                         <tr>
                                             <td class="table-td">{{ $position->code }}</td>
                                             <td class="table-td">{{ $position->name }}</td>
-                                            <td class="table-td">{{ $position->employee->name }}</td>
+                                            <td class="table-td">{{ $position->employee?->name ?? '-' }}</td>
                                             <td class="table-td">{{ $position->department->name }}</td>
                                             <td class="table-td">{{ $position->parent ? $position->parent->name : '-' }}
                                             </td>

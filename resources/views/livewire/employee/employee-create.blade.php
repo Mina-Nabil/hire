@@ -4,7 +4,6 @@
             <h4 class="font-medium lg:text-2xl text-xl capitalize text-slate-900">
                 Create New Employee
             </h4>
-            {{ $errors }}
             <div class="flex items-center">
                 <select id="status" class="form-control w-auto @error('status') !border-danger-500 @enderror"
                     wire:model="status">

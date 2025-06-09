@@ -312,7 +312,7 @@ class VacancyShow extends Component
                         'arabic_question' => $question['arabic_question'] ?? null,
                         'type' => $question['type'],
                         'required' => isset($question['required']) ? true : false,
-                        'options' => isset($question['options']) ? json_encode($question['options']) : null,
+                        'options' => isset($question['options']) ? json_encode(explode(',', $question['options'])) : null,
                     ];
 
                     if (isset($question['id'])) {

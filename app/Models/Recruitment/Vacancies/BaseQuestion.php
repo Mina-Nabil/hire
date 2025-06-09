@@ -72,7 +72,7 @@ class BaseQuestion extends Model
                 $options = explode(',', $options);
                 $options = array_map('trim', $options);
             }
-            $this->options = $options;
+            $this->options = json_encode($options);
         }
         
         $this->save();

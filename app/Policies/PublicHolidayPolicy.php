@@ -45,6 +45,6 @@ class PublicHolidayPolicy
      */
     public function delete(User $user, PublicHoliday $publicHoliday): bool
     {
-        return false;
+        return $user->is_admin;
     }
 }

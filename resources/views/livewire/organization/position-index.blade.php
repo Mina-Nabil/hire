@@ -26,7 +26,7 @@
     <div class="flex flex-wrap sm:flex-nowrap justify-between space-x-3 rtl:space-x-reverse mb-6">
         <div class="flex-0 w-full sm:w-auto mb-3 sm:mb-0">
             <div class="relative">
-                <input type="text" class="form-control pl-10" placeholder="Search..."
+                <input type="text" class="form-control pl-10" placeholder="Search by department or position or employee..."
                     wire:model.live.debounce.300ms="search">
                 <span class="absolute right-0 top-0 w-9 h-full flex items-center justify-center text-slate-400">
                     <iconify-icon icon="heroicons-solid:search"></iconify-icon>
@@ -36,7 +36,7 @@
     </div>
 
     <!-- Grid Layout for Tables -->
-    <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-5 mb-5 text-wrap">
+    <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-5 mb-5 text-wrap">
         <!-- Departments Table -->
         <div class="card mb-6">
             <header class="card-header noborder">
@@ -89,7 +89,7 @@
         </div>
 
         <!-- Positions Table -->
-        <div class="card">
+        <div class="card col-span-2">
             <header class="card-header noborder">
                 <h4 class="card-title">Positions</h4>
             </header>

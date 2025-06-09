@@ -222,7 +222,9 @@ class PositionIndex extends Component
     public function openEditPositionSec($id)
     {
         $position = Position::find($id);
+        
         $this->employees = Employee::current()->unemployed()->get();
+        $this->employees->push($position->employee);
 
         $this->positionId = $position->id;
         $this->positionName = $position->name;

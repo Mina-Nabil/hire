@@ -110,7 +110,7 @@ class BaseQuestion extends Model
         }
         
         $this->save();
-        AppLog::info('Question Updated', 'Question updated for vacancy: ' . $this->vacancy->id, loggable: $this);
+        AppLog::info('Question Updated', 'Base Question updated', loggable: $this);
         return $this;
     }
 

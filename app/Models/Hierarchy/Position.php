@@ -178,7 +178,7 @@ class Position extends Model
         int $locationId,
         int $departmentId,
         string $name,
-        ?int $parentId,
+        $parentId,
         string $arabicName,
         ?string $jobDescription,
         ?string $arabicJobDescription,

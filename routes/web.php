@@ -119,4 +119,7 @@ Route::group(['middleware' => ['auth', 'type:admin|hr']], function () {
 Route::group(['middleware' => 'guest'], function () {
     Route::get('/login', Login::class)->name('login');
     Route::get('/recruitment/apply/{vacancyID}/{referralID?}', ApplicantsCreate::class)->name('applicants.guest.create');
+    Route::get('/thank-you', function () {
+        return view('thank-you');
+    })->name('thank-you');
 });

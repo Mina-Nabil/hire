@@ -677,6 +677,10 @@ class ApplicantsCreate extends Component
             });
 
             $this->alertSuccess('Applicant created successfully!');
+            $user = Auth::user();
+            if(!$user){
+                return redirect()->to('/thank-you');
+            }
             return redirect()->to('/recruitment/applicants');
         } catch (AppException $e) {
             $this->alertError($e->getMessage());

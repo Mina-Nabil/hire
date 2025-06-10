@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class Position extends Model
 {
@@ -199,8 +200,8 @@ class Position extends Model
                 throw new AppException('You are not authorized to edit this position');
             }
 
-
-            return $this->update([
+            DB::beginTransaction();
+            $this->update([
                 'location_id' => $locationId,
                 'department_id' => $departmentId,
                 'name' => $name,
@@ -214,10 +215,23 @@ class Position extends Model
                 'job_benefits' => $jobBenefits,
                 'arabic_job_benefits' => $arabicJobBenefits,
                 'parent_id' => $parentId,
-                'code' => $code,
-                'employee_id' => $employeeId ?? NULL,
-                'salary_grade_id' => $salaryGradeId ?? NULL,
+                'code' => $code
             ]);
+            if($employeeId) {
+                $this->employee()->associate($employeeId);
+                $this->save();
+            } else {
+                $this->employee()->dissociate();
+                $this->save();
+            }
+            if($salaryGradeId) {
+                $this->salaryGrade()->associate($salaryGradeId);
+                $this->save();
+            } else {
+                $this->salaryGrade()->dissociate();
+                $this->save();
+            }
+            DB::commit();
             AppLog::info('Position Updated', "Name: $name", loggable: $this);
             return true;
         } catch (Exception $e) {

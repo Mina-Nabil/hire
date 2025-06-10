@@ -110,11 +110,13 @@ class ApplicantsCreate extends Component
 
         if ($vacancyID) {
             $vacancyID = decrypt($vacancyID);
+            $this->vacancyId = $vacancyID;
             $this->selectedVacancy = Vacancy::findOrFail($vacancyID);
         }
 
         if ($referralID) {
             $referralID = decrypt($referralID);
+            $this->referredById = $referralID;
             $this->selectedReferral = Employee::findOrFail($referralID);
         }
 

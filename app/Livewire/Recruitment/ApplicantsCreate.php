@@ -142,7 +142,6 @@ class ApplicantsCreate extends Component
         $this->computerSkillsList = ApplicantSkill::COMPUTER_SKILLS;
         $this->technicalSkillsList = ApplicantSkill::TECHNICAL_SKILLS;
         $this->softSkillsList = ApplicantSkill::SOFT_SKILLS;
-        
     }
 
     public function switchLocale($locale)
@@ -464,11 +463,11 @@ class ApplicantsCreate extends Component
                 ]);
             }
         }
-
-        $this->validate([
-            'hasHealthIssues' => 'boolean',
-            'healthIssues' => 'required_if:hasHealthIssues,1|string|max:2000',
-        ]);
+        if ($this->hasHealthIssues) {
+            $this->validate([
+                'healthIssues' => 'required|string|max:2000',
+            ]);
+        }
     }
 
 
@@ -539,9 +538,9 @@ class ApplicantsCreate extends Component
             $question["object"] = $questionObject;
         }
 
-        if(count($validationRules) > 0){
+        if (count($validationRules) > 0) {
             $this->validate($validationRules, $messages);
-        } else { 
+        } else {
             return true;
         }
     }

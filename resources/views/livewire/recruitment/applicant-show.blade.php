@@ -70,7 +70,7 @@
                 title: "Delete Applicant",
                 message: "Are you sure you want to delete this applicant?",
                 color: "danger",
-                action: "deleteApplicant",
+                callback: "deleteApplicant",
             })'
                 class="btn btn-danger inline-flex justify-center btn-sm">
                 Delete Applicant

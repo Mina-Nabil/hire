@@ -215,8 +215,8 @@ class Position extends Model
                 'arabic_job_benefits' => $arabicJobBenefits,
                 'parent_id' => $parentId,
                 'code' => $code,
-                'employee_id' => $employeeId,
-                'salary_grade_id' => $salaryGradeId,
+                'employee_id' => $employeeId ?? NULL,
+                'salary_grade_id' => $salaryGradeId ?? NULL,
             ]);
             AppLog::info('Position Updated', "Name: $name", loggable: $this);
             return true;

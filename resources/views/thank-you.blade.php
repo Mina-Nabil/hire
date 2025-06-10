@@ -15,7 +15,7 @@
             </div>
 
             <!-- Card -->
-            <div class="bg-white rounded-lg shadow-lg p-8 text-center">
+            <div class="bg-white rounded-lg shadow-lg p-8 text-center py-12">
                 <div class="mb-6">
                     <h2 class="text-xl font-semibold text-gray-800 mb-3">What happens next?</h2>
                     <div class="space-y-3 text-left">

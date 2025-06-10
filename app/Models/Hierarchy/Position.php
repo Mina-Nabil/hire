@@ -190,7 +190,7 @@ class Position extends Model
         ?string $arabicJobBenefits,
         ?string $code,
         ?string $employeeId,
-        ?int $salaryGradeId,
+        $salaryGradeId,
     ): bool {
         try {
             /** @var User $loggerInUser */

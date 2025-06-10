@@ -1,7 +1,7 @@
 @extends('components.layouts.guest')
 
 @section('content')
-    <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4">
+    <div class="bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4">
         <div class="max-w-md w-full">
             <!-- Success Icon -->
             <div class="text-center mb-8">

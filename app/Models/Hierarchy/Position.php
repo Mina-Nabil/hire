@@ -259,7 +259,7 @@ class Position extends Model
         }
         // Check if there are vacancies for this position
         else if ($this->vacancies()->count() > 0) {
-            throw new AppException('Cannot delete position with active vacancies.');
+            throw new AppException('Cannot delete position with vacancies.');
         }
 
         try {

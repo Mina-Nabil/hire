@@ -593,6 +593,87 @@
                             </div>
                         </li>
 
+                        <li wire:click="changeSection('labour_document')"
+                            class="block py-[8px] p-6  {{ $section == 'labour_document' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
+                            <div class="flex justify-between space-x-2 rtl:space-x-reverse">
+                                Labour Document
+
+                                <span>
+                                    @if ($employee->labourDocument)
+                                        <span
+                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                    @else
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                    @endif
+                                </span>
+
+                                @if ($section == 'labour_document')
+                                    <div class="flex-none">
+                                        <button type="button"
+                                            class="text-xs text-slate-900 dark:text-white {{ $section == 'labour_document' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
+                                            <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
+                                                height="25"></iconify-icon>
+                                        </button>
+                                    </div>
+                                @endif
+                            </div>
+                        </li>
+
+                        <li wire:click="changeSection('college_certificate')"
+                            class="block py-[8px] p-6  {{ $section == 'college_certificate' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
+                            <div class="flex justify-between space-x-2 rtl:space-x-reverse">
+                                College Certificate
+
+                                <span>
+                                    @if ($employee->collegeCertificate)
+                                        <span
+                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                    @else
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                    @endif
+                                </span>
+
+                                @if ($section == 'college_certificate')
+                                    <div class="flex-none">
+                                        <button type="button"
+                                            class="text-xs text-slate-900 dark:text-white {{ $section == 'college_certificate' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
+                                            <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
+                                                height="25"></iconify-icon>
+                                        </button>
+                                    </div>
+                                @endif
+                            </div>
+                        </li>
+
+                        <li wire:click="changeSection('social_print')"
+                            class="block py-[8px] p-6  {{ $section == 'social_print' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
+                            <div class="flex justify-between space-x-2 rtl:space-x-reverse">
+                                Social Print
+
+                                <span>
+                                    @if ($employee->socialPrint)
+                                        <span
+                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                    @else
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                    @endif
+                                </span>
+
+                                @if ($section == 'social_print')
+                                    <div class="flex-none">
+                                        <button type="button"
+                                            class="text-xs text-slate-900 dark:text-white {{ $section == 'social_print' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
+                                            <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
+                                                height="25"></iconify-icon>
+                                        </button>
+                                    </div>
+                                @endif
+                            </div>
+                        </li>
+
                     </ul>
                     <!-- END: FIles Card -->
                 </div>
@@ -2546,6 +2627,276 @@
                                     <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
                                         class="mr-1"></iconify-icon>
                                     Upload Syndicate Card
+                                </button>
+                            @endcan
+                        </div>
+                    @endif
+                </div>
+            @elseif ($section == 'labour_document')
+                <!-- Labour Document Section -->
+                <div class="card">
+                    <div class="card-header flex justify-between items-center">
+                        <h4
+                            class="font-medium lg:text-xl text-lg capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
+                            Labour Document
+                        </h4>
+
+                        @can('setDocs', $employee)
+                            <button wire:click="openEditLabourDocumentModal" class="action-btn" type="button">
+                                <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                            </button>
+                        @endcan
+                    </div>
+
+                    @if ($employee->labourDocument)
+                        <div class="card border border-slate-200 dark:border-slate-700 mb-5">
+                            <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
+                                <h5 class="card-title text-slate-900 dark:text-white">Labour Document - Issue Date
+                                    {{ $employee->labourDocument->issue_date }}</h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                    <!-- Document Preview -->
+                                    <div class="col-span-3 flex justify-center items-center">
+                                        @php
+                                            $fileExt = $this->getFileExtension($employee->labourDocument->file_path);
+                                        @endphp
+
+                                        @if ($fileExt == 'pdf')
+                                            <div class="border border-slate-200 rounded-md p-2 w-full">
+                                                <iframe src="{{ $employee->labourDocument->file_path }}"
+                                                    width="100%" height="800" class="border-0"></iframe>
+                                            </div>
+                                        @else
+                                            <img src="{{ $employee->labourDocument->file_path }}"
+                                                alt="Labour Document"
+                                                class="max-h-32 max-w-full rounded-md shadow-sm object-contain">
+                                        @endif
+                                    </div>
+
+                                    <!-- Document Info -->
+                                    <div class="col-span-1 pl-4 space-y-2">
+                                        <div class="flex justify-between">
+                                            <span class="text-sm text-slate-500 dark:text-slate-400">Issue
+                                                Date:</span>
+                                            <span
+                                                class="text-sm font-medium">{{ $employee->labourDocument->issue_date }}</span>
+                                        </div>
+
+                                        <!-- Download Button -->
+                                        <div class="mt-3">
+                                            <button wire:click="downloadLabourDocument" type="button"
+                                                class="btn btn-dark btn-sm">
+                                                <span class="inline-flex items-center justify-center"
+                                                    wire:loading.remove wire:target="downloadLabourDocument">
+                                                    <iconify-icon icon="fluent:arrow-download-28-filled"
+                                                        class="mr-1" width="16"
+                                                        height="16"></iconify-icon>
+                                                    Download Document
+                                                </span>
+                                                <iconify-icon wire:loading wire:target="downloadLabourDocument"
+                                                    icon="line-md:loading-twotone-loop" width="16"
+                                                    height="16"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        <div class="text-center py-5">
+                            <div class="mb-5">
+                                <iconify-icon icon="mingcute:document-line" width="60" height="60"
+                                    class="text-slate-400"></iconify-icon>
+                            </div>
+                            <h5 class="text-xl font-semibold mb-4">No Labour Document Found</h5>
+                            <p class="text-slate-500 mb-5">Please upload a labour document for this employee</p>
+                            @can('setDocs', $employee)
+                                <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                    wire:click="openEditLabourDocumentModal">
+                                    <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                        class="mr-1"></iconify-icon>
+                                    Upload Labour Document
+                                </button>
+                            @endcan
+                        </div>
+                    @endif
+                </div>
+            @elseif ($section == 'college_certificate')
+                <!-- College Certificate Section -->
+                <div class="card">
+                    <div class="card-header flex justify-between items-center">
+                        <h4
+                            class="font-medium lg:text-xl text-lg capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
+                            College Certificate
+                        </h4>
+
+                        @can('setDocs', $employee)
+                            <button wire:click="openEditCollegeCertificateModal" class="action-btn" type="button">
+                                <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                            </button>
+                        @endcan
+                    </div>
+
+                    @if ($employee->collegeCertificate)
+                        <div class="card border border-slate-200 dark:border-slate-700 mb-5">
+                            <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
+                                <h5 class="card-title text-slate-900 dark:text-white">College Certificate - Issue Date
+                                    {{ $employee->collegeCertificate->issue_date }}</h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                    <!-- Document Preview -->
+                                    <div class="col-span-3 flex justify-center items-center">
+                                        @php
+                                            $fileExt = $this->getFileExtension($employee->collegeCertificate->file_path);
+                                        @endphp
+
+                                        @if ($fileExt == 'pdf')
+                                            <div class="border border-slate-200 rounded-md p-2 w-full">
+                                                <iframe src="{{ $employee->collegeCertificate->file_path }}"
+                                                    width="100%" height="800" class="border-0"></iframe>
+                                            </div>
+                                        @else
+                                            <img src="{{ $employee->collegeCertificate->file_path }}"
+                                                alt="College Certificate"
+                                                class="max-h-32 max-w-full rounded-md shadow-sm object-contain">
+                                        @endif
+                                    </div>
+
+                                    <!-- Document Info -->
+                                    <div class="col-span-1 pl-4 space-y-2">
+                                        <div class="flex justify-between">
+                                            <span class="text-sm text-slate-500 dark:text-slate-400">Issue
+                                                Date:</span>
+                                            <span
+                                                class="text-sm font-medium">{{ $employee->collegeCertificate->issue_date }}</span>
+                                        </div>
+
+                                        <!-- Download Button -->
+                                        <div class="mt-3">
+                                            <button wire:click="downloadCollegeCertificate" type="button"
+                                                class="btn btn-dark btn-sm">
+                                                <span class="inline-flex items-center justify-center"
+                                                    wire:loading.remove wire:target="downloadCollegeCertificate">
+                                                    <iconify-icon icon="fluent:arrow-download-28-filled"
+                                                        class="mr-1" width="16"
+                                                        height="16"></iconify-icon>
+                                                    Download Document
+                                                </span>
+                                                <iconify-icon wire:loading wire:target="downloadCollegeCertificate"
+                                                    icon="line-md:loading-twotone-loop" width="16"
+                                                    height="16"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        <div class="text-center py-5">
+                            <div class="mb-5">
+                                <iconify-icon icon="mingcute:document-line" width="60" height="60"
+                                    class="text-slate-400"></iconify-icon>
+                            </div>
+                            <h5 class="text-xl font-semibold mb-4">No College Certificate Found</h5>
+                            <p class="text-slate-500 mb-5">Please upload a college certificate for this employee</p>
+                            @can('setDocs', $employee)
+                                <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                    wire:click="openEditCollegeCertificateModal">
+                                    <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                        class="mr-1"></iconify-icon>
+                                    Upload College Certificate
+                                </button>
+                            @endcan
+                        </div>
+                    @endif
+                </div>
+            @elseif ($section == 'social_print')
+                <!-- Social Print Section -->
+                <div class="card">
+                    <div class="card-header flex justify-between items-center">
+                        <h4
+                            class="font-medium lg:text-xl text-lg capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
+                            Social Print
+                        </h4>
+
+                        @can('setDocs', $employee)
+                            <button wire:click="openEditSocialPrintModal" class="action-btn" type="button">
+                                <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                            </button>
+                        @endcan
+                    </div>
+
+                    @if ($employee->socialPrint)
+                        <div class="card border border-slate-200 dark:border-slate-700 mb-5">
+                            <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
+                                <h5 class="card-title text-slate-900 dark:text-white">Social Print - Issue Date
+                                    {{ $employee->socialPrint->issue_date }}</h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                    <!-- Document Preview -->
+                                    <div class="col-span-3 flex justify-center items-center">
+                                        @php
+                                            $fileExt = $this->getFileExtension($employee->socialPrint->file_path);
+                                        @endphp
+
+                                        @if ($fileExt == 'pdf')
+                                            <div class="border border-slate-200 rounded-md p-2 w-full">
+                                                <iframe src="{{ $employee->socialPrint->file_path }}"
+                                                    width="100%" height="800" class="border-0"></iframe>
+                                            </div>
+                                        @else
+                                            <img src="{{ $employee->socialPrint->file_path }}"
+                                                alt="Social Print"
+                                                class="max-h-32 max-w-full rounded-md shadow-sm object-contain">
+                                        @endif
+                                    </div>
+
+                                    <!-- Document Info -->
+                                    <div class="col-span-1 pl-4 space-y-2">
+                                        <div class="flex justify-between">
+                                            <span class="text-sm text-slate-500 dark:text-slate-400">Issue
+                                                Date:</span>
+                                            <span
+                                                class="text-sm font-medium">{{ $employee->socialPrint->issue_date }}</span>
+                                        </div>
+
+                                        <!-- Download Button -->
+                                        <div class="mt-3">
+                                            <button wire:click="downloadSocialPrint" type="button"
+                                                class="btn btn-dark btn-sm">
+                                                <span class="inline-flex items-center justify-center"
+                                                    wire:loading.remove wire:target="downloadSocialPrint">
+                                                    <iconify-icon icon="fluent:arrow-download-28-filled"
+                                                        class="mr-1" width="16"
+                                                        height="16"></iconify-icon>
+                                                    Download Document
+                                                </span>
+                                                <iconify-icon wire:loading wire:target="downloadSocialPrint"
+                                                    icon="line-md:loading-twotone-loop" width="16"
+                                                    height="16"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        <div class="text-center py-5">
+                            <div class="mb-5">
+                                <iconify-icon icon="mingcute:document-line" width="60" height="60"
+                                    class="text-slate-400"></iconify-icon>
+                            </div>
+                            <h5 class="text-xl font-semibold mb-4">No Social Print Found</h5>
+                            <p class="text-slate-500 mb-5">Please upload a social print for this employee</p>
+                            @can('setDocs', $employee)
+                                <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                    wire:click="openEditSocialPrintModal">
+                                    <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                        class="mr-1"></iconify-icon>
+                                    Upload Social Print
                                 </button>
                             @endcan
                         </div>
@@ -5782,6 +6133,468 @@
                                     </span>
                                 </button>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Labour Document Edit Modal -->
+    @if ($showEditLabourDocumentModal)
+        <div>
+            <div id="editLabourDocumentModal"
+                class="modal fade fixed top-0 left-0 show w-full h-full outline-none overflow-x-hidden overflow-y-auto"
+                tabindex="-1" aria-labelledby="editLabourDocumentModalLabel" aria-hidden="true"
+                wire:ignore.self>
+                <div class="modal-dialog relative w-auto pointer-events-none">
+                    <div
+                        class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
+                        <div class="relative bg-white rounded-lg shadow dark:bg-slate-700">
+                            <!-- Modal header -->
+                            <div
+                                class="flex items-center justify-between p-5 border-b rounded-t dark:border-slate-600 bg-black-500">
+                                <h3 class="text-xl font-medium text-white dark:text-white capitalize">
+                                    Edit Labour Document
+                                </h3>
+                                <button wire:click="closeEditLabourDocumentModal" type="button"
+                                    class="text-slate-400 bg-transparent hover:text-slate-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-slate-600 dark:hover:text-white">
+                                    <svg aria-hidden="true" class="w-5 h-5" fill="#ffffff" viewBox="0 0 20 20"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd"
+                                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span class="sr-only">Close modal</span>
+                                </button>
+                            </div>
+                            <form wire:submit.prevent="updateLabourDocument">
+                                <!-- Modal body -->
+                                <div class="p-6 space-y-4">
+                                    <div class="grid grid-cols-12 gap-4">
+                                        @if ($employee->labourDocument)
+                                            <div class="col-span-12">
+                                                <div class="checkbox-area">
+                                                    <label class="inline-flex items-center cursor-pointer">
+                                                        <input type="checkbox" class="hidden"
+                                                            wire:model.live="keep_existing_labour_document">
+                                                        <span
+                                                            class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
+                                                            <img src="{{ asset('images/icon/ck-white.svg') }}"
+                                                                alt=""
+                                                                class="h-[10px] w-[10px] block m-auto opacity-0" />
+                                                        </span>
+                                                        <span
+                                                            class="text-slate-600 dark:text-slate-300 text-sm leading-6">Keep
+                                                            existing document</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        @endif
+
+                                        @if (!$keep_existing_labour_document)
+                                            <div class="col-span-12">
+                                                <label for="labour_document_file" class="form-label">Labour Document
+                                                    <iconify-icon wire:loading wire:target="labour_document_file"
+                                                        icon="line-md:loading-twotone-loop" width="18"
+                                                        height="18"></iconify-icon>
+                                                </label>
+                                                <div
+                                                    class="border-2 border-dashed border-slate-200 rounded-md p-4 text-center">
+                                                    @if ($labour_document_file)
+                                                        <div class="flex items-center justify-center mb-3">
+                                                            @if (in_array($labour_document_file->getClientOriginalExtension(), ['pdf']))
+                                                                <iconify-icon icon="mingcute:file-pdf-fill"
+                                                                    width="48" height="48"
+                                                                    class="text-red-500"></iconify-icon>
+                                                            @else
+                                                                <img src="{{ $labour_document_file->temporaryUrl() }}"
+                                                                    class="h-40 max-w-full rounded-md object-contain"
+                                                                    alt="Labour Document Preview">
+                                                            @endif
+                                                        </div>
+                                                        <p class="text-sm text-slate-500">
+                                                            {{ $labour_document_file->getClientOriginalName() }}
+                                                        </p>
+                                                        <button type="button" class="text-sm text-red-500 mt-2"
+                                                            wire:click="$set('labour_document_file', null)">
+                                                            Remove File
+                                                        </button>
+                                                    @else
+                                                        @if ($employee->labourDocument)
+                                                            <div class="mb-3">
+                                                                <small class="text-muted">
+                                                                    Current file: <a
+                                                                        href="{{ $employee->labourDocument->file_path }}"
+                                                                        target="_blank"
+                                                                        class="text-sm text-blue-500">View</a>
+                                                                </small>
+                                                            </div>
+                                                        @endif
+                                                        <div class="flex items-center justify-center">
+                                                            <label
+                                                                class="cursor-pointer flex flex-col items-center justify-center w-full h-40 rounded-lg text-slate-500 hover:border-primary-500 transition-colors duration-150">
+                                                                <div
+                                                                    class="flex flex-col items-center justify-center">
+                                                                    <iconify-icon
+                                                                        icon="heroicons:cloud-arrow-up-solid"
+                                                                        class="text-slate-500 text-2xl"></iconify-icon>
+                                                                    <p class="mt-2 text-sm">Click to upload or drag
+                                                                        and drop</p>
+                                                                    <p class="text-xs mt-1">PDF, JPG, PNG (max. 10MB)
+                                                                    </p>
+                                                                </div>
+                                                                <input id="labour_document_file" type="file"
+                                                                    class="hidden" accept="image/*,.pdf"
+                                                                    wire:model.live="labour_document_file" />
+                                                            </label>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                                @error('labour_document_file')
+                                                    <span class="text-danger-500 text-sm">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                        @endif
+
+                                        <div class="col-span-12">
+                                            <label for="labour_document_issue_date" class="form-label">Issue
+                                                Date</label>
+                                            <input type="date"
+                                                class="form-control @error('labour_document_issue_date') !border-danger-500 @enderror"
+                                                id="labour_document_issue_date"
+                                                wire:model="labour_document_issue_date">
+                                            @error('labour_document_issue_date')
+                                                <span class="text-danger-500 text-sm">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Modal footer -->
+                                <div
+                                    class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
+                                    <button wire:click="closeEditLabourDocumentModal" type="button"
+                                        class="btn inline-flex justify-center btn-outline-dark">Cancel</button>
+                                    <button wire:click="updateLabourDocument" type="button"
+                                        wire:target='updateLabourDocument' wire:loading.remove
+                                        class="btn inline-flex justify-center btn-dark">{{ $employee->labourDocument ? 'Update' : 'Upload' }}</button>
+                                    <button wire:loading wire:target="updateLabourDocument" type="button"
+                                        class="btn inline-flex justify-center btn-dark">
+                                        <span class="flex items-center">
+                                            <iconify-icon icon="line-md:loading-twotone-loop" width="25"
+                                                height="25"></iconify-icon>
+                                        </span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- College Certificate Edit Modal -->
+    @if ($showEditCollegeCertificateModal)
+        <div>
+            <div id="editCollegeCertificateModal"
+                class="modal fade fixed top-0 left-0 show w-full h-full outline-none overflow-x-hidden overflow-y-auto"
+                tabindex="-1" aria-labelledby="editCollegeCertificateModalLabel" aria-hidden="true"
+                wire:ignore.self>
+                <div class="modal-dialog relative w-auto pointer-events-none">
+                    <div
+                        class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
+                        <div class="relative bg-white rounded-lg shadow dark:bg-slate-700">
+                            <!-- Modal header -->
+                            <div
+                                class="flex items-center justify-between p-5 border-b rounded-t dark:border-slate-600 bg-black-500">
+                                <h3 class="text-xl font-medium text-white dark:text-white capitalize">
+                                    Edit College Certificate
+                                </h3>
+                                <button wire:click="closeEditCollegeCertificateModal" type="button"
+                                    class="text-slate-400 bg-transparent hover:text-slate-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-slate-600 dark:hover:text-white">
+                                    <svg aria-hidden="true" class="w-5 h-5" fill="#ffffff" viewBox="0 0 20 20"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd"
+                                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span class="sr-only">Close modal</span>
+                                </button>
+                            </div>
+                            <form wire:submit.prevent="updateCollegeCertificate">
+                                <!-- Modal body -->
+                                <div class="p-6 space-y-4">
+                                    <div class="grid grid-cols-12 gap-4">
+                                        @if ($employee->collegeCertificate)
+                                            <div class="col-span-12">
+                                                <div class="checkbox-area">
+                                                    <label class="inline-flex items-center cursor-pointer">
+                                                        <input type="checkbox" class="hidden"
+                                                            wire:model.live="keep_existing_college_certificate">
+                                                        <span
+                                                            class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
+                                                            <img src="{{ asset('images/icon/ck-white.svg') }}"
+                                                                alt=""
+                                                                class="h-[10px] w-[10px] block m-auto opacity-0" />
+                                                        </span>
+                                                        <span
+                                                            class="text-slate-600 dark:text-slate-300 text-sm leading-6">Keep
+                                                            existing document</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        @endif
+
+                                        @if (!$keep_existing_college_certificate)
+                                            <div class="col-span-12">
+                                                <label for="college_certificate_file" class="form-label">College Certificate
+                                                    <iconify-icon wire:loading wire:target="college_certificate_file"
+                                                        icon="line-md:loading-twotone-loop" width="18"
+                                                        height="18"></iconify-icon>
+                                                </label>
+                                                <div
+                                                    class="border-2 border-dashed border-slate-200 rounded-md p-4 text-center">
+                                                    @if ($college_certificate_file)
+                                                        <div class="flex items-center justify-center mb-3">
+                                                            @if (in_array($college_certificate_file->getClientOriginalExtension(), ['pdf']))
+                                                                <iconify-icon icon="mingcute:file-pdf-fill"
+                                                                    width="48" height="48"
+                                                                    class="text-red-500"></iconify-icon>
+                                                            @else
+                                                                <img src="{{ $college_certificate_file->temporaryUrl() }}"
+                                                                    class="h-40 max-w-full rounded-md object-contain"
+                                                                    alt="College Certificate Preview">
+                                                            @endif
+                                                        </div>
+                                                        <p class="text-sm text-slate-500">
+                                                            {{ $college_certificate_file->getClientOriginalName() }}
+                                                        </p>
+                                                        <button type="button" class="text-sm text-red-500 mt-2"
+                                                            wire:click="$set('college_certificate_file', null)">
+                                                            Remove File
+                                                        </button>
+                                                    @else
+                                                        @if ($employee->collegeCertificate)
+                                                            <div class="mb-3">
+                                                                <small class="text-muted">
+                                                                    Current file: <a
+                                                                        href="{{ $employee->collegeCertificate->file_path }}"
+                                                                        target="_blank"
+                                                                        class="text-sm text-blue-500">View</a>
+                                                                </small>
+                                                            </div>
+                                                        @endif
+                                                        <div class="flex items-center justify-center">
+                                                            <label
+                                                                class="cursor-pointer flex flex-col items-center justify-center w-full h-40 rounded-lg text-slate-500 hover:border-primary-500 transition-colors duration-150">
+                                                                <div
+                                                                    class="flex flex-col items-center justify-center">
+                                                                    <iconify-icon
+                                                                        icon="heroicons:cloud-arrow-up-solid"
+                                                                        class="text-slate-500 text-2xl"></iconify-icon>
+                                                                    <p class="mt-2 text-sm">Click to upload or drag
+                                                                        and drop</p>
+                                                                    <p class="text-xs mt-1">PDF, JPG, PNG (max. 10MB)
+                                                                    </p>
+                                                                </div>
+                                                                <input id="college_certificate_file" type="file"
+                                                                    class="hidden" accept="image/*,.pdf"
+                                                                    wire:model.live="college_certificate_file" />
+                                                            </label>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                                @error('college_certificate_file')
+                                                    <span class="text-danger-500 text-sm">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                        @endif
+
+                                        <div class="col-span-12">
+                                            <label for="college_certificate_issue_date" class="form-label">Issue
+                                                Date</label>
+                                            <input type="date"
+                                                class="form-control @error('college_certificate_issue_date') !border-danger-500 @enderror"
+                                                id="college_certificate_issue_date"
+                                                wire:model="college_certificate_issue_date">
+                                            @error('college_certificate_issue_date')
+                                                <span class="text-danger-500 text-sm">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Modal footer -->
+                                <div
+                                    class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
+                                    <button wire:click="closeEditCollegeCertificateModal" type="button"
+                                        class="btn inline-flex justify-center btn-outline-dark">Cancel</button>
+                                    <button wire:click="updateCollegeCertificate" type="button"
+                                        wire:target='updateCollegeCertificate' wire:loading.remove
+                                        class="btn inline-flex justify-center btn-dark">{{ $employee->collegeCertificate ? 'Update' : 'Upload' }}</button>
+                                    <button wire:loading wire:target="updateCollegeCertificate" type="button"
+                                        class="btn inline-flex justify-center btn-dark">
+                                        <span class="flex items-center">
+                                            <iconify-icon icon="line-md:loading-twotone-loop" width="25"
+                                                height="25"></iconify-icon>
+                                        </span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Social Print Edit Modal -->
+    @if ($showEditSocialPrintModal)
+        <div>
+            <div id="editSocialPrintModal"
+                class="modal fade fixed top-0 left-0 show w-full h-full outline-none overflow-x-hidden overflow-y-auto"
+                tabindex="-1" aria-labelledby="editSocialPrintModalLabel" aria-hidden="true"
+                wire:ignore.self>
+                <div class="modal-dialog relative w-auto pointer-events-none">
+                    <div
+                        class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
+                        <div class="relative bg-white rounded-lg shadow dark:bg-slate-700">
+                            <!-- Modal header -->
+                            <div
+                                class="flex items-center justify-between p-5 border-b rounded-t dark:border-slate-600 bg-black-500">
+                                <h3 class="text-xl font-medium text-white dark:text-white capitalize">
+                                    Edit Social Print
+                                </h3>
+                                <button wire:click="closeEditSocialPrintModal" type="button"
+                                    class="text-slate-400 bg-transparent hover:text-slate-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-slate-600 dark:hover:text-white">
+                                    <svg aria-hidden="true" class="w-5 h-5" fill="#ffffff" viewBox="0 0 20 20"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd"
+                                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span class="sr-only">Close modal</span>
+                                </button>
+                            </div>
+                            <form wire:submit.prevent="updateSocialPrint">
+                                <!-- Modal body -->
+                                <div class="p-6 space-y-4">
+                                    <div class="grid grid-cols-12 gap-4">
+                                        @if ($employee->socialPrint)
+                                            <div class="col-span-12">
+                                                <div class="checkbox-area">
+                                                    <label class="inline-flex items-center cursor-pointer">
+                                                        <input type="checkbox" class="hidden"
+                                                            wire:model.live="keep_existing_social_print">
+                                                        <span
+                                                            class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
+                                                            <img src="{{ asset('images/icon/ck-white.svg') }}"
+                                                                alt=""
+                                                                class="h-[10px] w-[10px] block m-auto opacity-0" />
+                                                        </span>
+                                                        <span
+                                                            class="text-slate-600 dark:text-slate-300 text-sm leading-6">Keep
+                                                            existing document</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        @endif
+
+                                        @if (!$keep_existing_social_print)
+                                            <div class="col-span-12">
+                                                <label for="social_print_file" class="form-label">Social Print
+                                                    <iconify-icon wire:loading wire:target="social_print_file"
+                                                        icon="line-md:loading-twotone-loop" width="18"
+                                                        height="18"></iconify-icon>
+                                                </label>
+                                                <div
+                                                    class="border-2 border-dashed border-slate-200 rounded-md p-4 text-center">
+                                                    @if ($social_print_file)
+                                                        <div class="flex items-center justify-center mb-3">
+                                                            @if (in_array($social_print_file->getClientOriginalExtension(), ['pdf']))
+                                                                <iconify-icon icon="mingcute:file-pdf-fill"
+                                                                    width="48" height="48"
+                                                                    class="text-red-500"></iconify-icon>
+                                                            @else
+                                                                <img src="{{ $social_print_file->temporaryUrl() }}"
+                                                                    class="h-40 max-w-full rounded-md object-contain"
+                                                                    alt="Social Print Preview">
+                                                            @endif
+                                                        </div>
+                                                        <p class="text-sm text-slate-500">
+                                                            {{ $social_print_file->getClientOriginalName() }}
+                                                        </p>
+                                                        <button type="button" class="text-sm text-red-500 mt-2"
+                                                            wire:click="$set('social_print_file', null)">
+                                                            Remove File
+                                                        </button>
+                                                    @else
+                                                        @if ($employee->socialPrint)
+                                                            <div class="mb-3">
+                                                                <small class="text-muted">
+                                                                    Current file: <a
+                                                                        href="{{ $employee->socialPrint->file_path }}"
+                                                                        target="_blank"
+                                                                        class="text-sm text-blue-500">View</a>
+                                                                </small>
+                                                            </div>
+                                                        @endif
+                                                        <div class="flex items-center justify-center">
+                                                            <label
+                                                                class="cursor-pointer flex flex-col items-center justify-center w-full h-40 rounded-lg text-slate-500 hover:border-primary-500 transition-colors duration-150">
+                                                                <div
+                                                                    class="flex flex-col items-center justify-center">
+                                                                    <iconify-icon
+                                                                        icon="heroicons:cloud-arrow-up-solid"
+                                                                        class="text-slate-500 text-2xl"></iconify-icon>
+                                                                    <p class="mt-2 text-sm">Click to upload or drag
+                                                                        and drop</p>
+                                                                    <p class="text-xs mt-1">PDF, JPG, PNG (max. 10MB)
+                                                                    </p>
+                                                                </div>
+                                                                <input id="social_print_file" type="file"
+                                                                    class="hidden" accept="image/*,.pdf"
+                                                                    wire:model.live="social_print_file" />
+                                                            </label>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                                @error('social_print_file')
+                                                    <span class="text-danger-500 text-sm">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                        @endif
+
+                                        <div class="col-span-12">
+                                            <label for="social_print_issue_date" class="form-label">Issue
+                                                Date</label>
+                                            <input type="date"
+                                                class="form-control @error('social_print_issue_date') !border-danger-500 @enderror"
+                                                id="social_print_issue_date"
+                                                wire:model="social_print_issue_date">
+                                            @error('social_print_issue_date')
+                                                <span class="text-danger-500 text-sm">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Modal footer -->
+                                <div
+                                    class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
+                                    <button wire:click="closeEditSocialPrintModal" type="button"
+                                        class="btn inline-flex justify-center btn-outline-dark">Cancel</button>
+                                    <button wire:click="updateSocialPrint" type="button"
+                                        wire:target='updateSocialPrint' wire:loading.remove
+                                        class="btn inline-flex justify-center btn-dark">{{ $employee->socialPrint ? 'Update' : 'Upload' }}</button>
+                                    <button wire:loading wire:target="updateSocialPrint" type="button"
+                                        class="btn inline-flex justify-center btn-dark">
+                                        <span class="flex items-center">
+                                            <iconify-icon icon="line-md:loading-twotone-loop" width="25"
+                                                height="25"></iconify-icon>
+                                        </span>
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>

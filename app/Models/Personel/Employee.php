@@ -26,6 +26,7 @@ use App\Models\Hierarchy\Position;
 use App\Models\Personel\Docs\ArmyServicePaper;
 use App\Models\Personel\Docs\BankAccount;
 use App\Models\Personel\Docs\BirthCertificate;
+use App\Models\Personel\Docs\CollegeCertificate;
 use App\Models\Personel\Docs\DriverLicense;
 use App\Models\Personel\Docs\EmployeeContract;
 use App\Models\Personel\Docs\EmployeeS1Doc;
@@ -34,10 +35,12 @@ use App\Models\Personel\Docs\EmployeeS6Doc;
 use App\Models\Personel\Docs\ExternalMedicalRecord;
 use App\Models\Personel\Docs\HrLetter;
 use App\Models\Personel\Docs\IDCard;
+use App\Models\Personel\Docs\LabourDocument;
 use App\Models\Personel\Docs\MedicalRecord;
 use App\Models\Personel\Docs\PoliceRecord;
 use App\Models\Personel\Docs\PracticeCard;
 use App\Models\Personel\Docs\SkillsQualification;
+use App\Models\Personel\Docs\SocialPrint;
 use App\Models\Personel\Docs\SyndicateCard;
 use App\Models\Personel\Docs\WorkDeclaration;
 use App\Models\Recruitment\Applicants\Applicant;
@@ -1099,6 +1102,108 @@ class Employee extends Model
             report($e);
             AppLog::error('Error setting work declaration', $e->getMessage(), loggable: $this);
             throw new AppException('Error setting work declaration: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Set or update labour document for employee
+     *
+     * @param string $file_path
+     * @param Carbon $issue_date
+     * @return bool
+     * @throws AppException
+     */
+    public function setLabourDocument($file_path, Carbon $issue_date)
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('setDocs', $this)) {
+            throw new AppException('You dont have permission to set docs for this employee');
+        }
+
+        try {
+            $this->labourDocument()->updateOrCreate(
+                ['employee_id' => $this->id],
+                [
+                    'created_by' => $loggedInUser->id,
+                    'file_path' => $file_path,
+                    'issue_date' => $issue_date,
+                ]
+            );
+            AppLog::info('Labour Document Set', 'Labour document set for employee: ' . $this->name, loggable: $this);
+            return true;
+        } catch (Exception $e) {
+            report($e);
+            AppLog::error('Error setting labour document', $e->getMessage(), loggable: $this);
+            throw new AppException('Error setting labour document: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Set or update college certificate for employee
+     *
+     * @param string $file_path
+     * @param Carbon $issue_date
+     * @return bool
+     * @throws AppException
+     */
+    public function setCollegeCertificate($file_path, Carbon $issue_date)
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('setDocs', $this)) {
+            throw new AppException('You dont have permission to set docs for this employee');
+        }
+
+        try {
+            $this->collegeCertificate()->updateOrCreate(
+                ['employee_id' => $this->id],
+                [
+                    'created_by' => $loggedInUser->id,
+                    'file_path' => $file_path,
+                    'issue_date' => $issue_date,
+                ]
+            );
+            AppLog::info('College Certificate Set', 'College certificate set for employee: ' . $this->name, loggable: $this);
+            return true;
+        } catch (Exception $e) {
+            report($e);
+            AppLog::error('Error setting college certificate', $e->getMessage(), loggable: $this);
+            throw new AppException('Error setting college certificate: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Set or update social print for employee
+     *
+     * @param string $file_path
+     * @param Carbon $issue_date
+     * @return bool
+     * @throws AppException
+     */
+    public function setSocialPrint($file_path, Carbon $issue_date)
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('setDocs', $this)) {
+            throw new AppException('You dont have permission to set docs for this employee');
+        }
+
+        try {
+            $this->socialPrint()->updateOrCreate(
+                ['employee_id' => $this->id],
+                [
+                    'created_by' => $loggedInUser->id,
+                    'file_path' => $file_path,
+                    'issue_date' => $issue_date,
+                ]
+            );
+            AppLog::info('Social Print Set', 'Social print set for employee: ' . $this->name, loggable: $this);
+            return true;
+        } catch (Exception $e) {
+            report($e);
+            AppLog::error('Error setting social print', $e->getMessage(), loggable: $this);
+            throw new AppException('Error setting social print: ' . $e->getMessage());
         }
     }
 
@@ -2621,6 +2726,21 @@ class Employee extends Model
     public function employeeS6Doc()
     {
         return $this->hasMany(EmployeeS6Doc::class);
+    }
+
+    public function labourDocument()
+    {
+        return $this->hasOne(LabourDocument::class);
+    }
+
+    public function collegeCertificate()
+    {
+        return $this->hasOne(CollegeCertificate::class);
+    }
+
+    public function socialPrint()
+    {
+        return $this->hasOne(SocialPrint::class);
     }
 
     public function applicant()

@@ -194,6 +194,24 @@ class EmployeeShow extends Component
     public $keep_existing_work_declaration = false;
     public $editing_work_declaration_id = null;
 
+    // Labour Document Properties
+    public $showEditLabourDocumentModal = false;
+    public $labour_document_file;
+    public $labour_document_issue_date;
+    public $keep_existing_labour_document = false;
+
+    // College Certificate Properties
+    public $showEditCollegeCertificateModal = false;
+    public $college_certificate_file;
+    public $college_certificate_issue_date;
+    public $keep_existing_college_certificate = false;
+
+    // Social Print Properties
+    public $showEditSocialPrintModal = false;
+    public $social_print_file;
+    public $social_print_issue_date;
+    public $keep_existing_social_print = false;
+
     public $statuses;
 
     public function changeStatus($status)
@@ -225,6 +243,9 @@ class EmployeeShow extends Component
             'practiceCard',
             'skillsQualifications',
             'syndicateCard',
+            'labourDocument',
+            'collegeCertificate',
+            'socialPrint',
         ])->findOrFail($id);
         $this->insuranceOffices = InsuranceOffice::all();
         $this->militaryStatuses = Applicant::MILITARY_STATUS;
@@ -2153,6 +2174,300 @@ class EmployeeShow extends Component
             $this->employee = Employee::with(['info', 'idCard', 'birthCertificate', 'armyServicePaper', 'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'policeRecords', 'hrLetters', 'driverLicense', 'medicalRecord', 'externalMedicalRecord', 'practiceCard', 'skillsQualifications', 'syndicateCard', 'workDeclarations'])->findOrFail($this->employee->id);
         } catch (Exception $e) {
             $this->alertError($e->getMessage());
+        }
+    }
+
+    /**
+     * Open the edit Labour Document modal
+     */
+    public function openEditLabourDocumentModal()
+    {
+        $this->showEditLabourDocumentModal = true;
+
+        if ($this->employee->labourDocument) {
+            $this->labour_document_issue_date = $this->employee->labourDocument->issue_date;
+            $this->keep_existing_labour_document = true;
+        } else {
+            $this->resetLabourDocumentFields();
+        }
+    }
+
+    /**
+     * Close the edit Labour Document modal
+     */
+    public function closeEditLabourDocumentModal()
+    {
+        $this->showEditLabourDocumentModal = false;
+        $this->resetLabourDocumentFields();
+    }
+
+    /**
+     * Reset the Labour Document form fields
+     */
+    private function resetLabourDocumentFields()
+    {
+        $this->labour_document_file = null;
+        $this->labour_document_issue_date = null;
+        $this->keep_existing_labour_document = false;
+    }
+
+    /**
+     * Update the Labour Document
+     */
+    public function updateLabourDocument()
+    {
+        $this->validate([
+            'labour_document_issue_date' => 'required|date',
+            'labour_document_file' => $this->keep_existing_labour_document ? 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif' : 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
+        ]);
+
+        try {
+            $filePath = null;
+            if (!$this->keep_existing_labour_document && $this->labour_document_file) {
+                // Delete existing labour document file if it exists
+                if ($this->employee->labourDocument && $this->employee->labourDocument->file_path) {
+                    $existingFilePath = str_replace('storage/', '', $this->employee->labourDocument->getRawOriginal('file_path'));
+                    if (Storage::disk('s3')->exists($existingFilePath)) {
+                        Storage::disk('s3')->delete($existingFilePath);
+                    }
+                }
+                // Upload new file to S3
+                $filePath = $this->labour_document_file->store(Employee::FILES_DIRECTORY.'/labour_documents', 's3');
+            } else if ($this->keep_existing_labour_document && $this->employee->labourDocument) {
+                $filePath = $this->employee->labourDocument->getRawOriginal('file_path');
+            }
+
+            $this->employee->setLabourDocument(
+                $filePath,
+                Carbon::parse($this->labour_document_issue_date)
+            );
+
+            $this->closeEditLabourDocumentModal();
+            $this->alertSuccess('Labour Document has been updated successfully!');
+            
+            // Refresh employee data
+            $this->employee = Employee::with([
+                'info', 'idCard', 'birthCertificate', 'armyServicePaper', 
+                'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'policeRecords', 
+                'hrLetters', 'driverLicense', 'medicalRecord', 'externalMedicalRecord',
+                'practiceCard', 'skillsQualifications', 'syndicateCard', 'labourDocument',
+                'collegeCertificate', 'socialPrint'
+            ])->findOrFail($this->employee->id);
+            
+        } catch (Exception $e) {
+            $this->alertError($e->getMessage());
+        }
+    }
+
+    /**
+     * Download the Labour Document file
+     */
+    public function downloadLabourDocument()
+    {
+        try {
+            if ($this->employee->labourDocument) {
+                return $this->employee->labourDocument->downloadFile();
+            } else {
+                $this->alertError('No labour document found.');
+            }
+        } catch (\Exception $e) {
+            $this->alertError('Error downloading document: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Open the edit College Certificate modal
+     */
+    public function openEditCollegeCertificateModal()
+    {
+        $this->showEditCollegeCertificateModal = true;
+
+        if ($this->employee->collegeCertificate) {
+            $this->college_certificate_issue_date = $this->employee->collegeCertificate->issue_date;
+            $this->keep_existing_college_certificate = true;
+        } else {
+            $this->resetCollegeCertificateFields();
+        }
+    }
+
+    /**
+     * Close the edit College Certificate modal
+     */
+    public function closeEditCollegeCertificateModal()
+    {
+        $this->showEditCollegeCertificateModal = false;
+        $this->resetCollegeCertificateFields();
+    }
+
+    /**
+     * Reset the College Certificate form fields
+     */
+    private function resetCollegeCertificateFields()
+    {
+        $this->college_certificate_file = null;
+        $this->college_certificate_issue_date = null;
+        $this->keep_existing_college_certificate = false;
+    }
+
+    /**
+     * Update the College Certificate
+     */
+    public function updateCollegeCertificate()
+    {
+        $this->validate([
+            'college_certificate_issue_date' => 'required|date',
+            'college_certificate_file' => $this->keep_existing_college_certificate ? 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif' : 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
+        ]);
+
+        try {
+            $filePath = null;
+            if (!$this->keep_existing_college_certificate && $this->college_certificate_file) {
+                // Delete existing college certificate file if it exists
+                if ($this->employee->collegeCertificate && $this->employee->collegeCertificate->file_path) {
+                    $existingFilePath = str_replace('storage/', '', $this->employee->collegeCertificate->getRawOriginal('file_path'));
+                    if (Storage::disk('s3')->exists($existingFilePath)) {
+                        Storage::disk('s3')->delete($existingFilePath);
+                    }
+                }
+                // Upload new file to S3
+                $filePath = $this->college_certificate_file->store(Employee::FILES_DIRECTORY.'/college_certificates', 's3');
+            } else if ($this->keep_existing_college_certificate && $this->employee->collegeCertificate) {
+                $filePath = $this->employee->collegeCertificate->getRawOriginal('file_path');
+            }
+
+            $this->employee->setCollegeCertificate(
+                $filePath,
+                Carbon::parse($this->college_certificate_issue_date)
+            );
+
+            $this->closeEditCollegeCertificateModal();
+            $this->alertSuccess('College Certificate has been updated successfully!');
+            
+            // Refresh employee data
+            $this->employee = Employee::with([
+                'info', 'idCard', 'birthCertificate', 'armyServicePaper', 
+                'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'policeRecords', 
+                'hrLetters', 'driverLicense', 'medicalRecord', 'externalMedicalRecord',
+                'practiceCard', 'skillsQualifications', 'syndicateCard', 'labourDocument',
+                'collegeCertificate', 'socialPrint'
+            ])->findOrFail($this->employee->id);
+            
+        } catch (Exception $e) {
+            $this->alertError($e->getMessage());
+        }
+    }
+
+    /**
+     * Download the College Certificate file
+     */
+    public function downloadCollegeCertificate()
+    {
+        try {
+            if ($this->employee->collegeCertificate) {
+                return $this->employee->collegeCertificate->downloadFile();
+            } else {
+                $this->alertError('No college certificate found.');
+            }
+        } catch (\Exception $e) {
+            $this->alertError('Error downloading document: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Open the edit Social Print modal
+     */
+    public function openEditSocialPrintModal()
+    {
+        $this->showEditSocialPrintModal = true;
+
+        if ($this->employee->socialPrint) {
+            $this->social_print_issue_date = $this->employee->socialPrint->issue_date;
+            $this->keep_existing_social_print = true;
+        } else {
+            $this->resetSocialPrintFields();
+        }
+    }
+
+    /**
+     * Close the edit Social Print modal
+     */
+    public function closeEditSocialPrintModal()
+    {
+        $this->showEditSocialPrintModal = false;
+        $this->resetSocialPrintFields();
+    }
+
+    /**
+     * Reset the Social Print form fields
+     */
+    private function resetSocialPrintFields()
+    {
+        $this->social_print_file = null;
+        $this->social_print_issue_date = null;
+        $this->keep_existing_social_print = false;
+    }
+
+    /**
+     * Update the Social Print
+     */
+    public function updateSocialPrint()
+    {
+        $this->validate([
+            'social_print_issue_date' => 'required|date',
+            'social_print_file' => $this->keep_existing_social_print ? 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif' : 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
+        ]);
+
+        try {
+            $filePath = null;
+            if (!$this->keep_existing_social_print && $this->social_print_file) {
+                // Delete existing social print file if it exists
+                if ($this->employee->socialPrint && $this->employee->socialPrint->file_path) {
+                    $existingFilePath = str_replace('storage/', '', $this->employee->socialPrint->getRawOriginal('file_path'));
+                    if (Storage::disk('s3')->exists($existingFilePath)) {
+                        Storage::disk('s3')->delete($existingFilePath);
+                    }
+                }
+                // Upload new file to S3
+                $filePath = $this->social_print_file->store(Employee::FILES_DIRECTORY.'/social_prints', 's3');
+            } else if ($this->keep_existing_social_print && $this->employee->socialPrint) {
+                $filePath = $this->employee->socialPrint->getRawOriginal('file_path');
+            }
+
+            $this->employee->setSocialPrint(
+                $filePath,
+                Carbon::parse($this->social_print_issue_date)
+            );
+
+            $this->closeEditSocialPrintModal();
+            $this->alertSuccess('Social Print has been updated successfully!');
+            
+            // Refresh employee data
+            $this->employee = Employee::with([
+                'info', 'idCard', 'birthCertificate', 'armyServicePaper', 
+                'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'policeRecords', 
+                'hrLetters', 'driverLicense', 'medicalRecord', 'externalMedicalRecord',
+                'practiceCard', 'skillsQualifications', 'syndicateCard', 'labourDocument',
+                'collegeCertificate', 'socialPrint'
+            ])->findOrFail($this->employee->id);
+            
+        } catch (Exception $e) {
+            $this->alertError($e->getMessage());
+        }
+    }
+
+    /**
+     * Download the Social Print file
+     */
+    public function downloadSocialPrint()
+    {
+        try {
+            if ($this->employee->socialPrint) {
+                return $this->employee->socialPrint->downloadFile();
+            } else {
+                $this->alertError('No social print found.');
+            }
+        } catch (\Exception $e) {
+            $this->alertError('Error downloading document: ' . $e->getMessage());
         }
     }
 

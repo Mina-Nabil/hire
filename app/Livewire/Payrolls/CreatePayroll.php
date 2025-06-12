@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Title;
 
 #[Title('Create Payroll')]
@@ -316,7 +317,7 @@ class CreatePayroll extends Component
             $employerInsurance = $insuranceAmount * Payroll::EMPLOYER_SHARE_SOCIAL_INSURANCE;
             $totalInsurance = $employeeInsurance + $employerInsurance;
             $otherAmount = $grossSalary - $insuranceAmount - $employerInsurance ?? 0;
-            $employeeMedical = $employee->activeMedicalBenefits(Carbon::parse($this->startDate))->sum('amount');
+            $employeeMedical = $employee->activeMedicalBenefits(Carbon::parse($this->startDate), Carbon::parse($this->endDate))->sum('amount');
             $totalMedical = $employeeMedical;
             $employeeDeductions = $employeeInsurance + $employeeMedical;
             $netIncome = $otherAmount + $insuranceAmount;
@@ -445,9 +446,9 @@ class CreatePayroll extends Component
             $totals['adj_amount'] += $adjAmount;
 
             $benefits = collect()
-                ->merge($employee->activeEmployeeBaseBenefits(Carbon::parse($this->startDate))->get())
-                ->merge($employee->activeOtherBaseBenefits(Carbon::parse($this->startDate))->get())
-                ->merge($employee->activeMedicalBenefits(Carbon::parse($this->startDate))->get());
+                ->merge($employee->activeEmployeeBaseBenefits(Carbon::parse($this->startDate), Carbon::parse($this->endDate))->get())
+                ->merge($employee->activeOtherBaseBenefits(Carbon::parse($this->startDate), Carbon::parse($this->endDate))->get())
+                ->merge($employee->activeMedicalBenefits(Carbon::parse($this->startDate), Carbon::parse($this->endDate))->get());
 
             // Explicitly use indexed arrays for employees to ensure we have id as a field
             $departmentGroups[$departmentId]['employees'][] = [
@@ -542,7 +543,8 @@ class CreatePayroll extends Component
                                     }
 
                                     // Calculate when normal working hours should end
-                                    $normalWorkingEnd = $attendanceStart->copy()->addHours($dailyWorkingHours);
+                                    Log::info('dailyWorkingHours', ['dailyWorkingHours' => $dailyWorkingHours]);
+                                    $normalWorkingEnd = $attendanceStart->copy()->addHours((float)$dailyWorkingHours);
 
                                     // Overtime starts when normal working hours end
                                     $overtimeStartTime = $normalWorkingEnd->format('H:i:s');
@@ -650,7 +652,7 @@ class CreatePayroll extends Component
                             'paid' => $employeeData['net_after_deductions'], // Same as net_after_deductions
                             'vacation_days' => 0, // Default to 0
                             'vacation_amount' => 0, // Default to 0
-                            'base_amount' => $employeeData['insurance_amount'], // Use insurance amount as base
+                            'base_amount' => $employeeData['insurance_amount'], // Use Social Insurance Salary as base
                             'extra_payment_ids' => $extraPaymentIds,
                             'attendance_ids' => $attendanceIds,
                             'overtime_ids' => $overtimeIds, // Include both existing and newly created overtime IDs

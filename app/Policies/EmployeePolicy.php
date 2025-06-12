@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Models\Attendance\Overtime;
+use App\Models\Benefits\Payrolls\AppliedVacation;
 use App\Models\Personel\Employee;
 use App\Models\Personel\Docs\EmployeeHrLetterRequest;
 use App\Models\Users\User;
@@ -41,14 +42,14 @@ class EmployeePolicy
         return $user->is_admin || $user->is_hr || $user->id === $employee->user_id;
     }
 
-    public function approveVacation(User $user): bool
+    public function approveVacation(User $user, Employee $employee, AppliedVacation $appliedVacation): bool
     {
-        return $user->is_admin || $user->is_hr;
+        return $user->is_admin || $user->is_hr || ($user->employee_id === $employee->manager_id && $appliedVacation->status === AppliedVacation::STATUS_PENDING);
     }
 
-    public function rejectVacation(User $user): bool
+    public function rejectVacation(User $user, Employee $employee, AppliedVacation $appliedVacation): bool
     {
-        return $user->is_admin || $user->is_hr;
+        return $user->is_admin || $user->is_hr || ($user->employee_id === $employee->manager_id && $appliedVacation->status === AppliedVacation::STATUS_PENDING);
     }
 
 

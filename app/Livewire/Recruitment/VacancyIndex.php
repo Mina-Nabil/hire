@@ -514,9 +514,6 @@ class VacancyIndex extends Component
             'vacancies' => $vacancies,
             'vacancyTypes' => $vacancyTypes,
             'vacancyStatuses' => $vacancyStatuses
-        ])->layout('components.layouts.app', [
-            'title' => 'Vacancies',
-            'vacanciesIndex' => 'active'
         ]);
     }
 }

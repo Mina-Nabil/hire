@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Benefits\Partials;
 
+use App\Models\Attendance\Bus;
 use App\Models\Benefits\Configurations\BenefitConfiguration;
 use App\Models\Benefits\Configurations\WorkingDay;
 use App\Models\Personel\Employee;
@@ -27,29 +28,28 @@ class ApplyAttendanceModal extends Component
     public $isAutomaticOvertime;
     public $isRequireAttendanceApproval;
     public $deleteOldConf = true;
-
-    public $attendanceCalculations = [
-        'fixed',
-        'semi-flexible',
-        'flexible'
-    ];
+    public $busId;
+    public $buses;
+    public $attendanceCalculations = BenefitConfiguration::ATTENDANCE_CALCULATION_LIST;
 
     protected $rules = [
         'workingDays' => 'required|array|min:1',
         'attendanceCalculation' => 'required',
-        'workingDayStartMin' => 'required',
-        'workingDayStartMax' => 'required',
-        'workingDayEndMin' => 'required',
-        'workingDayEndMax' => 'required',
+        'workingDayStartMin' => 'required_unless:attendanceCalculation,bus',
+        'workingDayStartMax' => 'required_unless:attendanceCalculation,bus',
+        'workingDayEndMin' => 'required_unless:attendanceCalculation,in-only',
+        'workingDayEndMax' => 'required_unless:attendanceCalculation,in-only',
         'dailyWorkingHours' => 'required|numeric|min:1|max:24',
         'overtimeRate' => 'required|numeric|min:1',
         'isAutomaticOvertime' => 'boolean',
         'isRequireAttendanceApproval' => 'boolean',
+        'busId' => 'required_if:attendanceCalculation,bus',
     ];
 
     protected $messages = [
         'workingDays.required' => 'Please select at least one working day',
         'workingDays.min' => 'Please select at least one working day',
+        'busId.required_if' => 'Please select a bus',
     ];
 
     public $listeners = ['editAttendance'];
@@ -69,7 +69,8 @@ class ApplyAttendanceModal extends Component
         $this->overtimeRate = $this->selectedEmployee->benefitConfiguration?->overtime_rate;
         $this->isAutomaticOvertime = $this->selectedEmployee->benefitConfiguration?->is_automatic_overtime ? true : false;
         $this->isRequireAttendanceApproval = $this->selectedEmployee->benefitConfiguration?->is_require_attendance_approval ? true : false;
-        
+        $this->busId = $this->selectedEmployee->benefitConfiguration?->bus_id;
+
         $this->showApplyAttendanceModal = true;
     }
 
@@ -100,14 +101,15 @@ class ApplyAttendanceModal extends Component
             $this->selectedEmployee->setAttendanceConfigurations(
                 $this->workingDays,
                 $this->attendanceCalculation,
+                $this->dailyWorkingHours,
+                $this->isAutomaticOvertime,
+                $this->overtimeRate,
                 $this->workingDayStartMin,
                 $this->workingDayStartMax,
                 $this->workingDayEndMin,
                 $this->workingDayEndMax,
-                $this->dailyWorkingHours,
-                $this->isAutomaticOvertime,
-                $this->overtimeRate,
-                $this->isRequireAttendanceApproval
+                $this->isRequireAttendanceApproval,
+                $this->busId
             );
 
             $this->alertSuccess('Attendance configuration applied successfully!');
@@ -118,8 +120,13 @@ class ApplyAttendanceModal extends Component
         }
     }
 
+    public function mount()
+    {
+        $this->buses = Bus::all();
+    }
+
     public function render()
     {
         return view('livewire.benefits.partials.apply-attendance-modal');
     }
-} 
+}

@@ -85,8 +85,10 @@
                                 @if ($locale === 'ar') dir="rtl" @endif
                                 class="form-control @error('firstName') !border-danger-500 @enderror">
                             @error('firstName')
-                                <span
-                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                <bdi>
+                                    <span
+                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                </bdi>
                             @enderror
                         </div>
                         <!-- Middle Name -->
@@ -96,8 +98,10 @@
                                 @if ($locale === 'ar') dir="rtl" @endif
                                 class="form-control @error('middleName') !border-danger-500 @enderror">
                             @error('middleName')
-                                <span
-                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                <bdi>
+                                    <span
+                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                </bdi>
                             @enderror
                         </div>
                         <!-- Last Name -->
@@ -108,8 +112,10 @@
                                 @if ($locale === 'ar') dir="rtl" @endif
                                 class="form-control @error('lastName') !border-danger-500 @enderror">
                             @error('lastName')
-                                <span
-                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                <bdi>
+                                    <span
+                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                </bdi>
                             @enderror
                         </div>
 
@@ -121,8 +127,10 @@
                                 @if ($locale === 'ar') dir="rtl" @endif
                                 class="form-control @error('email') !border-danger-500 @enderror">
                             @error('email')
-                                <span
-                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                <bdi>
+                                    <span
+                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                </bdi>
                             @enderror
                         </div>
 
@@ -134,8 +142,10 @@
                                 @if ($locale === 'ar') dir="rtl" @endif
                                 class="form-control @error('phone') !border-danger-500 @enderror">
                             @error('phone')
-                                <span
-                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                <bdi>
+                                    <span
+                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                </bdi>
                             @enderror
                         </div>
 
@@ -146,8 +156,10 @@
                                 @if ($locale === 'ar') dir="rtl" @endif
                                 class="form-control @error('homePhone') !border-danger-500 @enderror">
                             @error('homePhone')
-                                <span
-                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                <bdi>
+                                    <span
+                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                </bdi>
                             @enderror
                         </div>
 
@@ -164,8 +176,10 @@
                                 @endforeach
                             </select>
                             @error('cityId')
-                                <span
-                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                <bdi>
+                                    <span
+                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                </bdi>
                             @enderror
                         </div>
 
@@ -188,8 +202,10 @@
                                 @endforeach
                             </select>
                             @error('areaId')
-                                <span
-                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                <bdi>
+                                    <span
+                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                </bdi>
                             @enderror
                         </div>
 
@@ -200,8 +216,10 @@
                                 @if ($locale === 'ar') dir="rtl" @endif
                                 class="form-control @error('nationality') !border-danger-500 @enderror">
                             @error('nationality')
-                                <span
-                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                <bdi>
+                                    <span
+                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                </bdi>
                             @enderror
                         </div>
 
@@ -211,8 +229,10 @@
                             <textarea id="address" wire:model="address" @if ($locale === 'ar') dir="rtl" @endif
                                 class="form-control @error('address') !border-danger-500 @enderror" rows="2"></textarea>
                             @error('address')
-                                <span
-                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                <bdi>
+                                    <span
+                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                </bdi>
                             @enderror
                         </div>
 
@@ -223,8 +243,10 @@
                                 @if ($locale === 'ar') dir="rtl" @endif
                                 class="form-control @error('birthDate') !border-danger-500 @enderror">
                             @error('birthDate')
-                                <span
-                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                <bdi>
+                                    <span
+                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                </bdi>
                             @enderror
                         </div>
 
@@ -240,8 +262,10 @@
                                 @endforeach
                             </select>
                             @error('gender')
-                                <span
-                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                <bdi>
+                                    <span
+                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                </bdi>
                             @enderror
                         </div>
 
@@ -258,8 +282,10 @@
                                 @endforeach
                             </select>
                             @error('maritalStatus')
-                                <span
-                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                <bdi>
+                                    <span
+                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                </bdi>
                             @enderror
                         </div>
 
@@ -276,8 +302,10 @@
                                 @endforeach
                             </select>
                             @error('militaryStatus')
-                                <span
-                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                <bdi>
+                                    <span
+                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                </bdi>
                             @enderror
                         </div>
 
@@ -290,8 +318,10 @@
                                 @if ($locale === 'ar') dir="rtl" @endif
                                 class="form-control @error('socialNumber') !border-danger-500 @enderror">
                             @error('socialNumber')
-                                <span
-                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                <bdi>
+                                    <span
+                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                </bdi>
                             @enderror
                         </div>
 
@@ -308,8 +338,10 @@
                                 @endforeach
                             </select>
                             @error('channelId')
-                                <span
-                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                <bdi>
+                                    <span
+                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                </bdi>
                             @enderror
                         </div>
                     </div>
@@ -325,8 +357,10 @@
                             <div wire:loading wire:target="profileImage" class="text-primary-500 text-sm mt-2">
                                 {{ __('recruitment.uploading') }}</div>
                             @error('profileImage')
-                                <span
-                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                <bdi>
+                                    <span
+                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                </bdi>
                             @enderror
                             @if ($profileImage)
                                 <div class="mt-2">
@@ -346,8 +380,10 @@
                                 {{ __('recruitment.uploading') }}
                             </div>
                             @error('cv')
-                                <span
-                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                <bdi>
+                                    <span
+                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                </bdi>
                             @enderror
                             @if ($cv)
                                 <div class="mt-2">
@@ -381,8 +417,10 @@
                                         @if ($locale === 'ar') dir="rtl" @endif
                                         class="form-control @error('educations.' . $index . '.school_name') !border-danger-500 @enderror">
                                     @error('educations.' . $index . '.school_name')
-                                        <span
-                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        <bdi>
+                                            <span
+                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        </bdi>
                                     @enderror
                                 </div>
 
@@ -394,8 +432,10 @@
                                         @if ($locale === 'ar') dir="rtl" @endif
                                         class="form-control @error('educations.' . $index . '.degree') !border-danger-500 @enderror">
                                     @error('educations.' . $index . '.degree')
-                                        <span
-                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        <bdi>
+                                            <span
+                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        </bdi>
                                     @enderror
                                 </div>
 
@@ -407,8 +447,10 @@
                                         @if ($locale === 'ar') dir="rtl" @endif
                                         class="form-control @error('educations.' . $index . '.field_of_study') !border-danger-500 @enderror">
                                     @error('educations.' . $index . '.field_of_study')
-                                        <span
-                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        <bdi>
+                                            <span
+                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        </bdi>
                                     @enderror
                                 </div>
 
@@ -420,8 +462,10 @@
                                         @if ($locale === 'ar') dir="rtl" @endif
                                         class="form-control @error('educations.' . $index . '.start_date') !border-danger-500 @enderror">
                                     @error('educations.' . $index . '.start_date')
-                                        <span
-                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        <bdi>
+                                            <span
+                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        </bdi>
                                     @enderror
                                 </div>
 
@@ -432,8 +476,10 @@
                                         @if ($locale === 'ar') dir="rtl" @endif
                                         class="form-control @error('educations.' . $index . '.end_date') !border-danger-500 @enderror">
                                     @error('educations.' . $index . '.end_date')
-                                        <span
-                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        <bdi>
+                                            <span
+                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        </bdi>
                                     @enderror
                                 </div>
                             </div>
@@ -470,8 +516,10 @@
                                         @if ($locale === 'ar') dir="rtl" @endif
                                         class="form-control @error('trainings.' . $index . '.name') !border-danger-500 @enderror">
                                     @error('trainings.' . $index . '.name')
-                                        <span
-                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        <bdi>
+                                            <span
+                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        </bdi>
                                     @enderror
                                 </div>
 
@@ -483,8 +531,10 @@
                                         @if ($locale === 'ar') dir="rtl" @endif
                                         class="form-control @error('trainings.' . $index . '.sponsor') !border-danger-500 @enderror">
                                     @error('trainings.' . $index . '.sponsor')
-                                        <span
-                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        <bdi>
+                                            <span
+                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        </bdi>
                                     @enderror
                                 </div>
 
@@ -496,8 +546,10 @@
                                         @if ($locale === 'ar') dir="rtl" @endif
                                         class="form-control @error('trainings.' . $index . '.duration') !border-danger-500 @enderror">
                                     @error('trainings.' . $index . '.duration')
-                                        <span
-                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        <bdi>
+                                            <span
+                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        </bdi>
                                     @enderror
                                 </div>
 
@@ -509,8 +561,10 @@
                                         @if ($locale === 'ar') dir="rtl" @endif
                                         class="form-control @error('trainings.' . $index . '.start_date') !border-danger-500 @enderror">
                                     @error('trainings.' . $index . '.start_date')
-                                        <span
-                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        <bdi>
+                                            <span
+                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        </bdi>
                                     @enderror
                                 </div>
                             </div>
@@ -548,8 +602,10 @@
                                         @if ($locale === 'ar') dir="rtl" @endif
                                         class="form-control @error('experiences.' . $index . '.company_name') !border-danger-500 @enderror">
                                     @error('experiences.' . $index . '.company_name')
-                                        <span
-                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        <bdi>
+                                            <span
+                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        </bdi>
                                     @enderror
                                 </div>
 
@@ -561,8 +617,10 @@
                                         @if ($locale === 'ar') dir="rtl" @endif
                                         class="form-control @error('experiences.' . $index . '.position') !border-danger-500 @enderror">
                                     @error('experiences.' . $index . '.position')
-                                        <span
-                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        <bdi>
+                                            <span
+                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        </bdi>
                                     @enderror
                                 </div>
 
@@ -574,8 +632,10 @@
                                         @if ($locale === 'ar') dir="rtl" @endif
                                         class="form-control @error('experiences.' . $index . '.start_date') !border-danger-500 @enderror">
                                     @error('experiences.' . $index . '.start_date')
-                                        <span
-                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        <bdi>
+                                            <span
+                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        </bdi>
                                     @enderror
                                 </div>
 
@@ -586,8 +646,10 @@
                                         @if ($locale === 'ar') dir="rtl" @endif
                                         class="form-control @error('experiences.' . $index . '.end_date') !border-danger-500 @enderror">
                                     @error('experiences.' . $index . '.end_date')
-                                        <span
-                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        <bdi>
+                                            <span
+                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        </bdi>
                                     @enderror
                                 </div>
 
@@ -598,8 +660,10 @@
                                         @if ($locale === 'ar') dir="rtl" @endif
                                         class="form-control @error('experiences.' . $index . '.salary') !border-danger-500 @enderror">
                                     @error('experiences.' . $index . '.salary')
-                                        <span
-                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        <bdi>
+                                            <span
+                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        </bdi>
                                     @enderror
                                 </div>
 
@@ -611,8 +675,10 @@
                                         @if ($locale === 'ar') dir="rtl" @endif
                                         class="form-control @error('experiences.' . $index . '.reason_for_leaving') !border-danger-500 @enderror">
                                     @error('experiences.' . $index . '.reason_for_leaving')
-                                        <span
-                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        <bdi>
+                                            <span
+                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        </bdi>
                                     @enderror
                                 </div>
                             </div>
@@ -649,8 +715,10 @@
                                         @if ($locale === 'ar') dir="rtl" @endif
                                         class="form-control @error('languages.' . $index . '.language') !border-danger-500 @enderror">
                                     @error('languages.' . $index . '.language')
-                                        <span
-                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        <bdi>
+                                            <span
+                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        </bdi>
                                     @enderror
                                 </div>
 
@@ -667,8 +735,10 @@
                                         @endforeach
                                     </select>
                                     @error('languages.' . $index . '.speaking_level')
-                                        <span
-                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        <bdi>
+                                            <span
+                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        </bdi>
                                     @enderror
                                 </div>
 
@@ -685,8 +755,10 @@
                                         @endforeach
                                     </select>
                                     @error('languages.' . $index . '.writing_level')
-                                        <span
-                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        <bdi>
+                                            <span
+                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        </bdi>
                                     @enderror
                                 </div>
 
@@ -703,8 +775,10 @@
                                         @endforeach
                                     </select>
                                     @error('languages.' . $index . '.reading_level')
-                                        <span
-                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        <bdi>
+                                            <span
+                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        </bdi>
                                     @enderror
                                 </div>
                             </div>
@@ -741,8 +815,10 @@
                                         @if ($locale === 'ar') dir="rtl" @endif
                                         class="form-control @error('references.' . $index . '.name') !border-danger-500 @enderror">
                                     @error('references.' . $index . '.name')
-                                        <span
-                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        <bdi>
+                                            <span
+                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        </bdi>
                                     @enderror
                                 </div>
 
@@ -754,8 +830,10 @@
                                         @if ($locale === 'ar') dir="rtl" @endif
                                         class="form-control @error('references.' . $index . '.phone') !border-danger-500 @enderror">
                                     @error('references.' . $index . '.phone')
-                                        <span
-                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        <bdi>
+                                            <span
+                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        </bdi>
                                     @enderror
                                 </div>
 
@@ -766,8 +844,10 @@
                                         @if ($locale === 'ar') dir="rtl" @endif
                                         class="form-control @error('references.' . $index . '.email') !border-danger-500 @enderror">
                                     @error('references.' . $index . '.email')
-                                        <span
-                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        <bdi>
+                                            <span
+                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        </bdi>
                                     @enderror
                                 </div>
 
@@ -778,8 +858,10 @@
                                         @if ($locale === 'ar') dir="rtl" @endif
                                         class="form-control @error('references.' . $index . '.address') !border-danger-500 @enderror">
                                     @error('references.' . $index . '.address')
-                                        <span
-                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        <bdi>
+                                            <span
+                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        </bdi>
                                     @enderror
                                 </div>
 
@@ -790,8 +872,10 @@
                                         @if ($locale === 'ar') dir="rtl" @endif
                                         class="form-control @error('references.' . $index . '.relationship') !border-danger-500 @enderror">
                                     @error('references.' . $index . '.relationship')
-                                        <span
-                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        <bdi>
+                                            <span
+                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        </bdi>
                                     @enderror
                                 </div>
                             </div>
@@ -839,8 +923,10 @@
                                             <option value="other">{{ __('recruitment.other') }}</option>
                                         </select>
                                         @error('skills.' . $index . '.type')
-                                            <span
-                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                            <bdi>
+                                                <span
+                                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                            </bdi>
                                         @enderror
                                     </div>
 
@@ -874,8 +960,10 @@
                                         @endif
 
                                         @error('skills.' . $index . '.skill')
-                                            <span
-                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                            <bdi>
+                                                <span
+                                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                            </bdi>
                                         @enderror
                                     </div>
 
@@ -894,8 +982,10 @@
                                             @endforeach
                                         </select>
                                         @error('skills.' . $index . '.level')
-                                            <span
-                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                            <bdi>
+                                                <span
+                                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                            </bdi>
                                         @enderror
                                     </div>
                                 </div>
@@ -930,19 +1020,23 @@
                                 </label>
                             </div>
                             @error('hasHealthIssues')
-                                <span
-                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                <bdi>
+                                    <span
+                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                </bdi>
                             @enderror
                         </div>
 
                         @if ($hasHealthIssues)
                             <div class="form-group mb-4">
                                 <label class="form-label">{{ __('recruitment.describe_health_issues') }}</label>
-                                <textarea wire:model="healthConditionsDescription" @if ($locale === 'ar') dir="rtl" @endif
-                                    class="form-control @error('healthConditionsDescription') !border-danger-500 @enderror" rows="3"></textarea>
-                                @error('healthConditionsDescription')
-                                    <span
-                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                <textarea wire:model="healthIssues" @if ($locale === 'ar') dir="rtl" @endif
+                                    class="form-control @error('healthIssues') !border-danger-500 @enderror" rows="3"></textarea>
+                                @error('healthIssues')
+                                    <bdi>
+                                        <span
+                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                    </bdi>
                                 @enderror
                             </div>
                         @endif
@@ -1084,8 +1178,10 @@
                                             </div>
                                         @endif
                                         @error('questionAnswers.' . $index . '.answer')
-                                            <span
-                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                            <bdi>
+                                                <span
+                                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                            </bdi>
                                         @enderror
                                     </div>
                                 @endforeach
@@ -1106,8 +1202,10 @@
                                 @endforeach
                             </select>
                             @error('vacancyId')
-                                <span
-                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                <bdi>
+                                    <span
+                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                </bdi>
                             @enderror
                         </div>
                     @endif
@@ -1120,7 +1218,10 @@
                             @if ($locale === 'ar') dir="rtl" @endif rows="3"
                             placeholder="{{ __('recruitment.cover_letter_placeholder') }}"></textarea>
                         @error('coverLetter')
-                            <span class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                            <bdi>
+                                <span
+                                    class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                            </bdi>
                         @enderror
                     </div>
 
@@ -1128,7 +1229,7 @@
                     <div class="form-group mb-4">
                         <label class="flex items-center {{ $locale === 'ar' ? 'flex-row-reverse' : '' }}">
                             <input type="checkbox" wire:model="agreeToTerms" class="form-checkbox"
-                                @if ($locale === 'ar') dir="rtl" @endif >
+                                @if ($locale === 'ar') dir="rtl" @endif>
                             <span
                                 class="text-sm font-medium text-slate-600 {{ $locale === 'ar' ? 'ml-0 mr-2' : 'ml-2' }}">
                                 {{ __('recruitment.agree_terms') }} <a href="#"
@@ -1137,7 +1238,9 @@
                             </span>
                         </label>
                         @error('agreeToTerms')
-                            <span class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                            <bdi>
+                                <span class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                            </bdi>
                         @enderror
                     </div>
                 @endif

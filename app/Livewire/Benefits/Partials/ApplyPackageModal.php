@@ -16,7 +16,6 @@ class ApplyPackageModal extends Component
 
     public $packages = [];
     public $managersList = [];
-    public $attendanceCalculations = BenefitConfiguration::ATTENDANCE_CALCULATION_LIST;
 
     public $selectedEmployee;
     public $showApplyPackageModal = false;
@@ -41,7 +40,7 @@ class ApplyPackageModal extends Component
 
 
 
-        if ($this->selectedEmployee->benefitConfiguration) {
+        if ($this->selectedEmployee->benefitConfiguration?->salaryGrade) {
             $this->selectedPackage = $this->selectedEmployee->benefitConfiguration->salaryGrade;
             $this->selectedPackageId = $this->selectedEmployee->benefitConfiguration->salaryGrade->id;
             $this->grossSalary = $this->selectedEmployee->benefitConfiguration->gross_salary;
@@ -170,8 +169,8 @@ class ApplyPackageModal extends Component
             'grossSalary.numeric' => 'Gross salary must be a number',
             'grossSalary.min' => 'Gross salary must be greater than ' . $this->selectedPackage->gross_min,
             'grossSalary.max' => 'Gross salary must be less than ' . $this->selectedPackage->gross_max,
-            'insuranceAmount.required' => 'Insurance amount is required',
-            'insuranceAmount.numeric' => 'Insurance amount must be a number',
+            'insuranceAmount.required' => 'Social Insurance Salary is required',
+            'insuranceAmount.numeric' => 'Social Insurance Salary must be a number',
         ]);
 
         try {

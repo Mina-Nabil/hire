@@ -128,9 +128,6 @@ class ChannelIndex extends Component
 
         return view('livewire.recruitment.channel-index', [
             'channels' => $channels
-        ])->layout('components.layouts.app', [
-            'title' => 'Applicant Channels',
-            'channelsIndex' => 'active'
         ]);
     }
     // ===============================================

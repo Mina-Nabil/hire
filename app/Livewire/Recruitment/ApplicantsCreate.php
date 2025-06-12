@@ -110,11 +110,13 @@ class ApplicantsCreate extends Component
 
         if ($vacancyID) {
             $vacancyID = decrypt($vacancyID);
+            $this->vacancyId = $vacancyID;
             $this->selectedVacancy = Vacancy::findOrFail($vacancyID);
         }
 
         if ($referralID) {
             $referralID = decrypt($referralID);
+            $this->referredById = $referralID;
             $this->selectedReferral = Employee::findOrFail($referralID);
         }
 
@@ -142,7 +144,6 @@ class ApplicantsCreate extends Component
         $this->computerSkillsList = ApplicantSkill::COMPUTER_SKILLS;
         $this->technicalSkillsList = ApplicantSkill::TECHNICAL_SKILLS;
         $this->softSkillsList = ApplicantSkill::SOFT_SKILLS;
-        
     }
 
     public function switchLocale($locale)
@@ -464,11 +465,11 @@ class ApplicantsCreate extends Component
                 ]);
             }
         }
-
-        $this->validate([
-            'hasHealthIssues' => 'boolean',
-            'healthIssues' => 'required_if:hasHealthIssues,1|nullable|string|max:2000',
-        ]);
+        if ($this->hasHealthIssues) {
+            $this->validate([
+                'healthIssues' => 'required|string|max:2000',
+            ]);
+        }
     }
 
 
@@ -538,7 +539,12 @@ class ApplicantsCreate extends Component
             }
             $question["object"] = $questionObject;
         }
-        $this->validate($validationRules, $messages);
+
+        if (count($validationRules) > 0) {
+            $this->validate($validationRules, $messages);
+        } else {
+            return true;
+        }
     }
 
     public function validateVacancyAndApplication()
@@ -671,6 +677,10 @@ class ApplicantsCreate extends Component
             });
 
             $this->alertSuccess('Applicant created successfully!');
+            $user = Auth::user();
+            if(!$user){
+                return redirect()->to('/thank-you');
+            }
             return redirect()->to('/recruitment/applicants');
         } catch (AppException $e) {
             $this->alertError($e->getMessage());

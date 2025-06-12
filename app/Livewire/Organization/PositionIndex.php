@@ -24,6 +24,7 @@ class PositionIndex extends Component
     public $employees = [];
     public $locations = [];
     public $salaryGrades = [];
+    public $allDepartments = [];
 
     // Department section
     public $newDepartmentModal = false;
@@ -221,6 +222,12 @@ class PositionIndex extends Component
     public function openEditPositionSec($id)
     {
         $position = Position::find($id);
+
+        $this->employees = Employee::current()->unemployed()->get();
+        if ($position->employee) {
+            $this->employees->push($position->employee);
+        }
+
         $this->positionId = $position->id;
         $this->positionName = $position->name;
         $this->positionArabicName = $position->arabic_name;
@@ -370,9 +377,10 @@ class PositionIndex extends Component
 
     public function mount()
     {
-        $this->employees = Employee::current()->get();
+        $this->employees = Employee::current()->unemployed()->get();
         $this->locations = Location::all();
         $this->salaryGrades = SalaryGrade::all();
+        $this->allDepartments = Department::all();
     }
 
     public function render()
@@ -397,9 +405,6 @@ class PositionIndex extends Component
             'departments' => $departments,
             'positions' => $positions,
             'allPositions' => $allPositions
-        ])->layout('components.layouts.app', [
-            'title' => 'Positions',
-            'positionsIndex' => 'active'
         ]);
     }
 }

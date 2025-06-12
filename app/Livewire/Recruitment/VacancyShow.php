@@ -192,7 +192,7 @@ class VacancyShow extends Component
                 'arabic_question' => $question->arabic_question,
                 'type' => $question->type,
                 'required' => $question->required,
-                'options' => $question->options_array,
+                'options' => $question->options ? implode(',', $question->options_array) : '',
             ];
         }
 
@@ -312,7 +312,7 @@ class VacancyShow extends Component
                         'arabic_question' => $question['arabic_question'] ?? null,
                         'type' => $question['type'],
                         'required' => isset($question['required']) ? true : false,
-                        'options' => isset($question['options']) ? $question['options'] : null,
+                        'options' => isset($question['options']) ? json_encode(explode(',', $question['options'])) : null,
                     ];
 
                     if (isset($question['id'])) {

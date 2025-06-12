@@ -33,6 +33,7 @@ class Payroll extends Model
         'total_vacation_days',
         'total_vacation_amount',
         'total_employees',
+        'total_tax_amount',
         'status',
     ];
 
@@ -43,6 +44,21 @@ class Payroll extends Model
 
     const EMPLOYEE_SHARE_SOCIAL_INSURANCE = 0.11;
     const EMPLOYER_SHARE_SOCIAL_INSURANCE = 0.1875;
+
+    // Tax brackets and rates
+    const TAX_BRACKET_1 = 30000;   // 0% up to 30,000
+    const TAX_BRACKET_2 = 45000;   // 10% from 30,001 to 45,000
+    const TAX_BRACKET_3 = 60000;   // 15% from 45,001 to 60,000
+    const TAX_BRACKET_4 = 200000;  // 20% from 60,001 to 200,000
+    const TAX_BRACKET_5 = 400000;  // 22.5% from 200,001 to 400,000
+    const TAX_BRACKET_6 = 600000;  // 25% from 400,001 to 600,000
+    const TAX_BRACKET_7 = 700000;  // 25% from 600,001 to 700,000
+    const TAX_BRACKET_8 = 800000;  // 25% from 700,001 to 800,000
+    const TAX_BRACKET_9 = 900000;  // 25% from 800,001 to 900,000
+    const TAX_BRACKET_10 = 1200000; // 25% from 900,001 to 1,200,000
+    // 27.5% above 1,200,000
+    
+    const TAX_YEARLY_ALLOWANCE = 15000;
 
     /**
      * Get the employee records for this payroll
@@ -186,6 +202,7 @@ class Payroll extends Model
         $totalVacationAmount = 0;
         $totalEmployees = count($payrollData);
         $benefitPaymentIds = [];
+        $totalTaxAmount = 0;
 
         // Use DB::transaction as described with a function that uses the variables
         DB::transaction(function () use (
@@ -198,6 +215,7 @@ class Payroll extends Model
             &$totalVacationDays,
             &$totalVacationAmount,
             &$totalEmployees,
+            &$totalTaxAmount,
             &$benefitPaymentIds
         ) {
             // 1. Create the payroll record
@@ -221,13 +239,16 @@ class Payroll extends Model
                     continue; // Skip if employee not found
                 }
 
+                $taxAmount = self::calculateTaxAmount($employeeData['net_after_deductions']);
+
+
                 // Create payroll_employee record with fields that exist in the database schema
                 $payrollEmployee = $payroll->payrollEmployees()->create([
                     'employee_id' => $employeeId,
                     'paid' => $employeeData['net_after_deductions'] ?? 0, // Use net after deductions as paid amount
                     'vacation_days' => $employeeData['vacation_days'] ?? 0,
                     'vacation_amount' => $employeeData['vacation_amount'] ?? 0,
-                    'base_amount' => $employeeData['base_amount'] ?? ($employeeData['insurance_amount'] ?? 0), // Use insurance amount as base if not specified
+                    'base_amount' => $employeeData['base_amount'] ?? ($employeeData['insurance_amount'] ?? 0), // Use Social Insurance Salary as base if not specified
                     'gross_salary' => $employeeData['gross_salary'] ?? 0,
                     'insurance_amount' => $employeeData['insurance_amount'] ?? 0,
                     'other_amount' => $employeeData['other_amount'] ?? 0,
@@ -255,6 +276,7 @@ class Payroll extends Model
                     'other_base_benefits' => $employeeData['other_base_benefits'] ?? 0,
                     'position' => $employeeData['position'] ?? 'Unknown',
                     'department' => $employeeData['department'] ?? 'Unknown',
+                    'tax_amount' => $taxAmount,
                 ]);
 
                 // Create benefit payments for this employee using only base benefits data
@@ -265,6 +287,8 @@ class Payroll extends Model
 
                 // Add employee's net payment to the total
                 $totalPaid += $employeeData['net_after_deductions'] ?? 0;
+
+                $totalTaxAmount += $taxAmount;
 
                 // Link extra payments to this payroll
                 if (isset($employeeData['extra_payment_ids']) && is_array($employeeData['extra_payment_ids'])) {
@@ -311,6 +335,7 @@ class Payroll extends Model
                 'total_vacation_days' => $totalVacationDays,
                 'total_vacation_amount' => $totalVacationAmount,
                 'total_employees' => $totalEmployees,
+                'total_tax_amount' => $totalTaxAmount,
             ]);
 
             // Log the creation of the payroll
@@ -325,6 +350,58 @@ class Payroll extends Model
         return $payroll;
     }
 
+    public static function calculateTaxAmount($netAfterDeductions) : float
+    {
+        // Calculate annual taxable income: (12 * monthly_net_salary) - yearly_allowance
+        $annualTaxableIncome = (12 * $netAfterDeductions) - self::TAX_YEARLY_ALLOWANCE;
+        
+        // If taxable income is 0 or negative, no tax
+        if ($annualTaxableIncome <= 0) {
+            return 0;
+        }
+        
+        $tax = 0;
+        
+        // Progressive tax calculation based on the Excel formula
+        if ($annualTaxableIncome <= self::TAX_BRACKET_1) {
+            // 0% tax up to 30,000
+            $tax = 0;
+        } elseif ($annualTaxableIncome <= self::TAX_BRACKET_2) {
+            // 10% on amount above 30,000 up to 45,000
+            $tax = ($annualTaxableIncome - self::TAX_BRACKET_1) * 0.10;
+        } elseif ($annualTaxableIncome <= self::TAX_BRACKET_3) {
+            // 15% on amount above 45,000 up to 60,000, plus previous bracket tax
+            $tax = ($annualTaxableIncome - self::TAX_BRACKET_2) * 0.15 + 1500;
+        } elseif ($annualTaxableIncome <= self::TAX_BRACKET_4) {
+            // 20% on amount above 60,000 up to 200,000, plus previous brackets tax
+            $tax = ($annualTaxableIncome - self::TAX_BRACKET_3) * 0.20 + 1500 + 2250;
+        } elseif ($annualTaxableIncome <= self::TAX_BRACKET_5) {
+            // 22.5% on amount above 200,000 up to 400,000, plus previous brackets tax
+            $tax = ($annualTaxableIncome - self::TAX_BRACKET_4) * 0.225 + 1500 + 2250 + 28000;
+        } elseif ($annualTaxableIncome <= self::TAX_BRACKET_6) {
+            // 25% on amount above 400,000 up to 600,000, plus previous brackets tax
+            $tax = ($annualTaxableIncome - self::TAX_BRACKET_5) * 0.25 + 1500 + 2250 + 28000 + 45000;
+        } elseif ($annualTaxableIncome <= self::TAX_BRACKET_7) {
+            // 25% on amount above 400,000 up to 700,000, plus adjusted previous brackets tax
+            $tax = ($annualTaxableIncome - self::TAX_BRACKET_5) * 0.25 + 4500 + 2250 + 28000 + 45000;
+        } elseif ($annualTaxableIncome <= self::TAX_BRACKET_8) {
+            // 25% on amount above 400,000 up to 800,000, plus adjusted previous brackets tax
+            $tax = ($annualTaxableIncome - self::TAX_BRACKET_5) * 0.25 + 9000 + 28000 + 45000;
+        } elseif ($annualTaxableIncome <= self::TAX_BRACKET_9) {
+            // 25% on amount above 400,000 up to 900,000, plus adjusted previous brackets tax
+            $tax = ($annualTaxableIncome - self::TAX_BRACKET_5) * 0.25 + 40000 + 45000;
+        } elseif ($annualTaxableIncome <= self::TAX_BRACKET_10) {
+            // 25% on amount above 400,000 up to 1,200,000, plus adjusted previous brackets tax
+            $tax = ($annualTaxableIncome - self::TAX_BRACKET_5) * 0.25 + 90000;
+        } else {
+            // 27.5% on amount above 1,200,000, plus previous brackets tax
+            $tax = ($annualTaxableIncome - self::TAX_BRACKET_10) * 0.275 + 300000;
+        }
+
+        
+        // Return the monthly tax amount (divide annual tax by 12)
+        return $tax / 12;
+    }
 
     public function deletePayroll()
     {
@@ -337,5 +414,11 @@ class Payroll extends Model
             AppLog::error('Error deleting payroll', $e->getMessage());
             throw new AppException('Error deleting payroll');
         }
+    }
+
+    ///attributes
+    public function getTitleAttribute()
+    {
+        return 'Payroll ' . $this->start_date->format('Y-m-d') . ' -> ' . $this->end_date->format('Y-m-d');
     }
 }

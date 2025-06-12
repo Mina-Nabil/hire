@@ -50,6 +50,7 @@ class PayrollEmployee extends Model
         'overtime_hours',
         'net_amount',
         'status',
+        'tax_amount',
     ];
     
     /**

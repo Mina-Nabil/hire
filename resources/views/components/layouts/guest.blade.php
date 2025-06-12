@@ -28,7 +28,7 @@
             display: flex;
             flex-direction: column;
         }
-        
+
         .guest-header {
             text-align: center;
             margin-bottom: 2rem;
@@ -73,20 +73,20 @@
             font-size: 0.875rem;
             color: #64748b;
         }
-        
+
         /* Override card styles */
         .card {
             margin-bottom: 0;
             box-shadow: none;
             border-radius: 0;
         }
-        
+
         .card-header {
             padding: 1.5rem;
             background-color: #f8fafc;
             border-bottom: 1px solid #e2e8f0;
         }
-        
+
         .card-body {
             padding: 1.5rem;
         }
@@ -102,7 +102,7 @@
                 <img src="{{ asset('images/logo/hire-logo-wide.png') }}" alt="{{ config('app.name', 'HiRe') }} Logo">
             </div>
             <h1 class="text-2xl font-bold text-slate-900">{{ $title ?? 'Welcome' }}</h1>
-            @if(isset($description))
+            @if (isset($description))
                 <p class="text-slate-500 mt-2">{{ $description }}</p>
             @endif
         </div>
@@ -110,6 +110,7 @@
         <div class="guest-container">
             <div class="guest-card">
                 {{ $slot ?? '' }}
+                @yield('content')
             </div>
         </div>
 

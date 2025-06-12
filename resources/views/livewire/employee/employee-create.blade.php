@@ -5,7 +5,8 @@
                 Create New Employee
             </h4>
             <div class="flex items-center">
-                <select id="status" class="form-control w-auto @error('status') !border-danger-500 @enderror" wire:model="status">
+                <select id="status" class="form-control w-auto @error('status') !border-danger-500 @enderror"
+                    wire:model="status">
                     @foreach ($statuses as $statusValue)
                         <option value="{{ $statusValue }}">{{ ucfirst($statusValue) }}</option>
                     @endforeach
@@ -286,48 +287,48 @@
 
                 <div class="bg-slate-50 dark:bg-slate-900 p-5 rounded-md col-span-2">
                     <div class="grid grid-cols-12 gap-4">
-                            <div class="col-span-12">
-                                <label for="id_card_file" class="form-label">ID Card Document
-                                    <iconify-icon wire:loading wire:target="id_card_file"
-                                        icon="line-md:loading-twotone-loop" width="18"
-                                        height="18"></iconify-icon></label>
-                                <div class="border-2 border-dashed border-slate-200 rounded-md p-4 text-center">
-                                    @if ($id_card_file)
-                                        <div class="flex items-center justify-center mb-3">
-                                            @if (in_array($id_card_file->getClientOriginalExtension(), ['pdf']))
-                                                <iconify-icon icon="mingcute:file-pdf-fill" width="48"
-                                                    height="48" class="text-red-500"></iconify-icon>
-                                            @else
-                                                <img src="{{ $id_card_file->temporaryUrl() }}"
-                                                    class="h-40 max-w-full rounded-md object-contain"
-                                                    alt="ID Card Preview">
-                                            @endif
-                                        </div>
-                                        <p class="text-sm text-slate-500">
-                                            {{ $id_card_file->getClientOriginalName() }}</p>
-                                        <button type="button" class="text-sm text-red-500 mt-2"
-                                            wire:click="$set('id_card_file', null)">
-                                            Remove File
-                                        </button>
-                                    @else
-                                        <label for="id_card_file_input" class="cursor-pointer block">
-                                            <iconify-icon icon="mingcute:upload-line" width="32" height="32"
-                                                class="text-slate-400 mx-auto"></iconify-icon>
-                                            <p class="mt-2 text-sm text-slate-500">Click to upload or
-                                                drag
-                                                and drop</p>
-                                            <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF (Max
-                                                10MB)
-                                            </p>
-                                            <input id="id_card_file_input" type="file" class="hidden"
-                                                wire:model="id_card_file" accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
-                                        </label>
-                                    @endif
-                                </div>
-                                @error('id_card_file')
-                                    <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
-                                @enderror
+                        <div class="col-span-12">
+                            <label for="id_card_file" class="form-label">ID Card Document
+                                <iconify-icon wire:loading wire:target="id_card_file"
+                                    icon="line-md:loading-twotone-loop" width="18"
+                                    height="18"></iconify-icon></label>
+                            <div class="border-2 border-dashed border-slate-200 rounded-md p-4 text-center">
+                                @if ($id_card_file)
+                                    <div class="flex items-center justify-center mb-3">
+                                        @if (in_array($id_card_file->getClientOriginalExtension(), ['pdf']))
+                                            <iconify-icon icon="mingcute:file-pdf-fill" width="48" height="48"
+                                                class="text-red-500"></iconify-icon>
+                                        @else
+                                            <img src="{{ $id_card_file->temporaryUrl() }}"
+                                                class="h-40 max-w-full rounded-md object-contain"
+                                                alt="ID Card Preview">
+                                        @endif
+                                    </div>
+                                    <p class="text-sm text-slate-500">
+                                        {{ $id_card_file->getClientOriginalName() }}</p>
+                                    <button type="button" class="text-sm text-red-500 mt-2"
+                                        wire:click="$set('id_card_file', null)">
+                                        Remove File
+                                    </button>
+                                @else
+                                    <label for="id_card_file_input" class="cursor-pointer block">
+                                        <iconify-icon icon="mingcute:upload-line" width="32" height="32"
+                                            class="text-slate-400 mx-auto"></iconify-icon>
+                                        <p class="mt-2 text-sm text-slate-500">Click to upload or
+                                            drag
+                                            and drop</p>
+                                        <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF (Max
+                                            10MB)
+                                        </p>
+                                        <input id="id_card_file_input" type="file" class="hidden"
+                                            wire:model="id_card_file" accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
+                                    </label>
+                                @endif
                             </div>
+                            @error('id_card_file')
+                                <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                            @enderror
+                        </div>
                         <div class="col-span-12">
                             <label for="id_number" class="form-label">ID Number</label>
                             <input type="text"

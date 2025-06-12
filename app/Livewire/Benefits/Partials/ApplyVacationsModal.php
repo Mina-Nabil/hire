@@ -9,13 +9,13 @@ use App\Traits\AlertFrontEnd;
 use Carbon\Carbon;
 use Livewire\Component;
 use App\Models\Benefits\Configurations\VacationPackage;
+use Illuminate\Support\Facades\Log;
 
 class ApplyVacationsModal extends Component
 {
     use AlertFrontEnd;
 
     public $packages = [];
-    public $attendanceCalculations = BenefitConfiguration::ATTENDANCE_CALCULATION_LIST;
 
     public $selectedEmployee;
     public $showApplyPackageModal = false;
@@ -53,6 +53,7 @@ class ApplyVacationsModal extends Component
                 'max_balance' => $benefit->max_balance,
                 'hour_price' => $benefit->hour_price,
                 'current_balance' => $benefit->current_balance,
+                'original_current_balance' => $benefit->current_balance,
                 'type' => $benefit->type,
                 'start_date' => $benefit->start_date,
                 'end_date' => $benefit->end_date,
@@ -130,36 +131,40 @@ class ApplyVacationsModal extends Component
     public function updateCurrentBalance($key)
     {
         $value = $this->vacationBenefits[$key]['inc_rate'];
-        $currentBalance = $this->vacationBenefits[$key]['current_balance'] ?? 0;
+        $currentBalance = $this->vacationBenefits[$key]['original_current_balance'] ?? 0;
+        $startDate = Carbon::parse($this->vacationBenefits[$key]['start_date'] ?? $this->packageStartDate);
         switch ($this->vacationBenefits[$key]['type']) {
             case VacationDetail::TYPE_YEARLY:
-                $startDate = Carbon::parse($this->vacationBenefits[$key]['start_date']);
-                $startOfYear = Carbon::parse($startDate)->startOfYear();
-                $leftRatio = $startOfYear->diffInDays($startDate, true) / 365;
-                $this->vacationBenefits[$key]['current_balance'] = $currentBalance + $value * $leftRatio;
+                $endOfYear = $startDate->clone()->endOfYear();
+                $leftRatio = $endOfYear->diffInDays($startDate, true) / 365;
+                $this->vacationBenefits[$key]['current_balance'] = $currentBalance + ($value * $leftRatio);
                 break;
             case VacationDetail::TYPE_MONTHLY:
-                $startDate = Carbon::parse($this->vacationBenefits[$key]['start_date']);
-                $startOfMonth = Carbon::parse($startDate)->startOfMonth();
+                $startOfMonth = $startDate->clone()->startOfMonth();
                 $leftRatio = $startOfMonth->diffInDays($startDate, true) / 30;
-                $this->vacationBenefits[$key]['current_balance'] = $value * $leftRatio;
+                $this->vacationBenefits[$key]['current_balance'] = $currentBalance + ($value * $leftRatio);
                 break;
             case VacationDetail::TYPE_WEEKLY:
-                $startDate = Carbon::parse($this->vacationBenefits[$key]['start_date']);
-                $startOfWeek = Carbon::parse($startDate)->startOfWeek();
+                $startOfWeek = $startDate->clone()->startOfWeek();
                 $leftRatio = $startOfWeek->diffInDays($startDate, true) / 7;
-                $this->vacationBenefits[$key]['current_balance'] = $value * $leftRatio;
+                $this->vacationBenefits[$key]['current_balance'] = $currentBalance + ($value * $leftRatio);
                 break;
             case VacationDetail::TYPE_QUARTERLY:
-                $startDate = Carbon::parse($this->vacationBenefits[$key]['start_date']);
-                $startOfQuarter = Carbon::parse($startDate)->startOfQuarter();
+                $startOfQuarter = $startDate->clone()->startOfQuarter();
                 $leftRatio = $startOfQuarter->diffInDays($startDate, true) / 90;
-                $this->vacationBenefits[$key]['current_balance'] = $value * $leftRatio;
+                $this->vacationBenefits[$key]['current_balance'] = $currentBalance + ($value * $leftRatio);
                 break;
 
             case VacationDetail::TYPE_DAILY:
                 $this->vacationBenefits[$key]['current_balance'] = $value;
                 break;
+        }
+    }
+
+    public function updatedPackageStartDate()
+    {
+        foreach ($this->vacationBenefits as $key => $benefit) {
+            $this->updateCurrentBalance($key, 0);
         }
     }
 

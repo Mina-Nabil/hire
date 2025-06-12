@@ -21,9 +21,6 @@ class EmployeeIndex extends Component
 
         return view('livewire.employee.employee-index', [
             'employees' => $employees
-        ])->layout('components.layouts.app', [
-            'title' => 'Employees',
-            'employeesIndex' => 'active'
         ]);
     }
 

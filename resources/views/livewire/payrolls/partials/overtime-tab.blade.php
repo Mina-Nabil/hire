@@ -115,6 +115,6 @@
 
 @if(isset($overtimes))
     <div class="mt-6">
-        {{ $overtimes->links() }}
+        {{ $overtimes->links('vendor.livewire.simple-bootstrap') }}
     </div>
 @endif 

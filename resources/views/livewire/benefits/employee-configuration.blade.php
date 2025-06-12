@@ -252,7 +252,7 @@
                                     <div class="row mb-3">
                                         <div class="col-md-5 font-weight-bold">Attendance Calculation:</div>
                                         <div class="col-md-7">
-                                            {{ $this->getAttendanceCalculationLabel($employee->benefitConfiguration->attendace_calculation) }}
+                                            {{ $this->getAttendanceCalculationLabel($employee->benefitConfiguration->attendance_calculation) }}
                                         </div>
                                     </div>
                                     <div class="row mb-3">
@@ -282,6 +282,12 @@
                                         <div class="col-md-5 font-weight-bold">Is Automatic Overtime:</div>
                                         <div class="col-md-7">
                                             {{ $employee->benefitConfiguration->is_automatic_overtime ? 'Yes' : 'No' }}
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-5 font-weight-bold">Bus:</div>
+                                        <div class="col-md-7">{{ ucfirst($employee->benefitConfiguration->bus?->name ?? '-') }}
                                         </div>
                                     </div>
                                 @else
@@ -496,7 +502,7 @@
                                     <thead>
                                         <tr>
                                             <th class="table-th">Gross Salary</th>
-                                            <th class="table-th">Insurance Amount</th>
+                                            <th class="table-th">Social Insurance Salary</th>
                                             <th class="table-th">Other Amount</th>
                                             <th class="table-th">Penalties</th>
                                             <th class="table-th">Extra Payments</th>
@@ -1213,7 +1219,7 @@
                                 {{ number_format($selectedPayrollEmployee->gross_salary, 2) }}</div>
                         </div>
                         <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-3">
-                            <h5 class="text-xs font-medium text-slate-500 dark:text-slate-300 mb-1">Insurance Amount
+                            <h5 class="text-xs font-medium text-slate-500 dark:text-slate-300 mb-1">Social Insurance Salary
                             </h5>
                             <div class="text-sm font-semibold">
                                 {{ number_format($selectedPayrollEmployee->insurance_amount, 2) }}</div>

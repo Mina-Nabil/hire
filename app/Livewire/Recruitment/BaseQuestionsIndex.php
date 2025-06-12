@@ -77,7 +77,7 @@ class BaseQuestionsIndex extends Component
         $this->questionId = $baseQuestion->id;
         $this->question = $baseQuestion->question;
         $this->type = $baseQuestion->type;
-        $this->options = $baseQuestion->options ? implode(',', $baseQuestion->options) : '';
+        $this->options = $baseQuestion->options ? implode(',', $baseQuestion->options_array) : '';
         
         $this->editQuestionModal = true;
     }
@@ -161,6 +161,6 @@ class BaseQuestionsIndex extends Component
 
         return view('livewire.recruitment.base-questions-index', [
             'baseQuestions' => $baseQuestions,
-        ])->layout('components.layouts.app', ['title' => 'Base Questions', 'baseQuestionsIndex' => 'active']);
+        ]);
     }
 } 

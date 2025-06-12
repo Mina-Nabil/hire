@@ -109,10 +109,6 @@ class ConfigurationIndex extends Component
 
         return view('livewire.benefits.configuration-index', [
             'employees' => $employees
-        ])->layout('components.layouts.app', [
-            'title' => 'Compensation & Benefits',
-            'description' => 'Manage employee compensation and benefits configurations',
-            'configurationIndex' => 'active',
         ]);
     }
 } 

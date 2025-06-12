@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class Position extends Model
 {
@@ -178,7 +179,7 @@ class Position extends Model
         int $locationId,
         int $departmentId,
         string $name,
-        ?int $parentId,
+        $parentId,
         string $arabicName,
         ?string $jobDescription,
         ?string $arabicJobDescription,
@@ -190,7 +191,7 @@ class Position extends Model
         ?string $arabicJobBenefits,
         ?string $code,
         ?string $employeeId,
-        ?int $salaryGradeId,
+        $salaryGradeId,
     ): bool {
         try {
             /** @var User $loggerInUser */
@@ -199,8 +200,8 @@ class Position extends Model
                 throw new AppException('You are not authorized to edit this position');
             }
 
-
-            return $this->update([
+            DB::beginTransaction();
+            $this->update([
                 'location_id' => $locationId,
                 'department_id' => $departmentId,
                 'name' => $name,
@@ -214,10 +215,23 @@ class Position extends Model
                 'job_benefits' => $jobBenefits,
                 'arabic_job_benefits' => $arabicJobBenefits,
                 'parent_id' => $parentId,
-                'code' => $code,
-                'employee_id' => $employeeId,
-                'salary_grade_id' => $salaryGradeId,
+                'code' => $code
             ]);
+            if($employeeId) {
+                $this->employee()->associate($employeeId);
+                $this->save();
+            } else {
+                $this->employee()->dissociate();
+                $this->save();
+            }
+            if($salaryGradeId) {
+                $this->salaryGrade()->associate($salaryGradeId);
+                $this->save();
+            } else {
+                $this->salaryGrade()->dissociate();
+                $this->save();
+            }
+            DB::commit();
             AppLog::info('Position Updated', "Name: $name", loggable: $this);
             return true;
         } catch (Exception $e) {
@@ -245,7 +259,7 @@ class Position extends Model
         }
         // Check if there are vacancies for this position
         else if ($this->vacancies()->count() > 0) {
-            throw new AppException('Cannot delete position with active vacancies.');
+            throw new AppException('Cannot delete position with vacancies.');
         }
 
         try {
@@ -307,6 +321,9 @@ class Position extends Model
         return $query->where('name', 'like', '%' . $search . '%')
             ->orWhere('arabic_name', 'like', '%' . $search . '%')
             ->orWhereHas('department', function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%');
+            })
+            ->orWhereHas('employee', function ($q) use ($search) {
                 $q->where('name', 'like', '%' . $search . '%');
             });
     }

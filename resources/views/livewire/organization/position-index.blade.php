@@ -26,7 +26,7 @@
     <div class="flex flex-wrap sm:flex-nowrap justify-between space-x-3 rtl:space-x-reverse mb-6">
         <div class="flex-0 w-full sm:w-auto mb-3 sm:mb-0">
             <div class="relative">
-                <input type="text" class="form-control pl-10" placeholder="Search..."
+                <input type="text" class="form-control pl-10" placeholder="Search by department or position or employee..."
                     wire:model.live.debounce.300ms="search">
                 <span class="absolute right-0 top-0 w-9 h-full flex items-center justify-center text-slate-400">
                     <iconify-icon icon="heroicons-solid:search"></iconify-icon>
@@ -36,7 +36,7 @@
     </div>
 
     <!-- Grid Layout for Tables -->
-    <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-5 mb-5 text-wrap">
+    <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-5 mb-5 text-wrap">
         <!-- Departments Table -->
         <div class="card mb-6">
             <header class="card-header noborder">
@@ -50,7 +50,7 @@
                                 <thead class="bg-slate-200 dark:bg-slate-700">
                                     <tr>
                                         <th scope="col" class="table-th">Name</th>
-                                        <th scope="col" class="table-th">Prefix</th>
+                                        {{-- <th scope="col" class="table-th">Prefix</th> --}}
                                         <th scope="col" class="table-th">Positions</th>
                                         <th scope="col" class="table-th">Actions</th>
                                     </tr>
@@ -60,7 +60,7 @@
                                     @forelse($departments as $department)
                                         <tr>
                                             <td class="table-td">{{ $department->name }}</td>
-                                            <td class="table-td">{{ $department->prefix_code }}</td>
+                                            {{-- <td class="table-td">{{ $department->prefix_code }}</td> --}}
                                             <td class="table-td">{{ $department->positions_count }}</td>
                                             <td class="table-td">
                                                 <div class="flex space-x-3 rtl:space-x-reverse">
@@ -89,7 +89,7 @@
         </div>
 
         <!-- Positions Table -->
-        <div class="card">
+        <div class="card col-span-2">
             <header class="card-header noborder">
                 <h4 class="card-title">Positions</h4>
             </header>
@@ -100,7 +100,9 @@
                             <table class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
                                 <thead class="bg-slate-200 dark:bg-slate-700">
                                     <tr>
+                                        {{-- <th scope="col" class="table-th">Code</th> --}}
                                         <th scope="col" class="table-th">Name</th>
+                                        <th scope="col" class="table-th">Employee</th>
                                         <th scope="col" class="table-th">Department</th>
                                         <th scope="col" class="table-th">Parent</th>
                                         <th scope="col" class="table-th">Actions</th>
@@ -110,7 +112,9 @@
                                     class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
                                     @forelse($positions as $position)
                                         <tr>
+                                            {{-- <td class="table-td">{{ $position->code }}</td> --}}
                                             <td class="table-td">{{ $position->name }}</td>
+                                            <td class="table-td">{{ $position->employee?->name ?? '-' }}</td>
                                             <td class="table-td">{{ $position->department->name }}</td>
                                             <td class="table-td">{{ $position->parent ? $position->parent->name : '-' }}
                                             </td>
@@ -410,7 +414,7 @@
                                         class="form-control @error('selectedDepartmentId') !border-danger-500 @enderror"
                                         wire:model="selectedDepartmentId">
                                         <option value="">Select a department</option>
-                                        @foreach ($departments as $department)
+                                        @foreach ($allDepartments as $department)
                                             <option value="{{ $department->id }}">{{ $department->name }}</option>
                                         @endforeach
                                     </select>
@@ -604,7 +608,7 @@
                                         class="form-control @error('selectedDepartmentId') !border-danger-500 @enderror"
                                         wire:model="selectedDepartmentId">
                                         <option value="">Select a department</option>
-                                        @foreach ($departments as $department)
+                                        @foreach ($allDepartments as $department)
                                             <option value="{{ $department->id }}">{{ $department->name }}</option>
                                         @endforeach
                                     </select>

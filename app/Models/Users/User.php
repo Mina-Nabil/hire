@@ -76,6 +76,10 @@ class User extends Authenticatable
         return $this->image_url ? Storage::disk('s3')->url($this->image_url) : null;
     }
 
+    public function getEmployeeIdAttribute()
+    {
+        return $this->employee?->id;
+    }
 
     public function getLanguageAttribute()
     {

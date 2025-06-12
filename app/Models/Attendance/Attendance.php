@@ -3,6 +3,7 @@
 namespace App\Models\Attendance;
 
 use App\Exceptions\AppException;
+use App\Models\Benefits\Configurations\BenefitConfiguration;
 use App\Models\Personel\Employee;
 use App\Models\Users\AppLog;
 use App\Models\Users\User;
@@ -26,9 +27,10 @@ class Attendance extends Model
         'end_time',
         'hours',
         'extra_hours',
+        'penalized_hours',
         'is_extra_hours_approved',
         'is_approved',
-        'payroll_id',
+        'payroll_id',   
     ];
 
     const MORPH_NAME = 'attendance';
@@ -132,28 +134,43 @@ class Attendance extends Model
         for ($row = 2; $row <= $highestRow; $row++) {
 
             $employeeName = trim($sheet->getCell('A' . $row)->getValueString());
-            Log::info('Employee name', ['employeeName' => $employeeName]);
             if (!$employeeName) continue;
+
+            if(!$sheet->getCell('B' . $row)->getValue()) continue; //if the start time is empty, skip the row
             $attendanceStartDate = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($sheet->getCell('B' . $row)->getValue());
-            $attendanceEndDate = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($sheet->getCell('C' . $row)->getValue());
+            $attendanceEndDate = $sheet->getCell('C' . $row)->getValue() ? \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($sheet->getCell('C' . $row)->getValue()) : null;
             $extraHours = $sheet->getCell('D' . $row)->getValue();
 
-            $hours = abs(round(Carbon::parse($attendanceEndDate)->diffInHours(Carbon::parse($attendanceStartDate)), 2));
-
             $employee = Employee::where('name', $employeeName)->first();
+            if(!$employee) {
+                $attendance[] = [
+                    'employee_id' => "Not Found",
+                    'employee' => null,
+                    'uploaded_name' => $employeeName,
+                    'attendance_type' => "N/A",
+                    'date' => $attendanceStartDate->format('Y-m-d'),
+                    'start_time' => $attendanceStartDate->format('H:i'),
+                    'end_time' => $attendanceEndDate ? $attendanceEndDate->format('H:i') : null,
+                    'hours' => null,
+                    'extra_hours' => null,
+                    'is_extra_hours_approved' => null,
+                    'is_approved' => null,
+                    "error" => true,
+                    'creator_id' => Auth::id(),
+                ];
+                continue;
+            }
+
+            $attendanceType = $employee->benefitConfiguration->attendance_calculation;
+
+            if($attendanceType == BenefitConfiguration::ATTENDANCE_CALCULATION_IN_ONLY){
+                $hours = $employee->benefitConfiguration->daily_working_hours;
+            } else {
+                $hours = abs(round(Carbon::parse($attendanceEndDate)->diffInDays(Carbon::parse($attendanceStartDate)), 2));
+            }
+
             
-            // Calculate extra hours based on benefit configuration
-            // $extra_hours = null;
-            // if ($employee) {
-            //     $benefitConfig = $employee->benefitConfiguration;
-            //     if ($benefitConfig && $benefitConfig->daily_working_hours) {
-            //         $standardHours = $benefitConfig->daily_working_hours;
-            //         if($hours > $standardHours){
-            //             $extra_hours = $hours - $standardHours;
-            //         }
-            //     }
-            // }
-            
+          
             // Determine if attendance approval is required
             $isApproved = null;
             if ($employee) {
@@ -168,9 +185,10 @@ class Attendance extends Model
                 'employee_id' => $employee?->id ?? "Not Found",
                 'employee' => $employee,
                 'uploaded_name' => $employeeName,
+                'attendance_type' => $attendanceType,
                 'date' => $attendanceStartDate->format('Y-m-d'),
                 'start_time' => $attendanceStartDate->format('H:i'),
-                'end_time' => $attendanceEndDate->format('H:i'),
+                'end_time' => $attendanceEndDate ? $attendanceEndDate->format('H:i') : null,
                 'hours' => $hours,
                 'extra_hours' => $extraHours,
                 'is_extra_hours_approved' => null,

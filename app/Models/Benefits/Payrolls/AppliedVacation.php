@@ -38,7 +38,7 @@ class AppliedVacation extends Model
     {
         /** @var User $user */
         $user = Auth::user();
-        if(!$user->can('approveVacation', $this->employee)) {
+        if(!$user->can('approve', $this)) {
             throw new AppException('You dont have permission to approve vacation');
         }
 
@@ -52,7 +52,7 @@ class AppliedVacation extends Model
     {
         /** @var User $user */
         $user = Auth::user();
-        if(!$user->can('rejectVacation', $this->employee)) {
+        if(!$user->can('reject', $this)) {
             throw new AppException('You dont have permission to reject vacation');
         }
 

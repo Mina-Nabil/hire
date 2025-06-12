@@ -3,6 +3,9 @@
 namespace App\Providers;
 
 use App\Models\Attendance\Attendance;
+use App\Models\Attendance\Bus;
+use App\Models\Attendance\BusArrival;
+use App\Models\Attendance\MissingDay;
 use App\Models\Attendance\Overtime;
 use Illuminate\Support\Facades\Gate;
 use App\Models\Base\Area;
@@ -149,6 +152,9 @@ class AppServiceProvider extends ServiceProvider
             VacationPackage::MORPH_NAME => VacationPackage::class,
             Attendance::MORPH_NAME => Attendance::class,
             Overtime::MORPH_NAME => Overtime::class,
+            MissingDay::MORPH_NAME => MissingDay::class,
+            Bus::MORPH_NAME => Bus::class,
+            BusArrival::MORPH_NAME => BusArrival::class,
         ]);
     }
 }

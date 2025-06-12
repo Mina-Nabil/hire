@@ -5,13 +5,14 @@
                 <th class="table-th border sticky-colomn border-slate-100 dark:bg-slate-800 dark:border-slate-700">Employee</th>
                 <th class="table-th">Position</th>
                 <th class="table-th">Gross Salary</th>
-                <th class="table-th">Insurance Amount</th>
+                <th class="table-th">Social Insurance Salary</th>
                 <th class="table-th">Other Amount</th>
                 <th class="table-th">Absence</th>
                 <th class="table-th">Extra Payments</th>
                 <th class="table-th">Overtime</th>
                 <th class="table-th">Adjustment</th>
                 <th class="table-th">Net Amount</th>
+                <th class="table-th">Tax Amount</th>
                 <th class="table-th">Actions</th>
             </tr>
         </thead>
@@ -111,6 +112,7 @@
                     </td>
                     <td class="table-td font-semibold">
                         {{ number_format($payrollEmployee->net_after_deductions, 2) }}</td>
+                    <td class="table-td">{{ number_format($payrollEmployee->tax_amount, 2) }}</td>
                     <td class="table-td">
                         <div class="flex space-x-2">
                             <button type="button" class="btn btn-sm btn-outline-primary"
@@ -219,7 +221,11 @@
                     </div>
                 </td>
                 <td class="table-td border-t-2 border-slate-200 dark:border-slate-600">
-                    <div class="text-sm">-</div>
+                    <div class="text-sm font-bold">
+                        {{ number_format($totals['tax_amount'], 2) }}
+                    </div>
+                </td>
+                <td class="table-td border-t-2 border-slate-200 dark:border-slate-600">
                 </td>
             </tr>
         </tfoot>

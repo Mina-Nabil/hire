@@ -9,7 +9,10 @@ use App\Exceptions\AppException;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 
+#[Title('Attendance')]
 class ShowAttendance extends Component
 {
     use WithPagination, AlertFrontEnd;
@@ -213,6 +216,13 @@ class ShowAttendance extends Component
             } else {
                 $layout = 'components.layouts.employee'; // Employee layout
             }
+        }
+
+        $loggedInUser = Auth::user();
+        if($loggedInUser->is_admin || $loggedInUser->is_hr){
+            $layout = 'components.layouts.app';
+        }else{
+            $layout = 'components.layouts.employee';
         }
 
         return view('livewire.attendance.show-attendance', [

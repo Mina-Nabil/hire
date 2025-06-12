@@ -113,6 +113,6 @@
 
 @if(isset($extraPayments))
     <div class="mt-6">
-        {{ $extraPayments->links() }}
+        {{ $extraPayments->links('vendor.livewire.simple-bootstrap') }}
     </div>
 @endif 

@@ -173,4 +173,41 @@ class BaseBenefit extends Model
             })->orWhereNull('base_benefits.end_date');
         });
     }
+
+    public function scopeIncludeQuarterOrYearlyOnlyIfNeeded($query, Carbon $startDate, Carbon $endDate)
+    {
+
+        $benefitsToInclude = [self::TYPE_MONTHLY, self::TYPE_DAILY, self::TYPE_WEEKLY];
+
+        if ($endDate->year > $startDate->year) {
+            $benefitsToInclude[] = self::TYPE_YEARLY;
+        }
+
+        $yearsIncluded = ($endDate->year !== $startDate->year) ?
+            [$startDate->year, $endDate->year] : [$startDate->year];
+
+        $quarterDates = [];
+
+        foreach ($yearsIncluded as $year) {
+            $quarterDates[] = Carbon::parse("$year-01-01");
+            $quarterDates[] = Carbon::parse("$year-04-01");
+            $quarterDates[] = Carbon::parse("$year-07-01");
+            $quarterDates[] = Carbon::parse("$year-10-01");
+        }
+
+        $includeQuarterly = false;
+
+        foreach ($quarterDates as $quarterDate) {
+            if ($quarterDate->between($startDate, $endDate, true)) {
+                $includeQuarterly = true;
+                break;
+            }
+        }
+
+        if ($includeQuarterly) {
+            $benefitsToInclude[] = self::TYPE_QUARTERLY;
+        }
+
+        return $query->whereIn('base_benefits.type', $benefitsToInclude);
+    }
 }

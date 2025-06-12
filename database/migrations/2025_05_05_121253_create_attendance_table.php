@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignIdFor(User::class, 'creator_id')->constrained('users')->restrictOnDelete();
             $table->date('date');
             $table->time('start_time');
-            $table->time('end_time');
+            $table->time('end_time')->nullable();
             $table->float('hours');
             $table->float('extra_hours')->nullable();
             $table->boolean('is_extra_hours_approved')->nullable();

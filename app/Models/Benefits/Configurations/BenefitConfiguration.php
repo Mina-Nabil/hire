@@ -2,6 +2,7 @@
 
 namespace App\Models\Benefits\Configurations;
 
+use App\Models\Attendance\Bus;
 use App\Models\Personel\Employee;
 use App\Models\Benefits\Configurations\SalaryGrade;
 use App\Models\Users\User;
@@ -13,10 +14,14 @@ class BenefitConfiguration extends Model
     const ATTENDANCE_CALCULATION_FLEXIBLE = 'flexible';
     const ATTENDANCE_CALCULATION_SEMI_FLEXIBLE = 'semi-flexible';
     const ATTENDANCE_CALCULATION_FIXED = 'fixed';
+    const ATTENDANCE_CALCULATION_IN_ONLY = 'in-only';
+    const ATTENDANCE_CALCULATION_BUS = 'bus';
     const ATTENDANCE_CALCULATION_LIST = [
         self::ATTENDANCE_CALCULATION_FLEXIBLE,
         self::ATTENDANCE_CALCULATION_SEMI_FLEXIBLE,
         self::ATTENDANCE_CALCULATION_FIXED,
+        self::ATTENDANCE_CALCULATION_IN_ONLY,
+        self::ATTENDANCE_CALCULATION_BUS,
     ];
 
     protected $table = 'benefit_configurations';
@@ -27,7 +32,7 @@ class BenefitConfiguration extends Model
         'vacation_package_id',
         'gross_salary',
         'insurance_amount', //الاساسى
-        'attendace_calculation',
+        'attendance_calculation',
         'working_day_start_min',
         'working_day_start_max',
         'working_day_end_min',
@@ -35,7 +40,8 @@ class BenefitConfiguration extends Model
         'daily_working_hours',
         'overtime_rate',
         'is_automatic_overtime',
-        'is_require_attendance_approval'
+        'is_require_attendance_approval',
+        'bus_id'
     ];
 
     public function employee()
@@ -52,6 +58,12 @@ class BenefitConfiguration extends Model
     {
         return $this->belongsTo(Employee::class, 'manager_id');
     }
+
+    public function bus()
+    {
+        return $this->belongsTo(Bus::class);
+    }
+
     
     
     

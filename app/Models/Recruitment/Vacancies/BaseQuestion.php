@@ -45,7 +45,7 @@ class BaseQuestion extends Model
 
     public function getOptionsArrayAttribute()
     {
-        return $this->options ? explode(',', $this->options) : [];
+        return $this->options ? json_decode($this->options) : [];
     }
 
     /**
@@ -72,7 +72,7 @@ class BaseQuestion extends Model
                 $options = explode(',', $options);
                 $options = array_map('trim', $options);
             }
-            $this->options = $options;
+            $this->options = json_encode($options);
         }
         
         $this->save();
@@ -110,7 +110,7 @@ class BaseQuestion extends Model
         }
         
         $this->save();
-        AppLog::info('Question Updated', 'Question updated for vacancy: ' . $this->vacancy->id, loggable: $this);
+        AppLog::info('Question Updated', 'Base Question updated', loggable: $this);
         return $this;
     }
 
@@ -127,7 +127,7 @@ class BaseQuestion extends Model
             throw new AppException(__('misc.not_authorized'));
         }
         $deleted = $this->delete();
-        AppLog::info('Question Deleted', 'Question deleted for vacancy: ' . $this->vacancy->id, loggable: $this);
+        AppLog::info('Question Deleted', 'Base Question deleted', loggable: $this);
         return $deleted;
     }
 }

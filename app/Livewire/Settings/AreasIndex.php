@@ -260,9 +260,6 @@ class AreasIndex extends Component
         return view('livewire.settings.areas-index', [
             'cities' => $cities,
             'areas' => $areas,
-        ])->layout('components.layouts.app', [
-            'title' => 'Areas',
-            'areasIndex' => 'active'
         ]);
     }
 }

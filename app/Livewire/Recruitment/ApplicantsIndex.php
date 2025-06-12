@@ -94,10 +94,6 @@ class ApplicantsIndex extends Component
 
         return view('livewire.recruitment.applicants-index', [
             'applicants' => $applicants
-        ])->layout('components.layouts.app', [
-            'title' => 'Applicants',
-            'description' => 'Applicants found on the system, please use the filters to find the applicant you are looking for',
-            'applicantsIndex' => 'active',
         ]);
     }
 

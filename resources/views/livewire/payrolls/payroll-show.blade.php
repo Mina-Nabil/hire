@@ -179,7 +179,7 @@
                                 {{ number_format($selectedPayrollEmployee->gross_salary, 2) }}</div>
                         </div>
                         <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-3">
-                            <h5 class="text-xs font-medium text-slate-500 dark:text-slate-300 mb-1">Insurance Amount
+                            <h5 class="text-xs font-medium text-slate-500 dark:text-slate-300 mb-1">Social Insurance Salary
                             </h5>
                             <div class="text-sm font-semibold">
                                 {{ number_format($selectedPayrollEmployee->insurance_amount, 2) }}</div>
@@ -303,8 +303,15 @@
                             <div class="text-lg font-semibold text-primary-600 dark:text-primary-400">
                                 {{ number_format($selectedPayrollEmployee->net_after_deductions, 2) }}</div>
                         </div>
+                        <div class="bg-secondary-50 dark:bg-secondary-900/20 rounded-md p-3 md:col-span-6">
+                            <h5 class="text-xs font-medium text-secondary-500 dark:text-secondary-400 mb-1">Tax Amount</h5>
+                            <div class="text-lg font-semibold text-secondary-600 dark:text-secondary-400">
+                                {{ number_format($selectedPayrollEmployee->tax_amount, 2) }}</div>
+                        </div>
                     </div>
                 </div>
+
+            
 
                 <!-- Tabs for different sections -->
                 <div x-data="{ activeTab: 'attendance' }">
@@ -384,11 +391,14 @@
                                             <td class="table-td">
                                                 <span
                                                     class="
-                                            @if ($attendance->hours < $attendance->employee->benefitConfiguration->daily_working_hours) text-danger-500 @endif
-                                            @if ($attendance->hours > $attendance->employee->benefitConfiguration->daily_working_hours) text-success-500 @endif
+                                            @if ($attendance->penalized_hours > 0) text-danger-500 @else text-success-500 @endif
                                             ">
-                                                    {{ $attendance->hours ?? 'N/A' }}
-                                                    <small>Hours</small>
+                                                    {{ $attendance->hours ? $attendance->hours . 'h' : 'N/A' }}
+                                                    @if ($attendance->penalized_hours > 0)
+                                                        <span>
+                                                            - ({{ $attendance->penalized_hours }}h)
+                                                        </span>
+                                                    @endif
                                                 </span>
                                             </td>
                                             <td class="table-td">
@@ -633,6 +643,31 @@
                                     </tbody>
                                 </table>
                             </div>
+
+                            <!-- Missing Days Table -->
+                            <div class="overflow-x-auto mt-4">
+                                <table class="min-w-full divide-y divide-slate-100 dark:divide-slate-700">
+                                    <thead>
+                                        <tr>
+                                            <th class="table-th">Missed Day</th>
+                                            <th class="table-th">Hours</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
+                                        @forelse($employeeMissingDays as $missingDay)
+                                            <tr>
+                                                <td class="table-td">{{ \Carbon\Carbon::parse($missingDay->date)->format('d M Y') }}</td>
+                                                <td class="table-td">{{ $missingDay->hours }}</td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="2" class="table-td text-center py-4">No missing days found</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                            
                         @else
                             <div class="text-center py-8">
                                 <div class="flex flex-col items-center">

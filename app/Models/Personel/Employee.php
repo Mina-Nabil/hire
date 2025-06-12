@@ -306,8 +306,8 @@ class Employee extends Model
         $overtime_rate,
         $working_day_start_min = null,
         $working_day_start_max = null,
-        $working_day_end_max = null,
         $working_day_end_min = null,
+        $working_day_end_max = null,
         $is_require_attendance_approval = false,
         $bus_id = null
     ) {

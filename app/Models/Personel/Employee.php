@@ -126,7 +126,7 @@ class Employee extends Model
 
                 // Only apply filter if the user has assigned locations
                 if (!empty($locationIds)) {
-                    $builder->whereHas('positions', function ($query) use ($locationIds) {
+                    $builder->whereHas('position', function ($query) use ($locationIds) {
                         $query->whereIn('location_id', $locationIds);
                     });
                 }

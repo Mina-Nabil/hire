@@ -334,8 +334,8 @@ class Employee extends Model
             $attendance_calculation !== BenefitConfiguration::ATTENDANCE_CALCULATION_IN_ONLY
             && $attendance_calculation !== BenefitConfiguration::ATTENDANCE_CALCULATION_BUS
         ) {
-            $min_duration_diff = Carbon::parse($working_day_start_min)->diffInDays($working_day_end_min);
-            $max_duration_diff = Carbon::parse($working_day_start_max)->diffInDays($working_day_end_max);
+            $min_duration_diff = round(Carbon::parse($working_day_start_min)->diffInHours($working_day_end_min));
+            $max_duration_diff = round(Carbon::parse($working_day_start_max)->diffInHours($working_day_end_max));
 
             if ($min_duration_diff != $max_duration_diff) {
                 throw new AppException('Working day date range is not valid, must be the same between min and max');

@@ -587,7 +587,7 @@ class Employee extends Model
     }
 
     ////model document functions
-    public function setArmyServicePaper($file_path, Carbon $issue_date, $type = ArmyServicePaper::TYPE_ORIGINAL, ?Carbon $expiry_date)
+    public function setArmyServicePaper($file_path, Carbon $issue_date, $type = ArmyServicePaper::TYPE_ORIGINAL, ?Carbon $expiry_date = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -736,7 +736,7 @@ class Employee extends Model
         }
     }
 
-    public function setEmployeeS1Doc($file_path, Carbon $issue_date, Carbon $expiry_date, string $s1_number)
+    public function setEmployeeS1Doc($file_path, Carbon $issue_date, ?Carbon $expiry_date = null, string $s1_number)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -799,7 +799,7 @@ class Employee extends Model
         }
     }
 
-    public function setEmployeeS6Doc($file_path, Carbon $issue_date, Carbon $expiry_date, string $s6_number, string $leaving_reason)
+    public function setEmployeeS6Doc($file_path, Carbon $issue_date, ?Carbon $expiry_date = null, string $s6_number, string $leaving_reason)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -831,7 +831,7 @@ class Employee extends Model
         }
     }
 
-    public function setPoliceRecord($file_path, Carbon $issue_date, Carbon $expiry_date)
+    public function setPoliceRecord($file_path, Carbon $issue_date, ?Carbon $expiry_date = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -893,7 +893,7 @@ class Employee extends Model
      * @return bool
      * @throws AppException
      */
-    public function setMedicalRecord($file_path, Carbon $issue_date, Carbon $expiry_date, string $status, ?string $insurance_number = null, ?string $medical_card_code = null, ?Carbon $medical_card_start = null, ?Carbon $medical_card_expiry = null)
+    public function setMedicalRecord($file_path, Carbon $issue_date, ?Carbon $expiry_date = null, string $status, ?string $insurance_number = null, ?string $medical_card_code = null, ?Carbon $medical_card_start = null, ?Carbon $medical_card_expiry = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -967,7 +967,7 @@ class Employee extends Model
      * @return bool
      * @throws AppException
      */
-    public function setPracticeCard($file_path, Carbon $issue_date, Carbon $expiry_date)
+    public function setPracticeCard($file_path, Carbon $issue_date, ?Carbon $expiry_date = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -1005,7 +1005,7 @@ class Employee extends Model
      * @return bool
      * @throws AppException
      */
-    public function setSkillsQualification($file_path, Carbon $issue_date, Carbon $expiry_date)
+    public function setSkillsQualification($file_path, Carbon $issue_date, ?Carbon $expiry_date = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -1043,7 +1043,7 @@ class Employee extends Model
      * @return bool
      * @throws AppException
      */
-    public function setSyndicateCard($file_path, Carbon $issue_date, Carbon $expiry_date)
+    public function setSyndicateCard($file_path, Carbon $issue_date, ?Carbon $expiry_date = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -1204,6 +1204,47 @@ class Employee extends Model
             report($e);
             AppLog::error('Error setting social print', $e->getMessage(), loggable: $this);
             throw new AppException('Error setting social print: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Set bank account for the employee
+     *
+     * @param string $file_path
+     * @param Carbon $issue_date
+     * @param Carbon|null $expiry_date
+     * @param int $bank_id
+     * @param string $account_number
+     * @param string $bank_employee_code
+     * @param string|null $old_bank_code
+     * @return bool
+     * @throws AppException
+     */
+    public function setBankAccount($file_path, Carbon $issue_date, ?Carbon $expiry_date = null, int $bank_id, string $account_number, string $bank_employee_code, ?string $old_bank_code = null)
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('setDocs', $this)) {
+            throw new AppException('You dont have permission to set docs for this employee');
+        }
+
+        try {
+            $this->bankAccounts()->create([
+                'created_by' => $loggedInUser->id,
+                'file_path' => $file_path,
+                'issue_date' => $issue_date,
+                'expiry_date' => $expiry_date,
+                'bank_id' => $bank_id,
+                'account_number' => $account_number,
+                'bank_employee_code' => $bank_employee_code,
+                'old_bank_code' => $old_bank_code,
+            ]);
+            AppLog::info('Bank Account Set', 'Bank account set for employee: ' . $this->name, loggable: $this);
+            return true;
+        } catch (Exception $e) {
+            report($e);
+            AppLog::error('Error setting bank account', $e->getMessage(), loggable: $this);
+            throw new AppException('Error setting bank account: ' . $e->getMessage());
         }
     }
 

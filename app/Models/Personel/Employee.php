@@ -43,6 +43,7 @@ use App\Models\Personel\Docs\SkillsQualification;
 use App\Models\Personel\Docs\SocialPrint;
 use App\Models\Personel\Docs\SyndicateCard;
 use App\Models\Personel\Docs\WorkDeclaration;
+use App\Models\Personel\Docs\OtherDocument;
 use App\Models\Recruitment\Applicants\Applicant;
 use App\Models\Recruitment\Applicants\Application;
 use App\Models\Users\User;
@@ -1204,6 +1205,39 @@ class Employee extends Model
             report($e);
             AppLog::error('Error setting social print', $e->getMessage(), loggable: $this);
             throw new AppException('Error setting social print: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Set other document for the employee
+     *
+     * @param string $name
+     * @param string $file_path
+     * @param Carbon $issue_date
+     * @return bool
+     * @throws AppException
+     */
+    public function setOtherDocument($name, $file_path, Carbon $issue_date)
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('setDocs', $this)) {
+            throw new AppException('You dont have permission to set docs for this employee');
+        }
+
+        try {
+            $this->otherDocuments()->create([
+                'created_by' => $loggedInUser->id,
+                'name' => $name,
+                'file_path' => $file_path,
+                'issue_date' => $issue_date,
+            ]);
+            AppLog::info('Other Document Set', 'Other document set for employee: ' . $this->name, loggable: $this);
+            return true;
+        } catch (Exception $e) {
+            report($e);
+            AppLog::error('Error setting other document', $e->getMessage(), loggable: $this);
+            throw new AppException('Error setting other document: ' . $e->getMessage());
         }
     }
 
@@ -2782,6 +2816,11 @@ class Employee extends Model
     public function socialPrint()
     {
         return $this->hasOne(SocialPrint::class);
+    }
+
+    public function otherDocuments()
+    {
+        return $this->hasMany(OtherDocument::class);
     }
 
     public function applicant()

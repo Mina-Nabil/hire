@@ -7,6 +7,7 @@ use App\Models\Base\InsuranceOffice;
 use App\Models\Personel\Docs\ArmyServicePaper;
 use App\Models\Personel\Docs\BirthCertificate;
 use App\Models\Personel\Docs\EmployeeS6Doc;
+use App\Models\Personel\Docs\OtherDocument;
 use App\Models\Personel\Docs\PoliceRecord;
 use App\Models\Personel\Employee;
 use App\Models\Personel\EmployeeInfo;
@@ -15,6 +16,7 @@ use App\Traits\AlertFrontEnd;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -211,6 +213,14 @@ class EmployeeShow extends Component
     public $social_print_file;
     public $social_print_issue_date;
     public $keep_existing_social_print = false;
+
+    // Other Document Properties
+    public $editOtherDocumentModal = false;
+    public $other_document_file;
+    public $other_document_name;
+    public $other_document_issue_date;
+    public $keep_existing_other_document = false;
+    public $editing_other_document_id = null;
 
     public $statuses;
 
@@ -1220,7 +1230,7 @@ class EmployeeShow extends Component
 
     // Police Record Edit Methods
 
-    protected $listeners = ['deletePoliceRecordModal', 'deleteHrLetterModal', 'deleteEmployeeS2DocModal', 'deleteEmployeeS6DocModal', 'deleteEmployeeContractModal', 'deleteWorkDeclarationModal'];
+    protected $listeners = ['deletePoliceRecordModal', 'deleteHrLetterModal', 'deleteEmployeeS2DocModal', 'deleteEmployeeS6DocModal', 'deleteEmployeeContractModal', 'deleteWorkDeclarationModal', 'deleteOtherDocumentModal'];
     public function openEditPoliceRecordModal()
     {
         $this->resetValidation();
@@ -2468,6 +2478,199 @@ class EmployeeShow extends Component
             }
         } catch (\Exception $e) {
             $this->alertError('Error downloading document: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Open the edit Other Document modal
+     */
+    public function openEditOtherDocumentModal()
+    {
+        $this->resetValidation();
+        $this->editing_other_document_id = null;
+        $this->other_document_file = null;
+        $this->other_document_name = null;
+        $this->other_document_issue_date = null;
+        $this->keep_existing_other_document = false;
+        
+        $this->editOtherDocumentModal = true;
+    }
+    
+    /**
+     * Open the edit specific Other Document modal
+     */
+    public function openEditSpecificOtherDocumentModal($recordId)
+    {
+        $this->resetValidation();
+        $otherDocument = \App\Models\Personel\Docs\OtherDocument::findOrFail($recordId);
+        
+        $this->editing_other_document_id = $otherDocument->id;
+        $this->other_document_name = $otherDocument->name;
+        $this->other_document_issue_date = $otherDocument->issue_date;
+        $this->keep_existing_other_document = true;
+        
+        $this->editOtherDocumentModal = true;
+    }
+    
+    /**
+     * Close the edit Other Document modal
+     */
+    public function closeEditOtherDocumentModal()
+    {
+        $this->editOtherDocumentModal = false;
+        $this->resetOtherDocumentFields();
+    }
+    
+    /**
+     * Reset the Other Document form fields
+     */
+    private function resetOtherDocumentFields()
+    {
+        $this->other_document_file = null;
+        $this->other_document_name = null;
+        $this->other_document_issue_date = null;
+        $this->keep_existing_other_document = false;
+        $this->editing_other_document_id = null;
+        $this->resetValidation();
+    }
+
+    /**
+     * Update or create Other Document
+     */
+    public function updateOtherDocument()
+    {
+        $this->validate([
+            'other_document_name' => 'required|string|max:255',
+            'other_document_issue_date' => 'required|date',
+            'other_document_file' => $this->keep_existing_other_document ? 'nullable' : 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
+        ]);
+        // dd($this->keep_existing_other_document);
+        try {
+            $path = null;
+
+            if($this->editing_other_document_id){
+                $otherDocument = \App\Models\Personel\Docs\OtherDocument::findOrFail($this->editing_other_document_id);
+
+                if(!$this->keep_existing_other_document){
+                    //delete existing file
+                    if($otherDocument->file_path){
+                        $existingFilePath = str_replace('storage/', '', $otherDocument->getRawOriginal('file_path'));
+                        if (Storage::disk('s3')->exists($existingFilePath)) {
+                            Storage::disk('s3')->delete($existingFilePath);
+                        }
+                    }
+                    $path = $this->other_document_file->store(Employee::FILES_DIRECTORY.'/other_documents', 's3');
+
+                }else{
+                    //keep existing file
+                    $otherDocument = OtherDocument::findOrFail($this->editing_other_document_id);
+                    $path = $otherDocument->getRawOriginal('file_path');
+                }
+            
+                // update record
+                $otherDocument->updateRecord(
+                $this->other_document_name,
+                $path ?? $otherDocument->file_path,
+                Carbon::parse($this->other_document_issue_date)
+                );
+
+                $this->alertSuccess('Other document updated successfully!');
+            }else{
+                $path = $this->other_document_file->store(Employee::FILES_DIRECTORY.'/other_documents', 's3');
+            
+                //create new record
+                $this->employee->setOtherDocument(
+                    $this->other_document_name,
+                    $path,
+                    Carbon::parse($this->other_document_issue_date)
+                );
+
+                $this->alertSuccess('Other document created successfully!');
+            }
+            $this->closeEditOtherDocumentModal();
+            $this->mount($this->employee->id);
+            $this->employee = Employee::with([
+                'info', 'idCard', 'birthCertificate', 'armyServicePaper', 
+                'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'policeRecords', 
+                'hrLetters', 'driverLicense', 'medicalRecord', 'externalMedicalRecord',
+                'practiceCard', 'skillsQualifications', 'syndicateCard', 'labourDocument',
+                'collegeCertificate', 'socialPrint'
+            ])->findOrFail($this->employee->id);
+        } catch (\Exception $e) {
+            $this->alertError('Error updating other document: ' . $e->getMessage());
+        }
+
+        //     if ($this->keep_existing_other_document) {
+        //         $path = $this->employee->otherDocument->getRawOriginal('file_path');
+        //     } else {
+        //         $path = $this->other_document_file->store(Employee::FILES_DIRECTORY.'/other_documents', 's3');
+        //     }
+
+        //     if (!$this->keep_existing_other_document) {
+        //         $path = $this->other_document_file->store(Employee::FILES_DIRECTORY.'/other_documents', 's3');
+        //     }
+
+        //     // $otherDocument = \App\Models\Personel\Docs\OtherDocument::findOrFail($this->editing_other_document_id);
+        //     // dd($path, $this->editing_other_document_id,$path ?? $otherDocument->file_path);
+
+        //     if ($this->editing_other_document_id) {
+        //         $otherDocument = \App\Models\Personel\Docs\OtherDocument::findOrFail($this->editing_other_document_id);
+                
+        //         $res = $otherDocument->updateRecord(
+        //             $this->other_document_name,
+        //             $path ?? $otherDocument->file_path,
+        //             Carbon::parse($this->other_document_issue_date)
+        //         );
+        //     } else {
+        //         $res = $this->employee->setOtherDocument(
+        //             $this->other_document_name,
+        //             $path,
+        //             Carbon::parse($this->other_document_issue_date)
+        //         );
+        //     }
+
+        //     if ($res) {
+        //         $this->alertSuccess('Other document updated successfully!');
+        //         $this->closeEditOtherDocumentModal();
+        //         $this->mount($this->employee->id);
+        //     } else {
+        //         $this->alertError();
+        //     }
+
+        // } catch (\Exception $e) {
+        //     $this->alertError('Error updating other document: ' . $e->getMessage());
+        // }
+    }
+
+    /**
+     * Download Other Document
+     */
+    public function downloadOtherDocument($docId = null)
+    {
+        try {
+            if ($docId) {
+                $document = \App\Models\Personel\Docs\OtherDocument::findOrFail($docId);
+                return $document->downloadFile();
+            } else {
+                $this->alertError('Document not found.');
+            }
+        } catch (\Exception $e) {
+            $this->alertError('Error downloading document: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Delete Other Document Modal
+     */
+    public function deleteOtherDocumentModal($recordId)
+    {
+        try {
+            $otherDocument = \App\Models\Personel\Docs\OtherDocument::findOrFail($recordId);
+            $otherDocument->deleteRecord();
+            $this->alertSuccess('Other document deleted successfully!');
+            $this->mount($this->employee->id);
+        } catch (\Exception $e) {
+            $this->alertError('Error deleting other document: ' . $e->getMessage());
         }
     }
 

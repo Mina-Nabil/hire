@@ -44,6 +44,7 @@ return new class extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('events_users');
         Schema::dropIfExists('calendar_events');
     }
 };

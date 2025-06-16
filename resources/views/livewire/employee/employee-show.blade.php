@@ -674,6 +674,32 @@
                             </div>
                         </li>
 
+                        <li wire:click="changeSection('other_documents')"
+                            class="block py-[8px] p-6  {{ $section == 'other_documents' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
+                            <div class="flex justify-between space-x-2 rtl:space-x-reverse">
+                                Other Documents
+                                <span>
+                                    @if ($employee->otherDocuments->count() > 0)
+                                        <span
+                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">{{ $employee->otherDocuments->count() }}</span>
+                                    @else
+                                        <span
+                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">0</span>
+                                    @endif
+                                </span>
+
+                                @if ($section == 'other_documents')
+                                    <div class="flex-none">
+                                        <button type="button"
+                                            class="text-xs text-slate-900 dark:text-white {{ $section == 'other_documents' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
+                                            <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
+                                                height="25"></iconify-icon>
+                                        </button>
+                                    </div>
+                                @endif
+                            </div>
+                        </li>
+
                     </ul>
                     <!-- END: FIles Card -->
                 </div>
@@ -2901,6 +2927,118 @@
                             @endcan
                         </div>
                     @endif
+                </div>
+            @elseif ($section === 'other_documents')
+                <div class="card">
+                    <div class="card-header flex justify-between items-center">
+                        <h4
+                            class="font-medium lg:text-2xl text-xl capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
+                            Other Documents
+                        </h4>
+
+                        @can('setDocs', $employee)
+                            <button wire:click="openEditOtherDocumentModal" class="action-btn" type="button">
+                                <iconify-icon icon="heroicons:plus"></iconify-icon>
+                            </button>
+                        @endcan
+                    </div>
+                    <div class="card-body p-6">
+                        @if ($employee->otherDocuments->count() > 0)
+                            @foreach ($employee->otherDocuments as $document)
+                                <div class="card border border-slate-200 dark:border-slate-700 mb-5">
+                                    <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
+                                        <h5 class="card-title text-slate-900 dark:text-white">{{ $document->name }} - Issue
+                                            Date {{ $document->issue_date }}</h5>
+                                        @can('setDocs', $employee)
+                                            <div class="flex space-x-3 rtl:space-x-reverse">
+                                                <button
+                                                    wire:click="openEditSpecificOtherDocumentModal({{ $document->id }})"
+                                                    class="action-btn" type="button">
+                                                    <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                                                </button>
+                                                <button
+                                                    wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to delete this document?',color:'danger',callback:'deleteOtherDocumentModal',params:{{ $document->id }}})"
+                                                    class="action-btn" type="button">
+                                                    <iconify-icon icon="heroicons:trash"></iconify-icon>
+                                                </button>
+                                            </div>
+                                        @endcan
+                                    </div>
+                                    <div class="card-body p-4">
+                                        <div class="grid grid-cols-4 gap-4">
+                                            <!-- Document Preview -->
+                                            <div class="col-span-3 flex justify-center items-center">
+                                                @php
+                                                    $fileExt = $this->getFileExtension($document->file_path);
+                                                @endphp
+
+                                                @if ($fileExt == 'pdf')
+                                                    <div class="border border-slate-200 rounded-md p-2 w-full">
+                                                        <iframe src="{{ $document->file_path }}" width="100%"
+                                                            height="800" class="border-0"></iframe>
+                                                    </div>
+                                                @else
+                                                    <img src="{{ $document->file_path }}" alt="{{ $document->name }}"
+                                                        class="max-h-32 max-w-full rounded-md shadow-sm object-contain">
+                                                @endif
+                                            </div>
+
+                                            <!-- Document Info -->
+                                            <div class="col-span-1 pl-4 space-y-2">
+                                                <div class="flex justify-between">
+                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Document Name:</span>
+                                                    <span class="text-sm font-medium">{{ $document->name }}</span>
+                                                </div>
+                                                <div class="flex justify-between">
+                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Issue
+                                                        Date:</span>
+                                                    <span
+                                                        class="text-sm font-medium">{{ $document->issue_date }}</span>
+                                                </div>
+
+                                                <!-- Download Button -->
+                                                <div class="mt-3">
+                                                    <button
+                                                        wire:click="downloadOtherDocument({{ $document->id }})"
+                                                        type="button" class="btn btn-dark btn-sm">
+                                                        <span class="inline-flex items-center justify-center"
+                                                            wire:loading.remove
+                                                            wire:target="downloadOtherDocument({{ $document->id }})">
+                                                            <iconify-icon icon="fluent:arrow-download-28-filled"
+                                                                class="mr-1" width="16"
+                                                                height="16"></iconify-icon>
+                                                            Download
+                                                        </span>
+                                                        <iconify-icon wire:loading
+                                                            wire:target="downloadOtherDocument({{ $document->id }})"
+                                                            icon="line-md:loading-twotone-loop" width="16"
+                                                            height="16"></iconify-icon>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="text-center py-5">
+                                <div class="mb-5">
+                                    <iconify-icon icon="mingcute:document-line" width="60" height="60"
+                                        class="text-slate-400"></iconify-icon>
+                                </div>
+                                <h5 class="text-xl font-semibold mb-4">No Other Documents Found</h5>
+                                <p class="text-slate-500 mb-5">Please upload other documents for this employee</p>
+                                @can('setDocs', $employee)
+                                    <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
+                                        wire:click="openEditOtherDocumentModal">
+                                        <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
+                                            class="mr-1"></iconify-icon>
+                                        Upload Other Document
+                                    </button>
+                                @endcan
+                            </div>
+                        @endif
+                    </div>
                 </div>
             @endif
         </div>
@@ -6595,6 +6733,184 @@
                                     </button>
                                 </div>
                             </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Other Document Edit Modal -->
+    @if ($editOtherDocumentModal)
+        <div>
+            <div id="editOtherDocumentModal"
+                class="modal fade fixed top-0 left-0 show w-full h-full outline-none overflow-x-hidden overflow-y-auto"
+                tabindex="-1" aria-labelledby="editOtherDocumentModalLabel" aria-hidden="true"
+                wire:ignore.self>
+                <div class="modal-dialog relative w-auto pointer-events-none">
+                    <div
+                        class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
+                        <div class="relative bg-white rounded-lg shadow dark:bg-slate-700">
+                            <!-- Modal header -->
+                            <div
+                                class="flex items-center justify-between p-5 border-b rounded-t dark:border-slate-600 bg-black-500">
+                                <h3 class="text-xl font-medium text-white dark:text-white capitalize">
+                                    {{ $editing_other_document_id ? 'Edit' : 'Add' }} Other Document
+                                </h3>
+                                <button wire:click="closeEditOtherDocumentModal" type="button"
+                                    class="text-slate-400 bg-transparent hover:text-slate-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-slate-600 dark:hover:text-white"
+                                    data-bs-dismiss="modal">
+                                    <svg aria-hidden="true" class="w-5 h-5" fill="#ffffff" viewBox="0 0 20 20"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd"
+                                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span class="sr-only">Close modal</span>
+                                </button>
+                            </div>
+
+                            <!-- Modal body -->
+                            <div class="modal-body p-6">
+                                <div class="grid grid-cols-12 gap-4">
+                                    @if ($editing_other_document_id)
+                                        <div class="col-span-12 form-check">
+                                            <div class="checkbox-area">
+                                                <label class="inline-flex items-center cursor-pointer"
+                                                    for="keep_existing_other_document">
+                                                    <input type="checkbox" class="hidden" name="checkbox"
+                                                        id="keep_existing_other_document"
+                                                        wire:model.live="keep_existing_other_document">
+                                                    <span
+                                                        class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
+                                                        <img src="{{ asset('images/icon/ck-white.svg') }}"
+                                                            alt=""
+                                                            class="h-[10px] w-[10px] block m-auto opacity-0"></span>
+                                                    <span
+                                                        class="text-slate-500 dark:text-slate-400 text-sm leading-6">Keep
+                                                        existing document</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    <div class="col-span-12">
+                                        <label for="other_document_name" class="form-label">Document Name</label>
+                                        <input type="text"
+                                            class="form-control @error('other_document_name') !border-danger-500 @enderror"
+                                            wire:model="other_document_name" placeholder="Enter document name">
+                                        @error('other_document_name')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    
+                                    @if (!$keep_existing_other_document)
+                                        <div class="col-span-12">
+                                            <label for="other_document_file" class="form-label">Other Document
+                                                <iconify-icon wire:loading wire:target="other_document_file"
+                                                    icon="line-md:loading-twotone-loop" width="18"
+                                                    height="18"></iconify-icon></label>
+                                            <div
+                                                class="border-2 border-dashed border-slate-200 rounded-md p-4 text-center">
+                                                @if ($other_document_file)
+                                                    <div class="flex items-center justify-center mb-3">
+                                                        @if (in_array($other_document_file->getClientOriginalExtension(), ['pdf']))
+                                                            <iconify-icon icon="mingcute:file-pdf-fill"
+                                                                width="48" height="48"
+                                                                class="text-red-500"></iconify-icon>
+                                                        @else
+                                                            <img src="{{ $other_document_file->temporaryUrl() }}"
+                                                                class="h-40 max-w-full rounded-md object-contain"
+                                                                alt="Other Document Preview">
+                                                        @endif
+                                                    </div>
+                                                    <p class="text-sm text-slate-500">
+                                                        {{ $other_document_file->getClientOriginalName() }}</p>
+                                                    <button type="button" class="text-sm text-red-500 mt-2"
+                                                        wire:click="$set('other_document_file', null)">
+                                                        Remove File
+                                                    </button>
+                                                @else
+                                                    @if ($editing_other_document_id)
+                                                        <div class="mb-3">
+                                                            <small class="text-muted">
+                                                                Current file: <a
+                                                                    href="{{ $employee->otherDocuments->find($editing_other_document_id)->file_path ?? '#' }}"
+                                                                    target="_blank"
+                                                                    class="text-sm text-blue-500">View</a>
+                                                            </small>
+                                                        </div>
+                                                        
+                                                        @if (!$keep_existing_other_document)
+                                                            <label for="other_document_file_input"
+                                                                class="cursor-pointer block">
+                                                                <iconify-icon icon="mingcute:upload-line"
+                                                                    width="32" height="32"
+                                                                    class="text-slate-400 mx-auto"></iconify-icon>
+                                                                <p class="mt-2 text-sm text-slate-500">Click to upload
+                                                                </p>
+                                                                <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF
+                                                                    (Max
+                                                                    2MB)</p>
+                                                                <input id="other_document_file_input"
+                                                                    type="file" class="hidden"
+                                                                    wire:model="other_document_file"
+                                                                    accept=".pdf,.jpg,.jpeg,.png">
+                                                            </label>
+                                                        @endif
+                                                    @else
+                                                        <label for="other_document_file_input"
+                                                            class="cursor-pointer block">
+                                                            <iconify-icon icon="mingcute:upload-line" width="32"
+                                                                height="32"
+                                                                class="text-slate-400 mx-auto"></iconify-icon>
+                                                            <p class="mt-2 text-sm text-slate-500">Click to upload or
+                                                                drag
+                                                                and drop</p>
+                                                            <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF (Max
+                                                                2MB)
+                                                            </p>
+                                                            <input id="other_document_file_input" type="file"
+                                                                class="hidden" wire:model="other_document_file"
+                                                                accept=".pdf,.jpg,.jpeg,.png">
+                                                        </label>
+                                                    @endif
+                                                @endif
+                                            </div>
+                                            @error('other_document_file')
+                                                <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    @endif
+                                    
+                                    <div class="col-span-12">
+                                        <label for="other_document_issue_date" class="form-label">Issue
+                                            Date</label>
+                                        <input type="date"
+                                            class="form-control @error('other_document_issue_date') !border-danger-500 @enderror"
+                                            wire:model="other_document_issue_date">
+                                        @error('other_document_issue_date')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Modal footer -->
+                            <div
+                                class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
+                                <button wire:click="closeEditOtherDocumentModal" type="button"
+                                    class="btn inline-flex justify-center btn-outline-dark">Cancel</button>
+                                <button wire:click="updateOtherDocument" type="button"
+                                    wire:target='updateOtherDocument' wire:loading.remove
+                                    class="btn inline-flex justify-center btn-dark">{{ $editing_other_document_id ? 'Update' : 'Upload' }}</button>
+                                <button wire:loading wire:target="updateOtherDocument" type="button"
+                                    class="btn inline-flex justify-center btn-dark">
+                                    <span class="flex items-center">
+                                        <iconify-icon icon="line-md:loading-twotone-loop" width="25"
+                                            height="25"></iconify-icon>
+                                    </span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

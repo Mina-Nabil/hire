@@ -80,6 +80,34 @@ class Applicant extends Model
         self::MILITARY_STATUS_COMPLETED,
     ];
 
+    const DEGREE_HIGH_SCHOOL = 'High School';
+    const DEGREE_ASSOCIATE = 'Associate';
+    const DEGREE_BACHELOR = 'Bachelor';
+    const DEGREE_MASTER = 'Master';
+    const DEGREE_DOCTORATE = 'Doctorate';
+
+    const DEGREES = [
+        self::DEGREE_HIGH_SCHOOL,
+        self::DEGREE_ASSOCIATE,
+        self::DEGREE_BACHELOR,
+        self::DEGREE_MASTER,
+        self::DEGREE_DOCTORATE,
+    ];
+
+    const LANGUAGE_ENGLISH = 'English';
+    const LANGUAGE_ARABIC = 'Arabic';
+    const LANGUAGE_FRENCH = 'French';
+    const LANGUAGE_SPANISH = 'Spanish';
+    const LANGUAGE_GERMAN = 'German';
+
+    const LANGUAGES = [
+        self::LANGUAGE_ENGLISH,
+        self::LANGUAGE_ARABIC,
+        self::LANGUAGE_FRENCH,
+        self::LANGUAGE_SPANISH,
+        self::LANGUAGE_GERMAN,
+    ];
+
     ///attributes
     /**
      * Get the full name of the applicant

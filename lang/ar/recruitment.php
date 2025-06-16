@@ -103,10 +103,10 @@ return [
     'technical_skill' => 'مهارة تقنية',
     'soft_skill' => 'مهارة ناعمة',
     'other' => 'أخرى',
-    'basic' => 'أساسي',
-    'good' => 'جيد',
-    'very_good' => 'جيد جدا',
-    'excellent' => 'ممتاز',
+    'Basic' => 'أساسي',
+    'Good' => 'جيد',
+    'Very Good' => 'جيد جدا',
+    'Fluent' => 'طلاقة',
     
     // Application
     'select_vacancy' => 'اختر الوظيفة الشاغرة',

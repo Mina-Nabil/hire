@@ -428,7 +428,7 @@
                                 <div class="form-group">
                                     <label class="form-label">{{ __('recruitment.degree') }} <span
                                             class="text-danger-500">*</span></label>
-                                    <input type="text" wire:model="educations.{{ $index }}.degree"
+                                    <input type="text" wire:model="educations.{{ $index }}.degree" list="degrees"
                                         @if ($locale === 'ar') dir="rtl" @endif
                                         class="form-control @error('educations.' . $index . '.degree') !border-danger-500 @enderror">
                                     @error('educations.' . $index . '.degree')
@@ -437,6 +437,11 @@
                                                 class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
                                         </bdi>
                                     @enderror
+                                    <datalist id="degrees">
+                                        @foreach ($degrees as $degree)
+                                            <option value="{{ $degree }}">{{ $degree }}</option>
+                                        @endforeach
+                                    </datalist>
                                 </div>
 
                                 <!-- Field of Study -->
@@ -711,7 +716,7 @@
                                 <div class="form-group">
                                     <label class="form-label">{{ __('recruitment.language') }} <span
                                             class="text-danger-500">*</span></label>
-                                    <input type="text" wire:model="languages.{{ $index }}.language"
+                                    <input type="text" wire:model="languages.{{ $index }}.language" list="languages"
                                         @if ($locale === 'ar') dir="rtl" @endif
                                         class="form-control @error('languages.' . $index . '.language') !border-danger-500 @enderror">
                                     @error('languages.' . $index . '.language')
@@ -720,6 +725,11 @@
                                                 class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
                                         </bdi>
                                     @enderror
+                                    <datalist id="languages">
+                                        @foreach ($languages as $language)
+                                            <option value="{{ $language }}">{{ $language }}</option>
+                                        @endforeach
+                                    </datalist>
                                 </div>
 
                                 <!-- Speaking Level -->

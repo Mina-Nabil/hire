@@ -204,10 +204,10 @@ class ApplicantsCreate extends Component
             'socialNumber' => 'required',
             'phone' => 'required|string|max:255',
             'homePhone' => 'nullable|string|max:255',
-            'birthDate' => 'nullable|date',
-            'gender' => 'nullable|in:' . implode(',', Applicant::GENDER),
-            'maritalStatus' => 'nullable|in:' . implode(',', Applicant::MARITAL_STATUS),
-            'militaryStatus' => 'nullable|in:' . implode(',', Applicant::MILITARY_STATUS),
+            'birthDate' => 'required|date',
+            'gender' => 'required|in:' . implode(',', Applicant::GENDER),
+            'maritalStatus' => 'required|in:' . implode(',', Applicant::MARITAL_STATUS),
+            'militaryStatus' => 'required|in:' . implode(',', Applicant::MILITARY_STATUS),
             'channelId' => 'nullable|exists:channels,id',
             'profileImage' => 'nullable|image|max:4096',
             'cv' => 'nullable|file|mimes:pdf,doc,docx|max:4096',
@@ -701,7 +701,7 @@ class ApplicantsCreate extends Component
         } else {
             $this->pageTitle = 'Apply for ' . env('COMPANY_NAME', 'Our Company');
             $this->pageDescription = $this->selectedVacancy
-                ? 'Apply for the ' . $this->selectedVacancy->position->name . ' position'
+                ? env('COMPANY_NAME', 'Our Company') . ' Job Application'
                 : 'Apply for one of our open positions';
             $this->pageLayout = 'components.layouts.guest';
         }
@@ -711,6 +711,8 @@ class ApplicantsCreate extends Component
             'channels' => $this->channels,
             'employees' => $this->employees,
             'vacancies' => $this->vacancies,
+            'degrees' => Applicant::DEGREES,
+            'languages' => Applicant::LANGUAGES,
             'genderOptions' => Applicant::GENDER,
             'maritalStatusOptions' => Applicant::MARITAL_STATUS,
             'militaryStatusOptions' => Applicant::MILITARY_STATUS,

@@ -29,7 +29,7 @@ return [
     'gender' => 'Gender',
     'marital_status' => 'Marital Status',
     'military_status' => 'Military Status',
-    'social_number' => 'Social Number',
+    'social_number' => 'ID Number',
     'application_channel' => 'Application Channel',
     'select_city' => 'Select City',
     'select_area' => 'Select Area',
@@ -103,10 +103,10 @@ return [
     'technical_skill' => 'Technical Skill',
     'soft_skill' => 'Soft Skill',
     'other' => 'Other',
-    'basic' => 'Basic',
-    'good' => 'Good',
-    'very_good' => 'Very Good',
-    'excellent' => 'Excellent',
+    'Basic' => 'Basic',
+    'Good' => 'Good',
+    'Very Good' => 'Very Good',
+    'Fluent' => 'Fluent',
     
     // Application
     'select_vacancy' => 'Select Vacancy',

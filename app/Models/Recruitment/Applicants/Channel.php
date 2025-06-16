@@ -15,8 +15,12 @@ class Channel extends Model
 
     use HasFactory;
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'is_hidden'];
     public $timestamps = false;
+
+    protected $attributes = [
+        'is_hidden' => false
+    ];
 
     public function applicants(): HasMany
     {

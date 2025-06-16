@@ -25,6 +25,7 @@
                     <thead class="border-t border-slate-100 dark:border-slate-800 bg-slate-200 dark:bg-slate-700">
                         <tr>
                             <th scope="col" class="table-th">Name</th>
+                            <th scope="col" class="table-th">Status</th>
                             <th scope="col" class="table-th">Actions</th>
                         </tr>
                     </thead>
@@ -35,6 +36,13 @@
                                     <span class="hover-underline">
                                         <b>{{ $channel->name }}</b>
                                     </span>
+                                </td>
+                                <td class="table-td">
+                                    @if($channel->is_hidden)
+                                        <span class="badge bg-danger-500 text-white">Hidden</span>
+                                    @else
+                                        <span class="badge bg-success-500 text-white">Visible</span>
+                                    @endif
                                 </td>
                                 <td class="table-td">
                                     <div class="flex space-x-3 rtl:space-x-reverse">
@@ -100,6 +108,17 @@
                                     <span class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
                                 @enderror
                             </div>
+                            <div class="from-group">
+                                <div class="input-area">
+                                    <label class="form-label">Visibility</label>
+                                    <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                                        <label class="inline-flex items-center">
+                                            <input type="checkbox" class="form-checkbox" wire:model="is_hidden">
+                                            <span class="ml-2">Hide Channel</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Modal footer -->
@@ -141,6 +160,17 @@
                                 @error('editName')
                                     <span class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
                                 @enderror
+                            </div>
+                            <div class="from-group">
+                                <div class="input-area">
+                                    <label class="form-label">Visibility</label>
+                                    <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                                        <label class="inline-flex items-center">
+                                            <input type="checkbox" class="form-checkbox" wire:model="editIsHidden">
+                                            <span class="ml-2">Hide Channel</span>
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 

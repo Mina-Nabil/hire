@@ -712,7 +712,7 @@ class ApplicantsCreate extends Component
             'employees' => $this->employees,
             'vacancies' => $this->vacancies,
             'degrees' => Applicant::DEGREES,
-            'languages' => Applicant::LANGUAGES,
+            'baseLanguages' => Applicant::LANGUAGES,
             'genderOptions' => Applicant::GENDER,
             'maritalStatusOptions' => Applicant::MARITAL_STATUS,
             'militaryStatusOptions' => Applicant::MILITARY_STATUS,

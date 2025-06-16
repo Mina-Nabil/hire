@@ -238,7 +238,8 @@
 
                         <!-- Birth Date -->
                         <div class="form-group sm:col-span-3">
-                            <label for="birthDate" class="form-label">{{ __('recruitment.birth_date') }}</label>
+                            <label for="birthDate" class="form-label">{{ __('recruitment.birth_date') }} <span
+                                    class="text-danger-500">*</span></label>
                             <input type="date" id="birthDate" wire:model="birthDate"
                                 @if ($locale === 'ar') dir="rtl" @endif
                                 class="form-control @error('birthDate') !border-danger-500 @enderror">
@@ -252,7 +253,8 @@
 
                         <!-- Gender -->
                         <div class="form-group sm:col-span-3">
-                            <label for="gender" class="form-label">{{ __('recruitment.gender') }}</label>
+                            <label for="gender" class="form-label">{{ __('recruitment.gender') }} <span
+                                class="text-danger-500">*</span></label>
                             <select id="gender" wire:model="gender"
                                 @if ($locale === 'ar') dir="rtl" @endif
                                 class="form-control @error('gender') !border-danger-500 @enderror">
@@ -272,7 +274,8 @@
                         <!-- Marital Status -->
                         <div class="form-group sm:col-span-3">
                             <label for="maritalStatus"
-                                class="form-label">{{ __('recruitment.marital_status') }}</label>
+                                class="form-label">{{ __('recruitment.marital_status') }} <span
+                                    class="text-danger-500">*</span></label>
                             <select id="maritalStatus" wire:model="maritalStatus"
                                 @if ($locale === 'ar') dir="rtl" @endif
                                 class="form-control @error('maritalStatus') !border-danger-500 @enderror">
@@ -292,7 +295,8 @@
                         <!-- Military Status -->
                         <div class="form-group sm:col-span-3">
                             <label for="militaryStatus"
-                                class="form-label">{{ __('recruitment.military_status') }}</label>
+                                class="form-label">{{ __('recruitment.military_status') }} <span
+                                    class="text-danger-500">*</span></label>
                             <select id="militaryStatus" wire:model="militaryStatus"
                                 @if ($locale === 'ar') dir="rtl" @endif
                                 class="form-control @error('militaryStatus') !border-danger-500 @enderror">
@@ -726,8 +730,8 @@
                                         </bdi>
                                     @enderror
                                     <datalist id="languages">
-                                        @foreach ($languages as $language)
-                                            <option value="{{ $language }}">{{ $language }}</option>
+                                        @foreach ($baseLanguages as $l)
+                                            <option value="{{ $l }}">{{ $l }}</option>
                                         @endforeach
                                     </datalist>
                                 </div>

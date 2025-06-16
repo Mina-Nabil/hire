@@ -22,6 +22,11 @@ class Channel extends Model
         'is_hidden' => false
     ];
 
+    public function scopeShown($query)
+    {
+        return $query->where('is_hidden', false);
+    }
+
     public function applicants(): HasMany
     {
         return $this->hasMany(Applicant::class, 'channel_id');

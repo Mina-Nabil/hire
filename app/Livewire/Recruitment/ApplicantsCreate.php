@@ -127,7 +127,7 @@ class ApplicantsCreate extends Component
 
         // $this->areas = Area::all();
         $this->cities = City::all();
-        $this->channels = Channel::all();
+        $this->channels = Channel::shown()->get();
         $this->employees = Employee::all();
         $this->vacancies = Vacancy::where('status', 'open')->with('position')->get();
         $this->baseQuestions = BaseQuestion::all();

@@ -3280,7 +3280,7 @@ class Employee extends Model
 
         return [
             'status' => $status,
-            'details' => $status == self::DOC_STATUS_EXPIRED ? 'Work declaration expired on ' . $latestDeclaration->expiry_date->format('Y-m-d') : ($status == self::DOC_STATUS_NEAR_EXPIRY ? 'Work declaration will expire on ' . $latestDeclaration->expiry_date->format('Y-m-d') : 'Latest work declaration is valid'),
+            'details' => $status == self::DOC_STATUS_EXPIRED ? 'Work declaration expired on ' . $latestDeclaration->expiry_date : ($status == self::DOC_STATUS_NEAR_EXPIRY ? 'Work declaration will expire on ' . $latestDeclaration->expiry_date : 'Latest work declaration is valid'),
         ];
     }
 

@@ -597,8 +597,8 @@
                                     @yield('content')
                                     {{ $slot ?? '' }}
                                 </div>
+                                <livewire:components.info-modal />
                                 <livewire:components.confirmation-modal />
-
                             </div>
                         </div>
                     </div>

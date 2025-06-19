@@ -10,46 +10,43 @@
         <div class="card-body px-6 pb-6">
             <div class="-mx-6">
                 <div class="inline-block min-w-full align-middle">
-                    <div class="overflow-hidden">
-                        <table class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
-                            <thead
-                                class="border-t border-slate-100 dark:border-slate-800 bg-slate-200 dark:bg-slate-700">
+                    <table class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
+                        <thead class="border-t border-slate-100 dark:border-slate-800 bg-slate-200 dark:bg-slate-700">
+                            <tr>
+                                <th class="table-th">Name</th>
+                                <th class="table-th">Gross Min</th>
+                                <th class="table-th">Gross Max</th>
+                                <th class="table-th">Compensation & Benefit Details</th>
+                                <th class="table-th">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
+                            @forelse ($packages as $package)
                                 <tr>
-                                    <th class="table-th">Name</th>
-                                    <th class="table-th">Gross Min</th>
-                                    <th class="table-th">Gross Max</th>
-                                    <th class="table-th">Compensation & Benefit Details</th>
-                                    <th class="table-th">Actions</th>
+                                    <td class="table-td">{{ $package->name }}</td>
+                                    <td class="table-td">{{ $package->gross_min }}</td>
+                                    <td class="table-td">{{ $package->gross_max }}</td>
+                                    <td class="table-td">{{ $package->packageDetails->count() }}</td>
+                                    <td class="table-td">
+                                        <div class="flex space-x-3 rtl:space-x-reverse">
+                                            <button class="action-btn btn-edit"
+                                                wire:click="showEditModal({{ $package->id }})">
+                                                <iconify-icon icon="heroicons-outline:pencil-alt"></iconify-icon>
+                                            </button>
+                                            <button class="action-btn btn-delete"
+                                                wire:click="deletePackage({{ $package->id }})">
+                                                <iconify-icon icon="heroicons-outline:trash"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
-                                @forelse ($packages as $package)
-                                    <tr>
-                                        <td class="table-td">{{ $package->name }}</td>
-                                        <td class="table-td">{{ $package->gross_min }}</td>
-                                        <td class="table-td">{{ $package->gross_max }}</td>
-                                        <td class="table-td">{{ $package->packageDetails->count() }}</td>
-                                        <td class="table-td">
-                                            <div class="flex space-x-3 rtl:space-x-reverse">
-                                                <button class="action-btn btn-edit"
-                                                    wire:click="showEditModal({{ $package->id }})">
-                                                    <iconify-icon icon="heroicons-outline:pencil-alt"></iconify-icon>
-                                                </button>
-                                                <button class="action-btn btn-delete"
-                                                    wire:click="deletePackage({{ $package->id }})">
-                                                    <iconify-icon icon="heroicons-outline:trash"></iconify-icon>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="3" class="table-td text-center">No packages found.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
+                            @empty
+                                <tr>
+                                    <td colspan="3" class="table-td text-center">No packages found.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -79,9 +76,9 @@
                 <!-- Main Info -->
                 <div class="space-y-2">
                     <x-text-input label="Salary Grade Name" type="text" class="w-full" wire:model.defer="name" />
-                <x-textarea label="Description" class="w-full" wire:model.defer="desc"></x-textarea>
-                <x-text-input label="Gross Min" type="number" step="0.01" class="w-full"
-                    wire:model.defer="grossMin" />
+                    <x-textarea label="Description" class="w-full" wire:model.defer="desc"></x-textarea>
+                    <x-text-input label="Gross Min" type="number" step="0.01" class="w-full"
+                        wire:model.defer="grossMin" />
                     <x-text-input label="Gross Max" type="number" step="0.01" class="w-full"
                         wire:model.defer="grossMax" />
                 </div>

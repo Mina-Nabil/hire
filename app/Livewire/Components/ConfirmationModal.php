@@ -19,13 +19,11 @@ class ConfirmationModal extends Component
     #[On('showConfirmation')]
     public function showConfirmation($message, $color ,$callback, ...$params)
     {
-        Log::info('show-confirmation');
         $this->message = $message;
         $this->callback = $callback;
         $this->callbackParams = $params;
         $this->isOpen = true;
         $this->color = $color;
-        $this->dispatch('modal-open');
     }
 
     public function confirm()

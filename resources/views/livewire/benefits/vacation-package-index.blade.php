@@ -128,6 +128,10 @@
                                     <x-text-input type="number" step="0.01" class="w-20"
                                         label="Hour Price Maximum"
                                         wire:model.defer="vacationDetails.{{ $i }}.hour_price_max" />
+                                    <x-text-input type="number" class="w-20"
+                                        label="Apply Deadline (days after leave)"
+                                        wire:model.defer="vacationDetails.{{ $i }}.apply_deadline"
+                                        />
                                 </div>
                             </div>
                             <div class="flex flex-col items-center">

@@ -27,163 +27,166 @@
         <div class="card-body px-6 pb-6">
             <div class=" -mx-6">
                 <div class="inline-block min-w-full align-middle">
-                    <div class="overflow-hidden ">
-                        <table class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
-                            <thead
-                                class=" border-t border-slate-100 dark:border-slate-800 bg-slate-200 dark:bg-slate-700">
+
+                    <table class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
+                        <thead class=" border-t border-slate-100 dark:border-slate-800 bg-slate-200 dark:bg-slate-700">
+                            <tr>
+
+                                <th scope="col" class=" table-th ">
+                                    {{ __('users.name') }}
+                                </th>
+
+                                <th scope="col" class=" table-th ">
+                                    {{ __('users.username') }}
+                                </th>
+
+                                <th scope="col" class=" table-th ">
+                                    {{ __('users.type') }}
+                                </th>
+
+                                <th scope="col" class=" table-th ">
+                                    {{ __('users.active') }}
+                                </th>
+
+                                <th scope="col" class=" table-th ">
+                                    {{ __('users.action') }}
+                                </th>
+
+
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
+
+                            @foreach ($users as $user)
                                 <tr>
 
-                                    <th scope="col" class=" table-th ">
-                                        {{ __('users.name') }}
-                                    </th>
+                                    <td class="table-td flex items-center">
+                                        <div class="rounded-full flex-shrink-0 ltr:mr-[10px] rtl:ml-[10px]">
+                                            @if ($user->full_image_url)
+                                                <img src="{{ $user->full_image_url }}" alt="user"
+                                                    class="h-8 lg:h-8 w-8 lg:w-8 rounded-full object-cover">
+                                            @else
+                                                <span
+                                                    class="block w-8 h-8 lg:w-8 lg:h-8 object-cover text-center text-lg leading-8 user-initial">
+                                                    {{ strtoupper(substr($user->username, 0, 1)) }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                        <span>{{ $user->name }}</span>
+                                    </td>
 
-                                    <th scope="col" class=" table-th ">
-                                        {{ __('users.username') }}
-                                    </th>
 
-                                    <th scope="col" class=" table-th ">
-                                        {{ __('users.type') }}
-                                    </th>
 
-                                    <th scope="col" class=" table-th ">
-                                        {{ __('users.active') }}
-                                    </th>
+                                    <td class="table-td">
+                                        {{ $user->username }}
+                                    </td>
 
-                                    <th scope="col" class=" table-th ">
-                                        {{ __('users.action') }}
-                                    </th>
+                                    <td class="table-td ">
+                                        <div class="flex items-center gap-2">
+                                            <span
+                                                class="badge bg-info-500 text-slate-900 bg-opacity-30 capitalize rounded-3xl">{{ ucwords(str_replace('_', ' ', $user->type)) }}</span>
+
+
+                                            @if ($user->is_hr)
+                                                <span
+                                                    class="badge bg-primary-500 text-primary-500 bg-opacity-30 capitalize rounded-3xl cursor-pointer"
+                                                    wire:click="openLocationsModal({{ $user->id }})">Locations
+                                                    ({{ $user->assignedLocations->count() }})</span>
+                                            @endif
+                                        </div>
+                                    </td>
+
+                                    <td class="table-td">
+                                        @if ($user->is_active)
+                                            <span
+                                                class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">{{ __('users.active_status') }}</span>
+                                        @else
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">{{ __('users.deactivated_status') }}</span>
+                                        @endif
+
+                                    </td>
+
+                                    <td>
+                                        <div class="dropstart relative">
+                                            <button class="inline-flex justify-center items-center" type="button"
+                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                                <iconify-icon class="text-xl ltr:ml-2 rtl:mr-2"
+                                                    icon="heroicons-outline:dots-vertical"></iconify-icon>
+                                            </button>
+                                            <ul
+                                                class="dropdown-menu min-w-max absolute text-sm text-slate-700 dark:text-white hidden bg-white dark:bg-slate-700 shadow z-[29990] float-left list-none text-left rounded-lg mt-1 m-0 bg-clip-padding border-none">
+
+                                                <li wire:click="updateThisUser({{ $user->id }})">
+                                                    <span
+                                                        class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300  last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize  rtl:space-x-reverse">
+                                                        <iconify-icon icon="lucide:edit"></iconify-icon>
+                                                        <span>{{ __('users.edit') }}</span></span>
+                                                </li>
+
+                                                <li wire:click="openChangePasswordModal({{ $user->id }})">
+                                                    <span
+                                                        class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300  last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize  rtl:space-x-reverse">
+                                                        <iconify-icon icon="lucide:key"></iconify-icon>
+                                                        <span>{{ __('users.change_password') }}</span></span>
+                                                </li>
+
+                                                @if ($user->is_active)
+                                                    <li wire:click="toggleUserStatus({{ $user->id }})">
+                                                        <span
+                                                            class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300  last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize  rtl:space-x-reverse">
+                                                            <iconify-icon icon="ant-design:stop-twotone"></iconify-icon>
+                                                            <span>{{ __('users.set_as_deactivated') }}</span></span>
+                                                    </li>
+                                                @else
+                                                    <li wire:click="toggleUserStatus({{ $user->id }})">
+                                                        <span
+                                                            class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300  last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize  rtl:space-x-reverse">
+                                                            <iconify-icon
+                                                                icon="teenyicons:tick-circle-outline"></iconify-icon>
+                                                            <span>{{ __('users.set_as_active') }}</span></span>
+                                                    </li>
+                                                @endif
+
+                                                @if ($user->is_hr)
+                                                    <li wire:click="openLocationsModal({{ $user->id }})">
+                                                        <span
+                                                            class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300 last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize rtl:space-x-reverse">
+                                                            <iconify-icon icon="mdi:map-marker-multiple"></iconify-icon>
+                                                            <span>{{ __('users.set_locations') }}</span>
+                                                        </span>
+                                                    </li>
+                                                @endif
+
+                                            </ul>
+                                        </div>
+                                    </td>
 
 
                                 </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
+                            @endforeach
 
-                                @foreach ($users as $user)
-                                    <tr>
+                        </tbody>
+                    </table>
 
-                                        <td class="table-td flex items-center">
-                                            <div class="rounded-full flex-shrink-0 ltr:mr-[10px] rtl:ml-[10px]">
-                                                @if ($user->full_image_url)
-                                                    <img src="{{ $user->full_image_url }}" alt="user"
-                                                        class="h-8 lg:h-8 w-8 lg:w-8 rounded-full object-cover">
-                                                @else
-                                                    <span
-                                                        class="block w-8 h-8 lg:w-8 lg:h-8 object-cover text-center text-lg leading-8 user-initial">
-                                                        {{ strtoupper(substr($user->username, 0, 1)) }}
-                                                    </span>
-                                                @endif
-                                            </div>
-                                            <span>{{ $user->name }}</span>
-                                        </td>
-
-
-
-                                        <td class="table-td">
-                                            {{ $user->username }}
-                                        </td>
-
-                                        <td class="table-td ">
-                                            <div class="flex items-center gap-2">
-                                                <span class="badge bg-info-500 text-slate-900 bg-opacity-30 capitalize rounded-3xl">{{ ucwords(str_replace('_', ' ', $user->type)) }}</span>
-
-                                            
-                                                @if ($user->is_hr)
-                                                    <span class="badge bg-primary-500 text-primary-500 bg-opacity-30 capitalize rounded-3xl cursor-pointer" wire:click="openLocationsModal({{ $user->id }})">Locations ({{ $user->assignedLocations->count() }})</span>
-                                                @endif
-                                            </div>
-                                        </td>
-
-                                        <td class="table-td">
-                                            @if ($user->is_active)
-                                                <span
-                                                    class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">{{ __('users.active_status') }}</span>
-                                            @else
-                                                <span
-                                                    class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">{{ __('users.deactivated_status') }}</span>
-                                            @endif
-
-                                        </td>
-
-                                        <td>
-                                            <div class="dropstart relative z-[9999]">
-                                                <button class="inline-flex justify-center items-center" type="button"
-                                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <iconify-icon class="text-xl ltr:ml-2 rtl:mr-2"
-                                                        icon="heroicons-outline:dots-vertical"></iconify-icon>
-                                                </button>
-                                                <ul
-                                                    class="dropdown-menu min-w-max absolute text-sm text-slate-700 dark:text-white hidden bg-white dark:bg-slate-700 shadow z-[2] float-left overflow-hidden list-none text-left rounded-lg mt-1 m-0 bg-clip-padding border-none">
-
-                                                    <li wire:click="updateThisUser({{ $user->id }})">
-                                                        <span
-                                                            class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300  last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize  rtl:space-x-reverse">
-                                                            <iconify-icon icon="lucide:edit"></iconify-icon>
-                                                            <span>{{ __('users.edit') }}</span></span>
-                                                    </li>
-
-                                                    <li wire:click="openChangePasswordModal({{ $user->id }})">
-                                                        <span
-                                                            class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300  last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize  rtl:space-x-reverse">
-                                                            <iconify-icon icon="lucide:key"></iconify-icon>
-                                                            <span>{{ __('users.change_password') }}</span></span>
-                                                    </li>
-
-                                                    @if ($user->is_active)
-                                                        <li wire:click="toggleUserStatus({{ $user->id }})">
-                                                            <span
-                                                                class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300  last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize  rtl:space-x-reverse">
-                                                                <iconify-icon
-                                                                    icon="ant-design:stop-twotone"></iconify-icon>
-                                                                <span>{{ __('users.set_as_deactivated') }}</span></span>
-                                                        </li>
-                                                    @else
-                                                        <li wire:click="toggleUserStatus({{ $user->id }})">
-                                                            <span
-                                                                class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300  last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize  rtl:space-x-reverse">
-                                                                <iconify-icon
-                                                                    icon="teenyicons:tick-circle-outline"></iconify-icon>
-                                                                <span>{{ __('users.set_as_active') }}</span></span>
-                                                        </li>
-                                                    @endif
-
-                                                    @if ($user->is_hr)
-                                                        <li wire:click="openLocationsModal({{ $user->id }})">
-                                                            <span
-                                                                class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300 last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize rtl:space-x-reverse">
-                                                                <iconify-icon icon="mdi:map-marker-multiple"></iconify-icon>
-                                                                <span>{{ __('users.set_locations') }}</span>
-                                                            </span>
-                                                        </li>
-                                                    @endif
-
-                                                </ul>
-                                            </div>
-                                        </td>
-
-
-                                    </tr>
-                                @endforeach
-
-                            </tbody>
-                        </table>
-
-                        @if ($users->isEmpty())
-                            {{-- START: empty filter result --}}
-                            <div class="card m-5 p-5">
-                                <div class="card-body rounded-md bg-white dark:bg-slate-800">
-                                    <div class="items-center text-center p-5">
-                                        <h2><iconify-icon icon="icon-park-outline:search"></iconify-icon></h2>
-                                        <h2 class="card-title text-slate-900 dark:text-white mb-3">{{ __('users.no_users_with_filters') }}</h2>
-                                        <p class="card-text">{{ __('users.try_changing_filters') }}
-                                        </p>
-                                        <a href="{{ url('/users') }}"
-                                            class="btn inline-flex justify-center mx-2 mt-3 btn-primary active btn-sm">{{ __('users.view_all_users') }}</a>
-                                    </div>
+                    @if ($users->isEmpty())
+                        {{-- START: empty filter result --}}
+                        <div class="card m-5 p-5">
+                            <div class="card-body rounded-md bg-white dark:bg-slate-800">
+                                <div class="items-center text-center p-5">
+                                    <h2><iconify-icon icon="icon-park-outline:search"></iconify-icon></h2>
+                                    <h2 class="card-title text-slate-900 dark:text-white mb-3">
+                                        {{ __('users.no_users_with_filters') }}</h2>
+                                    <p class="card-text">{{ __('users.try_changing_filters') }}
+                                    </p>
+                                    <a href="{{ url('/users') }}"
+                                        class="btn inline-flex justify-center mx-2 mt-3 btn-primary active btn-sm">{{ __('users.view_all_users') }}</a>
                                 </div>
                             </div>
-                            {{-- END: empty filter result --}}
-                        @endif
-                    </div>
+                        </div>
+                        {{-- END: empty filter result --}}
+                    @endif
+
 
                 </div>
                 <div class="mt-6">
@@ -267,7 +270,8 @@
 
                                 <div class="uppercase text-xs text-slate-500 dark:text-slate-300 mb-1 leading-[12px]">
                                     {{ __('users.profile_image') }}
-                                    <span class="float-right cursor-pointer" wire:click='clearUserImage'>{{ __('users.clear') }}</span>
+                                    <span class="float-right cursor-pointer"
+                                        wire:click='clearUserImage'>{{ __('users.clear') }}</span>
                                 </div>
 
                                 @if ($userImage)
@@ -282,7 +286,8 @@
                                                 style="font-size:20px">
                                                 <iconify-icon icon="svg-spinners:tadpole"></iconify-icon>
                                             </p>
-                                            <p class="dropzone-para" wire:loading.remove wire:target="userImage">{{ __('users.choose_file') }}</p>
+                                            <p class="dropzone-para" wire:loading.remove wire:target="userImage">
+                                                {{ __('users.choose_file') }}</p>
                                             <input name="file" type="file" class="dropzone dropzone-input"
                                                 wire:model.live="userImage" />
                                         </div>
@@ -294,13 +299,15 @@
                                     <div class="from-group">
                                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
                                             <div class="input-area">
-                                                <label for="newPassword" class="form-label">{{ __('users.password') }}</label>
+                                                <label for="newPassword"
+                                                    class="form-label">{{ __('users.password') }}</label>
                                                 <input id="newPassword" type="password"
                                                     class="form-control @error('password') !border-danger-500 @enderror"
                                                     wire:model="password" autocomplete="off">
                                             </div>
                                             <div class="input-area">
-                                                <label for="password_confirmation" class="form-label">{{ __('users.confirm_password') }}</label>
+                                                <label for="password_confirmation"
+                                                    class="form-label">{{ __('users.confirm_password') }}</label>
                                                 <input type="password"
                                                     class="form-control @error('password_confirmation') !border-danger-500 @enderror"
                                                     autocomplete="off" wire:model="password_confirmation">
@@ -374,13 +381,15 @@
                             <div class="from-group">
                                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
                                     <div class="input-area">
-                                        <label for="changePassword" class="form-label">{{ __('users.new_password') }}</label>
+                                        <label for="changePassword"
+                                            class="form-label">{{ __('users.new_password') }}</label>
                                         <input id="changePassword" type="password"
                                             class="form-control @error('newPassword') !border-danger-500 @enderror"
                                             wire:model="newPassword" autocomplete="off">
                                     </div>
                                     <div class="input-area">
-                                        <label for="newPassword_confirmation" class="form-label">{{ __('users.confirm_new_password') }}</label>
+                                        <label for="newPassword_confirmation"
+                                            class="form-label">{{ __('users.confirm_new_password') }}</label>
                                         <input id="newPassword_confirmation" type="password"
                                             class="form-control @error('newPassword_confirmation') !border-danger-500 @enderror"
                                             autocomplete="off" wire:model="newPassword_confirmation">
@@ -397,7 +406,8 @@
                             class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
                             <button wire:click="changeUserPassword" data-bs-dismiss="modal"
                                 class="btn inline-flex justify-center text-white bg-black-500">
-                                <span wire:loading.remove wire:target="changeUserPassword">{{ __('users.change_password') }}</span>
+                                <span wire:loading.remove
+                                    wire:target="changeUserPassword">{{ __('users.change_password') }}</span>
                                 <iconify-icon class="text-xl spin-slow ltr:mr-2 rtl:ml-2 relative top-[1px]"
                                     wire:loading wire:target="changeUserPassword"
                                     icon="line-md:loading-twotone-loop"></iconify-icon>
@@ -444,7 +454,8 @@
                                         <div class="flex items-center">
                                             <div class="checkbox-area">
                                                 <label class="inline-flex items-center cursor-pointer">
-                                                    <input id="location-{{ $location->id }}" value="{{ $location->id }}" type="checkbox" class="hidden"
+                                                    <input id="location-{{ $location->id }}"
+                                                        value="{{ $location->id }}" type="checkbox" class="hidden"
                                                         wire:model.live="selectedLocations">
                                                     <span
                                                         class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
@@ -476,7 +487,8 @@
                             </button>
                             <button wire:click="saveLocationAssignments" data-bs-dismiss="modal"
                                 class="btn inline-flex justify-center text-white bg-black-500">
-                                <span wire:loading.remove wire:target="saveLocationAssignments">{{ __('users.save') }}</span>
+                                <span wire:loading.remove
+                                    wire:target="saveLocationAssignments">{{ __('users.save') }}</span>
                                 <iconify-icon class="text-xl spin-slow ltr:mr-2 rtl:ml-2 relative top-[1px]"
                                     wire:loading wire:target="saveLocationAssignments"
                                     icon="line-md:loading-twotone-loop"></iconify-icon>

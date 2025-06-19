@@ -337,6 +337,10 @@
                                                         <span class="text-slate-500 mr-2">Balance:</span>
                                                         <span>{{ $vacation->current_balance }}/{{ $vacation->max_balance }}</span>
                                                     </div>
+                                                    <div class="flex items-center">
+                                                        <span class="text-slate-500 mr-2">Apply Deadline:</span>
+                                                        <span>{{ $vacation->apply_deadline . ' days' }}</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         @endforeach
@@ -943,7 +947,9 @@
                             wire:model="vacationBenefit.max_balance"
                             errorMessage="{{ $errors->first('vacationBenefit.max_balance') }}" />
 
-
+                        <x-text-input label="Apply Deadline (days after leave)" type="number"
+                            wire:model="vacationBenefit.apply_deadline"
+                            errorMessage="{{ $errors->first('vacationBenefit.apply_deadline') }}" />
 
                         <x-text-input label="Start Date*" type="date" wire:model="vacationBenefit.start_date"
                             errorMessage="{{ $errors->first('vacationBenefit.start_date') }}" />

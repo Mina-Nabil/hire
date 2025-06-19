@@ -154,7 +154,7 @@
             </div>
 
             <div class="mt-6">
-                {{ $payrolls->links() }}
+                {{ $payrolls->links('vendor.livewire.simple-bootstrap') }}
             </div>
         </div>
     </div>

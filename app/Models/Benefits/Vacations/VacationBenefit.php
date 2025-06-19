@@ -11,6 +11,7 @@ use App\Models\Benefits\Vacations\GainedVacation;
 use App\Models\Benefits\Configurations\PackageDetail;
 use App\Models\Users\AppLog;
 use Exception;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
@@ -28,6 +29,7 @@ class VacationBenefit extends Model
         'current_balance',
         'start_date',
         'end_date',
+        'apply_deadline',
     ];
 
     protected $casts = [
@@ -58,6 +60,15 @@ class VacationBenefit extends Model
     public function gainedVacations()
     {
         return $this->hasMany(GainedVacation::class);
+    }
+
+    //mutators
+    public function applyDeadline(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $this->vacationDetail?->apply_deadline ?? ($value ?? 0),
+            set: fn ($value) => $value,
+        );
     }
 
     ///model functions

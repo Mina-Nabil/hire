@@ -97,7 +97,7 @@
             
             <!-- Pagination -->
             <div class="mt-6">
-                {{ $requests->links() }}
+                {{ $requests->links('vendor.livewire.simple-bootstrap') }}
             </div>
         </div>
     </div>

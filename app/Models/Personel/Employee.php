@@ -457,7 +457,8 @@ class Employee extends Model
         float $current_balance,
         float $max_balance,
         string $type,
-        Carbon $start_date
+        Carbon $start_date,
+        ?int $apply_deadline = null
     ) {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -473,7 +474,8 @@ class Employee extends Model
                 'current_balance' => $current_balance,
                 'max_balance' => $max_balance,
                 'type' => $type,
-                'start_date' => $start_date
+                'start_date' => $start_date,
+                'apply_deadline' => $apply_deadline,
             ]);
             AppLog::info('Custom Vacation Benefit Added', 'Custom vacation benefit added for employee: ' . $this->name, loggable: $this);
         } catch (Exception $e) {
@@ -539,6 +541,17 @@ class Employee extends Model
         if ($currentBalance < $hours_count) {
             throw new AppException('You dont have enough vacation days');
         }
+        $vacationBenefit->load('vacationDetail');
+        $applyDeadline = $vacationBenefit->apply_deadline;
+        $deadlineDate = Carbon::now()->addDays($applyDeadline)->setTime(23, 59, 59);
+        foreach($days as $day){
+            $dayDate = Carbon::parse($day['vacation_date']);
+            if($dayDate->isBefore($deadlineDate)){
+                throw new AppException('You cannot apply for vacation after the apply deadline');
+            }
+        }
+
+
         try {
             DB::transaction(function () use ($hours_count, $days, $currentBalance, $vacationBenefit, $is_approved) {
                 $appliedVacation = $this->appliedVacations()->create([

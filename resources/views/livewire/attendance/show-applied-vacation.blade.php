@@ -14,20 +14,23 @@
                     <iconify-icon wire:loading wire:target="search" class="loading-icon text-lg mr-2"
                         icon="line-md:loading-twotone-loop"></iconify-icon>
                     <input type="text" class="form-control !pl-9 mr-1 basis-1/4 w-full"
-                        placeholder="Search by employee name, email, or vacation benefit" wire:model.live.debounce.400ms="search">
+                        placeholder="Search by employee name, email, or vacation benefit"
+                        wire:model.live.debounce.400ms="search">
                 </div>
 
                 <div class="flex sm:space-x-4 space-x-2 sm:justify-end items-center rtl:space-x-reverse">
                     <button class="btn inline-flex justify-center btn-outline-secondary" wire:click="toggleFilters">
                         <span class="flex items-center">
-                            <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2" icon="heroicons-outline:filter"></iconify-icon>
+                            <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2"
+                                icon="heroicons-outline:filter"></iconify-icon>
                             <span>Filter</span>
                         </span>
                     </button>
-                    @if($search || $startDate || $endDate || $status)
+                    @if ($search || $startDate || $endDate || $status)
                         <button class="btn inline-flex justify-center btn-outline-danger" wire:click="resetFilters">
                             <span class="flex items-center">
-                                <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2" icon="heroicons-outline:x"></iconify-icon>
+                                <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2"
+                                    icon="heroicons-outline:x"></iconify-icon>
                                 <span>Reset</span>
                             </span>
                         </button>
@@ -78,7 +81,8 @@
                         </thead>
                         <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
                             @foreach ($appliedVacations as $appliedVacation)
-                                <tr class="even:bg-slate-100 dark:even:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700">
+                                <tr
+                                    class="even:bg-slate-100 dark:even:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700">
                                     <td class="table-td">
                                         <div class="flex items-center">
                                             @if ($appliedVacation->employee && $appliedVacation->employee->full_image_url)
@@ -116,7 +120,8 @@
                                         <span class="text-sm font-medium">{{ $appliedVacation->hours ?? 0 }}</span>
                                     </td>
                                     <td class="table-td">
-                                        <span class="text-sm font-medium">{{ $appliedVacation->new_balance ?? 0 }}</span>
+                                        <span
+                                            class="text-sm font-medium">{{ $appliedVacation->new_balance ?? 0 }}</span>
                                     </td>
                                     <td class="table-td">
                                         @if ($appliedVacation->status === 'pending')
@@ -138,21 +143,27 @@
                                     </td>
                                     <td class="table-td">
                                         <div class="flex space-x-2">
+                                            @if ($appliedVacation->note && !empty(trim($appliedVacation->note)))
+                                                <button
+                                                    wire:click="$dispatch('showInfoModal', {title: 'Vacation Note', message: 'Test', color: 'info'})"
+                                                    class="action-btn text-info-500" title="Info">
+                                                    <iconify-icon icon="heroicons:information-circle"></iconify-icon>
+                                                </button>
+                                            @endif
                                             @can('approve', $appliedVacation)
-                                                <button 
-                                                wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to approve this vacation?',color:'success',callback:'approve',params:{{ $appliedVacation->id }}})"
-                                                        class="action-btn text-success-500" 
-                                                        title="Approve">
+                                                <button
+                                                    wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to approve this vacation?',color:'success',callback:'approve',params:{{ $appliedVacation->id }}})"
+                                                    class="action-btn text-success-500" title="Approve">
                                                     <iconify-icon icon="heroicons:check"></iconify-icon>
                                                 </button>
                                             @endcan
                                             @can('reject', $appliedVacation)
-                                                <button wire:click="openRejectModal({{ $appliedVacation->id }})" 
-                                                        class="action-btn text-danger-500" 
-                                                        title="Reject">
+                                                <button wire:click="openRejectModal({{ $appliedVacation->id }})"
+                                                    class="action-btn text-danger-500" title="Reject">
                                                     <iconify-icon icon="heroicons:x-mark"></iconify-icon>
                                                 </button>
                                             @endcan
+
                                         </div>
                                     </td>
                                 </tr>
@@ -170,7 +181,8 @@
                                 <h2>
                                     <iconify-icon icon="icon-park-outline:search"></iconify-icon>
                                 </h2>
-                                <h2 class="card-title text-slate-900 dark:text-white mb-3">No applied vacation records found with
+                                <h2 class="card-title text-slate-900 dark:text-white mb-3">No applied vacation records
+                                    found with
                                     the applied filters</h2>
                                 <p class="card-text">Try changing the filters or search terms for this view.</p>
                             </div>
@@ -192,8 +204,11 @@
                             <i class="fas fa-info-circle mr-2"></i>
                             <div>
                                 <p class="font-medium">Rejecting vacation for:</p>
-                                <p>{{ $selectedAppliedVacation->employee ? $selectedAppliedVacation->employee->name : 'N/A' }}</p>
-                                <p class="text-sm mt-1">{{ $selectedAppliedVacation->vacationBenefit ? $selectedAppliedVacation->vacationBenefit->name : 'N/A' }} - {{ $selectedAppliedVacation->hours ?? 0 }} hours</p>
+                                <p>{{ $selectedAppliedVacation->employee ? $selectedAppliedVacation->employee->name : 'N/A' }}
+                                </p>
+                                <p class="text-sm mt-1">
+                                    {{ $selectedAppliedVacation->vacationBenefit ? $selectedAppliedVacation->vacationBenefit->name : 'N/A' }}
+                                    - {{ $selectedAppliedVacation->hours ?? 0 }} hours</p>
                             </div>
                         </div>
                     </div>
@@ -202,14 +217,16 @@
                 <div class="from-group">
                     <div class="input-area">
                         <label for="rejectNote" class="form-label">Rejection Note (Optional)</label>
-                        <textarea id="rejectNote" rows="4" class="form-control" wire:model="rejectNote" placeholder="Enter reason for rejection..."></textarea>
+                        <textarea id="rejectNote" rows="4" class="form-control" wire:model="rejectNote"
+                            placeholder="Enter reason for rejection..."></textarea>
                     </div>
                 </div>
             </div>
             <!-- Modal footer -->
             <x-slot name="footer">
                 <x-secondary-button wire:click="closeRejectModal">Cancel</x-secondary-button>
-                <x-primary-button wire:click.prevent="confirmReject" loadingFunction="confirmReject">Reject Vacation</x-primary-button>
+                <x-primary-button wire:click.prevent="confirmReject" loadingFunction="confirmReject">Reject
+                    Vacation</x-primary-button>
             </x-slot>
         </x-modal>
     @endif

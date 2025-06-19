@@ -19,6 +19,7 @@ class VacationDetail extends Model
         'max_balance_max',
         'hour_price_min',
         'hour_price_max',
+        'apply_deadline',
     ];
 
 

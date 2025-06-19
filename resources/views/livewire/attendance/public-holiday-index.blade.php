@@ -26,81 +26,82 @@
         <div class="card-body px-6 pb-6">
             <div class=" ">
                 <div class="inline-block min-w-full align-middle">
-                    <div class="overflow-hidden ">
-                        <table class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
-                            <thead
-                                class=" border-t border-slate-100 dark:border-slate-800 bg-slate-200 dark:bg-slate-700">
+
+                    <table class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
+                        <thead class=" border-t border-slate-100 dark:border-slate-800 bg-slate-200 dark:bg-slate-700">
+                            <tr>
+                                <th scope="col" class=" table-th ">
+                                    Name
+                                </th>
+                                <th scope="col" class=" table-th ">
+                                    Date
+                                </th>
+
+                                <th scope="col" class=" table-th ">
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
+                            @foreach ($holidays as $holiday)
                                 <tr>
-                                    <th scope="col" class=" table-th ">
-                                        Name
-                                    </th>
-                                    <th scope="col" class=" table-th ">
-                                        Date
-                                    </th>
-                         
-                                    <th scope="col" class=" table-th ">
-                                        Action
-                                    </th>
+                                    <td class="table-td">
+                                        {{ $holiday->name }}
+                                    </td>
+                                    <td class="table-td">
+                                        {{ $holiday->date->format('d/m/Y') }}
+                                    </td>
+
+                                    <td>
+                                        <div class="dropstart relative z-[9999]">
+                                            <button class="inline-flex justify-center items-center" type="button"
+                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                                <iconify-icon class="text-xl ltr:ml-2 rtl:mr-2"
+                                                    icon="heroicons-outline:dots-vertical"></iconify-icon>
+                                            </button>
+                                            <ul
+                                                class="dropdown-menu min-w-max absolute text-sm text-slate-700 dark:text-white hidden bg-white dark:bg-slate-700 shadow z-[2] float-left overflow-hidden list-none text-left rounded-lg mt-1 m-0 bg-clip-padding border-none">
+
+                                                <li wire:click="updateThisHoliday({{ $holiday->id }})">
+                                                    <span
+                                                        class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300  last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize  rtl:space-x-reverse">
+                                                        <iconify-icon icon="lucide:edit"></iconify-icon>
+                                                        <span>Edit</span></span>
+                                                </li>
+
+                                                <li
+                                                    wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to delete this holiday?',color:'danger',callback:'deletePublicHoliday',params:{{ $holiday->id }}})">
+                                                    <span
+                                                        class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300  last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize  rtl:space-x-reverse">
+                                                        <iconify-icon icon="lucide:trash-2"></iconify-icon>
+                                                        <span>Delete</span></span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
-                                @foreach ($holidays as $holiday)
-                                    <tr>
-                                        <td class="table-td">
-                                            {{ $holiday->name }}
-                                        </td>
-                                        <td class="table-td">
-                                            {{ $holiday->date->format('d/m/Y') }}
-                                        </td>
-                              
-                                        <td>
-                                            <div class="dropstart relative z-[9999]">
-                                                <button class="inline-flex justify-center items-center" type="button"
-                                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <iconify-icon class="text-xl ltr:ml-2 rtl:mr-2"
-                                                        icon="heroicons-outline:dots-vertical"></iconify-icon>
-                                                </button>
-                                                <ul
-                                                    class="dropdown-menu min-w-max absolute text-sm text-slate-700 dark:text-white hidden bg-white dark:bg-slate-700 shadow z-[2] float-left overflow-hidden list-none text-left rounded-lg mt-1 m-0 bg-clip-padding border-none">
+                            @endforeach
+                        </tbody>
+                    </table>
 
-                                                    <li wire:click="updateThisHoliday({{ $holiday->id }})">
-                                                        <span
-                                                            class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300  last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize  rtl:space-x-reverse">
-                                                            <iconify-icon icon="lucide:edit"></iconify-icon>
-                                                            <span>Edit</span></span>
-                                                    </li>
-
-                                                    <li wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to delete this holiday?',color:'danger',callback:'deletePublicHoliday',params:{{ $holiday->id }}})">
-                                                        <span
-                                                            class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300  last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize  rtl:space-x-reverse">
-                                                            <iconify-icon icon="lucide:trash-2"></iconify-icon>
-                                                            <span>Delete</span></span>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-
-                        @if ($holidays->isEmpty())
-                            {{-- START: empty filter result --}}
-                            <div class="card m-5 p-5">
-                                <div class="card-body rounded-md bg-white dark:bg-slate-800">
-                                    <div class="items-center text-center p-5">
-                                        <h2><iconify-icon icon="icon-park-outline:search"></iconify-icon></h2>
-                                        <h2 class="card-title text-slate-900 dark:text-white mb-3">No holidays found</h2>
-                                        <p class="card-text">Try changing your search criteria
-                                        </p>
-                                        <a href="{{ route('public-holidays.index') }}"
-                                            class="btn inline-flex justify-center mx-2 mt-3 btn-primary active btn-sm">View all holidays</a>
-                                    </div>
+                    @if ($holidays->isEmpty())
+                        {{-- START: empty filter result --}}
+                        <div class="card m-5 p-5">
+                            <div class="card-body rounded-md bg-white dark:bg-slate-800">
+                                <div class="items-center text-center p-5">
+                                    <h2><iconify-icon icon="icon-park-outline:search"></iconify-icon></h2>
+                                    <h2 class="card-title text-slate-900 dark:text-white mb-3">No holidays found</h2>
+                                    <p class="card-text">Try changing your search criteria
+                                    </p>
+                                    <a href="{{ route('public-holidays.index') }}"
+                                        class="btn inline-flex justify-center mx-2 mt-3 btn-primary active btn-sm">View
+                                        all holidays</a>
                                 </div>
                             </div>
-                            {{-- END: empty filter result --}}
-                        @endif
-                    </div>
+                        </div>
+                        {{-- END: empty filter result --}}
+                    @endif
+
 
                 </div>
                 <div class="mt-6">
@@ -186,4 +187,4 @@
             </div>
         @endif
     @endcan
-</div> 
+</div>

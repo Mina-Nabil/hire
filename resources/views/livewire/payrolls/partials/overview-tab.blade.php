@@ -234,6 +234,6 @@
 
 @if(isset($payrollEmployees))
     <div class="mt-6">
-        {{ $payrollEmployees->links() }}
+        {{ $payrollEmployees->links('vendor.livewire.simple-bootstrap') }}
     </div>
 @endif 

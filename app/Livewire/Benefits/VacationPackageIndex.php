@@ -59,6 +59,7 @@ class VacationPackageIndex extends Component
                 'max_balance_max' => $detail->max_balance_max,
                 'hour_price_min' => $detail->hour_price_min,
                 'hour_price_max' => $detail->hour_price_max,
+                'apply_deadline' => $detail->apply_deadline,
             ];
         })->toArray();
 
@@ -76,6 +77,7 @@ class VacationPackageIndex extends Component
             'max_balance_max' => '',
             'hour_price_min' => '',
             'hour_price_max' => '',
+            'apply_deadline' => '',
         ];
     }
 
@@ -100,6 +102,7 @@ class VacationPackageIndex extends Component
             'vacationDetails.*.max_balance_max' => 'required|numeric|min:0',
             'vacationDetails.*.hour_price_min' => 'required|numeric|min:0',
             'vacationDetails.*.hour_price_max' => 'required|numeric|min:0',
+            'vacationDetails.*.apply_deadline' => 'nullable|integer|min:0',
         ], [
             'vacationDetails.*.name.required' => 'Name#:position is required',
             'vacationDetails.*.type.required' => 'Type#:position is required',
@@ -109,6 +112,8 @@ class VacationPackageIndex extends Component
             'vacationDetails.*.max_balance_max.required' => 'Max balance maximum#:position is required',
             'vacationDetails.*.hour_price_min.required' => 'Hour price minimum#:position is required',
             'vacationDetails.*.hour_price_max.required' => 'Hour price maximum#:position is required',
+            'vacationDetails.*.apply_deadline.integer' => 'Apply deadline#:position must be a number',
+            'vacationDetails.*.apply_deadline.min' => 'Apply deadline#:position must be 0 or greater',
         ]);
 
         try {

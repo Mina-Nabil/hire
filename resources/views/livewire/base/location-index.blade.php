@@ -105,7 +105,7 @@
                 </div>
             </div>
             <div class="flex justify-between items-center mt-4">
-                <div>{{ $locations->links() }}</div>
+                <div>{{ $locations->links('vendor.livewire.simple-bootstrap') }}</div>
             </div>
         </div>
     </div>

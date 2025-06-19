@@ -9,13 +9,14 @@
         <div class="flex items-center space-x-3">
             <select wire:model.live="statusFilter" class="form-control min-w-[160px]">
                 <option value="">All Statuses</option>
-                @foreach($statusList as $status)
+                @foreach ($statusList as $status)
                     <option value="{{ $status }}">{{ $status }}</option>
                 @endforeach
             </select>
-            
+
             <div class="relative" style="min-width: 300px;">
-                <input type="text" wire:model.live.debounce.300ms="search" class="form-control" style="padding-left: 30px;" placeholder="Search date, hours...">
+                <input type="text" wire:model.live.debounce.300ms="search" class="form-control"
+                    style="padding-left: 30px;" placeholder="Search date, hours...">
                 <span class="absolute left-2 top-2 text-lg">
                     <iconify-icon icon="heroicons-outline:search"></iconify-icon>
                 </span>
@@ -65,15 +66,15 @@
                                         </td>
                                         <td class="table-td">
                                             <div class="flex items-center space-x-3">
-                                                <button wire:click="viewDetails({{ $overtime->id }})" class="action-btn" type="button">
+                                                <button wire:click="viewDetails({{ $overtime->id }})" class="action-btn"
+                                                    type="button">
                                                     <iconify-icon icon="heroicons:eye"></iconify-icon>
                                                 </button>
-                                                
-                                                @if($overtime->status === \App\Models\Attendance\Overtime::STATUS_PENDING)
-                                                    <button wire:click="cancelRequest({{ $overtime->id }})" 
-                                                            class="action-btn text-danger-500" 
-                                                            type="button"
-                                                            onclick="return confirm('Are you sure you want to cancel this overtime request?')">
+
+                                                @if ($overtime->status === \App\Models\Attendance\Overtime::STATUS_PENDING)
+                                                    <button wire:click="cancelRequest({{ $overtime->id }})"
+                                                        class="action-btn text-danger-500" type="button"
+                                                        onclick="return confirm('Are you sure you want to cancel this overtime request?')">
                                                         <iconify-icon icon="heroicons:trash"></iconify-icon>
                                                     </button>
                                                 @endif
@@ -90,10 +91,10 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Pagination -->
             <div class="mt-6">
-                {{ $overtimes->links() }}
+                {{ $overtimes->links('vendor.livewire.simple-bootstrap') }}
             </div>
         </div>
     </div>
@@ -108,37 +109,49 @@
             <div class="py-4">
                 <div class="mb-5">
                     <label for="startDate" class="form-label">Date</label>
-                    <input type="date" id="startDate" wire:model="startDate" class="form-control" min="{{ now()->format('Y-m-d') }}">
-                    @error('startDate') <span class="text-danger text-sm mt-1 block">{{ $message }}</span> @enderror
+                    <input type="date" id="startDate" wire:model="startDate" class="form-control"
+                        min="{{ now()->format('Y-m-d') }}">
+                    @error('startDate')
+                        <span class="text-danger text-sm mt-1 block">{{ $message }}</span>
+                    @enderror
                 </div>
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                     <div>
                         <label for="startTime" class="form-label">Start Time</label>
                         <input type="time" id="startTime" wire:model="startTime" class="form-control">
-                        @error('startTime') <span class="text-danger text-sm mt-1 block">{{ $message }}</span> @enderror
+                        @error('startTime')
+                            <span class="text-danger text-sm mt-1 block">{{ $message }}</span>
+                        @enderror
                     </div>
-                    
+
                     <div>
                         <label for="endTime" class="form-label">End Time</label>
                         <input type="time" id="endTime" wire:model="endTime" class="form-control">
-                        @error('endTime') <span class="text-danger text-sm mt-1 block">{{ $message }}</span> @enderror
+                        @error('endTime')
+                            <span class="text-danger text-sm mt-1 block">{{ $message }}</span>
+                        @enderror
                     </div>
                 </div>
-                
+
                 <div class="mb-5">
                     <label for="reason" class="form-label">Reason (Optional)</label>
-                    <textarea id="reason" wire:model="reason" class="form-control" rows="3" placeholder="Explain why overtime was needed"></textarea>
-                    @error('reason') <span class="text-danger text-sm mt-1 block">{{ $message }}</span> @enderror
+                    <textarea id="reason" wire:model="reason" class="form-control" rows="3"
+                        placeholder="Explain why overtime was needed"></textarea>
+                    @error('reason')
+                        <span class="text-danger text-sm mt-1 block">{{ $message }}</span>
+                    @enderror
                 </div>
-                
+
                 <div class="bg-blue-50 p-4 rounded border border-blue-200">
                     <div class="flex items-start">
-                        <iconify-icon icon="heroicons:information-circle" class="text-2xl text-blue-500 mr-2 mt-0.5"></iconify-icon>
+                        <iconify-icon icon="heroicons:information-circle"
+                            class="text-2xl text-blue-500 mr-2 mt-0.5"></iconify-icon>
                         <div>
                             <h5 class="font-medium text-blue-700">Important Information</h5>
                             <p class="text-sm text-blue-600">
-                                Overtime requests need to be approved by management. You will be notified once your request has been reviewed.
+                                Overtime requests need to be approved by management. You will be notified once your
+                                request has been reviewed.
                             </p>
                         </div>
                     </div>
@@ -166,11 +179,12 @@
             </x-slot>
 
             <div class="py-4">
-                @if($selectedOvertime)
+                @if ($selectedOvertime)
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div class="border rounded p-3">
                             <p class="text-sm text-slate-500">Date</p>
-                            <p class="font-medium">{{ \Carbon\Carbon::parse($selectedOvertime->date)->format('M d, Y') }}</p>
+                            <p class="font-medium">
+                                {{ \Carbon\Carbon::parse($selectedOvertime->date)->format('M d, Y') }}</p>
                         </div>
                         <div class="border rounded p-3">
                             <p class="text-sm text-slate-500">Status</p>
@@ -182,7 +196,8 @@
                         </div>
                         <div class="border rounded p-3">
                             <p class="text-sm text-slate-500">Time</p>
-                            <p class="font-medium">{{ $selectedOvertime->start_time }} - {{ $selectedOvertime->end_time }}</p>
+                            <p class="font-medium">{{ $selectedOvertime->start_time }} -
+                                {{ $selectedOvertime->end_time }}</p>
                         </div>
                         <div class="border rounded p-3">
                             <p class="text-sm text-slate-500">Hours</p>
@@ -192,43 +207,49 @@
                             <p class="text-sm text-slate-500">Created Date</p>
                             <p class="font-medium">{{ $selectedOvertime->created_at->format('M d, Y h:i A') }}</p>
                         </div>
-                        @if($selectedOvertime->approved_at)
-                        <div class="border rounded p-3">
-                            <p class="text-sm text-slate-500">Reviewed Date</p>
-                            <p class="font-medium">{{ \Carbon\Carbon::parse($selectedOvertime->approved_at)->format('M d, Y h:i A') }}</p>
-                        </div>
+                        @if ($selectedOvertime->approved_at)
+                            <div class="border rounded p-3">
+                                <p class="text-sm text-slate-500">Reviewed Date</p>
+                                <p class="font-medium">
+                                    {{ \Carbon\Carbon::parse($selectedOvertime->approved_at)->format('M d, Y h:i A') }}
+                                </p>
+                            </div>
                         @endif
                     </div>
 
-                    @if(isset($selectedOvertime->admin_note) && $selectedOvertime->admin_note)
-                    <div class="border rounded p-3 mb-4">
-                        <p class="text-sm text-slate-500">Admin Note</p>
-                        <p>{{ $selectedOvertime->admin_note }}</p>
-                    </div>
+                    @if (isset($selectedOvertime->admin_note) && $selectedOvertime->admin_note)
+                        <div class="border rounded p-3 mb-4">
+                            <p class="text-sm text-slate-500">Admin Note</p>
+                            <p>{{ $selectedOvertime->admin_note }}</p>
+                        </div>
                     @endif
 
-                    @if($selectedOvertime->status === \App\Models\Attendance\Overtime::STATUS_APPROVED)
-                    <div class="mt-4 bg-green-50 p-4 rounded border border-green-200">
-                        <div class="flex items-center">
-                            <iconify-icon icon="heroicons:check-circle" class="text-2xl text-green-500 mr-2"></iconify-icon>
-                            <div>
-                                <h5 class="font-medium text-green-700">Overtime Request Approved</h5>
-                                <p class="text-sm text-green-600">Your overtime request has been approved and will be considered for compensation.</p>
+                    @if ($selectedOvertime->status === \App\Models\Attendance\Overtime::STATUS_APPROVED)
+                        <div class="mt-4 bg-green-50 p-4 rounded border border-green-200">
+                            <div class="flex items-center">
+                                <iconify-icon icon="heroicons:check-circle"
+                                    class="text-2xl text-green-500 mr-2"></iconify-icon>
+                                <div>
+                                    <h5 class="font-medium text-green-700">Overtime Request Approved</h5>
+                                    <p class="text-sm text-green-600">Your overtime request has been approved and will
+                                        be considered for compensation.</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
                     @endif
 
-                    @if($selectedOvertime->status === \App\Models\Attendance\Overtime::STATUS_REJECTED)
-                    <div class="mt-4 bg-red-50 p-4 rounded border border-red-200">
-                        <div class="flex items-center">
-                            <iconify-icon icon="heroicons:x-circle" class="text-2xl text-red-500 mr-2"></iconify-icon>
-                            <div>
-                                <h5 class="font-medium text-red-700">Overtime Request Rejected</h5>
-                                <p class="text-sm text-red-600">Your overtime request has been rejected. Please check the admin note for details.</p>
+                    @if ($selectedOvertime->status === \App\Models\Attendance\Overtime::STATUS_REJECTED)
+                        <div class="mt-4 bg-red-50 p-4 rounded border border-red-200">
+                            <div class="flex items-center">
+                                <iconify-icon icon="heroicons:x-circle"
+                                    class="text-2xl text-red-500 mr-2"></iconify-icon>
+                                <div>
+                                    <h5 class="font-medium text-red-700">Overtime Request Rejected</h5>
+                                    <p class="text-sm text-red-600">Your overtime request has been rejected. Please
+                                        check the admin note for details.</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
                     @endif
                 @endif
             </div>
@@ -240,4 +261,4 @@
             </x-slot>
         </x-modal>
     </div>
-</div> 
+</div>

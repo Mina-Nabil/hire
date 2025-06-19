@@ -55,6 +55,7 @@ class EmployeeConfiguration extends Component
         'max_balance' => 0,
         'type' => '',
         'start_date' => '',
+        'apply_deadline' => null,
     ];
 
     // Loan Modal
@@ -295,6 +296,7 @@ class EmployeeConfiguration extends Component
             'max_balance' => 0,
             'type' => '',
             'start_date' => now()->format('Y-m-d'),
+            'apply_deadline' => 0,
         ];
     }
 
@@ -308,6 +310,7 @@ class EmployeeConfiguration extends Component
             'vacationBenefit.max_balance' => 'required|numeric|min:0',
             'vacationBenefit.type' => 'required|string',
             'vacationBenefit.start_date' => 'required|date',
+            'vacationBenefit.apply_deadline' => 'nullable|integer|min:0',
         ], [
             'vacationBenefit.name.required' => 'The name is required.',
             'vacationBenefit.inc_rate.required' => 'The inc rate is required.',
@@ -324,7 +327,8 @@ class EmployeeConfiguration extends Component
                 $this->vacationBenefit['current_balance'],
                 $this->vacationBenefit['max_balance'],
                 $this->vacationBenefit['type'],
-                Carbon::parse($this->vacationBenefit['start_date'])
+                Carbon::parse($this->vacationBenefit['start_date']),
+                $this->vacationBenefit['apply_deadline']
             );
 
             $this->closeAddCustomVacationBenefitModal();

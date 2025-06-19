@@ -348,6 +348,7 @@
                                     {{ $slot ?? '' }}
                                 </div>
                                 <livewire:components.confirmation-modal />
+                                <livewire:components.info-modal />
 
                             </div>
                         </div>

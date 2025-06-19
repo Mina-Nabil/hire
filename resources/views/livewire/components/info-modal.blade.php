@@ -1,9 +1,7 @@
-<div>
-    
-
-    <div class="modal fade fixed top-0 left-0 hidden w-full h-full outline-none overflow-x-hidden overflow-y-auto {{ $isOpen ? 'show' : '' }}"
+<div>    
+    <div class="modal fade fixed top-0 left-0 hidden w-full h-full outline-none overflow-x-hidden overflow-y-auto {{ $isInfoModalOpen ? 'show' : '' }}"
         tabindex="-1" aria-labelledby="dangerModalLabel" aria-modal="true" role="dialog"
-        aria-hidden="{{ $isOpen ? 'false' : 'true' }}" style="{{ $isOpen ? 'display: block;' : 'display: none;' }}">
+        aria-hidden="{{ $isInfoModalOpen ? 'false' : 'true' }}" style="{{ $isInfoModalOpen ? 'display: block;' : 'display: none;' }}">
         <div class="modal-dialog relative w-auto pointer-events-none">
             <div
                 class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding
@@ -13,7 +11,7 @@
                     <div
                         class="flex items-center justify-between p-5 border-b rounded-t dark:border-slate-600 bg-{{ $color }}-500">
                         <h3 class="text-base font-medium text-white dark:text-white capitalize">
-                            Confirmation
+                            Info
                         </h3>
                         <div>
                             <button wire:click="closeModal" type="button"
@@ -41,10 +39,8 @@
                     <!-- Modal footer -->
                     <div
                         class="flex items-center p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
-                        <button wire:click="confirm" data-bs-dismiss="modal"
-                            class="btn inline-flex justify-center text-white bg-{{ $color }}-500 btn-sm ml-2">Confirm</button>
                         <button wire:click="closeModal" data-bs-dismiss="modal"
-                            class="btn inline-flex justify-center text-white btn-outline-dark btn-sm">Cancel</button>
+                            class="btn inline-flex justify-center text-white btn-outline-dark btn-sm">Close</button>
                     </div>
                 </div>
             </div>

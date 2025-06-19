@@ -41,6 +41,7 @@ class BenefitConfiguration extends Model
         'overtime_rate',
         'is_automatic_overtime',
         'is_generate_overtime',
+        'overtime_max_time',
         'is_require_attendance_approval',
         'bus_id'
     ];

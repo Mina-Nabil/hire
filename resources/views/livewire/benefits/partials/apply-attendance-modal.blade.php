@@ -157,14 +157,18 @@
                                     wire:model="overtimeRate" errorMessage="{{ $errors->first('overtimeRate') }}"
                                     min="1" />
 
-                                <label class="flex items-center mt-2 col-span-2">
+                                <x-text-input label="Overtime Max Time" type="time"
+                                    wire:model="overtimeMaxTime" errorMessage="{{ $errors->first('overtimeMaxTime') }}"
+                                    min="0" placeholder="Leave empty for no limit" />
+
+                                {{-- <label class="flex items-center mt-2 col-span-2">
                                     <input type="checkbox" wire:model="isAutomaticOvertime" class="form-checkbox">
                                     <span class="ml-2">Enable Automatic Approved Overtime from Attendance Sheet</span>
-                                </label>
+                                </label> --}}
 
                                 <label class="flex items-center mt-2 col-span-2">
                                     <input type="checkbox" wire:model="isGenerateOvertime" class="form-checkbox">
-                                    <span class="ml-2">Generate Unapproved Overtime Automatically after 1 extra hour</span>
+                                    <span class="ml-2">Generate Unapproved Overtime Automatically after 1 hour</span>
                                 </label>
 
                                 <label class="flex items-center mt-2 col-span-2">

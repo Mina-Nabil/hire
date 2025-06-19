@@ -17,6 +17,9 @@ class ShowAppliedVacation extends Component
     public $endDate = '';
     public $showFilters = false;
     public $status = '';
+    public $showRejectModal = false;
+    public $selectedAppliedVacation = null;
+    public $rejectNote = '';
 
     public function toggleFilters()
     {
@@ -26,6 +29,20 @@ class ShowAppliedVacation extends Component
     public function resetFilters()
     {
         $this->reset(['search', 'startDate', 'endDate', 'status']);
+    }
+
+    public function openRejectModal($appliedVacationId)
+    {
+        $this->selectedAppliedVacation = AppliedVacation::findOrFail($appliedVacationId);
+        $this->rejectNote = '';
+        $this->showRejectModal = true;
+    }
+
+    public function closeRejectModal()
+    {
+        $this->showRejectModal = false;
+        $this->selectedAppliedVacation = null;
+        $this->rejectNote = '';
     }
 
     public function approve($appliedVacationId)
@@ -39,15 +56,21 @@ class ShowAppliedVacation extends Component
         }
     }
 
-    public function reject($appliedVacationId)
+    public function reject($appliedVacationId, $note = null)
     {
         try {
             $appliedVacation = AppliedVacation::findOrFail($appliedVacationId);
-            $appliedVacation->reject();
+            $appliedVacation->reject($note);
             $this->alertSuccess('Vacation rejected successfully');
+            $this->closeRejectModal();
         } catch (\Exception $e) {
             $this->alertError($e->getMessage());
         }
+    }
+
+    public function confirmReject()
+    {
+        $this->reject($this->selectedAppliedVacation->id, $this->rejectNote);
     }
 
     public function render()

@@ -30,7 +30,7 @@ class Attendance extends Model
         'penalized_hours',
         'is_extra_hours_approved',
         'is_approved',
-        'payroll_id',   
+        'payroll_id',
     ];
 
     const MORPH_NAME = 'attendance';
@@ -39,36 +39,36 @@ class Attendance extends Model
     {
         static::addGlobalScope('managerAccessibleAttendance', function ($builder) {
             $user = Auth::user();
-            
+
             // If no user is logged in or if they are admin, don't restrict
             if (!$user || $user->is_admin) {
                 return;
             }
-            
+
             // If user is HR, restrict to employees in their assigned locations
             if ($user->is_hr) {
                 // Get the HR user's assigned location IDs
                 $locationIds = $user->assignedLocations()->pluck('locations.id')->toArray();
-                
+
                 // Only apply filter if the user has assigned locations
                 if (!empty($locationIds)) {
-                    $builder->whereHas('employee.position', function($query) use ($locationIds) {
+                    $builder->whereHas('employee.position', function ($query) use ($locationIds) {
                         $query->whereIn('location_id', $locationIds);
                     });
                 }
                 return;
             }
-            
+
             // If user is a manager (has employees reporting to them)
             $userEmployee = Employee::where('user_id', $user->id)->first();
             if ($userEmployee && $userEmployee->is_manager) {
                 // Get attendance records of employees who have this manager as their manager
-                $builder->whereHas('employee.benefitConfiguration', function($query) use ($userEmployee) {
+                $builder->whereHas('employee.benefitConfiguration', function ($query) use ($userEmployee) {
                     $query->where('manager_id', $userEmployee->id);
                 });
             } else {
                 // Regular employee can only see their own attendance
-                $builder->where(function($query) use ($user, $userEmployee) {
+                $builder->where(function ($query) use ($user, $userEmployee) {
                     if ($userEmployee) {
                         $query->where('employee_id', $userEmployee->id);
                     } else {
@@ -136,13 +136,13 @@ class Attendance extends Model
             $employeeName = trim($sheet->getCell('A' . $row)->getValueString());
             if (!$employeeName) continue;
 
-            if(!$sheet->getCell('B' . $row)->getValue()) continue; //if the start time is empty, skip the row
+            if (!$sheet->getCell('B' . $row)->getValue()) continue; //if the start time is empty, skip the row
             $attendanceStartDate = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($sheet->getCell('B' . $row)->getValue());
             $attendanceEndDate = $sheet->getCell('C' . $row)->getValue() ? \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($sheet->getCell('C' . $row)->getValue()) : null;
             $extraHours = $sheet->getCell('D' . $row)->getValue();
 
             $employee = Employee::where('name', $employeeName)->first();
-            if(!$employee) {
+            if (!$employee) {
                 $attendance[] = [
                     'employee_id' => "Not Found",
                     'employee' => null,
@@ -163,14 +163,14 @@ class Attendance extends Model
 
             $attendanceType = $employee->benefitConfiguration->attendance_calculation;
 
-            if($attendanceType == BenefitConfiguration::ATTENDANCE_CALCULATION_IN_ONLY){
+            if ($attendanceType == BenefitConfiguration::ATTENDANCE_CALCULATION_IN_ONLY) {
                 $hours = $employee->benefitConfiguration->daily_working_hours;
             } else {
                 $hours = abs(round(Carbon::parse($attendanceEndDate)->diffInDays(Carbon::parse($attendanceStartDate)), 2));
             }
 
-            
-          
+
+
             // Determine if attendance approval is required
             $isApproved = null;
             if ($employee) {
@@ -202,13 +202,21 @@ class Attendance extends Model
         return $attendance;
     }
 
+    /**
+     * Save attendance records and generate overtime for each record
+     * 
+     * @param array $attendance
+     * @return void
+     * @throws AppException
+     */
     public static function saveAttendance($attendance)
     {
         try {
             DB::transaction(function () use ($attendance) {
                 foreach ($attendance as $attendance) {
-                    if (!$attendance['error']) {
-                        Attendance::create($attendance);
+                    if (!isset($attendance['error']) || !$attendance['error']) {
+                        $attendanceRecord = Attendance::create($attendance);
+                        $attendanceRecord->generateOvertime();
                     }
                 }
             });
@@ -220,6 +228,79 @@ class Attendance extends Model
         }
     }
 
+
+    /**
+     * Generate overtime for an attendance record if the employee has overtime enabled
+     * 
+     * @return void
+     * @throws AppException
+     */
+    public function generateOvertime()
+    {
+        $employeeConfiguration = $this->employee->benefitConfiguration;
+
+        if (!$employeeConfiguration->is_generate_overtime) return;
+
+        if (!$this->end_time) return;
+
+        $overtime = $this->getOvertimeHours($employeeConfiguration);
+
+        if ($overtime <= 1) return;
+
+        $startDate = Carbon::parse($this->date);
+        $endDate = Carbon::parse($this->date);
+
+        try {
+            return Overtime::updateOrCreate([
+                'employee_id' => $this->employee_id,
+                'creator_id' => $this->employee->user_id,
+                'date' => $startDate->format('Y-m-d'),
+                'status' => 'pending',
+            ], [
+                'start_time' => $endDate->format('H:i'),
+                'end_time' => $endDate->format('H:i'),
+                'hours' => $overtime,
+            ]);
+        } catch (Exception $e) {
+            report($e);
+            AppLog::error('Failed to generate overtime', $e->getMessage());
+            throw new AppException('Failed to generate overtime: ' . $e->getMessage());
+        }
+    }
+
+
+    public function getOvertimeHours(BenefitConfiguration $employeeConfiguration)
+    {
+        if (!$this->end_time) return 0;
+
+        $overTimeLimit = $employeeConfiguration->overtime_max_time ? Carbon::parse($employeeConfiguration->overtime_max_time) : null;
+        $attendanceEndTime = Carbon::parse($this->end_time);
+        $endTime = $overTimeLimit ? $attendanceEndTime->min($overTimeLimit) : $attendanceEndTime;
+
+        switch ($employeeConfiguration->attendance_calculation) {
+            case BenefitConfiguration::ATTENDANCE_CALCULATION_IN_ONLY:
+                return 0;
+
+            case BenefitConfiguration::ATTENDANCE_CALCULATION_FIXED:
+            case BenefitConfiguration::ATTENDANCE_CALCULATION_BUS:
+                $fixedEndTime = Carbon::parse($employeeConfiguration->working_day_end_max);
+                $diffInHours = $fixedEndTime->diffInHours($endTime);
+                return $diffInHours > 0 ? $diffInHours : 0;
+
+            case BenefitConfiguration::ATTENDANCE_CALCULATION_SEMI_FLEXIBLE:
+                $startTime = Carbon::parse($this->start_time);
+                $diffInHours = $endTime->diffInHours($startTime, true);
+                return $diffInHours - $employeeConfiguration->daily_working_hours;
+
+            case BenefitConfiguration::ATTENDANCE_CALCULATION_FLEXIBLE:
+                $startTime = Carbon::parse($this->start_time);
+                $hours = self::where('employee_id', $this->employee_id)->where('date', $this->date)->sum('hours');
+                return $hours - $employeeConfiguration->daily_working_hours;
+        }
+        return 0;
+    }
+
+
     /**
      * Approve extra hours for an attendance record
      * 
@@ -228,20 +309,20 @@ class Attendance extends Model
      */
     public function approveExtraHours()
     {
-        
+
         try {
             if ($this->extra_hours === null) {
                 throw new AppException('This attendance record has no extra hours to approve.');
             }
-            
+
             $this->is_extra_hours_approved = true;
 
             $employee = $this->employee->name ?? 'Unknown Employee';
             $date = $this->date ?? 'Unknown Date';
             $extraHours = $this->extra_hours ?? 0;
             AppLog::info(
-                "Approved Extra Hours for $employee", 
-                "Date: $date, Extra Hours: $extraHours hours", 
+                "Approved Extra Hours for $employee",
+                "Date: $date, Extra Hours: $extraHours hours",
                 loggable: $this
             );
 
@@ -270,8 +351,8 @@ class Attendance extends Model
             $date = $this->date ?? 'Unknown Date';
             $extraHours = $this->extra_hours ?? 0;
             AppLog::info(
-                "Rejected Extra Hours for $employee", 
-                "Date: $date, Extra Hours: $extraHours hours", 
+                "Rejected Extra Hours for $employee",
+                "Date: $date, Extra Hours: $extraHours hours",
                 loggable: $this
             );
             $this->is_extra_hours_approved = false;
@@ -282,7 +363,7 @@ class Attendance extends Model
             throw new AppException('Failed to reject extra hours: ' . $e->getMessage());
         }
     }
-    
+
     /**
      * Approve attendance record
      * 
@@ -297,8 +378,8 @@ class Attendance extends Model
             $date = $this->date ?? 'Unknown Date';
             $hours = $this->hours ?? 0;
             AppLog::info(
-                "Approved Attendance for $employee", 
-                "Date: $date, Hours: $hours hours", 
+                "Approved Attendance for $employee",
+                "Date: $date, Hours: $hours hours",
                 loggable: $this
             );
             return $this->save();
@@ -308,7 +389,7 @@ class Attendance extends Model
             throw new AppException('Failed to approve attendance: ' . $e->getMessage());
         }
     }
-    
+
     /**
      * Reject attendance record
      * 
@@ -323,8 +404,8 @@ class Attendance extends Model
             $date = $this->date ?? 'Unknown Date';
             $hours = $this->hours ?? 0;
             AppLog::info(
-                "Rejected Attendance for $employee", 
-                "Date: $date, Hours: $hours hours", 
+                "Rejected Attendance for $employee",
+                "Date: $date, Hours: $hours hours",
                 loggable: $this
             );
             return $this->save();

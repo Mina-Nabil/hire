@@ -139,14 +139,15 @@
                                     <td class="table-td">
                                         <div class="flex space-x-2">
                                             @can('approve', $appliedVacation)
-                                                <button wire:click="approve({{ $appliedVacation->id }})" 
+                                                <button 
+                                                wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to approve this vacation?',color:'success',callback:'approve',params:{{ $appliedVacation->id }}})"
                                                         class="action-btn text-success-500" 
                                                         title="Approve">
                                                     <iconify-icon icon="heroicons:check"></iconify-icon>
                                                 </button>
                                             @endcan
                                             @can('reject', $appliedVacation)
-                                                <button wire:click="reject({{ $appliedVacation->id }})" 
+                                                <button wire:click="openRejectModal({{ $appliedVacation->id }})" 
                                                         class="action-btn text-danger-500" 
                                                         title="Reject">
                                                     <iconify-icon icon="heroicons:x-mark"></iconify-icon>
@@ -179,4 +180,37 @@
             </div>
         </div>
     </div>
+
+    @if ($showRejectModal)
+        <x-modal wire:model="showRejectModal">
+            <x-slot name="title">Reject Vacation</x-slot>
+            <!-- Modal body -->
+            <div class="p-6 space-y-4">
+                @if ($selectedAppliedVacation)
+                    <div class="alert alert-info">
+                        <div class="flex items-center">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            <div>
+                                <p class="font-medium">Rejecting vacation for:</p>
+                                <p>{{ $selectedAppliedVacation->employee ? $selectedAppliedVacation->employee->name : 'N/A' }}</p>
+                                <p class="text-sm mt-1">{{ $selectedAppliedVacation->vacationBenefit ? $selectedAppliedVacation->vacationBenefit->name : 'N/A' }} - {{ $selectedAppliedVacation->hours ?? 0 }} hours</p>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                <div class="from-group">
+                    <div class="input-area">
+                        <label for="rejectNote" class="form-label">Rejection Note (Optional)</label>
+                        <textarea id="rejectNote" rows="4" class="form-control" wire:model="rejectNote" placeholder="Enter reason for rejection..."></textarea>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal footer -->
+            <x-slot name="footer">
+                <x-secondary-button wire:click="closeRejectModal">Cancel</x-secondary-button>
+                <x-primary-button wire:click.prevent="confirmReject" loadingFunction="confirmReject">Reject Vacation</x-primary-button>
+            </x-slot>
+        </x-modal>
+    @endif
 </div>

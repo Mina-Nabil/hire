@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('benefit_configurations', function (Blueprint $table) {
             $table->boolean('is_generate_overtime')->default(false)->after('is_automatic_overtime');
+            $table->time('overtime_max_time')->nullable()->after('is_generate_overtime');
         });
     }
 
@@ -23,6 +24,7 @@ return new class extends Migration
     {
         Schema::table('benefit_configurations', function (Blueprint $table) {
             $table->dropColumn('is_generate_overtime');
+            $table->dropColumn('overtime_max_time');
         });
     }
 };

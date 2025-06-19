@@ -312,6 +312,7 @@ class Employee extends Model
         $working_day_start_max = null,
         $working_day_end_min = null,
         $working_day_end_max = null,
+        $overtime_max_time = null,
         $is_require_attendance_approval = false,
         $bus_id = null,
         $is_generate_overtime = false
@@ -368,7 +369,7 @@ class Employee extends Model
 
 
         try {
-            DB::transaction(function () use ($attendance_calculation, $working_day_start_min, $working_day_start_max, $working_day_end_min, $working_day_end_max, $daily_working_hours, $overtime_rate, $is_automatic_overtime, $working_days, $is_require_attendance_approval, $bus_id, $is_generate_overtime) {
+            DB::transaction(function () use ($attendance_calculation, $working_day_start_min, $working_day_start_max, $working_day_end_min, $working_day_end_max, $daily_working_hours, $overtime_rate, $is_automatic_overtime, $working_days, $overtime_max_time, $is_require_attendance_approval, $bus_id, $is_generate_overtime) {
                 $this->workingDays()->delete();
 
                 $dbWorkingDays = [];
@@ -384,6 +385,7 @@ class Employee extends Model
                 ], [
                     'is_automatic_overtime' => $is_automatic_overtime,
                     'is_generate_overtime' => $is_generate_overtime,
+                    'overtime_max_time' => $overtime_max_time,
                     'is_require_attendance_approval' => $is_require_attendance_approval,
                     'attendance_calculation' => $attendance_calculation,
                     'working_day_start_min' => $working_day_start_min,

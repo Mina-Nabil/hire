@@ -27,6 +27,7 @@ class ApplyAttendanceModal extends Component
     public $overtimeRate;
     public $isAutomaticOvertime;
     public $isGenerateOvertime;
+    public $overtimeMaxTime;
     public $isRequireAttendanceApproval;
     public $deleteOldConf = true;
     public $busId;
@@ -44,6 +45,7 @@ class ApplyAttendanceModal extends Component
         'overtimeRate' => 'required|numeric|min:1',
         'isAutomaticOvertime' => 'boolean',
         'isGenerateOvertime' => 'boolean',
+        'overtimeMaxTime' => 'nullable|numeric|min:0',
         'isRequireAttendanceApproval' => 'boolean',
         'busId' => 'required_if:attendanceCalculation,bus',
     ];
@@ -71,6 +73,7 @@ class ApplyAttendanceModal extends Component
         $this->overtimeRate = $this->selectedEmployee->benefitConfiguration?->overtime_rate;
         $this->isAutomaticOvertime = $this->selectedEmployee->benefitConfiguration?->is_automatic_overtime ? true : false;
         $this->isGenerateOvertime = $this->selectedEmployee->benefitConfiguration?->is_generate_overtime ? true : false;
+        $this->overtimeMaxTime = $this->selectedEmployee->benefitConfiguration?->overtime_max_time;
         $this->isRequireAttendanceApproval = $this->selectedEmployee->benefitConfiguration?->is_require_attendance_approval ? true : false;
         $this->busId = $this->selectedEmployee->benefitConfiguration?->bus_id;
 
@@ -94,6 +97,7 @@ class ApplyAttendanceModal extends Component
         $this->overtimeRate = 1;
         $this->isAutomaticOvertime = true;
         $this->isGenerateOvertime = true;
+        $this->overtimeMaxTime = null;
         $this->isRequireAttendanceApproval = false;
     }
 
@@ -112,6 +116,7 @@ class ApplyAttendanceModal extends Component
                 $this->workingDayStartMax,
                 $this->workingDayEndMin,
                 $this->workingDayEndMax,
+                $this->overtimeMaxTime,
                 $this->isRequireAttendanceApproval,
                 $this->busId,
                 $this->isGenerateOvertime

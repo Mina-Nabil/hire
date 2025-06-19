@@ -8,8 +8,10 @@ use App\Models\Benefits\Vacations\VacationBenefit;
 use App\Models\Benefits\Payrolls\Payroll;
 use App\Models\Benefits\Vacations\VacationDay;
 use App\Models\Users\AppLog;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AppliedVacation extends Model
 {
@@ -23,6 +25,7 @@ class AppliedVacation extends Model
         'days',
         'hours',
         'new_balance',
+        'note'
     ];
     const STATUS_PENDING = 'pending';
     const STATUS_APPROVED = 'approved';
@@ -38,7 +41,7 @@ class AppliedVacation extends Model
     {
         /** @var User $user */
         $user = Auth::user();
-        if(!$user->can('approve', $this)) {
+        if (!$user->can('approve', $this)) {
             throw new AppException('You dont have permission to approve vacation');
         }
 
@@ -48,20 +51,31 @@ class AppliedVacation extends Model
     }
 
 
-    public function reject()
+    public function reject($note = null)
     {
         /** @var User $user */
         $user = Auth::user();
-        if(!$user->can('reject', $this)) {
+        if (!$user->can('reject', $this)) {
             throw new AppException('You dont have permission to reject vacation');
         }
 
-        $this->status = self::STATUS_REJECTED;
-        $this->save();
-        AppLog::info('Vacation Rejected', "Employee: $this->employee->name, Vacation: $this->vacationBenefit->name", loggable: $this);
+        try {
+            DB::transaction(function () use ($note) {
+                $this->status = self::STATUS_REJECTED;
+                $this->note = $note;
+                $this->save();
+                $this->vacationBenefit->update([
+                    'current_balance' => $this->vacationBenefit->current_balance + $this->hours,
+                ]);
+            });
+            AppLog::info('Vacation Rejected', "Employee: $this->employee->name, Vacation: $this->vacationBenefit->name", loggable: $this);
+        } catch (Exception $e) {
+            report($e);
+            AppLog::error('Error rejecting vacation', $e->getMessage(), loggable: $this);
+            throw new AppException('Error rejecting vacation');
+        }
     }
-    
-    
+
 
 
     ///relations
@@ -84,5 +98,4 @@ class AppliedVacation extends Model
     {
         return $this->hasMany(VacationDay::class);
     }
-    
 }

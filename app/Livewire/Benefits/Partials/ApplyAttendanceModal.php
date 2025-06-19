@@ -26,6 +26,7 @@ class ApplyAttendanceModal extends Component
     public $dailyWorkingHours;
     public $overtimeRate;
     public $isAutomaticOvertime;
+    public $isGenerateOvertime;
     public $isRequireAttendanceApproval;
     public $deleteOldConf = true;
     public $busId;
@@ -42,6 +43,7 @@ class ApplyAttendanceModal extends Component
         'dailyWorkingHours' => 'required|numeric|min:1|max:24',
         'overtimeRate' => 'required|numeric|min:1',
         'isAutomaticOvertime' => 'boolean',
+        'isGenerateOvertime' => 'boolean',
         'isRequireAttendanceApproval' => 'boolean',
         'busId' => 'required_if:attendanceCalculation,bus',
     ];
@@ -68,6 +70,7 @@ class ApplyAttendanceModal extends Component
         $this->dailyWorkingHours = $this->selectedEmployee->benefitConfiguration?->daily_working_hours;
         $this->overtimeRate = $this->selectedEmployee->benefitConfiguration?->overtime_rate;
         $this->isAutomaticOvertime = $this->selectedEmployee->benefitConfiguration?->is_automatic_overtime ? true : false;
+        $this->isGenerateOvertime = $this->selectedEmployee->benefitConfiguration?->is_generate_overtime ? true : false;
         $this->isRequireAttendanceApproval = $this->selectedEmployee->benefitConfiguration?->is_require_attendance_approval ? true : false;
         $this->busId = $this->selectedEmployee->benefitConfiguration?->bus_id;
 
@@ -90,6 +93,7 @@ class ApplyAttendanceModal extends Component
         $this->workingDayEndMax = '17:00';
         $this->overtimeRate = 1;
         $this->isAutomaticOvertime = true;
+        $this->isGenerateOvertime = true;
         $this->isRequireAttendanceApproval = false;
     }
 
@@ -109,7 +113,8 @@ class ApplyAttendanceModal extends Component
                 $this->workingDayEndMin,
                 $this->workingDayEndMax,
                 $this->isRequireAttendanceApproval,
-                $this->busId
+                $this->busId,
+                $this->isGenerateOvertime
             );
 
             $this->alertSuccess('Attendance configuration applied successfully!');

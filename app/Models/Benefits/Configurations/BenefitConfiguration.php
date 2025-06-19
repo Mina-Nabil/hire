@@ -40,6 +40,7 @@ class BenefitConfiguration extends Model
         'daily_working_hours',
         'overtime_rate',
         'is_automatic_overtime',
+        'is_generate_overtime',
         'is_require_attendance_approval',
         'bus_id'
     ];

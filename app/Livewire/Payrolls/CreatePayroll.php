@@ -325,7 +325,7 @@ class CreatePayroll extends Component
             $employeeBaseBenefits = $employee->getEmployeeBaseBenefitsCalculation(Carbon::parse($this->startDate), Carbon::parse($this->endDate));
             $otherBaseBenefits = $employee->getOtherBaseBenefitsCalculation(Carbon::parse($this->startDate), Carbon::parse($this->endDate));
 
-            
+
             // Get daily working hours from employee benefit configuration
             $dailyWorkingHours = $employee->benefitConfiguration?->daily_working_hours ?? 8;
             // dd('hourly rate: ' . $employee->calculateHourlyRate(), 'day price: ' . $dayPrice / $dailyWorkingHours);
@@ -375,7 +375,7 @@ class CreatePayroll extends Component
                     $dailyHours = $attendance->hours;
 
                     // Check if this day has overtime
-                    if ($dailyHours > $dailyWorkingHours) {
+                    if ($dailyHours - $dailyWorkingHours >= 1) {
                         $overtimeHours += ($dailyHours - $dailyWorkingHours);
 
                         // Store potential overtime data for later creation

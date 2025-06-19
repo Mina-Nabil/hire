@@ -202,6 +202,11 @@ class Attendance extends Model
         return $attendance;
     }
 
+    public static function handleAttendanceFromDevice($request)
+    {
+        Log::info('Attendance from device', $request->all());
+    }
+
     /**
      * Save attendance records and generate overtime for each record
      * 

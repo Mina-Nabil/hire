@@ -126,7 +126,7 @@ class MigrationService
                     // Ensure the username is not take
                     $i = 1;
                     while (User::where('username', $baseUsername)->exists()) {
-                        $baseUsername .= $baseUsername . $i;
+                        $baseUsername = $baseUsername . $i;
                         $i++;
                     }
 

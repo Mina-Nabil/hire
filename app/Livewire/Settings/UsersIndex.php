@@ -158,7 +158,7 @@ class UsersIndex extends Component
 
 
         try {
-            User::find($currentUserId)->editInfo($this->username, $this->name, $this->type, $imageUrl);
+            User::find($currentUserId)->editInfo( $this->name, $this->username, $this->type, $imageUrl);
             $this->closeSetUserSec();
             $this->alertSuccess('User updated successfuly!');
         } catch (AppException $e) {

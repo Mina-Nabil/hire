@@ -8,8 +8,10 @@ use App\Models\Personel\Employee;
 use App\Models\Recruitment\Vacancies\Vacancy;
 use App\Models\Users\AppLog;
 use App\Scopes\HrLocationScope;
+use Attribute;
 use Database\Factories\PositionFactory;
 use Exception;
+use Illuminate\Database\Eloquent\Casts\Attribute as CastsAttribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -288,6 +290,13 @@ class Position extends Model
         }
 
         return $level;
+    }
+
+    public function name() : CastsAttribute
+    {
+        return CastsAttribute::make(
+            get: fn($value) => $this->arabic_name ?? $this->name
+        );
     }
 
     public function getPotentialManagersAttribute(): array

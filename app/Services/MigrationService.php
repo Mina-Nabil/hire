@@ -123,7 +123,14 @@ class MigrationService
                         $baseUsername = 'employee' . rand(100, 999);
                     }
 
-                    $invalid_reason = match(true){
+                    // Ensure the username is not take
+                    $i = 1;
+                    while (User::where('username', $baseUsername)->exists()) {
+                        $baseUsername .= $baseUsername . $i;
+                        $i++;
+                    }
+
+                    $invalid_reason = match (true) {
                         !$employeeName => 'Employee name is required',
                         !$employeeNameAr => 'Employee name arabic is required',
                         !$id_number => 'ID number is required',
@@ -338,7 +345,7 @@ class MigrationService
                                     'amount_max' => $eb['max'],
                                     'receiver' => $eb['to'],
                                     'type' => $eb['type'],
-                                    
+
                                 ];
                             }
                         }

@@ -10,6 +10,7 @@ class PracticeCard extends Model
     use DocumentModel;
 
     const MORPH_NAME = 'practice_card';
+    const DOC_TYPE = 'practiceCard';
 
     protected $fillable = [
         'employee_id',

@@ -14,6 +14,7 @@ class CollegeCertificate extends Model
     use DocumentModel;
 
     const MORPH_NAME = 'college_certificate';
+    const DOC_TYPE = 'collegeCertificate';
 
     protected $fillable = [
         'employee_id',
@@ -37,7 +38,7 @@ class CollegeCertificate extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this->employee)) {
+        if (!$loggedInUser->can('setDocs', $this->employee->collegeCertificate()->first())) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 
@@ -65,7 +66,7 @@ class CollegeCertificate extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('deleteDocs', $this->employee)) {
+        if (!$loggedInUser->can('deleteDocs', $this->employee->collegeCertificate()->first())) {
             throw new AppException('You dont have permission to delete docs for this employee');
         }
 

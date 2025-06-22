@@ -14,6 +14,7 @@ class SocialPrint extends Model
     use DocumentModel;
 
     const MORPH_NAME = 'social_print';
+    const DOC_TYPE = 'socialPrint';
 
     protected $fillable = [
         'employee_id',
@@ -37,7 +38,7 @@ class SocialPrint extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this->employee)) {
+        if (!$loggedInUser->can('setDocs', [$this->employee, 'socialPrint'])) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 

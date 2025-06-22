@@ -9,7 +9,8 @@ class SkillsQualification extends Model
 {
     use DocumentModel;
 
-    const MORPH_NAME = 'skill_qualification';
+    const MORPH_NAME = 'skills_qualification';
+    const DOC_TYPE = 'skillsQualification';
 
     protected $fillable = [
         'employee_id',

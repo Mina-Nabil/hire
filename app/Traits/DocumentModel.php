@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use App\Exceptions\AppException;
+use App\Models\Base\DocManager;
 use App\Models\Personel\Employee;
 use App\Models\Users\User;
 use Carbon\Carbon;
@@ -12,6 +13,19 @@ use Illuminate\Support\Facades\Storage;
 
 trait DocumentModel
 {
+    /**
+     * Get the document name from DocManager based on DOC_TYPE constant
+     * 
+     * @return string|null
+     */
+    public function getDocumentNameAttribute()
+    {
+        if (defined('static::DOC_TYPE') && static::DOC_TYPE) {
+            $docManager = DocManager::where('doc_type', static::DOC_TYPE)->first();
+            return $docManager ? $docManager->name : null;
+        }
+        return null;
+    }
 
     public function getFileExtensionAttribute()
     {

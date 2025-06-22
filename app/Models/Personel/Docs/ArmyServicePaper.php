@@ -10,6 +10,7 @@ class ArmyServicePaper extends Model
     use DocumentModel;
 
     const MORPH_NAME = 'army_service_paper';
+    const DOC_TYPE = 'armyServicePaper';
 
     const TYPE_COPY = 'Copy';
     const TYPE_VERIFIED_COPY = 'Verified Copy';

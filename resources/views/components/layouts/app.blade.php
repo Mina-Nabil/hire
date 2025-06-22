@@ -375,6 +375,12 @@
                                         href="{{ url('/banks') }}">Banks</a>
                                 </li>
                             @endcan
+                            @can('viewAny', App\Models\Base\DocManager::class)
+                                <li>
+                                    <a class="{{ request()->routeIs('document-manager') ? 'active' : '' }}"
+                                        href="{{ url('/document-manager') }}">Document Manager</a>
+                                </li>
+                            @endcan
                             @can('viewAny', App\Models\Attendance\Bus::class)
                                 <li>
                                     <a class="{{ request()->routeIs('buses') ? 'active' : '' }}"

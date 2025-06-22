@@ -14,6 +14,7 @@ class PoliceRecord extends Model
     use DocumentModel;
 
     const MORPH_NAME = 'police_record';
+    const DOC_TYPE = 'policeRecord';
 
     protected $fillable = [
         'employee_id',
@@ -40,7 +41,7 @@ class PoliceRecord extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this->employee)) {
+        if (!$loggedInUser->can('setDocs', [$this->employee, 'policeRecord'])) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 

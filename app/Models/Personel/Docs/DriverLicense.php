@@ -10,6 +10,7 @@ class DriverLicense extends Model
     use DocumentModel;
 
     const MORPH_NAME = 'driver_license';
+    const DOC_TYPE = 'driverLicense';
 
     protected $fillable = [
         'employee_id',

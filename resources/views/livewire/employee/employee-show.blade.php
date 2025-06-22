@@ -1,5 +1,5 @@
 <div>
-    @can('setDocs', $employee)
+    @can('setDocs', [$employee, 'idCard'])
         <div class="flex justify-between flex-wrap items-center">
             <div class="md:mb-6 mb-4 flex space-x-3 rtl:space-x-reverse">
                 <div>
@@ -49,7 +49,7 @@
                         <li wire:click="changeSection('info')"
                             class="block py-[8px] p-6  {{ $section == 'info' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                Information
+                                {{ $this->getDocumentName('employeeInfo', 'Employee Info') }}
 
                                 @if ($section == 'info')
                                     <div class="flex-none">
@@ -62,11 +62,11 @@
                                 @endif
                             </div>
                         </li>
-
+                        @if ($this->isDocActive('idCard'))
                         <li wire:click="changeSection('id_card')"
                             class="block py-[8px] p-6  {{ $section == 'id_card' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                ID Card
+                                {{ $this->getDocumentName('idCard', 'ID Card') }}
                                 <span>
                                     @if ($employee->checkIDCardStatus()['status'] === 'valid')
                                         <span
@@ -95,11 +95,13 @@
                                 @endif
                             </div>
                         </li>
+                        @endif
 
+                        @if ($this->isDocActive('birthCertificate'))
                         <li wire:click="changeSection('birth_certificate')"
                             class="block py-[8px] p-6  {{ $section == 'birth_certificate' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                Birth Certificate
+                                {{ $this->getDocumentName('birthCertificate', 'Birth Certificate') }}
                                 <span>
                                     @if ($employee->checkBirthCertificateStatus()['status'] === 'valid')
                                         <span
@@ -128,11 +130,13 @@
                                 @endif
                             </div>
                         </li>
+                        @endif
 
+                        @if ($this->isDocActive('armyServicePaper'))
                         <li wire:click="changeSection('army_service_paper')"
                             class="block py-[8px] p-6  {{ $section == 'army_service_paper' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                Army Service Paper
+                                {{ $this->getDocumentName('armyServicePaper', 'Army Service Paper') }}
                                 <span>
                                     @if ($employee->checkArmyServicePaperStatus()['status'] === 'valid')
                                         <span
@@ -161,11 +165,13 @@
                                 @endif
                             </div>
                         </li>
+                        @endif
 
+                        @if ($this->isDocActive('driverLicense'))
                         <li wire:click="changeSection('driver_license')"
                             class="block py-[8px] p-6  {{ $section == 'driver_license' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                Driver License
+                                {{ $this->getDocumentName('driverLicense', 'Driver License') }}
                                 <span>
                                     @if ($employee->checkDriverLicenseStatus()['status'] === 'valid')
                                         <span
@@ -194,11 +200,13 @@
                                 @endif
                             </div>
                         </li>
+                        @endif
 
+                        @if ($this->isDocActive('employeeContract'))
                         <li wire:click="changeSection('employee_contract')"
                             class="block py-[8px] p-6  {{ $section == 'employee_contract' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                Employee Contract
+                                {{ $this->getDocumentName('employeeContract', 'Employee Contract') }}
                                 <span>
                                     @if ($employee->checkContractStatus()['status'] === 'valid')
                                         <span
@@ -227,11 +235,13 @@
                                 @endif
                             </div>
                         </li>
+                        @endif
 
+                        @if ($this->isDocActive('employeeS1Doc'))
                         <li wire:click="changeSection('employee_s1_doc')"
                             class="block py-[8px] p-6  {{ $section == 'employee_s1_doc' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                Employee S1 Doc
+                                {{ $this->getDocumentName('employeeS1Doc', 'Employee S1 Doc') }}
                                 <span>
 
                                     @if ($employee->checkS1DocStatus()['status'] === 'valid')
@@ -261,11 +271,13 @@
                                 @endif
                             </div>
                         </li>
+                        @endif
 
+                        @if ($this->isDocActive('employeeS2Doc'))
                         <li wire:click="changeSection('employee_s2_doc')"
                             class="block py-[8px] p-6  {{ $section == 'employee_s2_doc' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                Employee S2 Doc
+                                {{ $this->getDocumentName('employeeS2Doc', 'Employee S2 Doc') }}
                                 <span>
                                     @if ($employee->checkS2DocsStatus()['status'] === 'valid')
                                         <span
@@ -294,11 +306,13 @@
                                 @endif
                             </div>
                         </li>
+                        @endif
 
+                        @if ($this->isDocActive('employeeS6Doc'))
                         <li wire:click="changeSection('employee_s6_doc')"
                             class="block py-[8px] p-6  {{ $section == 'employee_s6_doc' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                Employee S6 Doc
+                                {{ $this->getDocumentName('employeeS6Doc', 'Employee S6 Doc') }}
                                 <span>
                                     @if ($employee->checkS6DocsStatus()['status'] === 'valid')
                                         <span
@@ -327,11 +341,13 @@
                                 @endif
                             </div>
                         </li>
+                        @endif
 
+                        @if ($this->isDocActive('policeRecord'))
                         <li wire:click="changeSection('police_record')"
                             class="block py-[8px] p-6  {{ $section == 'police_record' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                Police Record
+                                {{ $this->getDocumentName('policeRecord', 'Police Record') }}
                                 <span>
                                     @if ($employee->checkPoliceRecordStatus()['status'] === 'valid')
                                         <span
@@ -359,11 +375,13 @@
                                 @endif
                             </div>
                         </li>
+                        @endif
 
+                        @if ($this->isDocActive('hrLetter'))
                         <li wire:click="changeSection('hr_letter')"
                             class="block py-[8px] p-6  {{ $section == 'hr_letter' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                HR Letter
+                                {{ $this->getDocumentName('hrLetter', 'HR Letter') }}
                                 <span>
                                     @if ($employee->checkHrLettersStatus()['status'] === 'valid')
                                         <span
@@ -392,11 +410,13 @@
                                 @endif
                             </div>
                         </li>
+                        @endif
 
+                        @if ($this->isDocActive('medicalRecord'))
                         <li wire:click="changeSection('medical_record')"
                             class="block py-[8px] p-6  {{ $section == 'medical_record' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                Medical Record
+                                {{ $this->getDocumentName('medicalRecord', 'Medical Record') }}
                                 <span>
                                     @if ($employee->checkMedicalRecordStatus()['status'] === 'valid')
                                         <span
@@ -425,11 +445,13 @@
                                 @endif
                             </div>
                         </li>
+                        @endif
 
+                        @if ($this->isDocActive('externalMedicalRecord'))
                         <li wire:click="changeSection('external_medical_record')"
                             class="block py-[8px] p-6  {{ $section == 'external_medical_record' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                External Medical Record
+                                {{ $this->getDocumentName('externalMedicalRecord', 'External Medical Record') }}
                                 <span>
                                     @if ($employee->checkExternalMedicalRecordStatus()['status'] === 'valid')
                                         <span
@@ -458,11 +480,13 @@
                                 @endif
                             </div>
                         </li>
+                        @endif
 
+                        @if ($this->isDocActive('practiceCard'))
                         <li wire:click="changeSection('practice_card')"
                             class="block py-[8px] p-6  {{ $section == 'practice_card' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                Practice Card
+                                {{ $this->getDocumentName('practiceCard', 'Practice Card') }}
                                 <span>
                                     @if ($employee->checkPracticeCardStatus() === 'valid')
                                         <span
@@ -491,12 +515,13 @@
                                 @endif
                             </div>
                         </li>
+                        @endif
 
+                        @if ($this->isDocActive('skillsQualification'))
                         <li wire:click="changeSection('skills_qualification')"
                             class="block py-[8px] p-6  {{ $section == 'skills_qualification' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                Skills Qualification
-
+                                {{ $this->getDocumentName('skillsQualification', 'Skills Qualification') }}
                                 <span>
                                     @if ($employee->checkSkillsQualificationStatus() === 'valid')
                                         <span
@@ -525,12 +550,13 @@
                                 @endif
                             </div>
                         </li>
+                        @endif
 
+                        @if ($this->isDocActive('syndicateCard'))
                         <li wire:click="changeSection('syndicate_card')"
                             class="block py-[8px] p-6  {{ $section == 'syndicate_card' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                Syndicate Card
-
+                                {{ $this->getDocumentName('syndicateCard', 'Syndicate Card') }}
                                 <span>
                                     @if ($employee->checkSyndicateCardStatus() === 'valid')
                                         <span
@@ -559,11 +585,13 @@
                                 @endif
                             </div>
                         </li>
+                        @endif
 
+                        @if ($this->isDocActive('workDeclaration'))
                         <li wire:click="changeSection('work_declaration')"
                             class="block py-[8px] p-6  {{ $section == 'work_declaration' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                Work Declaration
+                                {{ $this->getDocumentName('workDeclaration', 'Work Declaration') }}
                                 <span>
                                     @if ($employee->checkWorkDeclarationStatus()['status'] === 'valid')
                                         <span
@@ -592,12 +620,13 @@
                                 @endif
                             </div>
                         </li>
+                        @endif
 
+                        @if ($this->isDocActive('labourDocument'))
                         <li wire:click="changeSection('labour_document')"
                             class="block py-[8px] p-6  {{ $section == 'labour_document' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                Labour Document
-
+                                {{ $this->getDocumentName('labourDocument', 'Labour Document') }}
                                 <span>
                                     @if ($employee->labourDocument)
                                         <span
@@ -619,12 +648,13 @@
                                 @endif
                             </div>
                         </li>
+                        @endif
 
+                        @if ($this->isDocActive('collegeCertificate'))
                         <li wire:click="changeSection('college_certificate')"
                             class="block py-[8px] p-6  {{ $section == 'college_certificate' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                College Certificate
-
+                                {{ $this->getDocumentName('collegeCertificate', 'College Certificate') }}
                                 <span>
                                     @if ($employee->collegeCertificate)
                                         <span
@@ -646,12 +676,13 @@
                                 @endif
                             </div>
                         </li>
+                        @endif
 
+                        @if ($this->isDocActive('socialPrint'))
                         <li wire:click="changeSection('social_print')"
                             class="block py-[8px] p-6  {{ $section == 'social_print' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                Social Print
-
+                                {{ $this->getDocumentName('socialPrint', 'Social Print') }}
                                 <span>
                                     @if ($employee->socialPrint)
                                         <span
@@ -673,11 +704,13 @@
                                 @endif
                             </div>
                         </li>
+                        @endif
 
+                        @if ($this->isDocActive('otherDocument'))
                         <li wire:click="changeSection('other_documents')"
                             class="block py-[8px] p-6  {{ $section == 'other_documents' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                             <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                Other Documents
+                                {{ $this->getDocumentName('otherDocument', 'Other Documents') }}
                                 <span>
                                     @if ($employee->otherDocuments->count() > 0)
                                         <span
@@ -699,6 +732,7 @@
                                 @endif
                             </div>
                         </li>
+                        @endif
 
                     </ul>
                     <!-- END: FIles Card -->
@@ -740,7 +774,7 @@
                                 </ul>
                             </div>
 
-                            @can('setDocs', $employee)
+                            @can('setDocs', [$employee, 'idCard'])
                                 @if (!$employee->idCard)
                                     <button type="button" class="text-slate-900 dark:text-white"
                                         wire:click="openEditBaseInfoModal">
@@ -831,7 +865,7 @@
                             Employee Information
                         </h4>
 
-                        @can('setDocs', $employee)
+                        @can('setDocs', [$employee, 'employeeInfo'])
                             <button type="button" class="text-slate-900 dark:text-white"
                                 wire:click="openEditEmployeeInfoModal">
                                 <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
@@ -896,7 +930,7 @@
                             ID Card Information
                         </h4>
 
-                        @can('setDocs', $employee)
+                        @can('setDocs', [$employee, 'idCard'])
                             <button type="button" class="text-slate-900 dark:text-white"
                                 wire:click="openEditIdCardModal">
                                 <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
@@ -975,7 +1009,7 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No ID Card Document Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload an ID card document for this employee</p>
-                                @can('setDocs', $employee)
+                                @can('setDocs', [$employee, 'idCard'])
                                     <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                         wire:click="openEditIdCardModal">
                                         <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
@@ -995,7 +1029,7 @@
                             Birth Certificate Information
                         </h4>
 
-                        @can('setDocs', $employee)
+                        @can('setDocs', [$employee, 'birthCertificate'])
                             <button type="button" class="text-slate-900 dark:text-white"
                                 wire:click="openEditBirthCertificateModal">
                                 <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
@@ -1085,7 +1119,7 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No Birth Certificate Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload a birth certificate for this employee</p>
-                                @can('setDocs', $employee)
+                                @can('setDocs', [$employee, 'birthCertificate'])
                                     <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                         wire:click="openEditBirthCertificateModal">
                                         <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
@@ -1105,7 +1139,7 @@
                             Army Service Paper Information
                         </h4>
 
-                        @can('setDocs', $employee)
+                        @can('setDocs', [$employee, 'armyServicePaper'])
                             <button type="button" class="text-slate-900 dark:text-white"
                                 wire:click="openEditArmyServicePaperModal">
                                 <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
@@ -1191,7 +1225,7 @@
                                 <h5 class="text-xl font-semibold mb-4">No Army Service Paper Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload an army service paper for this employee
                                 </p>
-                                @can('setDocs', $employee)
+                                @can('setDocs', [$employee, 'armyServicePaper'])
                                     <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                         wire:click="openEditArmyServicePaperModal">
                                         <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
@@ -1211,7 +1245,7 @@
                             Driver License Information
                         </h4>
 
-                        @can('setDocs', $employee)
+                        @can('setDocs', [$employee, 'driverLicense'])
                             <button type="button" class="text-slate-900 dark:text-white"
                                 wire:click="openEditDriverLicenseModal">
                                 <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
@@ -1287,7 +1321,7 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No Driver License Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload a driver license for this employee</p>
-                                @can('setDocs', $employee)
+                                @can('setDocs', [$employee, 'driverLicense'])
                                     <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                         wire:click="openEditDriverLicenseModal">
                                         <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
@@ -1307,7 +1341,7 @@
                             Employee Contract Information
                         </h4>
 
-                        @can('setDocs', $employee)
+                        @can('setDocs', [$employee, 'employeeContract'])
                             <button wire:click="openEditEmployeeContractModal" class="action-btn" type="button">
                                 <iconify-icon icon="heroicons:plus"></iconify-icon>
                             </button>
@@ -1320,7 +1354,7 @@
                                     <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
                                         <h5 class="card-title text-slate-900 dark:text-white">Contract - Issue Date
                                             {{ $contract->issue_date }}</h5>
-                                        @can('setDocs', $employee)
+                                        @can('setDocs', [$employee, 'employeeContract'])
                                             <div class="flex space-x-3 rtl:space-x-reverse">
                                                 <button wire:click="openEditSpecificContractModal({{ $contract->id }})"
                                                     class="action-btn" type="button">
@@ -1399,7 +1433,7 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No Employee Contracts Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload a contract for this employee</p>
-                                @can('setDocs', $employee)
+                                @can('setDocs', [$employee, 'employeeContract'])
                                     <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                         wire:click="openEditEmployeeContractModal">
                                         <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
@@ -1419,7 +1453,7 @@
                             Employee S6 Doc Information
                         </h4>
 
-                        @can('setDocs', $employee)
+                        @can('setDocs', [$employee, 'employeeS6Doc'])
                             <button type="button" class="text-slate-900 dark:text-white"
                                 wire:click="openEditEmployeeS6DocModal">
                                 <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
@@ -1432,7 +1466,7 @@
                                 <div class="card mb-5">
                                     <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
                                         <h5 class="card-title text-slate-900 dark:text-white">S6 Document</h5>
-                                        @can('setDocs', $employee)
+                                        @can('setDocs', [$employee, 'employeeS6Doc'])
                                             <div class="flex space-x-3 rtl:space-x-reverse">
                                                 <button type="button" class="text-slate-900 dark:text-white"
                                                     wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to delete this S6 document?',color:'danger',callback:'deleteEmployeeS6DocModal',params:{{ $s6Doc->id }}})">
@@ -1536,7 +1570,7 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No S6 Documents Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload an S6 document for this employee</p>
-                                @can('setDocs', $employee)
+                                @can('setDocs', [$employee, 'employeeS6Doc'])
                                     <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                         wire:click="openEditEmployeeS6DocModal">
                                         <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
@@ -1556,7 +1590,7 @@
                             Police Record Information
                         </h4>
 
-                        @can('setDocs', $employee)
+                        @can('setDocs', [$employee, 'policeRecord'])
                             <button wire:click="openEditPoliceRecordModal" class="action-btn" type="button">
                                 <iconify-icon icon="heroicons:plus"></iconify-icon>
                             </button>
@@ -1570,7 +1604,7 @@
                                         <h5 class="card-title text-slate-900 dark:text-white">Police Record - Issue
                                             Date
                                             {{ $record->issue_date }}</h5>
-                                        @can('setDocs', $employee)
+                                        @can('setDocs', [$employee, 'policeRecord'])
                                             <div class="flex space-x-3 rtl:space-x-reverse">
                                                 <button
                                                     wire:click="openEditSpecificPoliceRecordModal({{ $record->id }})"
@@ -1650,7 +1684,7 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No Police Records Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload a police record for this employee</p>
-                                @can('setDocs', $employee)
+                                @can('setDocs', [$employee, 'policeRecord'])
                                     <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                         wire:click="openEditPoliceRecordModal">
                                         <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
@@ -1670,7 +1704,7 @@
                             HR Letter Information
                         </h4>
 
-                        @can('setDocs', $employee)
+                        @can('setDocs', [$employee, 'hrLetter'])
                             <button wire:click="openEditHrLetterModal" class="action-btn" type="button">
                                 <iconify-icon icon="heroicons:plus"></iconify-icon>
                             </button>
@@ -1683,7 +1717,7 @@
                                     <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
                                         <h5 class="card-title text-slate-900 dark:text-white">HR Letter - Issue Date
                                             {{ $letter->issue_date }}</h5>
-                                        @can('setDocs', $employee)
+                                        @can('setDocs', [$employee, 'hrLetter'])
                                             <div class="flex space-x-3 rtl:space-x-reverse">
                                                 <button wire:click="openEditSpecificHrLetterModal({{ $letter->id }})"
                                                     class="action-btn" type="button">
@@ -1762,7 +1796,7 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No HR Letters Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload an HR letter for this employee</p>
-                                @can('setDocs', $employee)
+                                @can('setDocs', [$employee, 'hrLetter'])
                                     <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                         wire:click="openEditHrLetterModal">
                                         <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
@@ -1782,7 +1816,7 @@
                             Work Declaration Information
                         </h4>
 
-                        @can('setDocs', $employee)
+                        @can('setDocs', [$employee, 'workDeclaration'])
                             <button wire:click="openEditWorkDeclarationModal" class="action-btn" type="button">
                                 <iconify-icon icon="heroicons:plus"></iconify-icon>
                             </button>
@@ -1796,7 +1830,7 @@
                                         <h5 class="card-title text-slate-900 dark:text-white">Work Declaration - Issue
                                             Date
                                             {{ $declaration->issue_date }}</h5>
-                                        @can('setDocs', $employee)
+                                        @can('setDocs', [$employee, 'workDeclaration'])
                                             <div class="flex space-x-3 rtl:space-x-reverse">
                                                 <button
                                                     wire:click="openEditSpecificWorkDeclarationModal({{ $declaration->id }})"
@@ -1877,7 +1911,7 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No Work Declarations Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload a Work Declaration for this employee</p>
-                                @can('setDocs', $employee)
+                                @can('setDocs', [$employee, 'workDeclaration'])
                                     <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                         wire:click="openEditWorkDeclarationModal">
                                         <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
@@ -1897,7 +1931,7 @@
                             Employee S1 Doc Information
                         </h4>
 
-                        @can('setDocs', $employee)
+                        @can('setDocs', [$employee, 'employeeS1Doc'])
                             <button type="button" class="text-slate-900 dark:text-white"
                                 wire:click="openEditEmployeeS1DocModal">
                                 <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
@@ -1979,7 +2013,7 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No Employee S1 Doc Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload an S1 document for this employee</p>
-                                @can('setDocs', $employee)
+                                @can('setDocs', [$employee, 'employeeS1Doc'])
                                     <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                         wire:click="openEditEmployeeS1DocModal">
                                         <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
@@ -1999,7 +2033,7 @@
                             Employee S2 Doc Information
                         </h4>
 
-                        @can('setDocs', $employee)
+                        @can('setDocs', [$employee, 'employeeS2Doc'])
                             <button wire:click="openEditEmployeeS2DocModal" class="action-btn" type="button">
                                 <iconify-icon icon="heroicons:plus"></iconify-icon>
                             </button>
@@ -2025,7 +2059,7 @@
                                     <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
                                         <h5 class="card-title text-slate-900 dark:text-white">S2 Doc - Year
                                             {{ $s2Doc->year }}</h5>
-                                        @can('setDocs', $employee)
+                                        @can('setDocs', [$employee, 'employeeS2Doc'])
                                             <div class="flex space-x-3 rtl:space-x-reverse">
                                                 <button wire:click="openEditSpecificS2DocModal({{ $s2Doc->id }})"
                                                     class="action-btn" type="button">
@@ -2114,7 +2148,7 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No Employee S2 Docs Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload an S2 document for this employee</p>
-                                @can('setDocs', $employee)
+                                @can('setDocs', [$employee, 'employeeS2Doc'])
                                     <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                         wire:click="openEditEmployeeS2DocModal">
                                         <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
@@ -2134,7 +2168,7 @@
                             Medical Record Information
                         </h4>
 
-                        @can('setDocs', $employee)
+                        @can('setDocs', [$employee, 'medicalRecord'])
                             <button wire:click="openEditMedicalRecordModal" class="action-btn" type="button">
                                 <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
                             </button>
@@ -2248,7 +2282,7 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No Medical Record Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload a medical record for this employee</p>
-                                @can('setDocs', $employee)
+                                @can('setDocs', [$employee, 'medicalRecord'])
                                     <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                         wire:click="openEditMedicalRecordModal">
                                         <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
@@ -2271,7 +2305,7 @@
                             External Medical Record
                         </h4>
 
-                        @can('setDocs', $employee)
+                        @can('setDocs', [$employee, 'externalMedicalRecord'])
                             <button wire:click="openEditExternalMedicalRecordModal" class="action-btn" type="button">
                                 <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
                             </button>
@@ -2356,7 +2390,7 @@
                             <h5 class="text-xl font-semibold mb-4">No External Medical Record Found</h5>
                             <p class="text-slate-500 mb-5">Please upload an external medical record for this employee
                             </p>
-                            @can('setDocs', $employee)
+                            @can('setDocs', [$employee, 'externalMedicalRecord'])
                                 <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                     wire:click="openEditExternalMedicalRecordModal">
                                     <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
@@ -2376,7 +2410,7 @@
                             Practice Card
                         </h4>
 
-                        @can('setDocs', $employee)
+                        @can('setDocs', [$employee, 'practiceCard'])
                             <button wire:click="openEditPracticeCardModal" class="action-btn" type="button">
                                 <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
                             </button>
@@ -2452,7 +2486,7 @@
                             </div>
                             <h5 class="text-xl font-semibold mb-4">No Practice Card Found</h5>
                             <p class="text-slate-500 mb-5">Please upload a practice card for this employee</p>
-                            @can('setDocs', $employee)
+                            @can('setDocs', [$employee, 'practiceCard'])
                                 <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                     wire:click="openEditPracticeCardModal">
                                     <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
@@ -2472,7 +2506,7 @@
                             Skills Qualification
                         </h4>
 
-                        @can('setDocs', $employee)
+                        @can('setDocs', [$employee, 'skillsQualification'])
                             <button wire:click="openEditSkillsQualificationModal" class="action-btn" type="button">
                                 <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
                             </button>
@@ -2551,7 +2585,7 @@
                             </div>
                             <h5 class="text-xl font-semibold mb-4">No Skills Qualification Found</h5>
                             <p class="text-slate-500 mb-5">Please upload a skills qualification for this employee</p>
-                            @can('setDocs', $employee)
+                            @can('setDocs', [$employee, 'skillsQualification'])
                                 <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                     wire:click="openEditSkillsQualificationModal">
                                     <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
@@ -2571,7 +2605,7 @@
                             Syndicate Card
                         </h4>
 
-                        @can('setDocs', $employee)
+                        @can('setDocs', [$employee, 'syndicateCard'])
                             <button wire:click="openEditSyndicateCardModal" class="action-btn" type="button">
                                 <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
                             </button>
@@ -2647,7 +2681,7 @@
                             </div>
                             <h5 class="text-xl font-semibold mb-4">No Syndicate Card Found</h5>
                             <p class="text-slate-500 mb-5">Please upload a syndicate card for this employee</p>
-                            @can('setDocs', $employee)
+                            @can('setDocs', [$employee, 'syndicateCard'])
                                 <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                     wire:click="openEditSyndicateCardModal">
                                     <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
@@ -2667,7 +2701,7 @@
                             Labour Document
                         </h4>
 
-                        @can('setDocs', $employee)
+                        @can('setDocs', [$employee, 'labourDocument'])
                             <button wire:click="openEditLabourDocumentModal" class="action-btn" type="button">
                                 <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
                             </button>
@@ -2737,7 +2771,7 @@
                             </div>
                             <h5 class="text-xl font-semibold mb-4">No Labour Document Found</h5>
                             <p class="text-slate-500 mb-5">Please upload a labour document for this employee</p>
-                            @can('setDocs', $employee)
+                            @can('setDocs', [$employee, 'labourDocument'])
                                 <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                     wire:click="openEditLabourDocumentModal">
                                     <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
@@ -2757,7 +2791,7 @@
                             College Certificate
                         </h4>
 
-                        @can('setDocs', $employee)
+                        @can('setDocs', [$employee, 'collegeCertificate'])
                             <button wire:click="openEditCollegeCertificateModal" class="action-btn" type="button">
                                 <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
                             </button>
@@ -2827,7 +2861,7 @@
                             </div>
                             <h5 class="text-xl font-semibold mb-4">No College Certificate Found</h5>
                             <p class="text-slate-500 mb-5">Please upload a college certificate for this employee</p>
-                            @can('setDocs', $employee)
+                            @can('setDocs', [$employee, 'collegeCertificate'])
                                 <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                     wire:click="openEditCollegeCertificateModal">
                                     <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
@@ -2847,7 +2881,7 @@
                             Social Print
                         </h4>
 
-                        @can('setDocs', $employee)
+                        @can('setDocs', [$employee, 'socialPrint'])
                             <button wire:click="openEditSocialPrintModal" class="action-btn" type="button">
                                 <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
                             </button>
@@ -2917,7 +2951,7 @@
                             </div>
                             <h5 class="text-xl font-semibold mb-4">No Social Print Found</h5>
                             <p class="text-slate-500 mb-5">Please upload a social print for this employee</p>
-                            @can('setDocs', $employee)
+                            @can('setDocs', [$employee, 'socialPrint'])
                                 <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                     wire:click="openEditSocialPrintModal">
                                     <iconify-icon icon="lets-icons:download-circle" width="18" height="18"
@@ -2936,7 +2970,7 @@
                             Other Documents
                         </h4>
 
-                        @can('setDocs', $employee)
+                        @can('setDocs', [$employee, 'otherDocument'])
                             <button wire:click="openEditOtherDocumentModal" class="action-btn" type="button">
                                 <iconify-icon icon="heroicons:plus"></iconify-icon>
                             </button>
@@ -2949,7 +2983,7 @@
                                     <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
                                         <h5 class="card-title text-slate-900 dark:text-white">{{ $document->name }} - Issue
                                             Date {{ $document->issue_date }}</h5>
-                                        @can('setDocs', $employee)
+                                        @can('setDocs', [$employee, 'otherDocument'])
                                             <div class="flex space-x-3 rtl:space-x-reverse">
                                                 <button
                                                     wire:click="openEditSpecificOtherDocumentModal({{ $document->id }})"
@@ -3028,7 +3062,7 @@
                                 </div>
                                 <h5 class="text-xl font-semibold mb-4">No Other Documents Found</h5>
                                 <p class="text-slate-500 mb-5">Please upload other documents for this employee</p>
-                                @can('setDocs', $employee)
+                                @can('setDocs', [$employee, 'otherDocument'])
                                     <button type="button" class="btn btn-dark btn-sm inline-flex justify-center"
                                         wire:click="openEditOtherDocumentModal">
                                         <iconify-icon icon="lets-icons:download-circle" width="18" height="18"

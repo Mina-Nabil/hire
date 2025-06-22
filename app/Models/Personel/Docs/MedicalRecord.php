@@ -10,6 +10,7 @@ class MedicalRecord extends Model
     use DocumentModel;
 
     const MORPH_NAME = 'medical_record';
+    const DOC_TYPE = 'medicalRecord';
 
     const STATUS_NOT_COVERED = 'Not Covered';
     const STATUS_EXAMINATION = 'Examination';

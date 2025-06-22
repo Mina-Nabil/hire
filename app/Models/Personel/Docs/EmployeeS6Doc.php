@@ -10,6 +10,7 @@ class EmployeeS6Doc extends Model
     use DocumentModel;
 
     const MORPH_NAME = 'employee_s6_doc';
+    const DOC_TYPE = 'employeeS6Doc';
 
     const REASON_RESIGNATION = 'Resignation';
     const REASON_NOT_SHOWING_UP = 'Not showing up';

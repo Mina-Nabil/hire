@@ -10,6 +10,7 @@ class SyndicateCard extends Model
     use DocumentModel;
 
     const MORPH_NAME = 'syndicate_card';
+    const DOC_TYPE = 'syndicateCard';
 
     protected $fillable = [
         'employee_id',

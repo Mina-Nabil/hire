@@ -11,6 +11,7 @@ class IDCard extends Model
     use DocumentModel;
 
     const MORPH_NAME = 'id_card';
+    const DOC_TYPE = 'idCard';
 
     protected $table = 'id_cards';
 

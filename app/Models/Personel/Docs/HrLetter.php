@@ -15,6 +15,7 @@ class HrLetter extends Model
     use DocumentModel;
 
     const MORPH_NAME = 'hr_letter';
+    const DOC_TYPE = 'hrLetter';
 
     protected $fillable = [
         'employee_id',
@@ -41,7 +42,7 @@ class HrLetter extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this->employee)) {
+        if (!$loggedInUser->can('setDocs', [$this->employee, 'hrLetter'])) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 

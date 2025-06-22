@@ -11,6 +11,7 @@ class EmployeeS1Doc extends Model
     use DocumentModel;
 
     const MORPH_NAME = 'employee_s1_doc';
+    const DOC_TYPE = 'employeeS1Doc';
 
     protected $fillable = [
         'employee_id',

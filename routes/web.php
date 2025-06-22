@@ -15,6 +15,7 @@ use App\Http\Controllers\Hierarchy\OrganizationController;
 use App\Livewire\Home\Calendar;
 use App\Livewire\Base\BankIndex;
 use App\Livewire\Base\BusIndex;
+use App\Livewire\Base\DocManagerIndex;
 use App\Livewire\Base\ImportData;
 use App\Livewire\Base\InsuranceOfficeIndex;
 use App\Livewire\Base\LocationIndex;
@@ -92,6 +93,7 @@ Route::group(['middleware' => ['auth', 'type:admin|hr']], function () {
     Route::get('/recruitment/applicants/success', ApplicantSuccess::class)->name('applicants.success');
 
     Route::get('/banks', BankIndex::class)->name('banks');
+    Route::get('/document-manager', DocManagerIndex::class)->name('document-manager');
     Route::get('/buses', BusIndex::class)->name('buses');
     Route::get('/insurance-offices', InsuranceOfficeIndex::class)->name('insurance-offices');
 

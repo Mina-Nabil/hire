@@ -14,6 +14,7 @@ class OtherDocument extends Model
     use DocumentModel;
 
     const MORPH_NAME = 'other_document';
+    const DOC_TYPE = 'otherDocument';
 
     protected $fillable = [
         'employee_id',
@@ -39,7 +40,7 @@ class OtherDocument extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this->employee)) {
+        if (!$loggedInUser->can('setDocs', [$this->employee, 'otherDocument'])) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
         

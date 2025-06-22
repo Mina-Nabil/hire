@@ -111,10 +111,85 @@ class EmployeePolicy
     /**
      * Determine whether the user can set employee docs.
      */
-    public function setDocs(User $user, $doc = null): bool
+    public function setDocs(User $user, Employee $employee, $docType = null): bool
     {
-        $employeeCanUpload = !$doc;
-        return $user->is_admin || $user->is_hr || $employeeCanUpload;
+        $employeeCanUpload = false;
+
+        switch ($docType) {
+            case 'armyServicePaper':
+                $employeeCanUpload = !$employee->armyServicePaper()->exists();
+                break;
+            case 'birthCertificate':
+                $employeeCanUpload = !$employee->birthCertificate()->exists();
+                break;
+            case 'idCard':
+                $employeeCanUpload = !$employee->idCard()->exists();
+                break;
+            case 'driverLicense':
+                $employeeCanUpload = !$employee->driverLicense()->exists();
+                break;
+            case 'employeeContract':
+                $employeeCanUpload = !$employee->contracts()->exists();
+                break;
+            case 'employeeS1Doc':
+                $employeeCanUpload = !$employee->employeeS1Doc()->exists();
+                break;
+            case 'employeeS2Doc':
+                $employeeCanUpload = !$employee->employeeS2Doc()->exists();
+                break;
+            case 'employeeS6Doc':
+                $employeeCanUpload = !$employee->employeeS6Doc()->exists();
+                break;
+            case 'policeRecord':
+                $employeeCanUpload = !$employee->policeRecords()->exists();
+                break;
+            case 'hrLetter':
+                // Employees can never upload HR letters
+                $employeeCanUpload = false;
+                break;
+            case 'medicalRecord':
+                $employeeCanUpload = !$employee->medicalRecord()->exists();
+                break;
+            case 'externalMedicalRecord':
+                $employeeCanUpload = !$employee->externalMedicalRecord()->exists();
+                break;
+            case 'practiceCard':
+                $employeeCanUpload = !$employee->practiceCard()->exists();
+                break;
+            case 'skillsQualification':
+                $employeeCanUpload = !$employee->skillsQualifications()->exists();
+                break;
+            case 'syndicateCard':
+                $employeeCanUpload = !$employee->syndicateCard()->exists();
+                break;
+            case 'workDeclaration':
+                $employeeCanUpload = !$employee->workDeclarations()->exists();
+                break;
+            case 'labourDocument':
+                $employeeCanUpload = !$employee->labourDocument()->exists();
+                break;
+            case 'collegeCertificate':
+                $employeeCanUpload = !$employee->collegeCertificate()->exists();
+                break;
+            case 'socialPrint':
+                $employeeCanUpload = !$employee->socialPrint()->exists();
+                break;
+            case 'otherDocument':
+                $employeeCanUpload = !$employee->otherDocuments()->exists();
+                break;
+            case 'bankAccount':
+                $employeeCanUpload = !$employee->bankAccounts()->exists();
+                break;
+            default:
+                $employeeCanUpload = false;
+        }
+
+        // Only allow employee if they are uploading the first instance
+        if ($user->is_admin || $user->is_hr) {
+            return true;
+        }
+        // For employees, only allow if $employeeCanUpload is true
+        return $employeeCanUpload;
     }
 
     /**

@@ -10,6 +10,7 @@ class ExternalMedicalRecord extends Model
     use DocumentModel;
     
     const MORPH_NAME = 'external_medical_record';
+    const DOC_TYPE = 'externalMedicalRecord';
 
     protected $fillable = [
         'employee_id',

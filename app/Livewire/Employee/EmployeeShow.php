@@ -3,6 +3,7 @@
 namespace App\Livewire\Employee;
 
 use App\Exceptions\AppException;
+use App\Models\Base\DocManager;
 use App\Models\Base\InsuranceOffice;
 use App\Models\Personel\Docs\ArmyServicePaper;
 use App\Models\Personel\Docs\BirthCertificate;
@@ -30,6 +31,31 @@ class EmployeeShow extends Component
     public function changeSection($section)
     {
         $this->section = $section;
+    }
+
+    /**
+     * Get document name from DocManager
+     * 
+     * @param string $docType
+     * @param string $fallback
+     * @return string
+     */
+    public function getDocumentName($docType, $fallback = null)
+    {
+        $docManager = DocManager::where('doc_type', $docType)->first();
+        return $docManager ? $docManager->name : ($fallback ?: $docType);
+    }
+
+    public function isDocRequired($docType)
+    {
+        $docManager = DocManager::where('doc_type', $docType)->first();
+        return $docManager ? $docManager->is_required : true;
+    }
+
+    public function isDocActive($docType)
+    {
+        $docManager = DocManager::where('doc_type', $docType)->first();
+        return $docManager ? $docManager->is_active : true;
     }
 
     protected $queryString = ['section'];

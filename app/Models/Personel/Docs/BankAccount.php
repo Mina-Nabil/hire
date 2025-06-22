@@ -11,6 +11,7 @@ class BankAccount extends Model
     use DocumentModel;
 
     const MORPH_NAME = 'bank_account';
+    const DOC_TYPE = 'bankAccount';
 
     protected $fillable = [
         'employee_id',

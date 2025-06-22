@@ -14,6 +14,7 @@ class WorkDeclaration extends Model
     use DocumentModel;
 
     const MORPH_NAME = 'work_declaration';
+    const DOC_TYPE = 'workDeclaration';
 
     protected $fillable = [
         'employee_id',
@@ -40,7 +41,7 @@ class WorkDeclaration extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this->employee)) {
+        if (!$loggedInUser->can('setDocs', [$this->employee, 'workDeclaration'])) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 

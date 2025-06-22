@@ -10,6 +10,7 @@ class BirthCertificate extends Model
     use DocumentModel;
 
     const MORPH_NAME = 'birth_certificate';
+    const DOC_TYPE = 'birthCertificate';
 
     const TYPE_COPY = 'Copy';
     const TYPE_VERIFIED_COPY = 'Verified Copy';

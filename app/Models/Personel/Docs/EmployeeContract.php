@@ -13,6 +13,7 @@ class EmployeeContract extends Model
     use DocumentModel;
 
     const MORPH_NAME = 'employee_contract';
+    const DOC_TYPE = 'employeeContract';
 
     protected $fillable = [
         'employee_id',
@@ -51,7 +52,7 @@ class EmployeeContract extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this->employee)) {
+        if (!$loggedInUser->can('setDocs', $this->employee->employeeContract()->first())) {
             AppLog::error('Error updating employee contract', 'User: ' . $loggedInUser->name . ' tried to update a contract for employee: ' . $this->employee->name, loggable: $this);
             throw new AppException('You dont have permission to update docs for this employee');
         }

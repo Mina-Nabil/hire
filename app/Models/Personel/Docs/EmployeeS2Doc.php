@@ -13,6 +13,7 @@ class EmployeeS2Doc extends Model
     use DocumentModel;
 
     const MORPH_NAME = 'employee_s2_doc';
+    const DOC_TYPE = 'employeeS2Doc';
 
     protected $fillable = [
         'employee_id',
@@ -53,7 +54,7 @@ class EmployeeS2Doc extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this->employee)) {
+        if (!$loggedInUser->can('setDocs', $this->employee->employeeS2Doc()->first())) {
             AppLog::error('Error updating employee s2 doc', 'User: ' . $loggedInUser->name . ' tried to update a s2 doc for employee: ' . $this->employee->name, loggable: $this);
             throw new AppException('You dont have permission to update docs for this employee');
         }

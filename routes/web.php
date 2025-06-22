@@ -12,6 +12,7 @@ use App\Livewire\Settings\AreasIndex;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\UsersIndex;
 use App\Http\Controllers\Hierarchy\OrganizationController;
+use App\Http\Controllers\ZKDeviceController;
 use App\Livewire\Home\Calendar;
 use App\Livewire\Base\BankIndex;
 use App\Livewire\Base\BusIndex;
@@ -127,4 +128,8 @@ Route::group(['middleware' => 'guest'], function () {
     Route::get('/thank-you', function () {
         return view('thank-you');
     })->name('thank-you');
+
+    Route::get('/iclock/cdata', [ZKDeviceController::class, 'ping']);
+    Route::post('/iclock/cdata', [ZKDeviceController::class, 'attendance']);
+
 });

@@ -63,675 +63,675 @@
                             </div>
                         </li>
                         @if ($this->isDocActive('idCard'))
-                        <li wire:click="changeSection('id_card')"
-                            class="block py-[8px] p-6  {{ $section == 'id_card' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
-                            <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                {{ $this->getDocumentName('idCard', 'ID Card') }}
-                                <span>
-                                    @if ($employee->checkIDCardStatus()['status'] === 'valid')
-                                        <span
-                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
-                                    @elseif($employee->checkIDCardStatus()['status'] === 'near_expiry')
-                                        <span
-                                            class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
-                                            Expiry</span>
-                                    @elseif($employee->checkIDCardStatus()['status'] === 'expired')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
-                                    @elseif($employee->checkIDCardStatus()['status'] === 'missing')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
-                                    @endif
-                                </span>
+                            <li wire:click="changeSection('id_card')"
+                                class="block py-[8px] p-6  {{ $section == 'id_card' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
+                                <div class="flex justify-between space-x-2 rtl:space-x-reverse">
+                                    {{ $this->getDocumentName('idCard', 'ID Card') }}
+                                    <span>
+                                        @if ($employee->checkIDCardStatus()['status'] === 'valid')
+                                            <span
+                                                class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                        @elseif($employee->checkIDCardStatus()['status'] === 'near_expiry')
+                                            <span
+                                                class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
+                                                Expiry</span>
+                                        @elseif($employee->checkIDCardStatus()['status'] === 'expired')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                        @elseif($employee->checkIDCardStatus()['status'] === 'missing')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                        @endif
+                                    </span>
 
-                                @if ($section == 'id_card')
-                                    <div class="flex-none">
-                                        <button type="button"
-                                            class="text-xs text-slate-900 dark:text-white {{ $section == 'id_card' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
-                                            <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
-                                                height="25"></iconify-icon>
-                                        </button>
-                                    </div>
-                                @endif
-                            </div>
-                        </li>
+                                    @if ($section == 'id_card')
+                                        <div class="flex-none">
+                                            <button type="button"
+                                                class="text-xs text-slate-900 dark:text-white {{ $section == 'id_card' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
+                                                <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
+                                                    height="25"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    @endif
+                                </div>
+                            </li>
                         @endif
 
                         @if ($this->isDocActive('birthCertificate'))
-                        <li wire:click="changeSection('birth_certificate')"
-                            class="block py-[8px] p-6  {{ $section == 'birth_certificate' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
-                            <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                {{ $this->getDocumentName('birthCertificate', 'Birth Certificate') }}
-                                <span>
-                                    @if ($employee->checkBirthCertificateStatus()['status'] === 'valid')
-                                        <span
-                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
-                                    @elseif($employee->checkBirthCertificateStatus()['status'] === 'near_expiry')
-                                        <span
-                                            class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
-                                            Expiry</span>
-                                    @elseif($employee->checkBirthCertificateStatus()['status'] === 'expired')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
-                                    @elseif($employee->checkBirthCertificateStatus()['status'] === 'missing')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
-                                    @endif
-                                </span>
+                            <li wire:click="changeSection('birth_certificate')"
+                                class="block py-[8px] p-6  {{ $section == 'birth_certificate' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
+                                <div class="flex justify-between space-x-2 rtl:space-x-reverse">
+                                    {{ $this->getDocumentName('birthCertificate', 'Birth Certificate') }}
+                                    <span>
+                                        @if ($employee->checkBirthCertificateStatus()['status'] === 'valid')
+                                            <span
+                                                class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                        @elseif($employee->checkBirthCertificateStatus()['status'] === 'near_expiry')
+                                            <span
+                                                class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
+                                                Expiry</span>
+                                        @elseif($employee->checkBirthCertificateStatus()['status'] === 'expired')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                        @elseif($employee->checkBirthCertificateStatus()['status'] === 'missing')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                        @endif
+                                    </span>
 
-                                @if ($section == 'birth_certificate')
-                                    <div class="flex-none">
-                                        <button type="button"
-                                            class="text-xs text-slate-900 dark:text-white {{ $section == 'birth_certificate' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
-                                            <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
-                                                height="25"></iconify-icon>
-                                        </button>
-                                    </div>
-                                @endif
-                            </div>
-                        </li>
+                                    @if ($section == 'birth_certificate')
+                                        <div class="flex-none">
+                                            <button type="button"
+                                                class="text-xs text-slate-900 dark:text-white {{ $section == 'birth_certificate' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
+                                                <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
+                                                    height="25"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    @endif
+                                </div>
+                            </li>
                         @endif
 
                         @if ($this->isDocActive('armyServicePaper'))
-                        <li wire:click="changeSection('army_service_paper')"
-                            class="block py-[8px] p-6  {{ $section == 'army_service_paper' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
-                            <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                {{ $this->getDocumentName('armyServicePaper', 'Army Service Paper') }}
-                                <span>
-                                    @if ($employee->checkArmyServicePaperStatus()['status'] === 'valid')
-                                        <span
-                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
-                                    @elseif($employee->checkArmyServicePaperStatus()['status'] === 'near_expiry')
-                                        <span
-                                            class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
-                                            Expiry</span>
-                                    @elseif($employee->checkArmyServicePaperStatus()['status'] === 'expired')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
-                                    @elseif($employee->checkArmyServicePaperStatus()['status'] === 'missing')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
-                                    @endif
-                                </span>
+                            <li wire:click="changeSection('army_service_paper')"
+                                class="block py-[8px] p-6  {{ $section == 'army_service_paper' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
+                                <div class="flex justify-between space-x-2 rtl:space-x-reverse">
+                                    {{ $this->getDocumentName('armyServicePaper', 'Army Service Paper') }}
+                                    <span>
+                                        @if ($employee->checkArmyServicePaperStatus()['status'] === 'valid')
+                                            <span
+                                                class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                        @elseif($employee->checkArmyServicePaperStatus()['status'] === 'near_expiry')
+                                            <span
+                                                class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
+                                                Expiry</span>
+                                        @elseif($employee->checkArmyServicePaperStatus()['status'] === 'expired')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                        @elseif($employee->checkArmyServicePaperStatus()['status'] === 'missing')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                        @endif
+                                    </span>
 
-                                @if ($section == 'army_service_paper')
-                                    <div class="flex-none">
-                                        <button type="button"
-                                            class="text-xs text-slate-900 dark:text-white {{ $section == 'army_service_paper' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
-                                            <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
-                                                height="25"></iconify-icon>
-                                        </button>
-                                    </div>
-                                @endif
-                            </div>
-                        </li>
+                                    @if ($section == 'army_service_paper')
+                                        <div class="flex-none">
+                                            <button type="button"
+                                                class="text-xs text-slate-900 dark:text-white {{ $section == 'army_service_paper' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
+                                                <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
+                                                    height="25"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    @endif
+                                </div>
+                            </li>
                         @endif
 
                         @if ($this->isDocActive('driverLicense'))
-                        <li wire:click="changeSection('driver_license')"
-                            class="block py-[8px] p-6  {{ $section == 'driver_license' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
-                            <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                {{ $this->getDocumentName('driverLicense', 'Driver License') }}
-                                <span>
-                                    @if ($employee->checkDriverLicenseStatus()['status'] === 'valid')
-                                        <span
-                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
-                                    @elseif($employee->checkDriverLicenseStatus()['status'] === 'near_expiry')
-                                        <span
-                                            class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
-                                            Expiry</span>
-                                    @elseif($employee->checkDriverLicenseStatus()['status'] === 'expired')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
-                                    @elseif($employee->checkDriverLicenseStatus()['status'] === 'missing')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
-                                    @endif
-                                </span>
+                            <li wire:click="changeSection('driver_license')"
+                                class="block py-[8px] p-6  {{ $section == 'driver_license' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
+                                <div class="flex justify-between space-x-2 rtl:space-x-reverse">
+                                    {{ $this->getDocumentName('driverLicense', 'Driver License') }}
+                                    <span>
+                                        @if ($employee->checkDriverLicenseStatus()['status'] === 'valid')
+                                            <span
+                                                class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                        @elseif($employee->checkDriverLicenseStatus()['status'] === 'near_expiry')
+                                            <span
+                                                class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
+                                                Expiry</span>
+                                        @elseif($employee->checkDriverLicenseStatus()['status'] === 'expired')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                        @elseif($employee->checkDriverLicenseStatus()['status'] === 'missing')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                        @endif
+                                    </span>
 
-                                @if ($section == 'driver_license')
-                                    <div class="flex-none">
-                                        <button type="button"
-                                            class="text-xs text-slate-900 dark:text-white {{ $section == 'driver_license' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
-                                            <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
-                                                height="25"></iconify-icon>
-                                        </button>
-                                    </div>
-                                @endif
-                            </div>
-                        </li>
+                                    @if ($section == 'driver_license')
+                                        <div class="flex-none">
+                                            <button type="button"
+                                                class="text-xs text-slate-900 dark:text-white {{ $section == 'driver_license' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
+                                                <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
+                                                    height="25"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    @endif
+                                </div>
+                            </li>
                         @endif
 
                         @if ($this->isDocActive('employeeContract'))
-                        <li wire:click="changeSection('employee_contract')"
-                            class="block py-[8px] p-6  {{ $section == 'employee_contract' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
-                            <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                {{ $this->getDocumentName('employeeContract', 'Employee Contract') }}
-                                <span>
-                                    @if ($employee->checkContractStatus()['status'] === 'valid')
-                                        <span
-                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
-                                    @elseif($employee->checkContractStatus()['status'] === 'near_expiry')
-                                        <span
-                                            class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
-                                            Expiry</span>
-                                    @elseif($employee->checkContractStatus()['status'] === 'expired')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
-                                    @elseif($employee->checkContractStatus()['status'] === 'missing')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
-                                    @endif
-                                </span>
+                            <li wire:click="changeSection('employee_contract')"
+                                class="block py-[8px] p-6  {{ $section == 'employee_contract' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
+                                <div class="flex justify-between space-x-2 rtl:space-x-reverse">
+                                    {{ $this->getDocumentName('employeeContract', 'Employee Contract') }}
+                                    <span>
+                                        @if ($employee->checkContractStatus()['status'] === 'valid')
+                                            <span
+                                                class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                        @elseif($employee->checkContractStatus()['status'] === 'near_expiry')
+                                            <span
+                                                class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
+                                                Expiry</span>
+                                        @elseif($employee->checkContractStatus()['status'] === 'expired')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                        @elseif($employee->checkContractStatus()['status'] === 'missing')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                        @endif
+                                    </span>
 
-                                @if ($section == 'employee_contract')
-                                    <div class="flex-none">
-                                        <button type="button"
-                                            class="text-xs text-slate-900 dark:text-white {{ $section == 'employee_contract' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
-                                            <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
-                                                height="25"></iconify-icon>
-                                        </button>
-                                    </div>
-                                @endif
-                            </div>
-                        </li>
+                                    @if ($section == 'employee_contract')
+                                        <div class="flex-none">
+                                            <button type="button"
+                                                class="text-xs text-slate-900 dark:text-white {{ $section == 'employee_contract' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
+                                                <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
+                                                    height="25"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    @endif
+                                </div>
+                            </li>
                         @endif
 
                         @if ($this->isDocActive('employeeS1Doc'))
-                        <li wire:click="changeSection('employee_s1_doc')"
-                            class="block py-[8px] p-6  {{ $section == 'employee_s1_doc' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
-                            <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                {{ $this->getDocumentName('employeeS1Doc', 'Employee S1 Doc') }}
-                                <span>
+                            <li wire:click="changeSection('employee_s1_doc')"
+                                class="block py-[8px] p-6  {{ $section == 'employee_s1_doc' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
+                                <div class="flex justify-between space-x-2 rtl:space-x-reverse">
+                                    {{ $this->getDocumentName('employeeS1Doc', 'Employee S1 Doc') }}
+                                    <span>
 
-                                    @if ($employee->checkS1DocStatus()['status'] === 'valid')
-                                        <span
-                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
-                                    @elseif($employee->checkS1DocStatus()['status'] === 'near_expiry')
-                                        <span
-                                            class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
-                                            Expiry</span>
-                                    @elseif($employee->checkS1DocStatus()['status'] === 'expired')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
-                                    @elseif($employee->checkS1DocStatus()['status'] === 'missing')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                        @if ($employee->checkS1DocStatus()['status'] === 'valid')
+                                            <span
+                                                class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                        @elseif($employee->checkS1DocStatus()['status'] === 'near_expiry')
+                                            <span
+                                                class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
+                                                Expiry</span>
+                                        @elseif($employee->checkS1DocStatus()['status'] === 'expired')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                        @elseif($employee->checkS1DocStatus()['status'] === 'missing')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                        @endif
+                                    </span>
+
+                                    @if ($section == 'employee_s1_doc')
+                                        <div class="flex-none">
+                                            <button type="button"
+                                                class="text-xs text-slate-900 dark:text-white {{ $section == 'employee_s1_doc' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
+                                                <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
+                                                    height="25"></iconify-icon>
+                                            </button>
+                                        </div>
                                     @endif
-                                </span>
-
-                                @if ($section == 'employee_s1_doc')
-                                    <div class="flex-none">
-                                        <button type="button"
-                                            class="text-xs text-slate-900 dark:text-white {{ $section == 'employee_s1_doc' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
-                                            <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
-                                                height="25"></iconify-icon>
-                                        </button>
-                                    </div>
-                                @endif
-                            </div>
-                        </li>
+                                </div>
+                            </li>
                         @endif
 
                         @if ($this->isDocActive('employeeS2Doc'))
-                        <li wire:click="changeSection('employee_s2_doc')"
-                            class="block py-[8px] p-6  {{ $section == 'employee_s2_doc' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
-                            <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                {{ $this->getDocumentName('employeeS2Doc', 'Employee S2 Doc') }}
-                                <span>
-                                    @if ($employee->checkS2DocsStatus()['status'] === 'valid')
-                                        <span
-                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
-                                    @elseif($employee->checkS2DocsStatus()['status'] === 'near_expiry')
-                                        <span
-                                            class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
-                                            Expiry</span>
-                                    @elseif($employee->checkS2DocsStatus()['status'] === 'expired')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
-                                    @elseif($employee->checkS2DocsStatus()['status'] === 'missing')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
-                                    @endif
-                                </span>
+                            <li wire:click="changeSection('employee_s2_doc')"
+                                class="block py-[8px] p-6  {{ $section == 'employee_s2_doc' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
+                                <div class="flex justify-between space-x-2 rtl:space-x-reverse">
+                                    {{ $this->getDocumentName('employeeS2Doc', 'Employee S2 Doc') }}
+                                    <span>
+                                        @if ($employee->checkS2DocsStatus()['status'] === 'valid')
+                                            <span
+                                                class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                        @elseif($employee->checkS2DocsStatus()['status'] === 'near_expiry')
+                                            <span
+                                                class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
+                                                Expiry</span>
+                                        @elseif($employee->checkS2DocsStatus()['status'] === 'expired')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                        @elseif($employee->checkS2DocsStatus()['status'] === 'missing')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                        @endif
+                                    </span>
 
-                                @if ($section == 'employee_s2_doc')
-                                    <div class="flex-none">
-                                        <button type="button"
-                                            class="text-xs text-slate-900 dark:text-white {{ $section == 'employee_s2_doc' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
-                                            <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
-                                                height="25"></iconify-icon>
-                                        </button>
-                                    </div>
-                                @endif
-                            </div>
-                        </li>
+                                    @if ($section == 'employee_s2_doc')
+                                        <div class="flex-none">
+                                            <button type="button"
+                                                class="text-xs text-slate-900 dark:text-white {{ $section == 'employee_s2_doc' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
+                                                <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
+                                                    height="25"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    @endif
+                                </div>
+                            </li>
                         @endif
 
                         @if ($this->isDocActive('employeeS6Doc'))
-                        <li wire:click="changeSection('employee_s6_doc')"
-                            class="block py-[8px] p-6  {{ $section == 'employee_s6_doc' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
-                            <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                {{ $this->getDocumentName('employeeS6Doc', 'Employee S6 Doc') }}
-                                <span>
-                                    @if ($employee->checkS6DocsStatus()['status'] === 'valid')
-                                        <span
-                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
-                                    @elseif($employee->checkS6DocsStatus()['status'] === 'near_expiry')
-                                        <span
-                                            class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
-                                            Expiry</span>
-                                    @elseif($employee->checkS6DocsStatus()['status'] === 'expired')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
-                                    @elseif($employee->checkS6DocsStatus()['status'] === 'missing')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
-                                    @endif
-                                </span>
+                            <li wire:click="changeSection('employee_s6_doc')"
+                                class="block py-[8px] p-6  {{ $section == 'employee_s6_doc' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
+                                <div class="flex justify-between space-x-2 rtl:space-x-reverse">
+                                    {{ $this->getDocumentName('employeeS6Doc', 'Employee S6 Doc') }}
+                                    <span>
+                                        @if ($employee->checkS6DocsStatus()['status'] === 'valid')
+                                            <span
+                                                class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                        @elseif($employee->checkS6DocsStatus()['status'] === 'near_expiry')
+                                            <span
+                                                class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
+                                                Expiry</span>
+                                        @elseif($employee->checkS6DocsStatus()['status'] === 'expired')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                        @elseif($employee->checkS6DocsStatus()['status'] === 'missing')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                        @endif
+                                    </span>
 
-                                @if ($section == 'employee_s6_doc')
-                                    <div class="flex-none">
-                                        <button type="button"
-                                            class="text-xs text-slate-900 dark:text-white {{ $section == 'employee_s6_doc' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
-                                            <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
-                                                height="25"></iconify-icon>
-                                        </button>
-                                    </div>
-                                @endif
-                            </div>
-                        </li>
+                                    @if ($section == 'employee_s6_doc')
+                                        <div class="flex-none">
+                                            <button type="button"
+                                                class="text-xs text-slate-900 dark:text-white {{ $section == 'employee_s6_doc' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
+                                                <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
+                                                    height="25"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    @endif
+                                </div>
+                            </li>
                         @endif
 
                         @if ($this->isDocActive('policeRecord'))
-                        <li wire:click="changeSection('police_record')"
-                            class="block py-[8px] p-6  {{ $section == 'police_record' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
-                            <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                {{ $this->getDocumentName('policeRecord', 'Police Record') }}
-                                <span>
-                                    @if ($employee->checkPoliceRecordStatus()['status'] === 'valid')
-                                        <span
-                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
-                                    @elseif($employee->checkPoliceRecordStatus()['status'] === 'near_expiry')
-                                        <span
-                                            class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
-                                            Expiry</span>
-                                    @elseif($employee->checkPoliceRecordStatus()['status'] === 'expired')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
-                                    @elseif($employee->checkPoliceRecordStatus()['status'] === 'missing')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                            <li wire:click="changeSection('police_record')"
+                                class="block py-[8px] p-6  {{ $section == 'police_record' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
+                                <div class="flex justify-between space-x-2 rtl:space-x-reverse">
+                                    {{ $this->getDocumentName('policeRecord', 'Police Record') }}
+                                    <span>
+                                        @if ($employee->checkPoliceRecordStatus()['status'] === 'valid')
+                                            <span
+                                                class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                        @elseif($employee->checkPoliceRecordStatus()['status'] === 'near_expiry')
+                                            <span
+                                                class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
+                                                Expiry</span>
+                                        @elseif($employee->checkPoliceRecordStatus()['status'] === 'expired')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                        @elseif($employee->checkPoliceRecordStatus()['status'] === 'missing')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                        @endif
+                                    </span>
+                                    @if ($section == 'police_record')
+                                        <div class="flex-none">
+                                            <button type="button"
+                                                class="text-xs text-slate-900 dark:text-white {{ $section == 'police_record' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
+                                                <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
+                                                    height="25"></iconify-icon>
+                                            </button>
+                                        </div>
                                     @endif
-                                </span>
-                                @if ($section == 'police_record')
-                                    <div class="flex-none">
-                                        <button type="button"
-                                            class="text-xs text-slate-900 dark:text-white {{ $section == 'police_record' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
-                                            <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
-                                                height="25"></iconify-icon>
-                                        </button>
-                                    </div>
-                                @endif
-                            </div>
-                        </li>
+                                </div>
+                            </li>
                         @endif
 
                         @if ($this->isDocActive('hrLetter'))
-                        <li wire:click="changeSection('hr_letter')"
-                            class="block py-[8px] p-6  {{ $section == 'hr_letter' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
-                            <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                {{ $this->getDocumentName('hrLetter', 'HR Letter') }}
-                                <span>
-                                    @if ($employee->checkHrLettersStatus()['status'] === 'valid')
-                                        <span
-                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
-                                    @elseif($employee->checkHrLettersStatus()['status'] === 'near_expiry')
-                                        <span
-                                            class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
-                                            Expiry</span>
-                                    @elseif($employee->checkHrLettersStatus()['status'] === 'expired')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
-                                    @elseif($employee->checkHrLettersStatus()['status'] === 'missing')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
-                                    @endif
-                                </span>
+                            <li wire:click="changeSection('hr_letter')"
+                                class="block py-[8px] p-6  {{ $section == 'hr_letter' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
+                                <div class="flex justify-between space-x-2 rtl:space-x-reverse">
+                                    {{ $this->getDocumentName('hrLetter', 'HR Letter') }}
+                                    <span>
+                                        @if ($employee->checkHrLettersStatus()['status'] === 'valid')
+                                            <span
+                                                class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                        @elseif($employee->checkHrLettersStatus()['status'] === 'near_expiry')
+                                            <span
+                                                class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
+                                                Expiry</span>
+                                        @elseif($employee->checkHrLettersStatus()['status'] === 'expired')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                        @elseif($employee->checkHrLettersStatus()['status'] === 'missing')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                        @endif
+                                    </span>
 
-                                @if ($section == 'hr_letter')
-                                    <div class="flex-none">
-                                        <button type="button"
-                                            class="text-xs text-slate-900 dark:text-white {{ $section == 'hr_letter' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
-                                            <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
-                                                height="25"></iconify-icon>
-                                        </button>
-                                    </div>
-                                @endif
-                            </div>
-                        </li>
+                                    @if ($section == 'hr_letter')
+                                        <div class="flex-none">
+                                            <button type="button"
+                                                class="text-xs text-slate-900 dark:text-white {{ $section == 'hr_letter' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
+                                                <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
+                                                    height="25"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    @endif
+                                </div>
+                            </li>
                         @endif
 
                         @if ($this->isDocActive('medicalRecord'))
-                        <li wire:click="changeSection('medical_record')"
-                            class="block py-[8px] p-6  {{ $section == 'medical_record' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
-                            <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                {{ $this->getDocumentName('medicalRecord', 'Medical Record') }}
-                                <span>
-                                    @if ($employee->checkMedicalRecordStatus()['status'] === 'valid')
-                                        <span
-                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
-                                    @elseif($employee->checkMedicalRecordStatus()['status'] === 'near_expiry')
-                                        <span
-                                            class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
-                                            Expiry</span>
-                                    @elseif($employee->checkMedicalRecordStatus()['status'] === 'expired')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
-                                    @elseif($employee->checkMedicalRecordStatus()['status'] === 'missing')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
-                                    @endif
-                                </span>
+                            <li wire:click="changeSection('medical_record')"
+                                class="block py-[8px] p-6  {{ $section == 'medical_record' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
+                                <div class="flex justify-between space-x-2 rtl:space-x-reverse">
+                                    {{ $this->getDocumentName('medicalRecord', 'Medical Record') }}
+                                    <span>
+                                        @if ($employee->checkMedicalRecordStatus()['status'] === 'valid')
+                                            <span
+                                                class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                        @elseif($employee->checkMedicalRecordStatus()['status'] === 'near_expiry')
+                                            <span
+                                                class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
+                                                Expiry</span>
+                                        @elseif($employee->checkMedicalRecordStatus()['status'] === 'expired')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                        @elseif($employee->checkMedicalRecordStatus()['status'] === 'missing')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                        @endif
+                                    </span>
 
-                                @if ($section == 'medical_record')
-                                    <div class="flex-none">
-                                        <button type="button"
-                                            class="text-xs text-slate-900 dark:text-white {{ $section == 'medical_record' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
-                                            <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
-                                                height="25"></iconify-icon>
-                                        </button>
-                                    </div>
-                                @endif
-                            </div>
-                        </li>
+                                    @if ($section == 'medical_record')
+                                        <div class="flex-none">
+                                            <button type="button"
+                                                class="text-xs text-slate-900 dark:text-white {{ $section == 'medical_record' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
+                                                <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
+                                                    height="25"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    @endif
+                                </div>
+                            </li>
                         @endif
 
                         @if ($this->isDocActive('externalMedicalRecord'))
-                        <li wire:click="changeSection('external_medical_record')"
-                            class="block py-[8px] p-6  {{ $section == 'external_medical_record' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
-                            <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                {{ $this->getDocumentName('externalMedicalRecord', 'External Medical Record') }}
-                                <span>
-                                    @if ($employee->checkExternalMedicalRecordStatus()['status'] === 'valid')
-                                        <span
-                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
-                                    @elseif($employee->checkExternalMedicalRecordStatus()['status'] === 'near_expiry')
-                                        <span
-                                            class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
-                                            Expiry</span>
-                                    @elseif($employee->checkExternalMedicalRecordStatus()['status'] === 'expired')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
-                                    @elseif($employee->checkExternalMedicalRecordStatus()['status'] === 'missing')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
-                                    @endif
-                                </span>
+                            <li wire:click="changeSection('external_medical_record')"
+                                class="block py-[8px] p-6  {{ $section == 'external_medical_record' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
+                                <div class="flex justify-between space-x-2 rtl:space-x-reverse">
+                                    {{ $this->getDocumentName('externalMedicalRecord', 'External Medical Record') }}
+                                    <span>
+                                        @if ($employee->checkExternalMedicalRecordStatus()['status'] === 'valid')
+                                            <span
+                                                class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                        @elseif($employee->checkExternalMedicalRecordStatus()['status'] === 'near_expiry')
+                                            <span
+                                                class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
+                                                Expiry</span>
+                                        @elseif($employee->checkExternalMedicalRecordStatus()['status'] === 'expired')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                        @elseif($employee->checkExternalMedicalRecordStatus()['status'] === 'missing')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                        @endif
+                                    </span>
 
-                                @if ($section == 'external_medical_record')
-                                    <div class="flex-none">
-                                        <button type="button"
-                                            class="text-xs text-slate-900 dark:text-white {{ $section == 'external_medical_record' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
-                                            <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
-                                                height="25"></iconify-icon>
-                                        </button>
-                                    </div>
-                                @endif
-                            </div>
-                        </li>
+                                    @if ($section == 'external_medical_record')
+                                        <div class="flex-none">
+                                            <button type="button"
+                                                class="text-xs text-slate-900 dark:text-white {{ $section == 'external_medical_record' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
+                                                <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
+                                                    height="25"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    @endif
+                                </div>
+                            </li>
                         @endif
 
                         @if ($this->isDocActive('practiceCard'))
-                        <li wire:click="changeSection('practice_card')"
-                            class="block py-[8px] p-6  {{ $section == 'practice_card' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
-                            <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                {{ $this->getDocumentName('practiceCard', 'Practice Card') }}
-                                <span>
-                                    @if ($employee->checkPracticeCardStatus() === 'valid')
-                                        <span
-                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
-                                    @elseif($employee->checkPracticeCardStatus() === 'near_expiry')
-                                        <span
-                                            class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
-                                            Expiry</span>
-                                    @elseif($employee->checkPracticeCardStatus() === 'expired')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
-                                    @elseif($employee->checkPracticeCardStatus() === 'missing')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
-                                    @endif
-                                </span>
+                            <li wire:click="changeSection('practice_card')"
+                                class="block py-[8px] p-6  {{ $section == 'practice_card' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
+                                <div class="flex justify-between space-x-2 rtl:space-x-reverse">
+                                    {{ $this->getDocumentName('practiceCard', 'Practice Card') }}
+                                    <span>
+                                        @if ($employee->checkPracticeCardStatus() === 'valid')
+                                            <span
+                                                class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                        @elseif($employee->checkPracticeCardStatus() === 'near_expiry')
+                                            <span
+                                                class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
+                                                Expiry</span>
+                                        @elseif($employee->checkPracticeCardStatus() === 'expired')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                        @elseif($employee->checkPracticeCardStatus() === 'missing')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                        @endif
+                                    </span>
 
-                                @if ($section == 'practice_card')
-                                    <div class="flex-none">
-                                        <button type="button"
-                                            class="text-xs text-slate-900 dark:text-white {{ $section == 'practice_card' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
-                                            <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
-                                                height="25"></iconify-icon>
-                                        </button>
-                                    </div>
-                                @endif
-                            </div>
-                        </li>
+                                    @if ($section == 'practice_card')
+                                        <div class="flex-none">
+                                            <button type="button"
+                                                class="text-xs text-slate-900 dark:text-white {{ $section == 'practice_card' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
+                                                <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
+                                                    height="25"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    @endif
+                                </div>
+                            </li>
                         @endif
 
                         @if ($this->isDocActive('skillsQualification'))
-                        <li wire:click="changeSection('skills_qualification')"
-                            class="block py-[8px] p-6  {{ $section == 'skills_qualification' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
-                            <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                {{ $this->getDocumentName('skillsQualification', 'Skills Qualification') }}
-                                <span>
-                                    @if ($employee->checkSkillsQualificationStatus() === 'valid')
-                                        <span
-                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
-                                    @elseif($employee->checkSkillsQualificationStatus() === 'near_expiry')
-                                        <span
-                                            class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
-                                            Expiry</span>
-                                    @elseif($employee->checkSkillsQualificationStatus() === 'expired')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
-                                    @elseif($employee->checkSkillsQualificationStatus() === 'missing')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
-                                    @endif
-                                </span>
+                            <li wire:click="changeSection('skills_qualification')"
+                                class="block py-[8px] p-6  {{ $section == 'skills_qualification' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
+                                <div class="flex justify-between space-x-2 rtl:space-x-reverse">
+                                    {{ $this->getDocumentName('skillsQualification', 'Skills Qualification') }}
+                                    <span>
+                                        @if ($employee->checkSkillsQualificationStatus() === 'valid')
+                                            <span
+                                                class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                        @elseif($employee->checkSkillsQualificationStatus() === 'near_expiry')
+                                            <span
+                                                class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
+                                                Expiry</span>
+                                        @elseif($employee->checkSkillsQualificationStatus() === 'expired')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                        @elseif($employee->checkSkillsQualificationStatus() === 'missing')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                        @endif
+                                    </span>
 
-                                @if ($section == 'skills_qualification')
-                                    <div class="flex-none">
-                                        <button type="button"
-                                            class="text-xs text-slate-900 dark:text-white {{ $section == 'skills_qualification' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
-                                            <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
-                                                height="25"></iconify-icon>
-                                        </button>
-                                    </div>
-                                @endif
-                            </div>
-                        </li>
+                                    @if ($section == 'skills_qualification')
+                                        <div class="flex-none">
+                                            <button type="button"
+                                                class="text-xs text-slate-900 dark:text-white {{ $section == 'skills_qualification' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
+                                                <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
+                                                    height="25"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    @endif
+                                </div>
+                            </li>
                         @endif
 
                         @if ($this->isDocActive('syndicateCard'))
-                        <li wire:click="changeSection('syndicate_card')"
-                            class="block py-[8px] p-6  {{ $section == 'syndicate_card' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
-                            <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                {{ $this->getDocumentName('syndicateCard', 'Syndicate Card') }}
-                                <span>
-                                    @if ($employee->checkSyndicateCardStatus() === 'valid')
-                                        <span
-                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
-                                    @elseif($employee->checkSyndicateCardStatus() === 'near_expiry')
-                                        <span
-                                            class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
-                                            Expiry</span>
-                                    @elseif($employee->checkSyndicateCardStatus() === 'expired')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
-                                    @elseif($employee->checkSyndicateCardStatus() === 'missing')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
-                                    @endif
-                                </span>
+                            <li wire:click="changeSection('syndicate_card')"
+                                class="block py-[8px] p-6  {{ $section == 'syndicate_card' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
+                                <div class="flex justify-between space-x-2 rtl:space-x-reverse">
+                                    {{ $this->getDocumentName('syndicateCard', 'Syndicate Card') }}
+                                    <span>
+                                        @if ($employee->checkSyndicateCardStatus() === 'valid')
+                                            <span
+                                                class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                        @elseif($employee->checkSyndicateCardStatus() === 'near_expiry')
+                                            <span
+                                                class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
+                                                Expiry</span>
+                                        @elseif($employee->checkSyndicateCardStatus() === 'expired')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                        @elseif($employee->checkSyndicateCardStatus() === 'missing')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                        @endif
+                                    </span>
 
-                                @if ($section == 'syndicate_card')
-                                    <div class="flex-none">
-                                        <button type="button"
-                                            class="text-xs text-slate-900 dark:text-white {{ $section == 'syndicate_card' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
-                                            <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
-                                                height="25"></iconify-icon>
-                                        </button>
-                                    </div>
-                                @endif
-                            </div>
-                        </li>
+                                    @if ($section == 'syndicate_card')
+                                        <div class="flex-none">
+                                            <button type="button"
+                                                class="text-xs text-slate-900 dark:text-white {{ $section == 'syndicate_card' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
+                                                <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
+                                                    height="25"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    @endif
+                                </div>
+                            </li>
                         @endif
 
                         @if ($this->isDocActive('workDeclaration'))
-                        <li wire:click="changeSection('work_declaration')"
-                            class="block py-[8px] p-6  {{ $section == 'work_declaration' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
-                            <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                {{ $this->getDocumentName('workDeclaration', 'Work Declaration') }}
-                                <span>
-                                    @if ($employee->checkWorkDeclarationStatus()['status'] === 'valid')
-                                        <span
-                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
-                                    @elseif($employee->checkWorkDeclarationStatus()['status'] === 'near_expiry')
-                                        <span
-                                            class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
-                                            Expiry</span>
-                                    @elseif($employee->checkWorkDeclarationStatus()['status'] === 'expired')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
-                                    @elseif($employee->checkWorkDeclarationStatus()['status'] === 'missing')
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
-                                    @endif
-                                </span>
+                            <li wire:click="changeSection('work_declaration')"
+                                class="block py-[8px] p-6  {{ $section == 'work_declaration' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
+                                <div class="flex justify-between space-x-2 rtl:space-x-reverse">
+                                    {{ $this->getDocumentName('workDeclaration', 'Work Declaration') }}
+                                    <span>
+                                        @if ($employee->checkWorkDeclarationStatus()['status'] === 'valid')
+                                            <span
+                                                class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                        @elseif($employee->checkWorkDeclarationStatus()['status'] === 'near_expiry')
+                                            <span
+                                                class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize rounded-3xl">Near
+                                                Expiry</span>
+                                        @elseif($employee->checkWorkDeclarationStatus()['status'] === 'expired')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Expired</span>
+                                        @elseif($employee->checkWorkDeclarationStatus()['status'] === 'missing')
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                        @endif
+                                    </span>
 
-                                @if ($section == 'work_declaration')
-                                    <div class="flex-none">
-                                        <button type="button"
-                                            class="text-xs text-slate-900 dark:text-white {{ $section == 'work_declaration' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
-                                            <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
-                                                height="25"></iconify-icon>
-                                        </button>
-                                    </div>
-                                @endif
-                            </div>
-                        </li>
+                                    @if ($section == 'work_declaration')
+                                        <div class="flex-none">
+                                            <button type="button"
+                                                class="text-xs text-slate-900 dark:text-white {{ $section == 'work_declaration' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
+                                                <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
+                                                    height="25"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    @endif
+                                </div>
+                            </li>
                         @endif
 
                         @if ($this->isDocActive('labourDocument'))
-                        <li wire:click="changeSection('labour_document')"
-                            class="block py-[8px] p-6  {{ $section == 'labour_document' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
-                            <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                {{ $this->getDocumentName('labourDocument', 'Labour Document') }}
-                                <span>
-                                    @if ($employee->labourDocument)
-                                        <span
-                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
-                                    @else
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
-                                    @endif
-                                </span>
+                            <li wire:click="changeSection('labour_document')"
+                                class="block py-[8px] p-6  {{ $section == 'labour_document' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
+                                <div class="flex justify-between space-x-2 rtl:space-x-reverse">
+                                    {{ $this->getDocumentName('labourDocument', 'Labour Document') }}
+                                    <span>
+                                        @if ($employee->labourDocument)
+                                            <span
+                                                class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                        @else
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                        @endif
+                                    </span>
 
-                                @if ($section == 'labour_document')
-                                    <div class="flex-none">
-                                        <button type="button"
-                                            class="text-xs text-slate-900 dark:text-white {{ $section == 'labour_document' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
-                                            <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
-                                                height="25"></iconify-icon>
-                                        </button>
-                                    </div>
-                                @endif
-                            </div>
-                        </li>
+                                    @if ($section == 'labour_document')
+                                        <div class="flex-none">
+                                            <button type="button"
+                                                class="text-xs text-slate-900 dark:text-white {{ $section == 'labour_document' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
+                                                <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
+                                                    height="25"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    @endif
+                                </div>
+                            </li>
                         @endif
 
                         @if ($this->isDocActive('collegeCertificate'))
-                        <li wire:click="changeSection('college_certificate')"
-                            class="block py-[8px] p-6  {{ $section == 'college_certificate' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
-                            <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                {{ $this->getDocumentName('collegeCertificate', 'College Certificate') }}
-                                <span>
-                                    @if ($employee->collegeCertificate)
-                                        <span
-                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
-                                    @else
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
-                                    @endif
-                                </span>
+                            <li wire:click="changeSection('college_certificate')"
+                                class="block py-[8px] p-6  {{ $section == 'college_certificate' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
+                                <div class="flex justify-between space-x-2 rtl:space-x-reverse">
+                                    {{ $this->getDocumentName('collegeCertificate', 'College Certificate') }}
+                                    <span>
+                                        @if ($employee->collegeCertificate)
+                                            <span
+                                                class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                        @else
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                        @endif
+                                    </span>
 
-                                @if ($section == 'college_certificate')
-                                    <div class="flex-none">
-                                        <button type="button"
-                                            class="text-xs text-slate-900 dark:text-white {{ $section == 'college_certificate' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
-                                            <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
-                                                height="25"></iconify-icon>
-                                        </button>
-                                    </div>
-                                @endif
-                            </div>
-                        </li>
+                                    @if ($section == 'college_certificate')
+                                        <div class="flex-none">
+                                            <button type="button"
+                                                class="text-xs text-slate-900 dark:text-white {{ $section == 'college_certificate' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
+                                                <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
+                                                    height="25"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    @endif
+                                </div>
+                            </li>
                         @endif
 
                         @if ($this->isDocActive('socialPrint'))
-                        <li wire:click="changeSection('social_print')"
-                            class="block py-[8px] p-6  {{ $section == 'social_print' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
-                            <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                {{ $this->getDocumentName('socialPrint', 'Social Print') }}
-                                <span>
-                                    @if ($employee->socialPrint)
-                                        <span
-                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
-                                    @else
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
-                                    @endif
-                                </span>
+                            <li wire:click="changeSection('social_print')"
+                                class="block py-[8px] p-6  {{ $section == 'social_print' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
+                                <div class="flex justify-between space-x-2 rtl:space-x-reverse">
+                                    {{ $this->getDocumentName('socialPrint', 'Social Print') }}
+                                    <span>
+                                        @if ($employee->socialPrint)
+                                            <span
+                                                class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">Valid</span>
+                                        @else
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">Missing</span>
+                                        @endif
+                                    </span>
 
-                                @if ($section == 'social_print')
-                                    <div class="flex-none">
-                                        <button type="button"
-                                            class="text-xs text-slate-900 dark:text-white {{ $section == 'social_print' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
-                                            <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
-                                                height="25"></iconify-icon>
-                                        </button>
-                                    </div>
-                                @endif
-                            </div>
-                        </li>
+                                    @if ($section == 'social_print')
+                                        <div class="flex-none">
+                                            <button type="button"
+                                                class="text-xs text-slate-900 dark:text-white {{ $section == 'social_print' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
+                                                <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
+                                                    height="25"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    @endif
+                                </div>
+                            </li>
                         @endif
 
                         @if ($this->isDocActive('otherDocument'))
-                        <li wire:click="changeSection('other_documents')"
-                            class="block py-[8px] p-6  {{ $section == 'other_documents' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
-                            <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                {{ $this->getDocumentName('otherDocument', 'Other Documents') }}
-                                <span>
-                                    @if ($employee->otherDocuments->count() > 0)
-                                        <span
-                                            class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">{{ $employee->otherDocuments->count() }}</span>
-                                    @else
-                                        <span
-                                            class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">0</span>
-                                    @endif
-                                </span>
+                            <li wire:click="changeSection('other_documents')"
+                                class="block py-[8px] p-6  {{ $section == 'other_documents' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
+                                <div class="flex justify-between space-x-2 rtl:space-x-reverse">
+                                    {{ $this->getDocumentName('otherDocument', 'Other Documents') }}
+                                    <span>
+                                        @if ($employee->otherDocuments->count() > 0)
+                                            <span
+                                                class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize rounded-3xl">{{ $employee->otherDocuments->count() }}</span>
+                                        @else
+                                            <span
+                                                class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize rounded-3xl">0</span>
+                                        @endif
+                                    </span>
 
-                                @if ($section == 'other_documents')
-                                    <div class="flex-none">
-                                        <button type="button"
-                                            class="text-xs text-slate-900 dark:text-white {{ $section == 'other_documents' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
-                                            <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
-                                                height="25"></iconify-icon>
-                                        </button>
-                                    </div>
-                                @endif
-                            </div>
-                        </li>
+                                    @if ($section == 'other_documents')
+                                        <div class="flex-none">
+                                            <button type="button"
+                                                class="text-xs text-slate-900 dark:text-white {{ $section == 'other_documents' ? 'text-white' : 'text-slate-900 dark:text-white' }}">
+                                                <iconify-icon icon="mingcute:arrow-right-circle-fill" width="25"
+                                                    height="25"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    @endif
+                                </div>
+                            </li>
                         @endif
 
                     </ul>
@@ -1404,7 +1404,8 @@
 
                                                 <!-- Download Button -->
                                                 <div class="mt-3">
-                                                    <button wire:click="downloadEmployeeContract({{ $contract->id }})"
+                                                    <button
+                                                        wire:click="downloadEmployeeContract({{ $contract->id }})"
                                                         type="button" class="btn btn-dark btn-sm">
                                                         <span class="inline-flex items-center justify-center"
                                                             wire:loading.remove
@@ -1994,7 +1995,8 @@
                                                 <span class="inline-flex justify-center" wire:loading.remove
                                                     wire:target="downloadEmployeeS1Doc">
                                                     <iconify-icon icon="fluent:arrow-download-28-filled"
-                                                        class="mr-1" width="18" height="18"></iconify-icon>
+                                                        class="mr-1" width="18"
+                                                        height="18"></iconify-icon>
                                                     Download Document
                                                 </span>
                                                 <iconify-icon wire:loading wire:target="downloadEmployeeS1Doc"
@@ -2809,7 +2811,9 @@
                                     <!-- Document Preview -->
                                     <div class="col-span-3 flex justify-center items-center">
                                         @php
-                                            $fileExt = $this->getFileExtension($employee->collegeCertificate->file_path);
+                                            $fileExt = $this->getFileExtension(
+                                                $employee->collegeCertificate->file_path,
+                                            );
                                         @endphp
 
                                         @if ($fileExt == 'pdf')
@@ -2908,8 +2912,7 @@
                                                     width="100%" height="800" class="border-0"></iframe>
                                             </div>
                                         @else
-                                            <img src="{{ $employee->socialPrint->file_path }}"
-                                                alt="Social Print"
+                                            <img src="{{ $employee->socialPrint->file_path }}" alt="Social Print"
                                                 class="max-h-32 max-w-full rounded-md shadow-sm object-contain">
                                         @endif
                                     </div>
@@ -2981,7 +2984,8 @@
                             @foreach ($employee->otherDocuments as $document)
                                 <div class="card border border-slate-200 dark:border-slate-700 mb-5">
                                     <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
-                                        <h5 class="card-title text-slate-900 dark:text-white">{{ $document->name }} - Issue
+                                        <h5 class="card-title text-slate-900 dark:text-white">{{ $document->name }}
+                                            - Issue
                                             Date {{ $document->issue_date }}</h5>
                                         @can('setDocs', [$employee, 'otherDocument'])
                                             <div class="flex space-x-3 rtl:space-x-reverse">
@@ -3012,7 +3016,8 @@
                                                             height="800" class="border-0"></iframe>
                                                     </div>
                                                 @else
-                                                    <img src="{{ $document->file_path }}" alt="{{ $document->name }}"
+                                                    <img src="{{ $document->file_path }}"
+                                                        alt="{{ $document->name }}"
                                                         class="max-h-32 max-w-full rounded-md shadow-sm object-contain">
                                                 @endif
                                             </div>
@@ -3020,7 +3025,8 @@
                                             <!-- Document Info -->
                                             <div class="col-span-1 pl-4 space-y-2">
                                                 <div class="flex justify-between">
-                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Document Name:</span>
+                                                    <span class="text-sm text-slate-500 dark:text-slate-400">Document
+                                                        Name:</span>
                                                     <span class="text-sm font-medium">{{ $document->name }}</span>
                                                 </div>
                                                 <div class="flex justify-between">
@@ -3032,8 +3038,7 @@
 
                                                 <!-- Download Button -->
                                                 <div class="mt-3">
-                                                    <button
-                                                        wire:click="downloadOtherDocument({{ $document->id }})"
+                                                    <button wire:click="downloadOtherDocument({{ $document->id }})"
                                                         type="button" class="btn btn-dark btn-sm">
                                                         <span class="inline-flex items-center justify-center"
                                                             wire:loading.remove
@@ -6317,8 +6322,7 @@
         <div>
             <div id="editLabourDocumentModal"
                 class="modal fade fixed top-0 left-0 show w-full h-full outline-none overflow-x-hidden overflow-y-auto"
-                tabindex="-1" aria-labelledby="editLabourDocumentModalLabel" aria-hidden="true"
-                wire:ignore.self>
+                tabindex="-1" aria-labelledby="editLabourDocumentModalLabel" aria-hidden="true" wire:ignore.self>
                 <div class="modal-dialog relative w-auto pointer-events-none">
                     <div
                         class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
@@ -6520,7 +6524,8 @@
 
                                         @if (!$keep_existing_college_certificate)
                                             <div class="col-span-12">
-                                                <label for="college_certificate_file" class="form-label">College Certificate
+                                                <label for="college_certificate_file" class="form-label">College
+                                                    Certificate
                                                     <iconify-icon wire:loading wire:target="college_certificate_file"
                                                         icon="line-md:loading-twotone-loop" width="18"
                                                         height="18"></iconify-icon>
@@ -6625,8 +6630,7 @@
         <div>
             <div id="editSocialPrintModal"
                 class="modal fade fixed top-0 left-0 show w-full h-full outline-none overflow-x-hidden overflow-y-auto"
-                tabindex="-1" aria-labelledby="editSocialPrintModalLabel" aria-hidden="true"
-                wire:ignore.self>
+                tabindex="-1" aria-labelledby="editSocialPrintModalLabel" aria-hidden="true" wire:ignore.self>
                 <div class="modal-dialog relative w-auto pointer-events-none">
                     <div
                         class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
@@ -6742,8 +6746,7 @@
                                                 Date</label>
                                             <input type="date"
                                                 class="form-control @error('social_print_issue_date') !border-danger-500 @enderror"
-                                                id="social_print_issue_date"
-                                                wire:model="social_print_issue_date">
+                                                id="social_print_issue_date" wire:model="social_print_issue_date">
                                             @error('social_print_issue_date')
                                                 <span class="text-danger-500 text-sm">{{ $message }}</span>
                                             @enderror
@@ -6779,8 +6782,7 @@
         <div>
             <div id="editOtherDocumentModal"
                 class="modal fade fixed top-0 left-0 show w-full h-full outline-none overflow-x-hidden overflow-y-auto"
-                tabindex="-1" aria-labelledby="editOtherDocumentModalLabel" aria-hidden="true"
-                wire:ignore.self>
+                tabindex="-1" aria-labelledby="editOtherDocumentModalLabel" aria-hidden="true" wire:ignore.self>
                 <div class="modal-dialog relative w-auto pointer-events-none">
                     <div
                         class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
@@ -6837,7 +6839,7 @@
                                             <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
                                         @enderror
                                     </div>
-                                    
+
                                     @if (!$keep_existing_other_document)
                                         <div class="col-span-12">
                                             <label for="other_document_file" class="form-label">Other Document
@@ -6874,7 +6876,7 @@
                                                                     class="text-sm text-blue-500">View</a>
                                                             </small>
                                                         </div>
-                                                        
+
                                                         @if (!$keep_existing_other_document)
                                                             <label for="other_document_file_input"
                                                                 class="cursor-pointer block">
@@ -6886,9 +6888,8 @@
                                                                 <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF
                                                                     (Max
                                                                     2MB)</p>
-                                                                <input id="other_document_file_input"
-                                                                    type="file" class="hidden"
-                                                                    wire:model="other_document_file"
+                                                                <input id="other_document_file_input" type="file"
+                                                                    class="hidden" wire:model="other_document_file"
                                                                     accept=".pdf,.jpg,.jpeg,.png">
                                                             </label>
                                                         @endif
@@ -6912,11 +6913,12 @@
                                                 @endif
                                             </div>
                                             @error('other_document_file')
-                                                <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                                <span
+                                                    class="font-Inter text-sm text-danger-500">{{ $message }}</span>
                                             @enderror
                                         </div>
                                     @endif
-                                    
+
                                     <div class="col-span-12">
                                         <label for="other_document_issue_date" class="form-label">Issue
                                             Date</label>

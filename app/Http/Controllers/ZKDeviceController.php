@@ -27,6 +27,14 @@ class ZKDeviceController extends Controller
 
     public function attendance(Request $request)
     {
+        // Log all incoming data
+        Log::info('[ZKTeco Device Request]', [
+            'method' => $request->method(),
+            'query'  => $request->query(),
+            'body'   => $request->getContent(),
+            'all'    => $request->all()
+        ]);
+
         // Attendance Data (POST) - Usually contains `table=ATTLOG`
         // if ($request->isMethod('post')) {
         //     $table = $request->input('table');

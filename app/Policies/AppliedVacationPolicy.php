@@ -3,11 +3,27 @@
 namespace App\Policies;
 
 use App\Models\Benefits\Payrolls\AppliedVacation;
+use App\Models\Personel\Employee;
 use App\Models\Users\User;
 use Illuminate\Auth\Access\Response;
 
 class AppliedVacationPolicy
 {
+
+    public function viewAny(User $user): bool
+    {
+        return $user->is_admin || $user->is_hr;
+    }
+
+    public function apply(User $user, ?Employee $employee = null): bool
+    {
+        return $user->is_admin || $user->is_hr || $user->employee_id === $employee->id;
+    }
+    
+    public function applyForAny(User $user): bool
+    {
+        return $user->is_admin || $user->is_hr;
+    }
 
 
     /**

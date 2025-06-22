@@ -261,6 +261,7 @@ class Attendance extends Model
                 'creator_id' => $this->employee->user_id,
                 'date' => $startDate->format('Y-m-d'),
                 'status' => 'pending',
+                'admin_note' => 'Generated after attendance submission',
             ], [
                 'start_time' => $endDate->format('H:i'),
                 'end_time' => $endDate->format('H:i'),

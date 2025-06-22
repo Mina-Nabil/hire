@@ -9,10 +9,6 @@
                     <div class="alert alert-warning">
                         Your employee record was not found. Please contact HR.
                     </div>
-                @elseif (count($vacationBenefits) === 0)
-                    <div class="alert alert-info">
-                        You don't have any available vacation benefits or your balance is zero.
-                    </div>
                 @else
                     <form wire:submit.prevent="openConfirmModal">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5 mt-5">
@@ -20,10 +16,10 @@
                             <x-select wire:model.live="selectedEmployee" label="Employee*"
                                 errorMessage="{{ $errors->first('selectedEmployee') }}"
                                 class="w-full {{ $errors->has('selectedEmployee') ? '!border-danger-500' : '' }}">
-                                <option value="">-- Apply For one of your team members --</option>
-                                @foreach ($childrenEmployees as $employee)
-                                    <option value="{{ $employee->id }}">
-                                        {{ $employee->name }} - {{ $employee->position->name }}
+                                <option value="">-- Select Employee --</option>
+                                @foreach ($childrenEmployees as $e)
+                                    <option value="{{ $e->id }}">
+                                        {{ $e->name }}
                                     </option>
                                 @endforeach
                             </x-select>
@@ -103,14 +99,19 @@
                                 </div>
                             </div>
                         @endif
-
-                        <!-- Submit Button -->
-                        <div class="flex justify-end md:w-full">
-                            <x-primary-button type="submit" class="w-auto sm:w-full"
-                                loadingFunction="openConfirmModal">
-                                Review Application
-                            </x-primary-button>
-                        </div>
+                        @if (count($vacationBenefits) === 0)
+                            <div class="alert alert-info">
+                                Employee don't have any available vacation benefits or have no balance.
+                            </div>
+                        @else
+                            <!-- Submit Button -->
+                            <div class="flex justify-end md:w-full">
+                                <x-primary-button type="submit" class="w-auto sm:w-full"
+                                    loadingFunction="openConfirmModal">
+                                    Review Application
+                                </x-primary-button>
+                            </div>
+                        @endif
                     </form>
                 @endif
             </div>
@@ -187,8 +188,7 @@
                 <div class="mt-5 bg-yellow-50 p-3 rounded border border-yellow-200">
                     <p class="text-sm text-yellow-800">
                         <iconify-icon icon="mdi:information-outline" class="text-lg mr-1"></iconify-icon>
-                        Please confirm your vacation application. Once submitted, it will be pending approval from your
-                        supervisor.
+                        Please confirm vacation application. Once submitted, it will be pending approval from HR.
                     </p>
                 </div>
             </div>
@@ -208,12 +208,12 @@
         <!-- Vacation Benefits Info -->
         <div class="card mt-5">
             <div class="card-header mb-5">
-                <h4 class="card-title">My Vacation Benefits</h4>
+                <h4 class="card-title">Vacation Benefits</h4>
             </div>
             <div class="card-body px-6 pb-6">
                 @if (count($vacationBenefits) === 0)
                     <div class="alert alert-info">
-                        You don't have any vacation benefits.
+                        Employee don't have any vacation benefits.
                     </div>
                 @else
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-5">

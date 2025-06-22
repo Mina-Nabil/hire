@@ -82,7 +82,8 @@
                 <ul class="sidebar-menu">
 
                     <li>
-                        <a href="{{ url('/calendar') }}" class="navItem {{ request()->routeIs('calendar') ? 'active' : '' }}">
+                        <a href="{{ url('/calendar') }}"
+                            class="navItem {{ request()->routeIs('calendar') ? 'active' : '' }}">
                             <span class="flex items-center">
                                 <span>Calendar</span>
                             </span>
@@ -124,20 +125,7 @@
                                         Attendance Records</a>
                                 </li>
                             @endcan
-                            @can('viewAny', App\Models\Attendance\Attendance::class)
-                                <li>
-                                    <a class="{{ request()->routeIs('overtime.index') ? 'active' : '' }}"
-                                        href="{{ url('/attendance/overtime') }}">
-                                        Overtime Records</a>
-                                </li>
-                            @endcan
-                            @can('viewAny', App\Models\Attendance\Attendance::class)
-                                <li>
-                                    <a class="{{ request()->routeIs('applied-vacation.index') ? 'active' : '' }}"
-                                        href="{{ url('/attendance/applied-vacation') }}">
-                                        Applied Vacation Records</a>
-                                </li>
-                            @endcan
+
                             @can('viewAny', App\Models\Attendance\BusArrival::class)
                                 <li class="">
                                     <a href="javascript:void(0)" class="navItem">
@@ -173,6 +161,27 @@
                             <iconify-icon class="icon-arrow" icon="heroicons-outline:chevron-right"></iconify-icon>
                         </a>
                         <ul class="sidebar-submenu">
+                            @can('viewAny', App\Models\Benefits\Payrolls\AppliedVacation::class)
+                                <li>
+                                    <a class="{{ request()->routeIs('applied-vacation.index') ? 'active' : '' }}"
+                                        href="{{ url('/attendance/applied-vacation') }}">
+                                        Applied Vacations</a>
+                                </li>
+                            @endcan
+                            {{-- @can('viewAny', App\Models\Attendance\Attendance::class)
+                                <li>
+                                    <a class="{{ request()->routeIs('overtime.index') ? 'active' : '' }}"
+                                        href="{{ url('/attendance/overtime') }}">
+                                        Overtime Records</a>
+                                </li>
+                            @endcan --}}
+                            @can('applyForAny', App\Models\Benefits\Payrolls\AppliedVacation::class)
+                                <li>
+                                    <a class="{{ request()->routeIs('employee.apply-for-vacation') ? 'active' : '' }}"
+                                        href="{{ route('employee.apply-for-vacation') }}">
+                                        Add a Vacation</a>
+                                </li>
+                            @endcan
 
                             <li>
                                 <a href="{{ route('employees.requests.hr-letters.index') }}"

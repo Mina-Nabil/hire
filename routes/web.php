@@ -54,6 +54,11 @@ Route::group(['middleware' => ['auth', 'type:employee|hr|admin']], function () {
     Route::get('/recruitment/vacancies', VacancyIndex::class)->name('recruitment.vacancies');
 
     Route::get('/calendar', Calendar::class)->name('calendar');
+
+    Route::get('/logout', function () {
+        Auth::logout();
+        return redirect()->route('login');
+    });
 });
 
 Route::group(['middleware' => ['auth', 'type:admin|hr']], function () {
@@ -106,10 +111,7 @@ Route::group(['middleware' => ['auth', 'type:admin|hr']], function () {
 
     Route::get('/app-logs', AppLogIndex::class);
 
-    Route::get('/logout', function () {
-        Auth::logout();
-        return redirect()->route('login');
-    });
+
 
     Route::get('employees/requests/hr-letters', HrLetterRequests::class)->name('employees.requests.hr-letters.index');
     Route::get('employees/requests/overtime', OvertimeRequests::class)->name('employees.requests.overtime.index');

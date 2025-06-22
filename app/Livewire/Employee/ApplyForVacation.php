@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Employee;
 
+use App\Models\Benefits\Payrolls\AppliedVacation;
 use App\Models\Personel\Employee;
 use App\Models\Benefits\Vacations\VacationBenefit;
 use App\Traits\AlertFrontEnd;
@@ -11,7 +12,6 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\Auth;
 
-#[Layout('components.layouts.employee')]
 #[Title('Apply for Vacation')]
 class ApplyForVacation extends Component
 {
@@ -32,8 +32,19 @@ class ApplyForVacation extends Component
 
     public function mount()
     {
-        $this->employee = Employee::where('user_id', Auth::id())->first();
-        $this->childrenEmployees = $this->employee->childrenEmployees;
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        $this->employee = Employee::where('user_id', $loggedInUser->id)->first();
+
+
+        if ($loggedInUser->can('applyForAny', AppliedVacation::class)) {
+            $this->childrenEmployees = Employee::current()->get();
+            if (!$this->employee) {
+                $this->employee = $this->childrenEmployees->first();
+            }
+        } else {
+            $this->childrenEmployees = $this->employee->childrenEmployees;
+        }
 
         if ($this->employee) {
             $this->loadVacationBenefits();
@@ -199,8 +210,16 @@ class ApplyForVacation extends Component
 
     public function render()
     {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if ($loggedInUser->can('applyForAny', AppliedVacation::class)) {
+            $layout = 'components.layouts.app';
+        } else {
+            $layout = 'components.layouts.employee';
+        }
+
         return view('livewire.employee.apply-for-vacation', [
             'benefits' => 'active'
-        ]);
+        ])->layout($layout);
     }
 }

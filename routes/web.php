@@ -130,6 +130,6 @@ Route::group(['middleware' => 'guest'], function () {
     })->name('thank-you');
 
     Route::get('/iclock/cdata', [ZKDeviceController::class, 'ping']);
-    Route::post('/iclock/cdata', [ZKDeviceController::class, 'attendance']);
+    Route::match(['put', 'post'], '/iclock/cdata', [ZKDeviceController::class, 'attendance']);
 
 });

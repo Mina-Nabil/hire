@@ -15,6 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->validateCsrfTokens(except: [
+            'iclock/*',
+        ]);
+
         $middleware->alias([
             'type' => UserIsType::class,
             'auth-attendance-device' => AuthorizeAttendanceDevice::class,

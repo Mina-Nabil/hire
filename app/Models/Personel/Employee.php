@@ -876,7 +876,7 @@ class Employee extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs')) {
+        if (!$loggedInUser->can('setDocs', true)) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 
@@ -949,7 +949,7 @@ class Employee extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this)) {
+        if (!$loggedInUser->can('setDocs', $this->externalMedicalRecord()->first())) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 
@@ -1237,7 +1237,7 @@ class Employee extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs')) {
+        if (!$loggedInUser->can('setDocs', true)) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 
@@ -1274,7 +1274,7 @@ class Employee extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs')) {
+        if (!$loggedInUser->can('setDocs', true)) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 

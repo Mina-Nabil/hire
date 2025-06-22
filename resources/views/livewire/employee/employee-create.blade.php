@@ -291,7 +291,11 @@
                             <label for="id_card_file" class="form-label">ID Card Document
                                 <iconify-icon wire:loading wire:target="id_card_file"
                                     icon="line-md:loading-twotone-loop" width="18"
-                                    height="18"></iconify-icon></label>
+                                    height="18"></iconify-icon>
+                                @if (isset($applicantDocuments['id_card_url']) && $applicantDocuments['id_card_url'])
+                                    <span class="text-xs text-success-500 ml-2">(Loaded from applicant)</span>
+                                @endif
+                            </label>
                             <div class="border-2 border-dashed border-slate-200 rounded-md p-4 text-center">
                                 @if ($id_card_file)
                                     <div class="flex items-center justify-center mb-3">
@@ -299,9 +303,16 @@
                                             <iconify-icon icon="mingcute:file-pdf-fill" width="48" height="48"
                                                 class="text-red-500"></iconify-icon>
                                         @else
-                                            <img src="{{ $id_card_file->temporaryUrl() }}"
-                                                class="h-40 max-w-full rounded-md object-contain"
-                                                alt="ID Card Preview">
+                                            @if (method_exists($id_card_file, 'temporaryUrl'))
+                                                <img src="{{ $id_card_file->temporaryUrl() }}"
+                                                    class="h-40 max-w-full rounded-md object-contain"
+                                                    alt="ID Card Preview">
+                                            @else
+                                                <div class="h-40 w-full bg-slate-100 rounded-md flex items-center justify-center">
+                                                    <iconify-icon icon="mingcute:file-image-fill" width="48" height="48"
+                                                        class="text-slate-400"></iconify-icon>
+                                                </div>
+                                            @endif
                                         @endif
                                     </div>
                                     <p class="text-sm text-slate-500">
@@ -353,6 +364,164 @@
                                 class="form-control @error('id_expiry_date') !border-danger-500 @enderror"
                                 wire:model="id_expiry_date">
                             @error('id_expiry_date')
+                                <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Documents Section -->
+                <div class="bg-slate-50 dark:bg-slate-900 p-5 rounded-md col-span-2">
+                    <h5 class="font-medium text-xl text-slate-900 dark:text-white mb-5">
+                        Additional Documents
+                    </h5>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Birth Certificate -->
+                        <div>
+                            <label for="birth_certificate_file" class="form-label">Birth Certificate
+                                <iconify-icon wire:loading wire:target="birth_certificate_file"
+                                    icon="line-md:loading-twotone-loop" width="18" height="18"></iconify-icon>
+                                @if (isset($applicantDocuments['birth_certificate_url']) && $applicantDocuments['birth_certificate_url'])
+                                    <span class="text-xs text-success-500 ml-2">(Loaded from applicant)</span>
+                                @endif
+                            </label>
+                            <div class="border-2 border-dashed border-slate-200 rounded-md p-4 text-center">
+                                @if ($birth_certificate_file)
+                                    <div class="flex items-center justify-center mb-3">
+                                        @if (in_array($birth_certificate_file->getClientOriginalExtension(), ['pdf']))
+                                            <iconify-icon icon="mingcute:file-pdf-fill" width="48" height="48"
+                                                class="text-red-500"></iconify-icon>
+                                        @else
+                                            @if (method_exists($birth_certificate_file, 'temporaryUrl'))
+                                                <img src="{{ $birth_certificate_file->temporaryUrl() }}"
+                                                    class="h-32 max-w-full rounded-md object-contain"
+                                                    alt="Birth Certificate Preview">
+                                            @else
+                                                <div class="h-32 w-full bg-slate-100 rounded-md flex items-center justify-center">
+                                                    <iconify-icon icon="mingcute:file-image-fill" width="48" height="48"
+                                                        class="text-slate-400"></iconify-icon>
+                                                </div>
+                                            @endif
+                                        @endif
+                                    </div>
+                                    <p class="text-sm text-slate-500">
+                                        {{ $birth_certificate_file->getClientOriginalName() }}</p>
+                                    <button type="button" class="text-sm text-red-500 mt-2"
+                                        wire:click="$set('birth_certificate_file', null)">
+                                        Remove File
+                                    </button>
+                                @else
+                                    <label for="birth_certificate_file_input" class="cursor-pointer block">
+                                        <iconify-icon icon="mingcute:upload-line" width="32" height="32"
+                                            class="text-slate-400 mx-auto"></iconify-icon>
+                                        <p class="mt-2 text-sm text-slate-500">Click to upload or drag and drop</p>
+                                        <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF (Max 10MB)</p>
+                                        <input id="birth_certificate_file_input" type="file" class="hidden"
+                                            wire:model="birth_certificate_file" accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
+                                    </label>
+                                @endif
+                            </div>
+                            @error('birth_certificate_file')
+                                <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- College Certificate -->
+                        <div>
+                            <label for="college_certificate_file" class="form-label">College Certificate
+                                <iconify-icon wire:loading wire:target="college_certificate_file"
+                                    icon="line-md:loading-twotone-loop" width="18" height="18"></iconify-icon>
+                                @if (isset($applicantDocuments['college_certificate_url']) && $applicantDocuments['college_certificate_url'])
+                                    <span class="text-xs text-success-500 ml-2">(Loaded from applicant)</span>
+                                @endif
+                            </label>
+                            <div class="border-2 border-dashed border-slate-200 rounded-md p-4 text-center">
+                                @if ($college_certificate_file)
+                                    <div class="flex items-center justify-center mb-3">
+                                        @if (in_array($college_certificate_file->getClientOriginalExtension(), ['pdf']))
+                                            <iconify-icon icon="mingcute:file-pdf-fill" width="48" height="48"
+                                                class="text-red-500"></iconify-icon>
+                                        @else
+                                            @if (method_exists($college_certificate_file, 'temporaryUrl'))
+                                                <img src="{{ $college_certificate_file->temporaryUrl() }}"
+                                                    class="h-32 max-w-full rounded-md object-contain"
+                                                    alt="College Certificate Preview">
+                                            @else
+                                                <div class="h-32 w-full bg-slate-100 rounded-md flex items-center justify-center">
+                                                    <iconify-icon icon="mingcute:file-image-fill" width="48" height="48"
+                                                        class="text-slate-400"></iconify-icon>
+                                                </div>
+                                            @endif
+                                        @endif
+                                    </div>
+                                    <p class="text-sm text-slate-500">
+                                        {{ $college_certificate_file->getClientOriginalName() }}</p>
+                                    <button type="button" class="text-sm text-red-500 mt-2"
+                                        wire:click="$set('college_certificate_file', null)">
+                                        Remove File
+                                    </button>
+                                @else
+                                    <label for="college_certificate_file_input" class="cursor-pointer block">
+                                        <iconify-icon icon="mingcute:upload-line" width="32" height="32"
+                                            class="text-slate-400 mx-auto"></iconify-icon>
+                                        <p class="mt-2 text-sm text-slate-500">Click to upload or drag and drop</p>
+                                        <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF (Max 10MB)</p>
+                                        <input id="college_certificate_file_input" type="file" class="hidden"
+                                            wire:model="college_certificate_file" accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
+                                    </label>
+                                @endif
+                            </div>
+                            @error('college_certificate_file')
+                                <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- Army Certificate -->
+                        <div>
+                            <label for="army_certificate_file" class="form-label">Army Certificate
+                                <iconify-icon wire:loading wire:target="army_certificate_file"
+                                    icon="line-md:loading-twotone-loop" width="18" height="18"></iconify-icon>
+                                @if (isset($applicantDocuments['army_certificate_url']) && $applicantDocuments['army_certificate_url'])
+                                    <span class="text-xs text-success-500 ml-2">(Loaded from applicant)</span>
+                                @endif
+                            </label>
+                            <div class="border-2 border-dashed border-slate-200 rounded-md p-4 text-center">
+                                @if ($army_certificate_file)
+                                    <div class="flex items-center justify-center mb-3">
+                                        @if (in_array($army_certificate_file->getClientOriginalExtension(), ['pdf']))
+                                            <iconify-icon icon="mingcute:file-pdf-fill" width="48" height="48"
+                                                class="text-red-500"></iconify-icon>
+                                        @else
+                                            @if (method_exists($army_certificate_file, 'temporaryUrl'))
+                                                <img src="{{ $army_certificate_file->temporaryUrl() }}"
+                                                    class="h-32 max-w-full rounded-md object-contain"
+                                                    alt="Army Certificate Preview">
+                                            @else
+                                                <div class="h-32 w-full bg-slate-100 rounded-md flex items-center justify-center">
+                                                    <iconify-icon icon="mingcute:file-image-fill" width="48" height="48"
+                                                        class="text-slate-400"></iconify-icon>
+                                                </div>
+                                            @endif
+                                        @endif
+                                    </div>
+                                    <p class="text-sm text-slate-500">
+                                        {{ $army_certificate_file->getClientOriginalName() }}</p>
+                                    <button type="button" class="text-sm text-red-500 mt-2"
+                                        wire:click="$set('army_certificate_file', null)">
+                                        Remove File
+                                    </button>
+                                @else
+                                    <label for="army_certificate_file_input" class="cursor-pointer block">
+                                        <iconify-icon icon="mingcute:upload-line" width="32" height="32"
+                                            class="text-slate-400 mx-auto"></iconify-icon>
+                                        <p class="mt-2 text-sm text-slate-500">Click to upload or drag and drop</p>
+                                        <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF (Max 10MB)</p>
+                                        <input id="army_certificate_file_input" type="file" class="hidden"
+                                            wire:model="army_certificate_file" accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
+                                    </label>
+                                @endif
+                            </div>
+                            @error('army_certificate_file')
                                 <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
                             @enderror
                         </div>

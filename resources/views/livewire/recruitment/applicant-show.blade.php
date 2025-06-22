@@ -161,15 +161,178 @@
                 <div class="card">
                     <div class="card-header flex justify-between items-center">
                         <h5 class="card-title">Documents</h5>
-                        <button type="button" class="btn btn-primary btn-sm" wire:click="openDocumentUploadModal">
-                            <i class="fas fa-upload mr-1"></i> Upload Document
-                        </button>
+                        <div class="flex gap-2">
+                            <button type="button" class="btn btn-primary btn-sm"
+                                wire:click="openDocumentUploadModal">
+                                <i class="fas fa-upload mr-1"></i> Upload Document
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body">
-                        @if ($applicant->cv_url || ($applicant->documents && $applicant->documents->count() > 0))
-                            <div class="space-y-4">
-                                @if ($applicant->cv_url)
-                                    <div class="flex justify-between items-center p-3 border rounded-md">
+                        <div class="space-y-6">
+                            <!-- Official Documents Section -->
+                            <div>
+                                <h6 class="font-medium mb-4 text-lg">Official Documents</h6>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <!-- ID Card -->
+                                    <div class="border rounded-md p-4">
+                                        <div class="flex justify-between items-start mb-3">
+                                            <div class="flex items-center">
+                                                <div class="text-primary mr-3">
+                                                    <i class="fas fa-id-card text-xl"></i>
+                                                </div>
+                                                <div>
+                                                    <h6 class="font-medium">ID Card</h6>
+                                                    <p class="text-sm text-slate-500">National ID or Passport</p>
+                                                </div>
+                                            </div>
+                                            <div class="flex gap-2">
+                                                @if ($applicant->id_card_url)
+                                                    <a href="{{ $applicant->full_id_card_url }}" target="_blank"
+                                                        class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-download mr-1"></i> View
+                                                    </a>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger"
+                                                        wire:click="deleteIdCard">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                @else
+                                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                                        wire:click="openIdCardUploadModal">
+                                                        <i class="fas fa-upload mr-1"></i> Upload
+                                                    </button>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        @if ($applicant->id_card_url)
+                                            <div class="h-48 border rounded">
+                                                <iframe src="{{ $applicant->full_id_card_url }}" width="100%"
+                                                    height="100%"></iframe>
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    <!-- Birth Certificate -->
+                                    <div class="border rounded-md p-4">
+                                        <div class="flex justify-between items-start mb-3">
+                                            <div class="flex items-center">
+                                                <div class="text-primary mr-3">
+                                                    <i class="fas fa-certificate text-xl"></i>
+                                                </div>
+                                                <div>
+                                                    <h6 class="font-medium">Birth Certificate</h6>
+                                                    <p class="text-sm text-slate-500">Official birth document</p>
+                                                </div>
+                                            </div>
+                                            <div class="flex gap-2">
+                                                @if ($applicant->birth_certificate_url)
+                                                    <a href="{{ $applicant->full_birth_certificate_url }}"
+                                                        target="_blank" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-download mr-1"></i> View
+                                                    </a>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger"
+                                                        wire:click="deleteBirthCertificate">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                @else
+                                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                                        wire:click="openBirthCertificateUploadModal">
+                                                        <i class="fas fa-upload mr-1"></i> Upload
+                                                    </button>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        @if ($applicant->birth_certificate_url)
+                                            <div class="h-48 border rounded">
+                                                <iframe src="{{ $applicant->full_birth_certificate_url }}"
+                                                    width="100%" height="100%"></iframe>
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    <!-- College Certificate -->
+                                    <div class="border rounded-md p-4">
+                                        <div class="flex justify-between items-start mb-3">
+                                            <div class="flex items-center">
+                                                <div class="text-primary mr-3">
+                                                    <i class="fas fa-graduation-cap text-xl"></i>
+                                                </div>
+                                                <div>
+                                                    <h6 class="font-medium">College Certificate</h6>
+                                                    <p class="text-sm text-slate-500">Academic qualification</p>
+                                                </div>
+                                            </div>
+                                            <div class="flex gap-2">
+                                                @if ($applicant->college_certificate_url)
+                                                    <a href="{{ $applicant->full_college_certificate_url }}"
+                                                        target="_blank" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-download mr-1"></i> View
+                                                    </a>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger"
+                                                        wire:click="deleteCollegeCertificate">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                @else
+                                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                                        wire:click="openCollegeCertificateUploadModal">
+                                                        <i class="fas fa-upload mr-1"></i> Upload
+                                                    </button>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        @if ($applicant->college_certificate_url)
+                                            <div class="h-48 border rounded">
+                                                <iframe src="{{ $applicant->full_college_certificate_url }}"
+                                                    width="100%" height="100%"></iframe>
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    <!-- Army Certificate -->
+                                    <div class="border rounded-md p-4">
+                                        <div class="flex justify-between items-start mb-3">
+                                            <div class="flex items-center">
+                                                <div class="text-primary mr-3">
+                                                    <i class="fas fa-shield-alt text-xl"></i>
+                                                </div>
+                                                <div>
+                                                    <h6 class="font-medium">Army Certificate</h6>
+                                                    <p class="text-sm text-slate-500">Military service document</p>
+                                                </div>
+                                            </div>
+                                            <div class="flex gap-2">
+                                                @if ($applicant->army_certificate_url)
+                                                    <a href="{{ $applicant->full_army_certificate_url }}"
+                                                        target="_blank" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-download mr-1"></i> View
+                                                    </a>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger"
+                                                        wire:click="deleteArmyCertificate">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                @else
+                                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                                        wire:click="openArmyCertificateUploadModal">
+                                                        <i class="fas fa-upload mr-1"></i> Upload
+                                                    </button>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        @if ($applicant->army_certificate_url)
+                                            <div class="h-48 border rounded">
+                                                <iframe src="{{ $applicant->full_army_certificate_url }}"
+                                                    width="100%" height="100%"></iframe>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- CV/Resume Section -->
+                            @if ($applicant->cv_url)
+                                <div>
+                                    <h6 class="font-medium mb-4 text-lg">Resume/CV</h6>
+                                    <div class="flex justify-between items-center p-3 border rounded-md mb-4">
                                         <div class="flex items-center">
                                             <div class="text-primary mr-3">
                                                 <i class="fas fa-file-pdf text-xl"></i>
@@ -191,49 +354,74 @@
                                         <iframe src="{{ $applicant->full_cv_url }}" width="100%"
                                             height="100%"></iframe>
                                     </div>
-                                @endif
-
-                                @foreach ($applicant->documents as $document)
-                                    <div class="flex justify-between items-center p-3 border rounded-md">
-                                        <div class="flex items-center">
-                                            <div class="text-primary mr-3">
-                                                <i class="fas fa-file-alt text-xl"></i>
-                                            </div>
-                                            <div>
-                                                <h6 class="font-medium">{{ $document->name }}</h6>
-                                                <p class="text-sm text-slate-500">Uploaded:
-                                                    {{ $document->created_at->format('d M Y') }}</p>
-                                                @if ($document->notes)
-                                                    <p class="text-xs text-slate-500 mt-1">{{ $document->notes }}</p>
-                                                @endif
-                                            </div>
-                                        </div>
-                                        <div class="flex space-x-2">
-                                            <a href="{{ Storage::url($document->file_path) }}" target="_blank"
-                                                class="btn btn-sm btn-outline-primary">
-                                                <i class="fas fa-download mr-1 text-blue-500"></i> Download
-                                            </a>
-                                            <button type="button" class="btn btn-sm btn-outline-danger"
-                                                wire:click="confirmDeleteDocument({{ $document->id }})">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        @else
-                            <div class="text-center py-6">
-                                <div class="text-slate-400 mb-3">
-                                    <i class="fas fa-file-upload text-4xl"></i>
                                 </div>
-                                <h5 class="font-medium text-lg mb-1">No Documents Available</h5>
-                                <p class="text-slate-500 mb-4">Upload documents for this applicant to view them here.
-                                </p>
-                                <button type="button" class="btn btn-primary" wire:click="openDocumentUploadModal">
-                                    <i class="fas fa-upload mr-1"></i> Upload Document
-                                </button>
-                            </div>
-                        @endif
+                            @endif
+
+                            <!-- Other Documents Section -->
+                            @if ($applicant->documents && $applicant->documents->count() > 0)
+                                <div>
+                                    <h6 class="font-medium mb-4 text-lg">Other Documents</h6>
+                                    <div class="space-y-4">
+                                        @foreach ($applicant->documents as $document)
+                                            <div class="flex justify-between items-center p-3 border rounded-md">
+                                                <div class="flex items-center">
+                                                    <div class="text-primary mr-3">
+                                                        <i class="fas fa-file-alt text-xl"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="font-medium">{{ $document->name }}</h6>
+                                                        <p class="text-sm text-slate-500">Uploaded:
+                                                            {{ $document->created_at->format('d M Y') }}</p>
+                                                        @if ($document->notes)
+                                                            <p class="text-xs text-slate-500 mt-1">
+                                                                {{ $document->notes }}</p>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                <div class="flex space-x-2">
+                                                    <a href="{{ Storage::url($document->file_path) }}"
+                                                        target="_blank" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-download mr-1 text-blue-500"></i> Download
+                                                    </a>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger"
+                                                        wire:click="confirmDeleteDocument({{ $document->id }})">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+
+                            <!-- No Documents Message -->
+                            @if (
+                                !$applicant->cv_url &&
+                                    !$applicant->id_card_url &&
+                                    !$applicant->birth_certificate_url &&
+                                    !$applicant->college_certificate_url &&
+                                    !$applicant->army_certificate_url &&
+                                    (!$applicant->documents || $applicant->documents->count() === 0))
+                                <div class="text-center py-6">
+                                    <div class="text-slate-400 mb-3">
+                                        <i class="fas fa-file-upload text-4xl"></i>
+                                    </div>
+                                    <h5 class="font-medium text-lg mb-1">No Documents Available</h5>
+                                    <p class="text-slate-500 mb-4">Upload documents for this applicant to view them
+                                        here.</p>
+                                    <div class="flex gap-2 justify-center">
+                                        <button type="button" class="btn btn-primary"
+                                            wire:click="openDocumentUploadModal">
+                                            <i class="fas fa-upload mr-1"></i> Upload Document
+                                        </button>
+                                        <button type="button" class="btn btn-outline-primary"
+                                            wire:click="openIdCardUploadModal">
+                                            <i class="fas fa-id-card mr-1"></i> Upload ID Card
+                                        </button>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
@@ -707,6 +895,166 @@
                 <x-secondary-button wire:click="$set('showImageUploadModal', false)">Cancel</x-secondary-button>
                 <x-primary-button wire:click.prevent="uploadImage" loadingFunction="uploadImage">Upload
                     Image</x-primary-button>
+            </div>
+        </x-slot>
+    </x-modal>
+
+    <x-modal wire:model="showDocumentUploadModal">
+        <x-slot name="title">Upload Document</x-slot>
+        <div class="modal-body">
+            <div class="mb-3">
+                <label for="document_name" class="form-label">Document Name</label>
+                <input type="text" id="document_name" class="form-control" wire:model="documentName"
+                    placeholder="e.g. ID Card, Certificate, etc.">
+                @error('documentName')
+                    <div class="text-danger mt-1">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="mb-3">
+                <label for="document_file" class="form-label">Document File</label>
+                <input type="file" id="document_file" class="form-control" wire:model="documentFile">
+                <div wire:loading wire:target="documentFile" class="text-primary mt-1">
+                    <i class="fas fa-spinner fa-spin"></i> Uploading...
+                </div>
+                @error('documentFile')
+                    <div class="text-danger mt-1">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="mb-3">
+                <label for="document_notes" class="form-label">Notes (Optional)</label>
+                <textarea id="document_notes" class="form-control" wire:model="documentNotes" rows="2"
+                    placeholder="Any notes about this document"></textarea>
+                @error('documentNotes')
+                    <div class="text-danger mt-1">{{ $message }}</div>
+                @enderror
+            </div>
+        </div>
+        <x-slot name="footer">
+            <div class="mt-4 flex justify-end gap-3">
+                <x-secondary-button wire:click="closeDocumentUploadModal">Cancel</x-secondary-button>
+                <x-primary-button wire:click="uploadDocument" loadingFunction="uploadDocument">Upload Document
+                </x-primary-button>
+            </div>
+        </x-slot>
+    </x-modal>
+
+
+    <!-- ID Card Upload Modal -->
+    <x-modal wire:model="showIdCardUploadModal">
+        <x-slot name="title">Upload ID Card</x-slot>
+
+        <div class="space-y-4">
+            <div>
+                <x-input-label>ID Card File</x-input-label>
+                <input type="file" wire:model="idCardFile" accept=".pdf,.jpg,.jpeg,.png" class="form-control" />
+                @error('idCardFile')
+                    <span class="text-danger">{{ $message }}</span>
+                @enderror
+                <p class="text-sm text-slate-500 mt-1">Accepted formats: PDF, JPG, JPEG, PNG (Max: 4MB)</p>
+            </div>
+            @if ($idCardFile)
+                <div>
+                    <p class="text-sm text-slate-600">Selected file: {{ $idCardFile->getClientOriginalName() }}</p>
+                </div>
+            @endif
+        </div>
+        <x-slot name="footer">
+            <div class="mt-4 flex justify-end gap-3">
+                <x-secondary-button wire:click="closeIdCardUploadModal">Cancel</x-secondary-button>
+                <x-primary-button wire:click.prevent="uploadIdCard" loadingFunction="uploadIdCard">Upload ID
+                    Card</x-primary-button>
+            </div>
+        </x-slot>
+    </x-modal>
+
+    <!-- Birth Certificate Upload Modal -->
+    <x-modal wire:model="showBirthCertificateUploadModal">
+        <x-slot name="title">Upload Birth Certificate</x-slot>
+
+        <div class="space-y-4">
+            <div>
+                <x-input-label>Birth Certificate File</x-input-label>
+                <input type="file" wire:model="birthCertificateFile" accept=".pdf,.jpg,.jpeg,.png"
+                    class="form-control" />
+                @error('birthCertificateFile')
+                    <span class="text-danger">{{ $message }}</span>
+                @enderror
+                <p class="text-sm text-slate-500 mt-1">Accepted formats: PDF, JPG, JPEG, PNG (Max: 4MB)</p>
+            </div>
+            @if ($birthCertificateFile)
+                <div>
+                    <p class="text-sm text-slate-600">Selected file:
+                        {{ $birthCertificateFile->getClientOriginalName() }}</p>
+                </div>
+            @endif
+        </div>
+        <x-slot name="footer">
+            <div class="mt-4 flex justify-end gap-3">
+                <x-secondary-button wire:click="closeBirthCertificateUploadModal">Cancel</x-secondary-button>
+                <x-primary-button wire:click.prevent="uploadBirthCertificate"
+                    loadingFunction="uploadBirthCertificate">Upload Birth Certificate</x-primary-button>
+            </div>
+        </x-slot>
+    </x-modal>
+
+    <!-- College Certificate UshowDocumentUploadModalpload Modal -->
+    <x-modal wire:model="showCollegeCertificateUploadModal">
+        <x-slot name="title">Upload College Certificate</x-slot>
+
+        <div class="space-y-4">
+            <div>
+                <x-input-label>College Certificate File</x-input-label>
+                <input type="file" wire:model="collegeCertificateFile" accept=".pdf,.jpg,.jpeg,.png"
+                    class="form-control" />
+                @error('collegeCertificateFile')
+                    <span class="text-danger">{{ $message }}</span>
+                @enderror
+                <p class="text-sm text-slate-500 mt-1">Accepted formats: PDF, JPG, JPEG, PNG (Max: 4MB)</p>
+            </div>
+            @if ($collegeCertificateFile)
+                <div>
+                    <p class="text-sm text-slate-600">Selected file:
+                        {{ $collegeCertificateFile->getClientOriginalName() }}</p>
+                </div>
+            @endif
+        </div>
+        <x-slot name="footer">
+            <div class="mt-4 flex justify-end gap-3">
+                <x-secondary-button wire:click="closeCollegeCertificateUploadModal">Cancel</x-secondary-button>
+                <x-primary-button wire:click.prevent="uploadCollegeCertificate"
+                    loadingFunction="uploadCollegeCertificate">Upload College Certificate</x-primary-button>
+            </div>
+        </x-slot>
+    </x-modal>
+
+    <!-- Army Certificate Upload Modal -->
+    <x-modal wire:model="showArmyCertificateUploadModal">
+        <x-slot name="title">Upload Army Certificate</x-slot>
+
+        <div class="space-y-4">
+            <div>
+                <x-input-label>Army Certificate File</x-input-label>
+                <input type="file" wire:model="armyCertificateFile" accept=".pdf,.jpg,.jpeg,.png"
+                    class="form-control" />
+                @error('armyCertificateFile')
+                    <span class="text-danger">{{ $message }}</span>
+                @enderror
+                <p class="text-sm text-slate-500 mt-1">Accepted formats: PDF, JPG, JPEG, PNG (Max: 4MB)</p>
+            </div>
+            @if ($armyCertificateFile)
+                <div>
+                    <p class="text-sm text-slate-600">Selected file:
+                        {{ $armyCertificateFile->getClientOriginalName() }}</p>
+                </div>
+            @endif
+        </div>
+        <x-slot name="footer">
+            <div class="mt-4 flex justify-end gap-3">
+                <x-secondary-button wire:click="closeArmyCertificateUploadModal">Cancel</x-secondary-button>
+                <x-primary-button wire:click.prevent="uploadArmyCertificate"
+                    loadingFunction="uploadArmyCertificate">Upload Army Certificate</x-primary-button>
             </div>
         </x-slot>
     </x-modal>

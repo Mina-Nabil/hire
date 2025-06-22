@@ -37,7 +37,7 @@
             <x-select label="Hiring Manager" wire:model="hiringManagerId"
                 errorMessage="{{ $errors->first('hiringManagerId') }}">
                 <option value="">-- Select Hiring Manager --</option>
-                @foreach ($users as $user)
+                @foreach ($managers as $user)
                     <option value="{{ $user->id }}">{{ $user->name }}</option>
                 @endforeach
             </x-select>

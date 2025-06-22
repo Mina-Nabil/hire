@@ -42,6 +42,11 @@ return [
     'cv_resume' => 'CV/Resume',
     'uploading' => 'Uploading...',
     'file_selected' => 'File selected',
+    'additional_documents' => 'Additional Documents',
+    'id_card' => 'ID Card',
+    'birth_certificate' => 'Birth Certificate',
+    'college_certificate' => 'College Certificate',
+    'army_certificate' => 'Army Certificate',
     
     // Education
     'school_university' => 'School/University',

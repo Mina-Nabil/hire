@@ -142,6 +142,22 @@ class Vacancy extends Model
         });
     }
 
+    public function scopeCheckPermissions($query)
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+
+        if ($loggedInUser->can('viewAny', Vacancy::class)) {
+            return $query;
+        }
+
+        return $query->where(function ($q) use ($loggedInUser) {
+            $q->where('assigned_to', $loggedInUser->id)
+                ->orWhere('hiring_manager_id', $loggedInUser->id)
+                ->orWhere('hr_manager_id', $loggedInUser->id);
+        });
+    }
+
     /**
      * Create a new vacancy.
      */

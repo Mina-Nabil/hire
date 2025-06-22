@@ -204,6 +204,14 @@
                                         <div class="col-md-7">{{ $employee->benefitConfiguration->overtime_rate }}
                                         </div>
                                     </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-5 font-weight-bold">Working Days:</div>
+                                        <div class="col-md-7">
+                                            @foreach ($employee->workingDays as $day)
+                                                {{ ucfirst($day->day) }}
+                                            @endforeach
+                                        </div>
+                                    </div>
                                 @else
                                     <div class="alert alert-warning">
                                         No benefit configuration found for this employee.

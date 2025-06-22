@@ -67,6 +67,14 @@ class EmployeeCreate extends Component
     public $id_issue_date;
     public $id_expiry_date;
 
+    // Additional document files
+    public $birth_certificate_file;
+    public $college_certificate_file;
+    public $army_certificate_file;
+
+    // Store applicant documents for copying
+    public $applicantDocuments = [];
+
     // Applicant Selection Modal
     public $showApplicantModal = false;
     public $applicantSearch = '';
@@ -100,6 +108,9 @@ class EmployeeCreate extends Component
         'id_number' => 'required|string|max:50',
         'id_issue_date' => 'required|date',
         'id_expiry_date' => 'required|date|after:id_issue_date',
+        'birth_certificate_file' => 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
+        'college_certificate_file' => 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
+        'army_certificate_file' => 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
     ];
 
     public function mount($applicant_id = null)
@@ -187,7 +198,25 @@ class EmployeeCreate extends Component
         // Generate username preview
         $this->previewUsername();
         
+        // Load documents from applicant if available
+        $this->loadApplicantDocuments($applicant);
+        
         $this->alert('success', 'Applicant data loaded successfully');
+    }
+
+    /**
+     * Load documents from applicant to pre-fill the document uploads
+     */
+    protected function loadApplicantDocuments($applicant)
+    {
+        // Store the file paths from applicant for later use
+        // We'll copy these files to employee storage during employee creation
+        $this->applicantDocuments = [
+            'id_card_url' => $applicant->id_card_url,
+            'birth_certificate_url' => $applicant->birth_certificate_url,
+            'college_certificate_url' => $applicant->college_certificate_url,
+            'army_certificate_url' => $applicant->army_certificate_url,
+        ];
     }
 
     /**
@@ -300,6 +329,56 @@ class EmployeeCreate extends Component
 
             $path = $this->id_card_file->store(Employee::FILES_DIRECTORY.'/id_cards', 's3');
             
+            // Copy additional documents from applicant if available
+            $birthCertificatePath = null;
+            $collegeCertificatePath = null;
+            $armyCertificatePath = null;
+            
+            // Copy ID Card from applicant if not uploaded manually
+            if (!$this->id_card_file && isset($this->applicantDocuments['id_card_url']) && $this->applicantDocuments['id_card_url']) {
+                $newIdCardPath = Employee::FILES_DIRECTORY.'/id_cards/' . basename($this->applicantDocuments['id_card_url']);
+                if (Storage::disk('s3')->copy($this->applicantDocuments['id_card_url'], $newIdCardPath)) {
+                    $path = $newIdCardPath;
+                }
+            }
+            
+            // Copy Birth Certificate from applicant if available
+            if (isset($this->applicantDocuments['birth_certificate_url']) && $this->applicantDocuments['birth_certificate_url']) {
+                $newBirthCertPath = Employee::FILES_DIRECTORY.'/birth_certificates/' . basename($this->applicantDocuments['birth_certificate_url']);
+                if (Storage::disk('s3')->copy($this->applicantDocuments['birth_certificate_url'], $newBirthCertPath)) {
+                    $birthCertificatePath = $newBirthCertPath;
+                }
+            }
+            
+            // Copy College Certificate from applicant if available
+            if (isset($this->applicantDocuments['college_certificate_url']) && $this->applicantDocuments['college_certificate_url']) {
+                $newCollegeCertPath = Employee::FILES_DIRECTORY.'/college_certificates/' . basename($this->applicantDocuments['college_certificate_url']);
+                if (Storage::disk('s3')->copy($this->applicantDocuments['college_certificate_url'], $newCollegeCertPath)) {
+                    $collegeCertificatePath = $newCollegeCertPath;
+                }
+            }
+            
+            // Copy Army Certificate from applicant if available
+            if (isset($this->applicantDocuments['army_certificate_url']) && $this->applicantDocuments['army_certificate_url']) {
+                $newArmyCertPath = Employee::FILES_DIRECTORY.'/army_certificates/' . basename($this->applicantDocuments['army_certificate_url']);
+                if (Storage::disk('s3')->copy($this->applicantDocuments['army_certificate_url'], $newArmyCertPath)) {
+                    $armyCertificatePath = $newArmyCertPath;
+                }
+            }
+            
+            // Handle manually uploaded files (these take precedence over applicant files)
+            if ($this->birth_certificate_file) {
+                $birthCertificatePath = $this->birth_certificate_file->store(Employee::FILES_DIRECTORY.'/birth_certificates', 's3');
+            }
+            
+            if ($this->college_certificate_file) {
+                $collegeCertificatePath = $this->college_certificate_file->store(Employee::FILES_DIRECTORY.'/college_certificates', 's3');
+            }
+            
+            if ($this->army_certificate_file) {
+                $armyCertificatePath = $this->army_certificate_file->store(Employee::FILES_DIRECTORY.'/army_certificates', 's3');
+            }
+            
             // Create employee info data array
             $employeeInfoData = [
                 'insurance_office_id' => $this->insurance_office_id,
@@ -336,6 +415,19 @@ class EmployeeCreate extends Component
                 $this->status
             );
 
+            // Set additional documents if provided
+            if ($birthCertificatePath) {
+                $employee->setBirthCertificate($birthCertificatePath, Carbon::now());
+            }
+            
+            if ($collegeCertificatePath) {
+                $employee->setCollegeCertificate($collegeCertificatePath, Carbon::now());
+            }
+            
+            if ($armyCertificatePath) {
+                $employee->setArmyServicePaper($armyCertificatePath, Carbon::now());
+            }
+
             // Update the user with employee_id
             $user->employee_id = $employee->id;
             $user->save();
@@ -365,6 +457,32 @@ class EmployeeCreate extends Component
                     // Continue with the error handling even if file deletion fails
                 }
             }
+            
+            // Delete additional files if they were uploaded
+            if (isset($birthCertificatePath) && Storage::disk('s3')->exists($birthCertificatePath)) {
+                try {
+                    Storage::disk('s3')->delete($birthCertificatePath);
+                } catch (Exception $deleteException) {
+                    report($deleteException);
+                }
+            }
+            
+            if (isset($collegeCertificatePath) && Storage::disk('s3')->exists($collegeCertificatePath)) {
+                try {
+                    Storage::disk('s3')->delete($collegeCertificatePath);
+                } catch (Exception $deleteException) {
+                    report($deleteException);
+                }
+            }
+            
+            if (isset($armyCertificatePath) && Storage::disk('s3')->exists($armyCertificatePath)) {
+                try {
+                    Storage::disk('s3')->delete($armyCertificatePath);
+                } catch (Exception $deleteException) {
+                    report($deleteException);
+                }
+            }
+            
             $this->alert('failed', $e->getMessage());
         } catch (Exception $e) {
             DB::rollBack();
@@ -376,6 +494,32 @@ class EmployeeCreate extends Component
                     // Continue with the error handling even if file deletion fails
                 }
             }
+            
+            // Delete additional files if they were uploaded
+            if (isset($birthCertificatePath) && Storage::disk('s3')->exists($birthCertificatePath)) {
+                try {
+                    Storage::disk('s3')->delete($birthCertificatePath);
+                } catch (Exception $deleteException) {
+                    report($deleteException);
+                }
+            }
+            
+            if (isset($collegeCertificatePath) && Storage::disk('s3')->exists($collegeCertificatePath)) {
+                try {
+                    Storage::disk('s3')->delete($collegeCertificatePath);
+                } catch (Exception $deleteException) {
+                    report($deleteException);
+                }
+            }
+            
+            if (isset($armyCertificatePath) && Storage::disk('s3')->exists($armyCertificatePath)) {
+                try {
+                    Storage::disk('s3')->delete($armyCertificatePath);
+                } catch (Exception $deleteException) {
+                    report($deleteException);
+                }
+            }
+            
             report($e);
             $this->alertError($e->getMessage());
         }
@@ -463,6 +607,15 @@ class EmployeeCreate extends Component
         if (count($this->insuranceOffices) > 0) {
             $this->insurance_office_id = $this->insuranceOffices[0]->id;
         }
+        
+        // Reset document files
+        $this->id_card_file = null;
+        $this->birth_certificate_file = null;
+        $this->college_certificate_file = null;
+        $this->army_certificate_file = null;
+        
+        // Reset applicant documents
+        $this->applicantDocuments = [];
         
         $this->alert('info', 'Form has been reset');
     }

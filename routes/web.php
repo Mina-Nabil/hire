@@ -50,6 +50,9 @@ Route::group(['middleware' => ['auth', 'type:employee|hr|admin']], function () {
     Route::get('/employee/overtime-requests', EmployeeOvertimeRequests::class)->name('employee.overtime-requests');
     Route::get('/attendance/applied-vacation', App\Livewire\Attendance\ShowAppliedVacation::class)->name('applied-vacation.index');
 
+    Route::get('/recruitment/vacancies/{id}', VacancyShow::class)->name('recruitment.vacancies.show');
+    Route::get('/recruitment/vacancies', VacancyIndex::class)->name('recruitment.vacancies');
+
     Route::get('/calendar', Calendar::class)->name('calendar');
 });
 
@@ -77,8 +80,6 @@ Route::group(['middleware' => ['auth', 'type:admin|hr']], function () {
     Route::get('/hierarchy/positions', PositionIndex::class)->name('hierarchy.positions');
     Route::get('/hierarchy/locations', LocationIndex::class)->name('hierarchy.locations');
 
-    Route::get('/recruitment/vacancies/{id}', VacancyShow::class)->name('recruitment.vacancies.show');
-    Route::get('/recruitment/vacancies', VacancyIndex::class)->name('recruitment.vacancies');
     Route::get('/recruitment/applicants', ApplicantsIndex::class)->name('recruitment.applicants');
     Route::get('/recruitment/applicants/create', ApplicantsCreate::class)->name('applicants.create');
     Route::get('/recruitment/applicants/{applicant}', ApplicantShow::class)->name('recruitment.applicants.show');

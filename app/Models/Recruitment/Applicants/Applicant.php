@@ -23,6 +23,10 @@ class Applicant extends Model
     const MORPH_NAME = 'applicant';
     const CV_PATH = 'applicant-documents';
     const IMAGE_PATH = 'applicant-images';
+    const ID_CARD_PATH = 'applicant-documents/id-cards';
+    const BIRTH_CERTIFICATE_PATH = 'applicant-documents/birth-certificates';
+    const COLLEGE_CERTIFICATE_PATH = 'applicant-documents/college-certificates';
+    const ARMY_CERTIFICATE_PATH = 'applicant-documents/army-certificates';
 
     protected $table = 'applicants';
     protected $fillable = [
@@ -44,7 +48,11 @@ class Applicant extends Model
         'cv_url',
         'signature_url',
         'signature_date',
-        'is_hired'
+        'is_hired',
+        'id_card_url',
+        'birth_certificate_url',
+        'college_certificate_url',
+        'army_certificate_url',
     ];
 
     protected $casts = [
@@ -125,6 +133,26 @@ class Applicant extends Model
     public function getFullImageUrlAttribute(): string|null
     {
         return $this->image_url ? Storage::disk('s3')->url($this->image_url) : null;
+    }
+
+    public function getFullIdCardUrlAttribute(): string|null
+    {
+        return $this->id_card_url ? Storage::disk('s3')->url($this->id_card_url) : null;
+    }
+
+    public function getFullBirthCertificateUrlAttribute(): string|null
+    {
+        return $this->birth_certificate_url ? Storage::disk('s3')->url($this->birth_certificate_url) : null;
+    }
+
+    public function getFullCollegeCertificateUrlAttribute(): string|null
+    {
+        return $this->college_certificate_url ? Storage::disk('s3')->url($this->college_certificate_url) : null;
+    }
+
+    public function getFullArmyCertificateUrlAttribute(): string|null
+    {
+        return $this->army_certificate_url ? Storage::disk('s3')->url($this->army_certificate_url) : null;
     }
 
     ///relations
@@ -713,5 +741,93 @@ class Applicant extends Model
             })
             ->where('status', Application::STATUS_OFFER)
             ->exists() && !$this->is_hired;
+    }
+
+    /**
+     * Set the applicant's ID card document
+     * 
+     * @param string $idCardUrl
+     * @return bool
+     */
+    public function setIdCard(string $idCardUrl): bool
+    {
+        try {
+            if($this->id_card_url){
+                Storage::disk('s3')->delete($this->id_card_url);
+            }
+            $idCard = $this->update(['id_card_url' => $idCardUrl]);
+            AppLog::info('Applicant ID Card Updated', 'Applicant. ' . $this->full_name . ' ID card updated successfully', loggable: $this);
+            return $idCard;
+        } catch (Exception $e) {
+            report($e);
+            AppLog::error('Error setting ID card', $e->getMessage(), loggable: $this);
+            throw new AppException('Failed to set ID card: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Set the applicant's birth certificate document
+     * 
+     * @param string $birthCertificateUrl
+     * @return bool
+     */
+    public function setBirthCertificate(string $birthCertificateUrl): bool
+    {
+        try {
+            if($this->birth_certificate_url){
+                Storage::disk('s3')->delete($this->birth_certificate_url);
+            }
+            $birthCertificate = $this->update(['birth_certificate_url' => $birthCertificateUrl]);
+            AppLog::info('Applicant Birth Certificate Updated', 'Applicant. ' . $this->full_name . ' birth certificate updated successfully', loggable: $this);
+            return $birthCertificate;
+        } catch (Exception $e) {
+            report($e);
+            AppLog::error('Error setting birth certificate', $e->getMessage(), loggable: $this);
+            throw new AppException('Failed to set birth certificate: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Set the applicant's college certificate document
+     * 
+     * @param string $collegeCertificateUrl
+     * @return bool
+     */
+    public function setCollegeCertificate(string $collegeCertificateUrl): bool
+    {
+        try {
+            if($this->college_certificate_url){
+                Storage::disk('s3')->delete($this->college_certificate_url);
+            }
+            $collegeCertificate = $this->update(['college_certificate_url' => $collegeCertificateUrl]);
+            AppLog::info('Applicant College Certificate Updated', 'Applicant. ' . $this->full_name . ' college certificate updated successfully', loggable: $this);
+            return $collegeCertificate;
+        } catch (Exception $e) {
+            report($e);
+            AppLog::error('Error setting college certificate', $e->getMessage(), loggable: $this);
+            throw new AppException('Failed to set college certificate: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Set the applicant's army certificate document
+     * 
+     * @param string $armyCertificateUrl
+     * @return bool
+     */
+    public function setArmyCertificate(string $armyCertificateUrl): bool
+    {
+        try {
+            if($this->army_certificate_url){
+                Storage::disk('s3')->delete($this->army_certificate_url);
+            }
+            $armyCertificate = $this->update(['army_certificate_url' => $armyCertificateUrl]);
+            AppLog::info('Applicant Army Certificate Updated', 'Applicant. ' . $this->full_name . ' army certificate updated successfully', loggable: $this);
+            return $armyCertificate;
+        } catch (Exception $e) {
+            report($e);
+            AppLog::error('Error setting army certificate', $e->getMessage(), loggable: $this);
+            throw new AppException('Failed to set army certificate: ' . $e->getMessage());
+        }
     }
 }

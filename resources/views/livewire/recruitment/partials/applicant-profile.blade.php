@@ -442,45 +442,4 @@
         </div>
     </div>
 
-    <x-modal wire:model="showDocumentUploadModal">
-        <x-slot name="title">Upload Document</x-slot>
-        <div class="modal-body">
-            <div class="mb-3">
-                <label for="document_name" class="form-label">Document Name</label>
-                <input type="text" id="document_name" class="form-control" wire:model="documentName"
-                    placeholder="e.g. ID Card, Certificate, etc.">
-                @error('documentName')
-                    <div class="text-danger mt-1">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <div class="mb-3">
-                <label for="document_file" class="form-label">Document File</label>
-                <input type="file" id="document_file" class="form-control" wire:model="documentFile">
-                <div wire:loading wire:target="documentFile" class="text-primary mt-1">
-                    <i class="fas fa-spinner fa-spin"></i> Uploading...
-                </div>
-                @error('documentFile')
-                    <div class="text-danger mt-1">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <div class="mb-3">
-                <label for="document_notes" class="form-label">Notes (Optional)</label>
-                <textarea id="document_notes" class="form-control" wire:model="documentNotes" rows="2"
-                    placeholder="Any notes about this document"></textarea>
-                @error('documentNotes')
-                    <div class="text-danger mt-1">{{ $message }}</div>
-                @enderror
-            </div>
-        </div>
-        <x-slot name="footer">
-            <div class="mt-4 flex justify-end gap-3">
-                <x-secondary-button wire:click="closeDocumentUploadModal">Cancel</x-secondary-button>
-                <x-primary-button wire:click="uploadDocument" loadingFunction="uploadDocument">Upload Document
-                </x-primary-button>
-            </div>
-        </x-slot>
-    </x-modal>
-
 </div>

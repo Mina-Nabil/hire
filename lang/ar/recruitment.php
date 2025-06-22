@@ -42,6 +42,11 @@ return [
     'cv_resume' => 'السيرة الذاتية',
     'uploading' => 'جاري التحميل...',
     'file_selected' => 'تم اختيار الملف',
+    'additional_documents' => 'مستندات إضافية',
+    'id_card' => 'بطاقة الهوية',
+    'birth_certificate' => 'شهادة الميلاد',
+    'college_certificate' => 'شهادة الكلية',
+    'army_certificate' => 'شهادة الجيش',
     
     // Education
     'school_university' => 'المدرسة/الجامعة',

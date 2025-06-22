@@ -65,6 +65,10 @@ class ApplicantsCreate extends Component
     public $maritalStatus = null;
     public $profileImage = null;
     public $cv = null;
+    public $idCard = null;
+    public $birthCertificate = null;
+    public $collegeCertificate = null;
+    public $armyCertificate = null;
 
     // Step 2: Education
     public $educations = [];
@@ -211,6 +215,10 @@ class ApplicantsCreate extends Component
             'channelId' => 'nullable|exists:channels,id',
             'profileImage' => 'nullable|image|max:4096',
             'cv' => 'nullable|file|mimes:pdf,doc,docx|max:4096',
+            'idCard' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:4096',
+            'birthCertificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:4096',
+            'collegeCertificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:4096',
+            'armyCertificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:4096',
         ], [
             'areaId.required' => 'The area is required',
             'firstName.required' => 'The first name is required',
@@ -607,6 +615,26 @@ class ApplicantsCreate extends Component
                     $applicant->updateCv($cvPath);
                 }
 
+                if ($this->idCard) {
+                    $idCardPath = $this->idCard->store(Applicant::ID_CARD_PATH, 's3');
+                    $applicant->setIdCard($idCardPath);
+                }
+
+                if ($this->birthCertificate) {
+                    $birthCertificatePath = $this->birthCertificate->store(Applicant::BIRTH_CERTIFICATE_PATH, 's3');
+                    $applicant->setBirthCertificate($birthCertificatePath);
+                }
+
+                if ($this->collegeCertificate) {
+                    $collegeCertificatePath = $this->collegeCertificate->store(Applicant::COLLEGE_CERTIFICATE_PATH, 's3');
+                    $applicant->setCollegeCertificate($collegeCertificatePath);
+                }
+
+                if ($this->armyCertificate) {
+                    $armyCertificatePath = $this->armyCertificate->store(Applicant::ARMY_CERTIFICATE_PATH, 's3');
+                    $applicant->setArmyCertificate($armyCertificatePath);
+                }
+
                 // 3. Set educations
                 $validEducations = array_filter($this->educations, function ($education) {
                     return !empty($education['school_name']);
@@ -726,7 +754,5 @@ class ApplicantsCreate extends Component
             'description' => $this->pageDescription,
             'applicantsCreate' => 'active',
         ]);
-
-        return $view;
     }
 }

@@ -146,7 +146,6 @@ class Application extends Model
                 'vacancy_id' => $vacancyId
             ], [
                 'cover_letter' => $coverLetter,
-                'status' => self::STATUS_PENDING,
                 'referred_by_id' => $refered_by_id,
             ]);
             AppLog::info('Application Created', 'Application created for applicant: ' . $application->applicant->full_name, loggable: $application);

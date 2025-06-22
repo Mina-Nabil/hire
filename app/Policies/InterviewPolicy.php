@@ -37,7 +37,8 @@ class InterviewPolicy
      */
     public function update(User $user, Interview $interview): bool
     {
-        return $user->is_admin || $user->is_hr;
+        $vacancy = $interview->application->vacancy;
+        return $user->is_admin || $user->is_hr || $user->id == $vacancy->assigned_to || $user->id == $vacancy->hiring_manager_id || $user->id == $vacancy->hr_manager_id;
     }
 
     /**

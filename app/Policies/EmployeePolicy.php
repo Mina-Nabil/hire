@@ -111,9 +111,13 @@ class EmployeePolicy
     /**
      * Determine whether the user can set employee docs.
      */
-    public function setDocs(User $user, Employee $employee): bool
+    public function setDocs(User $user, ?Object $doc = null): bool
     {
-        return $user->is_admin || $user->is_hr;
+        $employeeCanUpload = false;
+        if ($doc) {
+            $employee = $doc->employee;
+        }
+        return $user->is_admin || $user->is_hr || ($user->id === $employee->user_id && $employeeCanUpload);
     }
 
     /**

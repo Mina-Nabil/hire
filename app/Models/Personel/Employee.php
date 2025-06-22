@@ -356,14 +356,13 @@ class Employee extends Model
             if (!$bus_id) {
                 throw new AppException('Bus is required for bus attendance calculation');
             }
-
         }
-        
-        if($working_day_end_min > $working_day_end_max){
+
+        if ($working_day_end_min > $working_day_end_max) {
             throw new AppException('Working day end min must be less than or equal to working day end max');
         }
 
-        if($working_day_start_min > $working_day_start_max){
+        if ($working_day_start_min > $working_day_start_max) {
             throw new AppException('Working day start min must be less than or equal to working day start max');
         }
 
@@ -544,9 +543,9 @@ class Employee extends Model
         $vacationBenefit->load('vacationDetail');
         $applyDeadline = $vacationBenefit->apply_deadline;
         $deadlineDate = Carbon::now()->addDays($applyDeadline)->setTime(23, 59, 59);
-        foreach($days as $day){
+        foreach ($days as $day) {
             $dayDate = Carbon::parse($day['vacation_date']);
-            if($dayDate->isBefore($deadlineDate)){
+            if ($dayDate->isBefore($deadlineDate)) {
                 throw new AppException('You cannot apply for vacation after the apply deadline');
             }
         }
@@ -609,7 +608,7 @@ class Employee extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this)) {
+        if (!$loggedInUser->can('setDocs', $this->armyServicePaper()->first())) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 
@@ -639,7 +638,7 @@ class Employee extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this)) {
+        if (!$loggedInUser->can('setDocs', $this->birthCertificate()->first())) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 
@@ -669,7 +668,7 @@ class Employee extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this)) {
+        if (!$loggedInUser->can('setDocs', $this->idCard()->first())) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 
@@ -699,7 +698,7 @@ class Employee extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this)) {
+        if (!$loggedInUser->can('setDocs', $this->driverLicense()->first())) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 
@@ -728,7 +727,7 @@ class Employee extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this)) {
+        if (!$loggedInUser->can('setDocs', $this->contracts()->first())) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 
@@ -758,7 +757,7 @@ class Employee extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this)) {
+        if (!$loggedInUser->can('setDocs', $this->employeeS1Doc()->first())) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 
@@ -788,7 +787,7 @@ class Employee extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this)) {
+        if (!$loggedInUser->can('setDocs', $this->employeeS2Doc()->first())) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 
@@ -821,7 +820,7 @@ class Employee extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this)) {
+        if (!$loggedInUser->can('setDocs', $this->employeeS6Doc()->first())) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 
@@ -853,7 +852,7 @@ class Employee extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this)) {
+        if (!$loggedInUser->can('setDocs', $this->policeRecords()->first())) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 
@@ -877,7 +876,7 @@ class Employee extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this)) {
+        if (!$loggedInUser->can('setDocs')) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 
@@ -915,7 +914,7 @@ class Employee extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this)) {
+        if (!$loggedInUser->can('setDocs', $this->externalMedicalRecord()->first())) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 
@@ -989,7 +988,7 @@ class Employee extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this)) {
+        if (!$loggedInUser->can('setDocs', $this->practiceCard()->first())) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 
@@ -1027,7 +1026,7 @@ class Employee extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this)) {
+        if (!$loggedInUser->can('setDocs', $this->skillsQualifications()->first())) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 
@@ -1065,7 +1064,7 @@ class Employee extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this)) {
+        if (!$loggedInUser->can('setDocs', $this->syndicateCard()->first())) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 
@@ -1103,7 +1102,7 @@ class Employee extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this)) {
+        if (!$loggedInUser->can('setDocs', $this->workDeclarations()->first())) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 
@@ -1135,7 +1134,7 @@ class Employee extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this)) {
+        if (!$loggedInUser->can('setDocs', $this->labourDocument()->first())) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 
@@ -1169,7 +1168,7 @@ class Employee extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this)) {
+        if (!$loggedInUser->can('setDocs', $this->collegeCertificate()->first())) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 
@@ -1203,7 +1202,7 @@ class Employee extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this)) {
+        if (!$loggedInUser->can('setDocs', $this->socialPrint()->first())) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 
@@ -1238,7 +1237,7 @@ class Employee extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this)) {
+        if (!$loggedInUser->can('setDocs')) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 
@@ -1275,7 +1274,7 @@ class Employee extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this)) {
+        if (!$loggedInUser->can('setDocs')) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 
@@ -2709,6 +2708,17 @@ class Employee extends Model
         return $this->baseBenefits?->where('name', 'basic')->first()?->amount;
     }
 
+    public function getChildrenEmployeesAttribute()
+    {
+        return $this->position?->children()
+            ->with('employee')
+            ->whereHas('employee')
+            ->get()
+            ->map(function ($position) {
+                return $position->employee;
+            });
+    }
+
     //// relations ////
     public function user()
     {
@@ -3693,18 +3703,18 @@ class Employee extends Model
             ->where('date', '>=', $startDate->format('Y-m-d'))
             ->where('date', '<=', $endDate->format('Y-m-d'))
             ->where('is_approved', true);
-        
+
         // If payrollId is provided, include attendance records for that payroll
         // Otherwise, only include unassigned attendance records
         if ($payrollId !== null) {
             $attendanceQuery->where(function ($query) use ($payrollId) {
                 $query->whereNull('payroll_id')
-                      ->orWhere('payroll_id', $payrollId);
+                    ->orWhere('payroll_id', $payrollId);
             });
         } else {
             $attendanceQuery->whereNull('payroll_id');
         }
-        
+
         $attendedDates = $attendanceQuery->pluck('date')->toArray();
 
         // Return the difference - days that should have been worked but weren't
@@ -3934,18 +3944,18 @@ class Employee extends Model
             ->where('date', '>=', $startDate->format('Y-m-d'))
             ->where('date', '<=', $endDate->format('Y-m-d'))
             ->where('is_approved', true);
-        
+
         // If payrollId is provided, include attendance records for that payroll
         // Otherwise, only include unassigned attendance records
         if ($payrollId !== null) {
             $attendanceQuery->where(function ($query) use ($payrollId) {
                 $query->whereNull('payroll_id')
-                      ->orWhere('payroll_id', $payrollId);
+                    ->orWhere('payroll_id', $payrollId);
             });
         } else {
             $attendanceQuery->whereNull('payroll_id');
         }
-        
+
         $attendances = $attendanceQuery->get();
 
         $totalPenaltyHours = $missedHours;
@@ -3977,7 +3987,6 @@ class Employee extends Model
                         $attendanceEnd,
                         $workingDayEndMin
                     );
-
                 } elseif ($this->benefitConfiguration->attendance_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_IN_ONLY) {
                     $penaltyHoursForDay = $this->calculatePenaltyAfterInOnly(
                         $attendanceStart,
@@ -3999,7 +4008,7 @@ class Employee extends Model
                 }
             }
 
-            if($penaltyHoursForDay > 0){
+            if ($penaltyHoursForDay > 0) {
                 $attendance->penalized_hours = $penaltyHoursForDay;
                 $attendance->save();
             }
@@ -4117,12 +4126,12 @@ class Employee extends Model
             return 0;
         }
         $allowedStartMax = Carbon::parse($busArrival->date . ' ' . $busArrival->time)->addMinutes(BusArrival::BUS_ARRIVAL_TIME_OFFSET);
-        
+
         // Calculating penalty for arriving late after bus arrival
         if ($attendanceStart->gt($allowedStartMax)) {
             $penaltyDays = $attendanceStart->diffInDays($allowedStartMax, true);
         }
-        
+
         $allowedEndMin = Carbon::parse($attendanceStart->format('Y-m-d') . ' ' . $workingDayEndMin);
 
 
@@ -4576,7 +4585,7 @@ class Employee extends Model
 
         // Get total penalty hours
         $totalPenaltyHours = $this->getTotalPenaltyHours($startDate, $endDate, $payrollId);
-        
+
         if ($totalPenaltyHours <= 0) {
             return [
                 'total_penalty_hours' => 0,

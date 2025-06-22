@@ -17,6 +17,8 @@ class ApplyForVacation extends Component
 {
     use AlertFrontEnd;
 
+    public $selectedEmployee;
+    public $childrenEmployees;
     public $employee;
     public $vacationBenefits = [];
     public $selectedBenefitId;
@@ -31,11 +33,26 @@ class ApplyForVacation extends Component
     public function mount()
     {
         $this->employee = Employee::where('user_id', Auth::id())->first();
-        
+        $this->childrenEmployees = $this->employee->childrenEmployees;
+
         if ($this->employee) {
             $this->loadVacationBenefits();
         }
+    }
 
+    public function updatedSelectedEmployee()
+    {
+        if ($this->selectedEmployee) {
+            $this->employee = Employee::find($this->selectedEmployee);
+        } else {
+            $this->employee = Employee::where('user_id', Auth::id())->first();
+        }
+
+        if ($this->employee) {
+            $this->loadVacationBenefits();
+        } else {
+            $this->vacationBenefits = [];
+        }
     }
 
     public function loadVacationBenefits()
@@ -69,27 +86,28 @@ class ApplyForVacation extends Component
         }
 
         $this->resetDays();
-        
+
         $startDate = Carbon::parse($this->fromDate);
         $endDate = Carbon::parse($this->toDate);
-        
+
         if ($startDate->gt($endDate)) {
             $this->alertError('Start date cannot be after end date');
             return;
         }
-        
+
         $currentDate = $startDate->copy();
-        
+        $employeeWorkingDays = $this->employee->workingDays()->get()->pluck('day')->toArray();
+
         while ($currentDate->lte($endDate)) {
-            // Skip weekends (modify as needed based on your business logic)
-            if (!$currentDate->isWeekend()) {
+
+            if (in_array(strtolower($currentDate->format('l')), $employeeWorkingDays)) {
                 $this->days[] = [
                     'vacation_date' => $currentDate->format('Y-m-d'),
                     'hours' => 8, // Default to 8 hours per day
                 ];
                 $this->totalHours += 8;
             }
-            
+
             $currentDate->addDay();
         }
     }
@@ -108,7 +126,7 @@ class ApplyForVacation extends Component
         unset($this->days[$index]);
         $this->days = array_values($this->days);
     }
-    
+
     public function openConfirmModal()
     {
         $this->validate([
@@ -126,19 +144,18 @@ class ApplyForVacation extends Component
 
         try {
             $this->selectedBenefit = VacationBenefit::findOrFail($this->selectedBenefitId);
-            
+
             if ($this->selectedBenefit->current_balance < $this->totalHours) {
                 $this->alertError('You don\'t have enough balance for this vacation request');
                 return;
             }
-            
+
             $this->showConfirmModal = true;
-            
         } catch (\Exception $e) {
             $this->alertError('Error: ' . $e->getMessage());
         }
     }
-    
+
     public function closeConfirmModal()
     {
         $this->showConfirmModal = false;
@@ -153,14 +170,14 @@ class ApplyForVacation extends Component
 
         try {
             $vacationBenefit = VacationBenefit::findOrFail($this->selectedBenefitId);
-            
+
             if ($vacationBenefit->current_balance < $this->totalHours) {
                 $this->alertError('You don\'t have enough balance for this vacation request');
                 return;
             }
-            
+
             $this->employee->applyForVacation($vacationBenefit, $this->totalHours, $this->days);
-            
+
             $this->showConfirmModal = false;
             $this->alertSuccess('Vacation request submitted successfully');
             $this->resetForm();
@@ -186,4 +203,4 @@ class ApplyForVacation extends Component
             'benefits' => 'active'
         ]);
     }
-} 
+}

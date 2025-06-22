@@ -6,12 +6,11 @@ use App\Exceptions\AppException;
 use App\Models\Hierarchy\Position;
 use App\Models\Recruitment\Vacancies\BaseQuestion;
 use App\Models\Recruitment\Vacancies\Vacancy;
-use App\Models\Recruitment\Vacancies\VacancyQuestion;
-use App\Models\Recruitment\Vacancies\VacancySlot;
 use App\Models\Users\User;
 use App\Traits\AlertFrontEnd;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -504,16 +503,22 @@ class VacancyIndex extends Component
                 $query->search($this->search);
             })
             ->orderBy('created_at', 'desc')
+            ->checkPermissions()
             ->paginate(30);
 
 
         $vacancyTypes = Vacancy::TYPE_OPTIONS;
         $vacancyStatuses = Vacancy::STATUS_OPTIONS;
+        $loggedInUser = Auth::user();
+        $layout = 'components.layouts.app';
+        if ($loggedInUser->is_employee) {
+            $layout = 'components.layouts.employee';
+        } 
 
         return view('livewire.recruitment.vacancy-index', [
             'vacancies' => $vacancies,
             'vacancyTypes' => $vacancyTypes,
             'vacancyStatuses' => $vacancyStatuses
-        ]);
+        ])->layout($layout);
     }
 }

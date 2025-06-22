@@ -396,6 +396,100 @@
                             @endif
                         </div>
                     </div>
+
+                    <!-- Additional Documents -->
+                    <div class="mt-6">
+                        <h5 class="text-lg font-medium mb-4">{{ __('recruitment.additional_documents') }}</h5>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- ID Card -->
+                            <div class="form-group">
+                                <label for="idCard" class="form-label">{{ __('recruitment.id_card') }}</label>
+                                <input type="file" id="idCard" wire:model="idCard"
+                                    @if ($locale === 'ar') dir="rtl" @endif
+                                    class="form-control @error('idCard') !border-danger-500 @enderror">
+                                <div wire:loading wire:target="idCard" class="text-primary-500 text-sm mt-2">
+                                    {{ __('recruitment.uploading') }}
+                                </div>
+                                @error('idCard')
+                                    <bdi>
+                                        <span
+                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                    </bdi>
+                                @enderror
+                                @if ($idCard)
+                                    <div class="mt-2">
+                                        <span class="text-success-500">{{ __('recruitment.file_selected') }}</span>
+                                    </div>
+                                @endif
+                            </div>
+
+                            <!-- Birth Certificate -->
+                            <div class="form-group">
+                                <label for="birthCertificate" class="form-label">{{ __('recruitment.birth_certificate') }}</label>
+                                <input type="file" id="birthCertificate" wire:model="birthCertificate"
+                                    @if ($locale === 'ar') dir="rtl" @endif
+                                    class="form-control @error('birthCertificate') !border-danger-500 @enderror">
+                                <div wire:loading wire:target="birthCertificate" class="text-primary-500 text-sm mt-2">
+                                    {{ __('recruitment.uploading') }}
+                                </div>
+                                @error('birthCertificate')
+                                    <bdi>
+                                        <span
+                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                    </bdi>
+                                @enderror
+                                @if ($birthCertificate)
+                                    <div class="mt-2">
+                                        <span class="text-success-500">{{ __('recruitment.file_selected') }}</span>
+                                    </div>
+                                @endif
+                            </div>
+
+                            <!-- College Certificate -->
+                            <div class="form-group">
+                                <label for="collegeCertificate" class="form-label">{{ __('recruitment.college_certificate') }}</label>
+                                <input type="file" id="collegeCertificate" wire:model="collegeCertificate"
+                                    @if ($locale === 'ar') dir="rtl" @endif
+                                    class="form-control @error('collegeCertificate') !border-danger-500 @enderror">
+                                <div wire:loading wire:target="collegeCertificate" class="text-primary-500 text-sm mt-2">
+                                    {{ __('recruitment.uploading') }}
+                                </div>
+                                @error('collegeCertificate')
+                                    <bdi>
+                                        <span
+                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                    </bdi>
+                                @enderror
+                                @if ($collegeCertificate)
+                                    <div class="mt-2">
+                                        <span class="text-success-500">{{ __('recruitment.file_selected') }}</span>
+                                    </div>
+                                @endif
+                            </div>
+
+                            <!-- Army Certificate -->
+                            <div class="form-group">
+                                <label for="armyCertificate" class="form-label">{{ __('recruitment.army_certificate') }}</label>
+                                <input type="file" id="armyCertificate" wire:model="armyCertificate"
+                                    @if ($locale === 'ar') dir="rtl" @endif
+                                    class="form-control @error('armyCertificate') !border-danger-500 @enderror">
+                                <div wire:loading wire:target="armyCertificate" class="text-primary-500 text-sm mt-2">
+                                    {{ __('recruitment.uploading') }}
+                                </div>
+                                @error('armyCertificate')
+                                    <bdi>
+                                        <span
+                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                    </bdi>
+                                @enderror
+                                @if ($armyCertificate)
+                                    <div class="mt-2">
+                                        <span class="text-success-500">{{ __('recruitment.file_selected') }}</span>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
                 @endif
 
                 <!-- Step 2: Education -->
@@ -1240,7 +1334,7 @@
                     </div>
 
                     <!-- Terms and Conditions -->
-                    <div class="form-group mb-4">
+                    {{-- <div class="form-group mb-4">
                         <label class="flex items-center {{ $locale === 'ar' ? 'flex-row-reverse' : '' }}">
                             <input type="checkbox" wire:model="agreeToTerms" class="form-checkbox"
                                 @if ($locale === 'ar') dir="rtl" @endif>
@@ -1256,7 +1350,7 @@
                                 <span class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
                             </bdi>
                         @enderror
-                    </div>
+                    </div> --}}
                 @endif
 
                 <!-- Step navigation -->

@@ -254,7 +254,7 @@ class User extends Authenticatable
         });
     }
 
-    public function scopeEmployee($query)
+    public function scopeEmployeeOnly($query)
     {
         return $query->where('type', self::TYPE_EMPLOYEE);
     }

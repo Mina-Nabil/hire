@@ -138,6 +138,16 @@ class ApplicantShow extends Component
     public $documentFile;
     public $documentNotes;
 
+    // New document upload properties
+    public $showIdCardUploadModal = false;
+    public $showBirthCertificateUploadModal = false;
+    public $showCollegeCertificateUploadModal = false;
+    public $showArmyCertificateUploadModal = false;
+    public $idCardFile;
+    public $birthCertificateFile;
+    public $collegeCertificateFile;
+    public $armyCertificateFile;
+
     // Edit Main Information Modal
     public $showMainInfoModal = false;
     public $editMainInfo = [];
@@ -285,6 +295,233 @@ class ApplicantShow extends Component
         }
     }
 
+    // ID Card Management
+    public function openIdCardUploadModal()
+    {
+        $this->showIdCardUploadModal = true;
+        $this->reset(['idCardFile']);
+    }
+
+    public function closeIdCardUploadModal()
+    {
+        $this->showIdCardUploadModal = false;
+        $this->reset(['idCardFile']);
+    }
+
+    public function uploadIdCard()
+    {
+        $this->validate([
+            'idCardFile' => 'required|file|mimes:pdf,jpg,jpeg,png|max:4096',
+        ], [
+            'idCardFile.required' => 'ID Card file is required',
+            'idCardFile.mimes' => 'ID Card must be a PDF, JPG, JPEG, or PNG file',
+            'idCardFile.max' => 'ID Card must be less than 4MB',
+        ]);
+
+        try {
+            $filePath = $this->idCardFile->store(Applicant::ID_CARD_PATH, 's3');
+            $this->applicant->setIdCard($filePath);
+
+            $this->alert('success', 'ID Card uploaded successfully');
+            $this->closeIdCardUploadModal();
+
+            // Refresh applicant data
+            $this->applicant->refresh();
+        } catch (AppException $e) {
+            $this->alert('error', $e->getMessage());
+        } catch (Exception $e) {
+            report($e);
+            $this->alert('error', 'Failed to upload ID Card: ' . $e->getMessage());
+        }
+    }
+
+    public function deleteIdCard()
+    {
+        try {
+            if ($this->applicant->id_card_url) {
+                Storage::disk('s3')->delete($this->applicant->id_card_url);
+                $this->applicant->update(['id_card_url' => null]);
+                $this->alert('success', 'ID Card deleted successfully');
+                $this->applicant->refresh();
+            }
+        } catch (AppException $e) {
+            $this->alert('error', $e->getMessage());
+        } catch (Exception $e) {
+            report($e);
+            $this->alert('error', 'Failed to delete ID Card: ' . $e->getMessage());
+        }
+    }
+
+    // Birth Certificate Management
+    public function openBirthCertificateUploadModal()
+    {
+        $this->showBirthCertificateUploadModal = true;
+        $this->reset(['birthCertificateFile']);
+    }
+
+    public function closeBirthCertificateUploadModal()
+    {
+        $this->showBirthCertificateUploadModal = false;
+        $this->reset(['birthCertificateFile']);
+    }
+
+    public function uploadBirthCertificate()
+    {
+        $this->validate([
+            'birthCertificateFile' => 'required|file|mimes:pdf,jpg,jpeg,png|max:4096',
+        ], [
+            'birthCertificateFile.required' => 'Birth Certificate file is required',
+            'birthCertificateFile.mimes' => 'Birth Certificate must be a PDF, JPG, JPEG, or PNG file',
+            'birthCertificateFile.max' => 'Birth Certificate must be less than 4MB',
+        ]);
+
+        try {
+            $filePath = $this->birthCertificateFile->store(Applicant::BIRTH_CERTIFICATE_PATH, 's3');
+            $this->applicant->setBirthCertificate($filePath);
+
+            $this->alert('success', 'Birth Certificate uploaded successfully');
+            $this->closeBirthCertificateUploadModal();
+
+            // Refresh applicant data
+            $this->applicant->refresh();
+        } catch (AppException $e) {
+            $this->alert('error', $e->getMessage());
+        } catch (Exception $e) {
+            report($e);
+            $this->alert('error', 'Failed to upload Birth Certificate: ' . $e->getMessage());
+        }
+    }
+
+    public function deleteBirthCertificate()
+    {
+        try {
+            if ($this->applicant->birth_certificate_url) {
+                Storage::disk('s3')->delete($this->applicant->birth_certificate_url);
+                $this->applicant->update(['birth_certificate_url' => null]);
+                $this->alert('success', 'Birth Certificate deleted successfully');
+                $this->applicant->refresh();
+            }
+        } catch (AppException $e) {
+            $this->alert('error', $e->getMessage());
+        } catch (Exception $e) {
+            report($e);
+            $this->alert('error', 'Failed to delete Birth Certificate: ' . $e->getMessage());
+        }
+    }
+
+    // College Certificate Management
+    public function openCollegeCertificateUploadModal()
+    {
+        $this->showCollegeCertificateUploadModal = true;
+        $this->reset(['collegeCertificateFile']);
+    }
+
+    public function closeCollegeCertificateUploadModal()
+    {
+        $this->showCollegeCertificateUploadModal = false;
+        $this->reset(['collegeCertificateFile']);
+    }
+
+    public function uploadCollegeCertificate()
+    {
+        $this->validate([
+            'collegeCertificateFile' => 'required|file|mimes:pdf,jpg,jpeg,png|max:4096',
+        ], [
+            'collegeCertificateFile.required' => 'College Certificate file is required',
+            'collegeCertificateFile.mimes' => 'College Certificate must be a PDF, JPG, JPEG, or PNG file',
+            'collegeCertificateFile.max' => 'College Certificate must be less than 4MB',
+        ]);
+
+        try {
+            $filePath = $this->collegeCertificateFile->store(Applicant::COLLEGE_CERTIFICATE_PATH, 's3');
+            $this->applicant->setCollegeCertificate($filePath);
+
+            $this->alert('success', 'College Certificate uploaded successfully');
+            $this->closeCollegeCertificateUploadModal();
+
+            // Refresh applicant data
+            $this->applicant->refresh();
+        } catch (AppException $e) {
+            $this->alert('error', $e->getMessage());
+        } catch (Exception $e) {
+            report($e);
+            $this->alert('error', 'Failed to upload College Certificate: ' . $e->getMessage());
+        }
+    }
+
+    public function deleteCollegeCertificate()
+    {
+        try {
+            if ($this->applicant->college_certificate_url) {
+                Storage::disk('s3')->delete($this->applicant->college_certificate_url);
+                $this->applicant->update(['college_certificate_url' => null]);
+                $this->alert('success', 'College Certificate deleted successfully');
+                $this->applicant->refresh();
+            }
+        } catch (AppException $e) {
+            $this->alert('error', $e->getMessage());
+        } catch (Exception $e) {
+            report($e);
+            $this->alert('error', 'Failed to delete College Certificate: ' . $e->getMessage());
+        }
+    }
+
+    // Army Certificate Management
+    public function openArmyCertificateUploadModal()
+    {
+        $this->showArmyCertificateUploadModal = true;
+        $this->reset(['armyCertificateFile']);
+    }
+
+    public function closeArmyCertificateUploadModal()
+    {
+        $this->showArmyCertificateUploadModal = false;
+        $this->reset(['armyCertificateFile']);
+    }
+
+    public function uploadArmyCertificate()
+    {
+        $this->validate([
+            'armyCertificateFile' => 'required|file|mimes:pdf,jpg,jpeg,png|max:4096',
+        ], [
+            'armyCertificateFile.required' => 'Army Certificate file is required',
+            'armyCertificateFile.mimes' => 'Army Certificate must be a PDF, JPG, JPEG, or PNG file',
+            'armyCertificateFile.max' => 'Army Certificate must be less than 4MB',
+        ]);
+
+        try {
+            $filePath = $this->armyCertificateFile->store(Applicant::ARMY_CERTIFICATE_PATH, 's3');
+            $this->applicant->setArmyCertificate($filePath);
+
+            $this->alert('success', 'Army Certificate uploaded successfully');
+            $this->closeArmyCertificateUploadModal();
+
+            // Refresh applicant data
+            $this->applicant->refresh();
+        } catch (AppException $e) {
+            $this->alert('error', $e->getMessage());
+        } catch (Exception $e) {
+            report($e);
+            $this->alert('error', 'Failed to upload Army Certificate: ' . $e->getMessage());
+        }
+    }
+
+    public function deleteArmyCertificate()
+    {
+        try {
+            if ($this->applicant->army_certificate_url) {
+                Storage::disk('s3')->delete($this->applicant->army_certificate_url);
+                $this->applicant->update(['army_certificate_url' => null]);
+                $this->alert('success', 'Army Certificate deleted successfully');
+                $this->applicant->refresh();
+            }
+        } catch (AppException $e) {
+            $this->alert('error', $e->getMessage());
+        } catch (Exception $e) {
+            report($e);
+            $this->alert('error', 'Failed to delete Army Certificate: ' . $e->getMessage());
+        }
+    }
 
     //mount and render
     /**

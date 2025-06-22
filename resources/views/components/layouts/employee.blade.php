@@ -82,6 +82,16 @@
                 <ul class="sidebar-menu">
 
                     <li>
+                        <a class="navItem {{ request()->routeIs('recruitment.vacancies') ? 'active' : '' }}"
+                            href="{{ url('/recruitment/vacancies') }}">
+                            <span class="flex items-center">
+                                <iconify-icon class="nav-icon" icon="heroicons-outline:briefcase"></iconify-icon>
+                                <span>Assigned Vacancies</span>
+                            </span>
+                            </a>
+                    </li>
+
+                    <li>
                         <a href="{{ url('/employee/benefits') }}" class="navItem {{ $benefits ?? '' }}">
                             <span class="flex items-center">
                                 <iconify-icon class="nav-icon" icon="heroicons-outline:credit-card"></iconify-icon>

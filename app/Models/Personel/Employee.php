@@ -7,6 +7,7 @@ use App\Models\Attendance\BusArrival;
 use App\Models\Attendance\Overtime;
 use App\Models\Attendance\PublicHoliday;
 use App\Models\Base\City;
+use App\Models\Base\DocManager;
 use App\Models\Base\InsuranceOffice;
 use App\Models\Benefits\Payrolls\AppliedVacation;
 use App\Models\Benefits\Configurations\BaseBenefit;
@@ -1432,46 +1433,54 @@ class Employee extends Model
      */
     public function scopeWithMissingDocuments($query)
     {
-        return $query->where(function ($query) {
+
+        $docManagers = DocManager::where('is_required', true)->get();
+        return $query->where(function ($query) use ($docManagers) {
             // 1. ID Card
             $query
-                ->whereDoesntHave('idCard')
+                ->when($docManagers->contains('doc_type', 'idCard'), fn($q) => $q->orwhereDoesntHave('idCard'))
                 // 2. Birth Certificate
-                ->orWhereDoesntHave('birthCertificate')
+                ->when($docManagers->contains('doc_type', 'birthCertificate'), fn($q) => $q->orWhereDoesntHave('birthCertificate'))
                 // 3. Employment Contract
-                ->orWhereDoesntHave('contracts')
+                ->when($docManagers->contains('doc_type', 'contract'), fn($q) => $q->orWhereDoesntHave('contracts'))
                 // 4. Army Service Paper - only for males with appropriate military status
-                ->orWhere(function ($query) {
+                ->when($docManagers->contains('doc_type', 'armyServicePaper'), fn($q) => $q->orWhere(function ($query) {
                     $query
                         ->whereHas('info', function ($q) {
                             $q->where('gender', 'male')->whereNotIn('military_status', ['exempt', 'completed']);
                         })
                         ->whereDoesntHave('armyServicePaper');
-                })
+                }))
                 // 5. Driver License - only if required
-                ->orWhere(function ($query) {
+                ->when($docManagers->contains('doc_type', 'driverLicense'), fn($q) => $q->orWhere(function ($query) {
                     $query->where('license_required', 1)->whereDoesntHave('driverLicense');
-                })
+                }))
                 // 6. Police Record
-                ->orWhereDoesntHave('policeRecords')
+                ->when($docManagers->contains('doc_type', 'policeRecord'), fn($q) => $q->orWhereDoesntHave('policeRecords'))
                 // 7. HR Letter
-                ->orWhereDoesntHave('hrLetters')
+                // ->when($docManagers->contains('doc_type', 'hrLetter'), fn($q) => $q->orWhereDoesntHave('hrLetters'))
                 // 8. S1 Document
-                ->orWhereDoesntHave('employeeS1Doc')
+                ->when($docManagers->contains('doc_type', 'employeeS1Doc'), fn($q) => $q->orWhereDoesntHave('employeeS1Doc'))
                 // 9. S2 Document
-                ->orWhereDoesntHave('employeeS2Doc')
+                ->when($docManagers->contains('doc_type', 'employeeS2Doc'), fn($q) => $q->orWhereDoesntHave('employeeS2Doc'))
                 // 10. S6 Document
-                ->orWhereDoesntHave('employeeS6Doc')
+                ->when($docManagers->contains('doc_type', 'employeeS6Doc'), fn($q) => $q->orWhereDoesntHave('employeeS6Doc'))
                 // 11. Medical Record
-                ->orWhereDoesntHave('medicalRecord')
+                ->when($docManagers->contains('doc_type', 'medicalRecord'), fn($q) => $q->orWhereDoesntHave('medicalRecord'))
                 // 12. External Medical Record
-                ->orWhereDoesntHave('externalMedicalRecord')
+                ->when($docManagers->contains('doc_type', 'externalMedicalRecord'), fn($q) => $q->orWhereDoesntHave('externalMedicalRecord'))
                 // 13. Practice Card
-                ->orWhereDoesntHave('practiceCard')
+                ->when($docManagers->contains('doc_type', 'practiceCard'), fn($q) => $q->orWhereDoesntHave('practiceCard'))
                 // 14. Syndicate Card
-                ->orWhereDoesntHave('syndicateCard')
+                ->when($docManagers->contains('doc_type', 'syndicateCard'), fn($q) => $q->orWhereDoesntHave('syndicateCard'))
                 // 15. Work Declaration
-                ->orWhereDoesntHave('workDeclarations');
+                ->when($docManagers->contains('doc_type', 'workDeclaration'), fn($q) => $q->orWhereDoesntHave('workDeclarations'))
+                // 16. Social Print
+                ->when($docManagers->contains('doc_type', 'socialPrint'), fn($q) => $q->orWhereDoesntHave('socialPrint'))
+                // 17. Passport
+                ->when($docManagers->contains('doc_type', 'collegeCertificate'), fn($q) => $q->orWhereDoesntHave('collegeCertificate'))
+                // 18. Labour Document
+                ->when($docManagers->contains('doc_type', 'labourDocument'), fn($q) => $q->orWhereDoesntHave('labourDocument'));
         });
     }
 

@@ -32,6 +32,7 @@ class DatabaseSeeder extends Seeder
                 UsersSeeder::class,
                 ChannelSeeder::class,
                 VacationPackageSeeder::class,
+                DocManagerSeeder::class,
             ]);
         }
     }

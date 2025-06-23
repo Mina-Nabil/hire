@@ -315,8 +315,6 @@ class MigrationService
                             'created_by' => 1,
                         ]);
                         $employee->info()->create([
-                            'marital_status' => Applicant::MARITAL_STATUS[0],
-                            'military_status' => Applicant::MILITARY_STATUS[0],
                             'employee_code' => $employee['employee_code'],
                         ]);
                     }

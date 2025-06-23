@@ -324,8 +324,6 @@ class Interview extends Model
     {
         $loggedInUser = Auth::user();
 
-        $vacancy = $this->application->vacancy;
-
         $query->select('interviews.*')
             ->join('applications', 'applications.id', '=', 'interviews.application_id')
             ->join('vacancies', 'vacancies.id', '=', 'applications.vacancy_id')

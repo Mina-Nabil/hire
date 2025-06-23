@@ -482,8 +482,8 @@ class EmployeeShow extends Component
             'academic_qualification' => 'nullable|string|max:255',
             'university' => 'nullable|string|max:255',
             'graduation_year' => 'nullable|integer',
-            'military_status' => 'nullable|string|max:50',
-            'marital_status' => 'nullable|string|max:50',
+            'military_status' => 'required|string|max:50',
+            'marital_status' => 'required|string|max:50',
             'employee_code' => 'nullable|string|max:50',
             'device_id' => 'nullable|string|max:50',
         ]);

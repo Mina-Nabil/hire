@@ -87,6 +87,8 @@ class EmployeeShow extends Component
     public $graduation_year;
     public $military_status;
     public $marital_status;
+    public $employee_code;
+    public $device_id;
     
     // ID Card Modal
     public $editIdCardModal = false;

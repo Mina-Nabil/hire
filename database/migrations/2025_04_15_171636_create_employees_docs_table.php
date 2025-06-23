@@ -25,7 +25,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Employee::class)->constrained()->cascadeOnDelete();
 
-            $table->foreignIdFor(InsuranceOffice::class)->constrained()->restrictOnDelete();
+            $table->foreignIdFor(InsuranceOffice::class)->nullable()->constrained()->nullOnDelete();
             $table->string('insurance_number')->nullable();
             $table->double('insurance_amount', 10, 2)->nullable();
 
@@ -34,8 +34,8 @@ return new class extends Migration
             $table->string('graduation_year')->nullable();
 
             $table->enum('military_status', Applicant::MILITARY_STATUS)->nullable();
-            $table->enum('gender', Applicant::GENDER);
-            $table->enum('marital_status', Applicant::MARITAL_STATUS);
+            $table->enum('gender', Applicant::GENDER)->nullable();
+            $table->enum('marital_status', Applicant::MARITAL_STATUS)->nullable();
 
             $table->unsignedInteger('children_count')->default(0);
             $table->string('emergency_name')->nullable();

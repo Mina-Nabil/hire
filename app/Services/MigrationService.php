@@ -10,6 +10,8 @@ use App\Models\Hierarchy\Department;
 use App\Models\Hierarchy\Location;
 use App\Models\Hierarchy\Position;
 use App\Models\Personel\Employee;
+use App\Models\Personel\EmployeeInfo;
+use App\Models\Recruitment\Applicants\Applicant;
 use App\Models\Users\AppLog;
 use App\Models\Users\User;
 use Carbon\Carbon;
@@ -80,6 +82,7 @@ class MigrationService
                     $employeeAddress = $employees_sheet->getCell('F' . $row)->getValueString();
                     $nationality = $employees_sheet->getCell('G' . $row)->getValueString();
                     $gender = $employees_sheet->getCell('H' . $row)->getValueString();
+                
                     try {
                         if ($employees_sheet->getCell('I' . $row)->getValue()) {
                             $birthDate = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($employees_sheet->getCell('I' . $row)->getValue());
@@ -105,6 +108,7 @@ class MigrationService
                     } catch (Exception $e) {
                         $employment_date = Carbon::parse('2024-01-01');
                     }
+                    $employeeCode = $employees_sheet->getCell('L' . $row)->getValueString();
 
                     // Extract first and last name from full name
                     $nameParts = explode(' ', $employeeName);
@@ -144,29 +148,7 @@ class MigrationService
                         !$employment_date => 'Employment date is required',
                         true => null,
                     };
-                    // if (!$employeeName) {
-                    //     $invalid_reason = 'Employee name is required';
-                    // } else if (!$employeeNameAr) {
-                    //     $invalid_reason = 'Employee name arabic is required';
-                    // } else if (!$id_number) {
-                    //     $invalid_reason = 'ID number is required';
-                    // } else if (!$employeeEmail) {
-                    //     $invalid_reason = 'Employee email is required';
-                    // } else if (!$employeePhone) {
-                    //     $invalid_reason = 'Employee phone is required';
-                    // } else if (!$employeeAddress) {
-                    //     $invalid_reason = 'Employee address is required';
-                    // } else if (!$nationality) {
-                    //     $invalid_reason = 'Nationality is required';
-                    // } else if (!$gender) {
-                    //     $invalid_reason = 'Gender is required';
-                    // } else if (!$birthDate) {
-                    //     $invalid_reason = 'Birth date is required';
-                    // } else if (!$city_name) {
-                    //     $invalid_reason = 'City name is required';
-                    // } else if (!$employment_date) {
-                    //     $invalid_reason = 'Employment date is required';
-                    // }
+                   
 
                     $employees[] = [
                         'name' => $employeeName,
@@ -181,6 +163,7 @@ class MigrationService
                         'employment_date' => Carbon::parse($employment_date)->format('Y-m-d'),
                         'city_id' => $city->id,
                         'city_name' => $city_name,
+                        'employee_code' => $employeeCode,
 
                         'base_username' => $baseUsername,
                         'base_password' => "pass@123",
@@ -271,7 +254,7 @@ class MigrationService
                         'arabic_name' => $positionArabicName,
                         'parent' => $parentPositionCode,
                         'code' => $positionCode,
-                        'employee_id' => $employeeIDNumber,
+                        'employee_id' => $positionCode,
                         'salary_grade' => $salaryGradeName,
                         'not_valid' => $invalid,
                         'invalid_reason' => $invalid_reason,
@@ -316,7 +299,7 @@ class MigrationService
                             'type' => User::TYPE_EMPLOYEE,
                         ]);
 
-                        Employee::create([
+                        $employee = Employee::create([
                             'user_id' => $user->id,
                             'name' => $employee['name'],
                             'name_ar' => $employee['name_ar'],
@@ -330,6 +313,11 @@ class MigrationService
                             'employment_date' => Carbon::parse($employee['employment_date'])->format('Y-m-d'),
                             'birth_place_id' => $employee['city_id'],
                             'created_by' => 1,
+                        ]);
+                        $employee->info()->create([
+                            'marital_status' => Applicant::MARITAL_STATUS[0],
+                            'military_status' => Applicant::MILITARY_STATUS[0],
+                            'employee_code' => $employee['employee_code'],
                         ]);
                     }
                 }
@@ -368,7 +356,9 @@ class MigrationService
                             $salary_grade = SalaryGrade::where('name', $position['salary_grade'])->first();
                         }
                         if ($position['employee_id']) {
-                            $position_employee = Employee::where('id_number', $position['employee_id'])->first();
+                            $position_employee = Employee::whereHas('info', function ($query) use ($position) {
+                                $query->where('employee_code', $position['employee_id']);
+                            })->first();
                         }
                         if ($position['parent']) {
                             $parent_position = Position::where('code', $position['parent'])->first();

@@ -196,7 +196,7 @@ class Calendar extends Component
                 'allDay'    => false,
                 'start'     => (new Carbon($t->date))->toIso8601String(),
                 'end'       => (new Carbon($t->date))->addHours(1)->toIso8601String(),
-                'url'       => $t->zoom_link ?? "#"
+                'url'       => $t->zoom_link ?? url('/recruitment/vacancies/' . $t->application->vacancy->id)
             ];
         }
 

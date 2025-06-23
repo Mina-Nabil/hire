@@ -459,8 +459,8 @@ class EmployeeShow extends Component
             $this->academic_qualification = $this->employee->info->academic_qualification;
             $this->university = $this->employee->info->university;
             $this->graduation_year = $this->employee->info->graduation_year;
-            $this->military_status = $this->employee->info->military_status;
-            $this->marital_status = $this->employee->info->marital_status;
+            $this->military_status = $this->employee->info->military_status ?? Applicant::MILITARY_STATUS[0];
+            $this->marital_status = $this->employee->info->marital_status ?? Applicant::MARITAL_STATUS[0];
         } else {
             // Default values for new employee info
             $this->insurance_office_id = $this->insuranceOffices->first()->id ?? null;

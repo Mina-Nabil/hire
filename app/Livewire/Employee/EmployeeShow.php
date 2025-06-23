@@ -77,6 +77,7 @@ class EmployeeShow extends Component
     public $birth_date;
     public $employment_date;
     public $termination_date;
+    public $device_id;
 
     // Employee Info Edit Modal
     public $editEmployeeInfoModal = false;
@@ -387,7 +388,6 @@ class EmployeeShow extends Component
 
     public function openEditBaseInfoModal()
     {
-        $this->resetValidation();
         $this->name = $this->employee->name;
         $this->name_ar = $this->employee->name_ar;
         $this->mother_name = $this->employee->mother_name;
@@ -396,9 +396,10 @@ class EmployeeShow extends Component
         $this->address = $this->employee->address;
         $this->nationality = $this->employee->nationality;
         $this->gender = $this->employee->gender;
-        $this->birth_date = $this->employee->birth_date ? $this->employee->birth_date->format('Y-m-d') : null;
-        $this->employment_date = $this->employee->employment_date ? $this->employee->employment_date->format('Y-m-d') : null;
-        $this->id_number = $this->employee->id_number;
+        $this->birth_date = $this->employee->birth_date ? Carbon::parse($this->employee->birth_date)->format('Y-m-d') : null;
+        $this->employment_date = $this->employee->employment_date ? Carbon::parse($this->employee->employment_date)->format('Y-m-d') : null;
+        $this->termination_date = $this->employee->termination_date ? Carbon::parse($this->employee->termination_date)->format('Y-m-d') : null;
+        $this->device_id = $this->employee->device_id;
         $this->editBaseInfoModal = true;
     }
 
@@ -435,14 +436,15 @@ class EmployeeShow extends Component
                 $this->gender,
                 $this->birth_date,
                 $this->employment_date,
-                $this->id_number,
+                $this->employee->id_number,
+                $this->device_id,
                 $this->mother_name,
                 $this->termination_date ? Carbon::parse($this->termination_date) : null
             );
 
             if ($res) {
                 $this->closeEditBaseInfoModal();
-                $this->alert('success', 'Employee updated successfully!');
+                $this->alert('success', 'Employee base info updated successfully');
             } else {
                 $this->alertError();
             }

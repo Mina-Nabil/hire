@@ -30,6 +30,21 @@ class EmployeeConfiguration extends Component
     public Employee $employee;
     public $activeTab = 'info';
 
+    // Base Info Edit Modal
+    public $editBaseInfoModal = false;
+    public $name;
+    public $name_ar;
+    public $mother_name;
+    public $email;
+    public $phone;
+    public $address;
+    public $nationality;
+    public $gender;
+    public $birth_date;
+    public $employment_date;
+    public $termination_date;
+    public $device_id;
+
     public $benefitIncrementTypes = BaseBenefit::TYPE_LIST;
     public $vacationBenefitTypes = VacationDetail::TYPE_LIST;
 
@@ -606,37 +621,20 @@ class EmployeeConfiguration extends Component
         $this->employeeExtraPayments = [];
     }
 
-    // Base Info Edit Modal
-    public $editBaseInfoModal = false;
-    public $name;
-    public $name_ar;
-    public $id_number;
-    public $mother_name;
-    public $email;
-    public $phone;
-    public $address;
-    public $nationality;
-    public $gender;
-    public $birth_date;
-    public $employment_date;
-    public $termination_date;
-
-
     public function openEditBaseInfoModal()
     {
-        $this->resetValidation();
         $this->name = $this->employee->name;
         $this->name_ar = $this->employee->name_ar;
-        $this->id_number = $this->employee->id_number;
         $this->mother_name = $this->employee->mother_name;
         $this->email = $this->employee->email;
         $this->phone = $this->employee->phone;
         $this->address = $this->employee->address;
         $this->nationality = $this->employee->nationality;
         $this->gender = $this->employee->gender;
-        $this->birth_date = $this->employee->birth_date ? $this->employee->birth_date->format('Y-m-d') : null;
-        $this->employment_date = $this->employee->employment_date ? $this->employee->employment_date->format('Y-m-d') : null;
-
+        $this->birth_date = $this->employee->birth_date ? Carbon::parse($this->employee->birth_date)->format('Y-m-d') : null;
+        $this->employment_date = $this->employee->employment_date ? Carbon::parse($this->employee->employment_date)->format('Y-m-d') : null;
+        $this->termination_date = $this->employee->termination_date ? Carbon::parse($this->employee->termination_date)->format('Y-m-d') : null;
+        $this->device_id = $this->employee->device_id;
         $this->editBaseInfoModal = true;
     }
 
@@ -650,18 +648,17 @@ class EmployeeConfiguration extends Component
         $this->validate([
             'name' => 'required|string|max:255',
             'name_ar' => 'required|string|max:255',
-            'mother_name' => 'nullable|string|max:255',
-            'id_number' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'phone' => 'required|string|max:20',
             'address' => 'required|string|max:255',
-            'nationality' => 'required|string|max:50',
-            'gender' => 'required|in:Male,Female',
+            'nationality' => 'required|string|max:255',
+            'gender' => 'required|string|in:Male,Female',
             'birth_date' => 'required|date',
             'employment_date' => 'required|date',
             'termination_date' => 'nullable|date',
+            'mother_name' => 'nullable|string|max:255',
+            'device_id' => 'nullable|string|max:255',
         ]);
-
 
         $res = $this->employee->updateBaseInfo(
             $this->name,
@@ -673,7 +670,8 @@ class EmployeeConfiguration extends Component
             $this->gender,
             $this->birth_date,
             $this->employment_date,
-            $this->id_number,
+            $this->employee->id_number,
+            $this->device_id,
             $this->mother_name,
             $this->termination_date ? Carbon::parse($this->termination_date) : null
         );

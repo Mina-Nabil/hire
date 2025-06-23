@@ -105,6 +105,7 @@ class Employee extends Model
         'termination_date',
         'mother_name',
         'status',
+        'device_id',
     ];
 
     protected $casts = [
@@ -1312,7 +1313,7 @@ class Employee extends Model
      * @return Employee
      * @throws AppException
      */
-    public function updateBaseInfo(string $name, string $name_ar, string $email, string $phone, string $address, string $nationality, string $gender, $birth_date, $employment_date, string $id_number, ?string $mother_name = null, ?Carbon $termination_date = null)
+    public function updateBaseInfo(string $name, string $name_ar, string $email, string $phone, string $address, string $nationality, string $gender, $birth_date, $employment_date, string $id_number, ?string $device_id = null, ?string $mother_name = null, ?Carbon $termination_date = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -1334,6 +1335,7 @@ class Employee extends Model
                 'employment_date' => $employment_date,
                 'mother_name' => $mother_name,
                 'termination_date' => $termination_date,
+                'device_id' => $device_id,
             ]);
             AppLog::info('Employee Base Info Updated', 'Employee base info updated for employee: ' . $this->name, loggable: $this);
             return $this->fresh();
@@ -3658,7 +3660,7 @@ class Employee extends Model
      * @param Carbon|string $endDate End date of the range
      * @return \Illuminate\Support\Collection Collection of dates that were working days but had no attendance
      */
-    public function getMissedWorkingDays($startDate, $endDate, $deleteOldMissedDays = false)
+    public function getMissedWorkingDays($startDate, $endDate, $deleteOldMissedDays = false, $payrollId = null)
     {
         $startDate = $startDate instanceof Carbon ? $startDate : Carbon::parse($startDate);
         $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
@@ -3736,9 +3738,9 @@ class Employee extends Model
      * @param Carbon|string $endDate End date of the range
      * @return float Total hours that should have been worked but weren't
      */
-    public function getMissedWorkingHours($startDate, $endDate, $deleteOldMissedDays = false)
+    public function getMissedWorkingHours($startDate, $endDate, $deleteOldMissedDays = false, $payrollId = null)
     {
-        $missedDays = $this->getMissedWorkingDays($startDate, $endDate, $deleteOldMissedDays);
+        $missedDays = $this->getMissedWorkingDays($startDate, $endDate, $deleteOldMissedDays, $payrollId);
         $dailyHours = $this->benefitConfiguration?->daily_working_hours ?? 8;
 
         return $missedDays->count() * $dailyHours;
@@ -3764,7 +3766,7 @@ class Employee extends Model
             $hourlyRate = $grossSalary / ($workingDaysPerMonth * $dailyHours);
         }
 
-        $missedHours = $this->getMissedWorkingHours($startDate, $endDate, true);
+        $missedHours = $this->getMissedWorkingHours($startDate, $endDate, true, $payrollId);
         return $missedHours * $hourlyRate;
     }
 

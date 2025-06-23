@@ -1556,18 +1556,8 @@ class Employee extends Model
                 ->when($docManagers->contains('doc_type', 'workDeclaration'), fn($q) => $q->orWhereHas('workDeclarations', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
                 }))
-                // 16. Social Print expired
-                ->when($docManagers->contains('doc_type', 'socialPrint'), fn($q) => $q->orWhereHas('socialPrint', function ($q) use ($today) {
-                    $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
-                }))
-                // 17. College Certificate expired
-                ->when($docManagers->contains('doc_type', 'collegeCertificate'), fn($q) => $q->orWhereHas('collegeCertificate', function ($q) use ($today) {
-                    $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
-                }))
-                // 18. Labour Document expired
-                ->when($docManagers->contains('doc_type', 'labourDocument'), fn($q) => $q->orWhereHas('labourDocument', function ($q) use ($today) {
-                    $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
-                }));
+         
+
         });
     }
 

@@ -1,40 +1,40 @@
 <div>
-    @can('setDocs', [$employee, 'idCard'])
-        <div class="flex justify-between flex-wrap items-center">
-            <div class="md:mb-6 mb-4 flex space-x-3 rtl:space-x-reverse">
-                <div>
-                    <h4
-                        class="font-medium flex items-center lg:text-2xl text-xl capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
-                        <span class="flex items-center gap-2">
-                            {{ $employee->name }}
-                            @switch($employee->status)
-                                @case('active')
-                                    <span
-                                        class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize">{{ __('Active') }}</span>
-                                @break
 
-                                @case('suspended')
-                                    <span
-                                        class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize">{{ __('Suspended') }}</span>
-                                @break
+    <div class="flex justify-between flex-wrap items-center">
+        <div class="md:mb-6 mb-4 flex space-x-3 rtl:space-x-reverse">
+            <div>
+                <h4
+                    class="font-medium flex items-center lg:text-2xl text-xl capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
+                    <span class="flex items-center gap-2">
+                        {{ $employee->name }}
+                        @switch($employee->status)
+                            @case('active')
+                                <span
+                                    class="badge bg-success-500 text-success-500 bg-opacity-30 capitalize">{{ __('Active') }}</span>
+                            @break
 
-                                @case('terminated')
-                                    <span
-                                        class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize">{{ __('Terminated') }}</span>
-                                @break
+                            @case('suspended')
+                                <span
+                                    class="badge bg-warning-500 text-warning-500 bg-opacity-30 capitalize">{{ __('Suspended') }}</span>
+                            @break
 
-                                @case('resigned')
-                                    <span
-                                        class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize">{{ __('Resigned') }}</span>
-                                @break
-                            @endswitch
-                        </span>
-                    </h4>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">Employee</p>
-                </div>
+                            @case('terminated')
+                                <span
+                                    class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize">{{ __('Terminated') }}</span>
+                            @break
+
+                            @case('resigned')
+                                <span
+                                    class="badge bg-danger-500 text-danger-500 bg-opacity-30 capitalize">{{ __('Resigned') }}</span>
+                            @break
+                        @endswitch
+                    </span>
+                </h4>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Employee</p>
             </div>
         </div>
-    @endcan
+    </div>
+
     <div class="grid grid-cols-12 gap-5">
 
         <div class="xl:col-span-3 lg:col-span-4 col-span-12">
@@ -3542,6 +3542,8 @@
                                             class="form-control @error('employee_code') !border-danger-500 @enderror"
                                             wire:model="employee_code">
                                         @error('employee_code')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                     <div class="col-span-12 xl:col-span-6">
                                         <label for="device_id" class="form-label">Device ID</label>
@@ -3549,6 +3551,8 @@
                                             class="form-control @error('device_id') !border-danger-500 @enderror"
                                             wire:model="device_id">
                                         @error('device_id')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                 </div>
                             </div>
@@ -3573,6 +3577,7 @@
                 </div>
             </div>
         </div>
+
     @endif
 
     <!-- ID Card Modal -->
@@ -3633,129 +3638,123 @@
                                                         wire:click="$set('id_card_file', null)">
                                                         Remove File
                                                     </button>
-                                                @else
-                                                    @if ($employee->idCard)
-                                                        <div class="mb-3">
+                                                @elseif ($employee->idCard)
+                                                    <div class="mb-3">
 
-                                                            <small class="text-muted">
-                                                                Current file: <a
-                                                                    href="{{ $employee->idCard->file_path }}"
-                                                                    target="_blank"
-                                                                    class="text-sm text-blue-500">View</a>
-                                                            </small>
-                                                        </div>
-                                                        @if (!$keep_existing_file)
-                                                            <label for="id_card_file_input"
-                                                                class="cursor-pointer block">
-                                                                <iconify-icon icon="mingcute:upload-line"
-                                                                    width="32" height="32"
-                                                                    class="text-slate-400 mx-auto"></iconify-icon>
-                                                                <p class="mt-2 text-sm text-slate-500">Click to upload
-                                                                </p>
-                                                                <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF
-                                                                    (Max
-                                                                    10MB)</p>
-                                                                <input id="id_card_file_input" type="file"
-                                                                    class="hidden" wire:model="id_card_file"
-                                                                    accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
-                                                            </label>
-                                                        @endif
-                                                    @else
+                                                        <small class="text-muted">
+                                                            Current file: <a
+                                                                href="{{ $employee->idCard->file_path }}"
+                                                                target="_blank"
+                                                                class="text-sm text-blue-500">View</a>
+                                                        </small>
+                                                    </div>
+                                                    @if (!$keep_existing_file)
                                                         <label for="id_card_file_input"
                                                             class="cursor-pointer block">
                                                             <iconify-icon icon="mingcute:upload-line" width="32"
                                                                 height="32"
                                                                 class="text-slate-400 mx-auto"></iconify-icon>
-                                                            <p class="mt-2 text-sm text-slate-500">Click to upload or
-                                                                drag
-                                                                and drop</p>
-                                                            <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF (Max
-                                                                10MB)
+                                                            <p class="mt-2 text-sm text-slate-500">Click to upload
                                                             </p>
+                                                            <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF
+                                                                (Max
+                                                                10MB)</p>
                                                             <input id="id_card_file_input" type="file"
                                                                 class="hidden" wire:model="id_card_file"
                                                                 accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
                                                         </label>
                                                     @endif
+                                                @else
+                                                    <label for="id_card_file_input" class="cursor-pointer block">
+                                                        <iconify-icon icon="mingcute:upload-line" width="32"
+                                                            height="32"
+                                                            class="text-slate-400 mx-auto"></iconify-icon>
+                                                        <p class="mt-2 text-sm text-slate-500">Click to upload or
+                                                            drag
+                                                            and drop</p>
+                                                        <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF (Max
+                                                            10MB)
+                                                        </p>
+                                                        <input id="id_card_file_input" type="file"
+                                                            class="hidden" wire:model="id_card_file"
+                                                            accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
+                                                    </label>
                                                 @endif
-                                            </div>
-                                            @error('id_card_file')
-                                                <span
-                                                    class="font-Inter text-sm text-danger-500">{{ $message }}</span>
-                                            @enderror
-                                        </div>
                                     @endif
-                                    @if ($employee->idCard)
-                                        <div class="col-span-12 form-check">
-                                            <div class="checkbox-area">
-                                                <label class="inline-flex items-center cursor-pointer"
-                                                    for="keep_existing_file">
-                                                    <input type="checkbox" class="hidden" name="checkbox"
-                                                        id="keep_existing_file"
-                                                        wire:model.live="keep_existing_file">
-                                                    <span
-                                                        class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
-                                                        <img src="{{ asset('images/icon/ck-white.svg') }}"
-                                                            alt=""
-                                                            class="h-[10px] w-[10px] block m-auto opacity-0"></span>
-                                                    <span
-                                                        class="text-slate-500 dark:text-slate-400 text-sm leading-6">Keep
-                                                        existing document</span>
-                                                </label>
-                                            </div>
-
-                                        </div>
-                                    @endif
-                                    <div class="col-span-12">
-                                        <label for="id_number" class="form-label">ID Number</label>
-                                        <input type="text"
-                                            class="form-control @error('id_number') !border-danger-500 @enderror"
-                                            wire:model="id_number">
-                                        @error('id_number')
-                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                    <div class="col-span-12 xl:col-span-6">
-                                        <label for="id_issue_date" class="form-label">Issue Date</label>
-                                        <input type="date"
-                                            class="form-control @error('id_issue_date') !border-danger-500 @enderror"
-                                            wire:model="id_issue_date">
-                                        @error('id_issue_date')
-                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                    <div class="col-span-12 xl:col-span-6">
-                                        <label for="id_expiry_date" class="form-label">Expiry Date</label>
-                                        <input type="date"
-                                            class="form-control @error('id_expiry_date') !border-danger-500 @enderror"
-                                            wire:model="id_expiry_date">
-                                        @error('id_expiry_date')
-                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
-                                        @enderror
-                                    </div>
                                 </div>
+                                @error('id_card_file')
+                                    <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                @enderror
                             </div>
-                            <!-- Modal footer -->
-                            <div
-                                class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
-                                <button wire:click="closeEditIdCardModal" type="button"
-                                    class="btn inline-flex justify-center btn-outline-dark">Cancel</button>
-                                <button wire:click="updateIdCard" type="button" wire:target='updateIdCard'
-                                    wire:loading.remove
-                                    class="btn inline-flex justify-center btn-dark">Upload</button>
-                                <button wire:loading wire:target="updateIdCard" type="button"
-                                    class="btn inline-flex justify-center btn-dark">
-                                    <span class="flex items-center">
-                                        <iconify-icon icon="line-md:loading-twotone-loop" width="25"
-                                            height="25"></iconify-icon>
-                                    </span>
-                                </button>
+
+
+                            @if ($employee->idCard)
+                                <div class="col-span-12 form-check">
+                                    <div class="checkbox-area">
+                                        <label class="inline-flex items-center cursor-pointer"
+                                            for="keep_existing_file">
+                                            <input type="checkbox" class="hidden" name="checkbox"
+                                                id="keep_existing_file" wire:model.live="keep_existing_file">
+                                            <span
+                                                class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
+                                                <img src="{{ asset('images/icon/ck-white.svg') }}" alt=""
+                                                    class="h-[10px] w-[10px] block m-auto opacity-0"></span>
+                                            <span class="text-slate-500 dark:text-slate-400 text-sm leading-6">Keep
+                                                existing document</span>
+                                        </label>
+                                    </div>
+
+                                </div>
+                            @endif
+
+                            <div class="col-span-12">
+                                <label for="id_number" class="form-label">ID Number</label>
+                                <input type="text"
+                                    class="form-control @error('id_number') !border-danger-500 @enderror"
+                                    wire:model="id_number">
+                                @error('id_number')
+                                    <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="col-span-12 xl:col-span-6">
+                                <label for="id_issue_date" class="form-label">Issue Date</label>
+                                <input type="date"
+                                    class="form-control @error('id_issue_date') !border-danger-500 @enderror"
+                                    wire:model="id_issue_date">
+                                @error('id_issue_date')
+                                    <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="col-span-12 xl:col-span-6">
+                                <label for="id_expiry_date" class="form-label">Expiry Date</label>
+                                <input type="date"
+                                    class="form-control @error('id_expiry_date') !border-danger-500 @enderror"
+                                    wire:model="id_expiry_date">
+                                @error('id_expiry_date')
+                                    <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                @enderror
                             </div>
                         </div>
+                    </div>
+                    <!-- Modal footer -->
+                    <div
+                        class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
+                        <button wire:click="closeEditIdCardModal" type="button"
+                            class="btn inline-flex justify-center btn-outline-dark">Cancel</button>
+                        <button wire:click="updateIdCard" type="button" wire:target='updateIdCard'
+                            wire:loading.remove class="btn inline-flex justify-center btn-dark">Upload</button>
+                        <button wire:loading wire:target="updateIdCard" type="button"
+                            class="btn inline-flex justify-center btn-dark">
+                            <span class="flex items-center">
+                                <iconify-icon icon="line-md:loading-twotone-loop" width="25"
+                                    height="25"></iconify-icon>
+                            </span>
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
+
     @endif
 
     <!-- Birth Certificate Modal -->
@@ -4143,267 +4142,89 @@
 
     <!-- Employee S1 Doc Modal -->
     @if ($editEmployeeS1DocModal)
-        <div>
-            <div id="editEmployeeS1DocModal"
-                class="modal fade fixed top-0 left-0 show w-full h-full outline-none overflow-x-hidden overflow-y-auto"
-                tabindex="-1" aria-labelledby="editEmployeeS1DocModalLabel" aria-hidden="true" wire:ignore.self>
-                <div class="modal-dialog relative w-auto pointer-events-none">
-                    <div
-                        class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
-                        <div class="relative bg-white rounded-lg shadow dark:bg-slate-700">
-                            <!-- Modal header -->
-                            <div
-                                class="flex items-center justify-between p-5 border-b rounded-t dark:border-slate-600 bg-black-500">
-                                <h3 class="text-xl font-medium text-white dark:text-white capitalize">
-                                    Edit Employee S1 Doc
-                                </h3>
-                                <button type="button"
-                                    class="text-slate-400 bg-transparent hover:text-slate-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-slate-600 dark:hover:text-white"
-                                    wire:click="closeEditEmployeeS1DocModal">
-                                    <svg aria-hidden="true" class="w-5 h-5" fill="#ffffff" viewBox="0 0 20 20"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path fill-rule="evenodd"
-                                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                            clip-rule="evenodd"></path>
-                                    </svg>
-                                    <span class="sr-only">Close modal</span>
-                                </button>
-                            </div>
-                            <!-- Modal body -->
-                            <div class="p-6 space-y-4">
-                                <div class="grid grid-cols-12 gap-4">
-                                    @if (!$keep_existing_employee_s1_doc)
-                                        <div class="col-span-12">
-                                            <label for="employee_s1_doc_file" class="form-label">Employee S1 Doc
-                                                Document
-                                                <iconify-icon wire:loading wire:target="employee_s1_doc_file"
-                                                    icon="line-md:loading-twotone-loop" width="18"
-                                                    height="18"></iconify-icon></label>
-                                            <div
-                                                class="border-2 border-dashed border-slate-200 rounded-md p-4 text-center">
-                                                @if ($employee_s1_doc_file)
-                                                    <div class="flex items-center justify-center mb-3">
-                                                        @if (in_array($employee_s1_doc_file->getClientOriginalExtension(), ['pdf']))
-                                                            <iconify-icon icon="mingcute:file-pdf-fill"
-                                                                width="48" height="48"
-                                                                class="text-red-500"></iconify-icon>
-                                                        @else
-                                                            <img src="{{ $employee_s1_doc_file->temporaryUrl() }}"
-                                                                class="h-40 max-w-full rounded-md object-contain"
-                                                                alt="Employee S1 Doc Preview">
-                                                        @endif
-                                                    </div>
-                                                    <p class="text-sm text-slate-500">
-                                                        {{ $employee_s1_doc_file->getClientOriginalName() }}</p>
-                                                    <button type="button" class="text-sm text-red-500 mt-2"
-                                                        wire:click="$set('employee_s1_doc_file', null)">
-                                                        Remove File
-                                                    </button>
-                                                @else
-                                                    @if ($employee->employeeS1Doc)
-                                                        <div class="mb-3">
-                                                            <small class="text-muted">
-                                                                Current file: <a
-                                                                    href="{{ $employee->employeeS1Doc->file_path }}"
-                                                                    target="_blank"
-                                                                    class="text-sm text-blue-500">View</a>
-                                                            </small>
-                                                        </div>
-                                                        @if (!$keep_existing_employee_s1_doc)
-                                                            <label for="employee_s1_doc_file_input"
-                                                                class="cursor-pointer block">
-                                                                <iconify-icon icon="mingcute:upload-line"
-                                                                    width="32" height="32"
-                                                                    class="text-slate-400 mx-auto"></iconify-icon>
-                                                                <p class="mt-2 text-sm text-slate-500">Click to upload
-                                                                </p>
-                                                                <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF
-                                                                    (Max
-                                                                    10MB)</p>
-                                                                <input id="employee_s1_doc_file_input"
-                                                                    type="file" class="hidden"
-                                                                    wire:model="employee_s1_doc_file"
-                                                                    accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
-                                                            </label>
-                                                        @endif
+
+        <div id="editEmployeeS1DocModal"
+            class="modal fade fixed top-0 left-0 show w-full h-full outline-none overflow-x-hidden overflow-y-auto"
+            tabindex="-1" aria-labelledby="editEmployeeS1DocModalLabel" aria-hidden="true" wire:ignore.self>
+            <div class="modal-dialog relative w-auto pointer-events-none">
+                <div
+                    class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
+                    <div class="relative bg-white rounded-lg shadow dark:bg-slate-700">
+                        <!-- Modal header -->
+                        <div
+                            class="flex items-center justify-between p-5 border-b rounded-t dark:border-slate-600 bg-black-500">
+                            <h3 class="text-xl font-medium text-white dark:text-white capitalize">
+                                Edit Employee S1 Doc
+                            </h3>
+                            <button type="button"
+                                class="text-slate-400 bg-transparent hover:text-slate-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-slate-600 dark:hover:text-white"
+                                wire:click="closeEditEmployeeS1DocModal">
+                                <svg aria-hidden="true" class="w-5 h-5" fill="#ffffff" viewBox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd"
+                                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                        clip-rule="evenodd"></path>
+                                </svg>
+                                <span class="sr-only">Close modal</span>
+                            </button>
+                        </div>
+                        <!-- Modal body -->
+                        <div class="p-6 space-y-4">
+                            <div class="grid grid-cols-12 gap-4">
+                                @if (!$keep_existing_employee_s1_doc)
+                                    <div class="col-span-12">
+                                        <label for="employee_s1_doc_file" class="form-label">Employee S1 Doc
+                                            Document
+                                            <iconify-icon wire:loading wire:target="employee_s1_doc_file"
+                                                icon="line-md:loading-twotone-loop" width="18"
+                                                height="18"></iconify-icon></label>
+                                        <div
+                                            class="border-2 border-dashed border-slate-200 rounded-md p-4 text-center">
+                                            @if ($employee_s1_doc_file)
+                                                <div class="flex items-center justify-center mb-3">
+                                                    @if (in_array($employee_s1_doc_file->getClientOriginalExtension(), ['pdf']))
+                                                        <iconify-icon icon="mingcute:file-pdf-fill" width="48"
+                                                            height="48" class="text-red-500"></iconify-icon>
                                                     @else
+                                                        <img src="{{ $employee_s1_doc_file->temporaryUrl() }}"
+                                                            class="h-40 max-w-full rounded-md object-contain"
+                                                            alt="Employee S1 Doc Preview">
+                                                    @endif
+                                                </div>
+                                                <p class="text-sm text-slate-500">
+                                                    {{ $employee_s1_doc_file->getClientOriginalName() }}</p>
+                                                <button type="button" class="text-sm text-red-500 mt-2"
+                                                    wire:click="$set('employee_s1_doc_file', null)">
+                                                    Remove File
+                                                </button>
+                                            @else
+                                                @if ($employee->employeeS1Doc)
+                                                    <div class="mb-3">
+                                                        <small class="text-muted">
+                                                            Current file: <a
+                                                                href="{{ $employee->employeeS1Doc->file_path }}"
+                                                                target="_blank"
+                                                                class="text-sm text-blue-500">View</a>
+                                                        </small>
+                                                    </div>
+                                                    @if (!$keep_existing_employee_s1_doc)
                                                         <label for="employee_s1_doc_file_input"
                                                             class="cursor-pointer block">
                                                             <iconify-icon icon="mingcute:upload-line" width="32"
                                                                 height="32"
                                                                 class="text-slate-400 mx-auto"></iconify-icon>
-                                                            <p class="mt-2 text-sm text-slate-500">Click to upload or
-                                                                drag
-                                                                and drop</p>
-                                                            <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF (Max
-                                                                10MB)
+                                                            <p class="mt-2 text-sm text-slate-500">Click to upload
                                                             </p>
+                                                            <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF
+                                                                (Max
+                                                                10MB)</p>
                                                             <input id="employee_s1_doc_file_input" type="file"
                                                                 class="hidden" wire:model="employee_s1_doc_file"
                                                                 accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
                                                         </label>
                                                     @endif
-                                                @endif
-                                            </div>
-                                            @error('employee_s1_doc_file')
-                                                <span class="text-danger-500 text-sm mt-1">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-                                    @endif
-                                    @if ($employee->employeeS1Doc)
-                                        <div class="col-span-12 form-check">
-                                            <div class="checkbox-area">
-                                                <label class="inline-flex items-center cursor-pointer"
-                                                    for="keep_existing_employee_s1_doc">
-                                                    <input type="checkbox" class="hidden" name="checkbox"
-                                                        id="keep_existing_employee_s1_doc"
-                                                        wire:model.live="keep_existing_employee_s1_doc">
-                                                    <span
-                                                        class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
-                                                        <img src="{{ asset('images/icon/ck-white.svg') }}"
-                                                            alt=""
-                                                            class="h-[10px] w-[10px] block m-auto opacity-0"></span>
-                                                    <span
-                                                        class="text-slate-500 dark:text-slate-400 text-sm leading-6">Keep
-                                                        existing document</span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    @endif
-                                    <div class="col-span-12">
-                                        <label for="s1_number" class="form-label">S1 Number</label>
-                                        <input type="text" id="s1_number"
-                                            class="form-control @error('s1_number') !border-danger-500 @enderror"
-                                            wire:model="s1_number">
-                                        @error('s1_number')
-                                            <span class="text-danger-500 text-sm mt-1">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                    <div class="col-span-12 xl:col-span-6">
-                                        <label for="employee_s1_doc_issue_date" class="form-label">Issue
-                                            Date</label>
-                                        <input type="date"
-                                            class="form-control @error('employee_s1_doc_issue_date') !border-danger-500 @enderror"
-                                            wire:model="employee_s1_doc_issue_date">
-                                        @error('employee_s1_doc_issue_date')
-                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                    <div class="col-span-12 xl:col-span-6">
-                                        <label for="employee_s1_doc_expiry_date" class="form-label">Expiry Date
-                                            (if applicable)</label>
-                                        <input type="date"
-                                            class="form-control @error('employee_s1_doc_expiry_date') !border-danger-500 @enderror"
-                                            wire:model="employee_s1_doc_expiry_date">
-                                        @error('employee_s1_doc_expiry_date')
-                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Modal footer -->
-                            <div
-                                class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
-                                <button wire:click="closeEditEmployeeS1DocModal" type="button"
-                                    class="btn inline-flex justify-center btn-outline-dark">Cancel</button>
-                                <button wire:click="updateEmployeeS1Doc" type="button"
-                                    wire:target='updateEmployeeS1Doc' wire:loading.remove
-                                    class="btn inline-flex justify-center btn-dark">Upload</button>
-                                <button wire:loading wire:target="updateEmployeeS1Doc" type="button"
-                                    class="btn inline-flex justify-center btn-dark">
-                                    <span class="flex items-center">
-                                        <iconify-icon icon="line-md:loading-twotone-loop" width="25"
-                                            height="25"></iconify-icon>
-                                    </span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endif
-
-    <!-- Employee S2 Doc Modal -->
-    @if ($editEmployeeS2DocModal)
-        <div>
-            <div id="editEmployeeS2DocModal"
-                class="modal fade fixed top-0 left-0 show w-full h-full outline-none overflow-x-hidden overflow-y-auto"
-                tabindex="-1" aria-labelledby="editEmployeeS2DocModalLabel" aria-hidden="true" wire:ignore.self>
-                <div class="modal-dialog relative w-auto pointer-events-none">
-                    <div
-                        class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
-                        <div class="relative bg-white rounded-lg shadow dark:bg-slate-700">
-                            <!-- Modal header -->
-                            <div
-                                class="flex items-center justify-between p-5 border-b rounded-t dark:border-slate-600 bg-black-500">
-                                <h3 class="text-xl font-medium text-white dark:text-white capitalize">
-                                    Edit Employee S2 Doc
-                                </h3>
-                                <button type="button"
-                                    class="text-slate-400 bg-transparent hover:text-slate-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-slate-600 dark:hover:text-white"
-                                    wire:click="closeEditEmployeeS2DocModal">
-                                    <svg aria-hidden="true" class="w-5 h-5" fill="#ffffff" viewBox="0 0 20 20"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path fill-rule="evenodd"
-                                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                            clip-rule="evenodd"></path>
-                                    </svg>
-                                    <span class="sr-only">Close modal</span>
-                                </button>
-                            </div>
-                            <!-- Modal body -->
-                            <div class="p-6 space-y-4">
-                                <div class="grid grid-cols-12 gap-4">
-                                    @if ($editing_record_id)
-                                        <div class="col-span-12 form-check">
-                                            <div class="checkbox-area">
-                                                <label class="inline-flex items-center cursor-pointer"
-                                                    for="keep_existing_employee_s2_doc">
-                                                    <input type="checkbox" class="hidden" name="checkbox"
-                                                        id="keep_existing_employee_s2_doc"
-                                                        wire:model.live="keep_existing_employee_s2_doc">
-                                                    <span
-                                                        class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
-                                                        <img src="{{ asset('images/icon/ck-white.svg') }}"
-                                                            alt=""
-                                                            class="h-[10px] w-[10px] block m-auto opacity-0"></span>
-                                                    <span
-                                                        class="text-slate-500 dark:text-slate-400 text-sm leading-6">Keep
-                                                        existing document</span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    @endif
-                                    @if (!$keep_existing_employee_s2_doc)
-                                        <div class="col-span-12">
-                                            <label for="employee_s2_doc_file" class="form-label">Employee S2 Doc
-                                                Document
-                                                <iconify-icon wire:loading wire:target="employee_s2_doc_file"
-                                                    icon="line-md:loading-twotone-loop" width="18"
-                                                    height="18"></iconify-icon></label>
-                                            <div
-                                                class="border-2 border-dashed border-slate-200 rounded-md p-4 text-center">
-                                                @if ($employee_s2_doc_file)
-                                                    <div class="flex items-center justify-center mb-3">
-                                                        @if (in_array($employee_s2_doc_file->getClientOriginalExtension(), ['pdf']))
-                                                            <iconify-icon icon="mingcute:file-pdf-fill"
-                                                                width="48" height="48"
-                                                                class="text-red-500"></iconify-icon>
-                                                        @else
-                                                            <img src="{{ $employee_s2_doc_file->temporaryUrl() }}"
-                                                                class="h-40 max-w-full rounded-md object-contain"
-                                                                alt="Employee S2 Doc Preview">
-                                                        @endif
-                                                    </div>
-                                                    <p class="text-sm text-slate-500">
-                                                        {{ $employee_s2_doc_file->getClientOriginalName() }}</p>
-                                                    <button type="button" class="text-sm text-red-500 mt-2"
-                                                        wire:click="$set('employee_s2_doc_file', null)">
-                                                        Remove File
-                                                    </button>
                                                 @else
-                                                    <label for="employee_s2_doc_file_input"
+                                                    <label for="employee_s1_doc_file_input"
                                                         class="cursor-pointer block">
                                                         <iconify-icon icon="mingcute:upload-line" width="32"
                                                             height="32"
@@ -4414,447 +4235,618 @@
                                                         <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF (Max
                                                             10MB)
                                                         </p>
-                                                        <input id="employee_s2_doc_file_input" type="file"
-                                                            class="hidden" wire:model="employee_s2_doc_file"
+                                                        <input id="employee_s1_doc_file_input" type="file"
+                                                            class="hidden" wire:model="employee_s1_doc_file"
                                                             accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
                                                     </label>
                                                 @endif
-                                            </div>
-                                            @error('employee_s2_doc_file')
-                                                <span class="text-danger-500 text-sm mt-1">{{ $message }}</span>
-                                            @enderror
+                                            @endif
                                         </div>
-                                    @endif
-                                    <div class="col-span-12">
-                                        <label for="s2_amount" class="form-label">S2 Amount</label>
-                                        <input type="number" step="0.01" id="s2_amount"
-                                            class="form-control @error('s2_amount') !border-danger-500 @enderror"
-                                            wire:model="s2_amount">
-                                        @error('s2_amount')
+                                        @error('employee_s1_doc_file')
                                             <span class="text-danger-500 text-sm mt-1">{{ $message }}</span>
                                         @enderror
                                     </div>
-                                    <div class="col-span-12">
-                                        <label for="s2_year" class="form-label">Year</label>
-                                        <input type="number" id="s2_year"
-                                            class="form-control @error('s2_year') !border-danger-500 @enderror"
-                                            wire:model="s2_year">
-                                        @error('s2_year')
-                                            <span class="text-danger-500 text-sm mt-1">{{ $message }}</span>
-                                        @enderror
+                                @endif
+                                @if ($employee->employeeS1Doc)
+                                    <div class="col-span-12 form-check">
+                                        <div class="checkbox-area">
+                                            <label class="inline-flex items-center cursor-pointer"
+                                                for="keep_existing_employee_s1_doc">
+                                                <input type="checkbox" class="hidden" name="checkbox"
+                                                    id="keep_existing_employee_s1_doc"
+                                                    wire:model.live="keep_existing_employee_s1_doc">
+                                                <span
+                                                    class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
+                                                    <img src="{{ asset('images/icon/ck-white.svg') }}"
+                                                        alt=""
+                                                        class="h-[10px] w-[10px] block m-auto opacity-0"></span>
+                                                <span
+                                                    class="text-slate-500 dark:text-slate-400 text-sm leading-6">Keep
+                                                    existing document</span>
+                                            </label>
+                                        </div>
                                     </div>
-                                    <div class="col-span-12 xl:col-span-6">
-                                        <label for="employee_s2_doc_issue_date" class="form-label">Issue
-                                            Date</label>
-                                        <input type="date"
-                                            class="form-control @error('employee_s2_doc_issue_date') !border-danger-500 @enderror"
-                                            wire:model="employee_s2_doc_issue_date">
-                                        @error('employee_s2_doc_issue_date')
-                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                    <div class="col-span-12 xl:col-span-6">
-                                        <label for="employee_s2_doc_expiry_date" class="form-label">Expiry Date (if
-                                            applicable)</label>
-                                        <input type="date"
-                                            class="form-control @error('employee_s2_doc_expiry_date') !border-danger-500 @enderror"
-                                            wire:model="employee_s2_doc_expiry_date">
-                                        @error('employee_s2_doc_expiry_date')
-                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
-                                        @enderror
-                                    </div>
+                                @endif
+                                <div class="col-span-12">
+                                    <label for="s1_number" class="form-label">S1 Number</label>
+                                    <input type="text" id="s1_number"
+                                        class="form-control @error('s1_number') !border-danger-500 @enderror"
+                                        wire:model="s1_number">
+                                    @error('s1_number')
+                                        <span class="text-danger-500 text-sm mt-1">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <div class="col-span-12 xl:col-span-6">
+                                    <label for="employee_s1_doc_issue_date" class="form-label">Issue
+                                        Date</label>
+                                    <input type="date"
+                                        class="form-control @error('employee_s1_doc_issue_date') !border-danger-500 @enderror"
+                                        wire:model="employee_s1_doc_issue_date">
+                                    @error('employee_s1_doc_issue_date')
+                                        <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <div class="col-span-12 xl:col-span-6">
+                                    <label for="employee_s1_doc_expiry_date" class="form-label">Expiry Date
+                                        (if applicable)</label>
+                                    <input type="date"
+                                        class="form-control @error('employee_s1_doc_expiry_date') !border-danger-500 @enderror"
+                                        wire:model="employee_s1_doc_expiry_date">
+                                    @error('employee_s1_doc_expiry_date')
+                                        <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                    @enderror
                                 </div>
                             </div>
-                            <!-- Modal footer -->
-                            <div
-                                class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
-                                <button wire:click="closeEditEmployeeS2DocModal" type="button"
-                                    class="btn inline-flex justify-center btn-outline-dark">Cancel</button>
-                                <button wire:click="updateEmployeeS2Doc" type="button"
-                                    wire:target='updateEmployeeS2Doc' wire:loading.remove
-                                    class="btn inline-flex justify-center btn-dark">Upload</button>
-                                <button wire:loading wire:target="updateEmployeeS2Doc" type="button"
-                                    class="btn inline-flex justify-center btn-dark">
-                                    <span class="flex items-center">
-                                        <iconify-icon icon="line-md:loading-twotone-loop" width="25"
-                                            height="25"></iconify-icon>
-                                    </span>
-                                </button>
-                            </div>
+                        </div>
+                        <!-- Modal footer -->
+                        <div
+                            class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
+                            <button wire:click="closeEditEmployeeS1DocModal" type="button"
+                                class="btn inline-flex justify-center btn-outline-dark">Cancel</button>
+                            <button wire:click="updateEmployeeS1Doc" type="button"
+                                wire:target='updateEmployeeS1Doc' wire:loading.remove
+                                class="btn inline-flex justify-center btn-dark">Upload</button>
+                            <button wire:loading wire:target="updateEmployeeS1Doc" type="button"
+                                class="btn inline-flex justify-center btn-dark">
+                                <span class="flex items-center">
+                                    <iconify-icon icon="line-md:loading-twotone-loop" width="25"
+                                        height="25"></iconify-icon>
+                                </span>
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+    @endif
+
+    <!-- Employee S2 Doc Modal -->
+    @if ($editEmployeeS2DocModal)
+
+        <div id="editEmployeeS2DocModal"
+            class="modal fade fixed top-0 left-0 show w-full h-full outline-none overflow-x-hidden overflow-y-auto"
+            tabindex="-1" aria-labelledby="editEmployeeS2DocModalLabel" aria-hidden="true" wire:ignore.self>
+            <div class="modal-dialog relative w-auto pointer-events-none">
+                <div
+                    class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
+                    <div class="relative bg-white rounded-lg shadow dark:bg-slate-700">
+                        <!-- Modal header -->
+                        <div
+                            class="flex items-center justify-between p-5 border-b rounded-t dark:border-slate-600 bg-black-500">
+                            <h3 class="text-xl font-medium text-white dark:text-white capitalize">
+                                Edit Employee S2 Doc
+                            </h3>
+                            <button type="button"
+                                class="text-slate-400 bg-transparent hover:text-slate-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-slate-600 dark:hover:text-white"
+                                wire:click="closeEditEmployeeS2DocModal">
+                                <svg aria-hidden="true" class="w-5 h-5" fill="#ffffff" viewBox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd"
+                                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                        clip-rule="evenodd"></path>
+                                </svg>
+                                <span class="sr-only">Close modal</span>
+                            </button>
+                        </div>
+                        <!-- Modal body -->
+                        <div class="p-6 space-y-4">
+                            <div class="grid grid-cols-12 gap-4">
+                                @if ($editing_record_id)
+                                    <div class="col-span-12 form-check">
+                                        <div class="checkbox-area">
+                                            <label class="inline-flex items-center cursor-pointer"
+                                                for="keep_existing_employee_s2_doc">
+                                                <input type="checkbox" class="hidden" name="checkbox"
+                                                    id="keep_existing_employee_s2_doc"
+                                                    wire:model.live="keep_existing_employee_s2_doc">
+                                                <span
+                                                    class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
+                                                    <img src="{{ asset('images/icon/ck-white.svg') }}"
+                                                        alt=""
+                                                        class="h-[10px] w-[10px] block m-auto opacity-0"></span>
+                                                <span
+                                                    class="text-slate-500 dark:text-slate-400 text-sm leading-6">Keep
+                                                    existing document</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                @endif
+                                @if (!$keep_existing_employee_s2_doc)
+                                    <div class="col-span-12">
+                                        <label for="employee_s2_doc_file" class="form-label">Employee S2 Doc
+                                            Document
+                                            <iconify-icon wire:loading wire:target="employee_s2_doc_file"
+                                                icon="line-md:loading-twotone-loop" width="18"
+                                                height="18"></iconify-icon></label>
+                                        <div
+                                            class="border-2 border-dashed border-slate-200 rounded-md p-4 text-center">
+                                            @if ($employee_s2_doc_file)
+                                                <div class="flex items-center justify-center mb-3">
+                                                    @if (in_array($employee_s2_doc_file->getClientOriginalExtension(), ['pdf']))
+                                                        <iconify-icon icon="mingcute:file-pdf-fill" width="48"
+                                                            height="48" class="text-red-500"></iconify-icon>
+                                                    @else
+                                                        <img src="{{ $employee_s2_doc_file->temporaryUrl() }}"
+                                                            class="h-40 max-w-full rounded-md object-contain"
+                                                            alt="Employee S2 Doc Preview">
+                                                    @endif
+                                                </div>
+                                                <p class="text-sm text-slate-500">
+                                                    {{ $employee_s2_doc_file->getClientOriginalName() }}</p>
+                                                <button type="button" class="text-sm text-red-500 mt-2"
+                                                    wire:click="$set('employee_s2_doc_file', null)">
+                                                    Remove File
+                                                </button>
+                                            @else
+                                                <label for="employee_s2_doc_file_input"
+                                                    class="cursor-pointer block">
+                                                    <iconify-icon icon="mingcute:upload-line" width="32"
+                                                        height="32"
+                                                        class="text-slate-400 mx-auto"></iconify-icon>
+                                                    <p class="mt-2 text-sm text-slate-500">Click to upload or
+                                                        drag
+                                                        and drop</p>
+                                                    <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF (Max
+                                                        10MB)
+                                                    </p>
+                                                    <input id="employee_s2_doc_file_input" type="file"
+                                                        class="hidden" wire:model="employee_s2_doc_file"
+                                                        accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
+                                                </label>
+                                            @endif
+                                        </div>
+                                        @error('employee_s2_doc_file')
+                                            <span class="text-danger-500 text-sm mt-1">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                @endif
+                                <div class="col-span-12">
+                                    <label for="s2_amount" class="form-label">S2 Amount</label>
+                                    <input type="number" step="0.01" id="s2_amount"
+                                        class="form-control @error('s2_amount') !border-danger-500 @enderror"
+                                        wire:model="s2_amount">
+                                    @error('s2_amount')
+                                        <span class="text-danger-500 text-sm mt-1">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <div class="col-span-12">
+                                    <label for="s2_year" class="form-label">Year</label>
+                                    <input type="number" id="s2_year"
+                                        class="form-control @error('s2_year') !border-danger-500 @enderror"
+                                        wire:model="s2_year">
+                                    @error('s2_year')
+                                        <span class="text-danger-500 text-sm mt-1">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <div class="col-span-12 xl:col-span-6">
+                                    <label for="employee_s2_doc_issue_date" class="form-label">Issue
+                                        Date</label>
+                                    <input type="date"
+                                        class="form-control @error('employee_s2_doc_issue_date') !border-danger-500 @enderror"
+                                        wire:model="employee_s2_doc_issue_date">
+                                    @error('employee_s2_doc_issue_date')
+                                        <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <div class="col-span-12 xl:col-span-6">
+                                    <label for="employee_s2_doc_expiry_date" class="form-label">Expiry Date (if
+                                        applicable)</label>
+                                    <input type="date"
+                                        class="form-control @error('employee_s2_doc_expiry_date') !border-danger-500 @enderror"
+                                        wire:model="employee_s2_doc_expiry_date">
+                                    @error('employee_s2_doc_expiry_date')
+                                        <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Modal footer -->
+                        <div
+                            class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
+                            <button wire:click="closeEditEmployeeS2DocModal" type="button"
+                                class="btn inline-flex justify-center btn-outline-dark">Cancel</button>
+                            <button wire:click="updateEmployeeS2Doc" type="button"
+                                wire:target='updateEmployeeS2Doc' wire:loading.remove
+                                class="btn inline-flex justify-center btn-dark">Upload</button>
+                            <button wire:loading wire:target="updateEmployeeS2Doc" type="button"
+                                class="btn inline-flex justify-center btn-dark">
+                                <span class="flex items-center">
+                                    <iconify-icon icon="line-md:loading-twotone-loop" width="25"
+                                        height="25"></iconify-icon>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     @endif
 
     <!-- Employee S6 Doc Edit Modal -->
     @if ($editEmployeeS6DocModal)
-        <div>
-            <div id="editEmployeeS6DocModal"
-                class="modal fade fixed top-0 left-0 show w-full h-full outline-none overflow-x-hidden overflow-y-auto"
-                tabindex="-1" aria-labelledby="editEmployeeS6DocModalLabel" aria-hidden="true" wire:ignore.self>
-                <div class="modal-dialog relative w-auto pointer-events-none">
-                    <div
-                        class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
-                        <div class="relative bg-white rounded-lg shadow dark:bg-slate-700">
-                            <!-- Modal header -->
-                            <div
-                                class="flex items-center justify-between p-5 border-b rounded-t dark:border-slate-600 bg-black-500">
-                                <h3 class="text-xl font-medium text-white dark:text-white capitalize">
-                                    Edit Employee S6 Doc
-                                </h3>
-                                <button wire:click="closeEditEmployeeS6DocModal" type="button"
-                                    class="text-slate-400 bg-transparent hover:text-slate-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-slate-600 dark:hover:text-white"
-                                    data-bs-dismiss="modal">
-                                    <svg aria-hidden="true" class="w-5 h-5" fill="#ffffff" viewBox="0 0 20 20"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path fill-rule="evenodd"
-                                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                            clip-rule="evenodd"></path>
-                                    </svg>
-                                    <span class="sr-only">Close modal</span>
-                                </button>
-                            </div>
 
-                            <!-- Modal body -->
-                            <div class="p-6 space-y-4">
-                                <div class="grid grid-cols-12 gap-4">
-                                    @if (!$keep_existing_employee_s6_doc)
-                                        <div class="col-span-12">
-                                            <label for="employee_s6_doc_file" class="form-label">S6 Document
-                                                <iconify-icon wire:loading wire:target="employee_s6_doc_file"
-                                                    icon="line-md:loading-twotone-loop" width="18"
-                                                    height="18"></iconify-icon></label>
-                                            <div
-                                                class="border-2 border-dashed border-slate-200 rounded-md p-4 text-center">
-                                                @if ($employee_s6_doc_file)
-                                                    <div class="flex items-center justify-center mb-3">
-                                                        @if (in_array($employee_s6_doc_file->getClientOriginalExtension(), ['pdf']))
-                                                            <iconify-icon icon="mingcute:file-pdf-fill"
-                                                                width="48" height="48"
-                                                                class="text-red-500"></iconify-icon>
-                                                        @else
-                                                            <img src="{{ $employee_s6_doc_file->temporaryUrl() }}"
-                                                                class="h-40 max-w-full rounded-md object-contain"
-                                                                alt="S6 Document Preview">
-                                                        @endif
-                                                    </div>
-                                                    <p class="text-sm text-slate-500">
-                                                        {{ $employee_s6_doc_file->getClientOriginalName() }}</p>
-                                                    <button type="button" class="text-sm text-red-500 mt-2"
-                                                        wire:click="$set('employee_s6_doc_file', null)">
-                                                        Remove File
-                                                    </button>
-                                                @else
-                                                    @if ($editing_record_id)
-                                                        <div class="mb-3">
-                                                            <small class="text-muted">
-                                                                Current file: <a
-                                                                    href="{{ $employee->employeeS6Doc->find($editing_record_id)->file_path }}"
-                                                                    target="_blank"
-                                                                    class="text-sm text-blue-500">View</a>
-                                                            </small>
-                                                        </div>
-                                                        @if (!$keep_existing_employee_s6_doc)
-                                                            <label for="employee_s6_doc_file_input"
-                                                                class="cursor-pointer block">
-                                                                <iconify-icon icon="mingcute:upload-line"
-                                                                    width="32" height="32"
-                                                                    class="text-slate-400 mx-auto"></iconify-icon>
-                                                                <p class="mt-2 text-sm text-slate-500">Click to upload
-                                                                </p>
-                                                                <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF
-                                                                    (Max
-                                                                    10MB)</p>
-                                                                <input id="employee_s6_doc_file_input"
-                                                                    type="file" class="hidden"
-                                                                    wire:model="employee_s6_doc_file"
-                                                                    accept=".pdf,.jpg,.jpeg,.png,.gif,.bmp">
-                                                            </label>
-                                                        @endif
+        <div id="editEmployeeS6DocModal"
+            class="modal fade fixed top-0 left-0 show w-full h-full outline-none overflow-x-hidden overflow-y-auto"
+            tabindex="-1" aria-labelledby="editEmployeeS6DocModalLabel" aria-hidden="true" wire:ignore.self>
+            <div class="modal-dialog relative w-auto pointer-events-none">
+                <div
+                    class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
+                    <div class="relative bg-white rounded-lg shadow dark:bg-slate-700">
+                        <!-- Modal header -->
+                        <div
+                            class="flex items-center justify-between p-5 border-b rounded-t dark:border-slate-600 bg-black-500">
+                            <h3 class="text-xl font-medium text-white dark:text-white capitalize">
+                                Edit Employee S6 Doc
+                            </h3>
+                            <button wire:click="closeEditEmployeeS6DocModal" type="button"
+                                class="text-slate-400 bg-transparent hover:text-slate-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-slate-600 dark:hover:text-white"
+                                data-bs-dismiss="modal">
+                                <svg aria-hidden="true" class="w-5 h-5" fill="#ffffff" viewBox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd"
+                                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                        clip-rule="evenodd"></path>
+                                </svg>
+                                <span class="sr-only">Close modal</span>
+                            </button>
+                        </div>
+
+                        <!-- Modal body -->
+                        <div class="p-6 space-y-4">
+                            <div class="grid grid-cols-12 gap-4">
+                                @if (!$keep_existing_employee_s6_doc)
+                                    <div class="col-span-12">
+                                        <label for="employee_s6_doc_file" class="form-label">S6 Document
+                                            <iconify-icon wire:loading wire:target="employee_s6_doc_file"
+                                                icon="line-md:loading-twotone-loop" width="18"
+                                                height="18"></iconify-icon></label>
+                                        <div
+                                            class="border-2 border-dashed border-slate-200 rounded-md p-4 text-center">
+                                            @if ($employee_s6_doc_file)
+                                                <div class="flex items-center justify-center mb-3">
+                                                    @if (in_array($employee_s6_doc_file->getClientOriginalExtension(), ['pdf']))
+                                                        <iconify-icon icon="mingcute:file-pdf-fill" width="48"
+                                                            height="48" class="text-red-500"></iconify-icon>
                                                     @else
+                                                        <img src="{{ $employee_s6_doc_file->temporaryUrl() }}"
+                                                            class="h-40 max-w-full rounded-md object-contain"
+                                                            alt="S6 Document Preview">
+                                                    @endif
+                                                </div>
+                                                <p class="text-sm text-slate-500">
+                                                    {{ $employee_s6_doc_file->getClientOriginalName() }}</p>
+                                                <button type="button" class="text-sm text-red-500 mt-2"
+                                                    wire:click="$set('employee_s6_doc_file', null)">
+                                                    Remove File
+                                                </button>
+                                            @else
+                                                @if ($editing_record_id)
+                                                    <div class="mb-3">
+                                                        <small class="text-muted">
+                                                            Current file: <a
+                                                                href="{{ $employee->employeeS6Doc->find($editing_record_id)->file_path }}"
+                                                                target="_blank"
+                                                                class="text-sm text-blue-500">View</a>
+                                                        </small>
+                                                    </div>
+                                                    @if (!$keep_existing_employee_s6_doc)
                                                         <label for="employee_s6_doc_file_input"
                                                             class="cursor-pointer block">
                                                             <iconify-icon icon="mingcute:upload-line" width="32"
                                                                 height="32"
                                                                 class="text-slate-400 mx-auto"></iconify-icon>
-                                                            <p class="mt-2 text-sm text-slate-500">Click to upload or
-                                                                drag
-                                                                and drop</p>
-                                                            <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF (Max
-                                                                10MB)
+                                                            <p class="mt-2 text-sm text-slate-500">Click to upload
                                                             </p>
+                                                            <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF
+                                                                (Max
+                                                                10MB)</p>
                                                             <input id="employee_s6_doc_file_input" type="file"
                                                                 class="hidden" wire:model="employee_s6_doc_file"
                                                                 accept=".pdf,.jpg,.jpeg,.png,.gif,.bmp">
                                                         </label>
                                                     @endif
+                                                @else
+                                                    <label for="employee_s6_doc_file_input"
+                                                        class="cursor-pointer block">
+                                                        <iconify-icon icon="mingcute:upload-line" width="32"
+                                                            height="32"
+                                                            class="text-slate-400 mx-auto"></iconify-icon>
+                                                        <p class="mt-2 text-sm text-slate-500">Click to upload or
+                                                            drag
+                                                            and drop</p>
+                                                        <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF (Max
+                                                            10MB)
+                                                        </p>
+                                                        <input id="employee_s6_doc_file_input" type="file"
+                                                            class="hidden" wire:model="employee_s6_doc_file"
+                                                            accept=".pdf,.jpg,.jpeg,.png,.gif,.bmp">
+                                                    </label>
                                                 @endif
-                                            </div>
-                                            @error('employee_s6_doc_file')
-                                                <span class="text-danger-500 text-sm mt-1">{{ $message }}</span>
-                                            @enderror
+                                            @endif
                                         </div>
-                                    @endif
-                                    @if ($employee->employeeS6Doc)
-                                        <div class="col-span-12 form-check">
-                                            <div class="checkbox-area">
-                                                <label class="inline-flex items-center cursor-pointer"
-                                                    for="keep_existing_employee_s6_doc">
-                                                    <input type="checkbox" class="hidden" name="checkbox"
-                                                        id="keep_existing_employee_s6_doc"
-                                                        wire:model.live="keep_existing_employee_s6_doc">
-                                                    <span
-                                                        class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
-                                                        <img src="{{ asset('images/icon/ck-white.svg') }}"
-                                                            alt=""
-                                                            class="h-[10px] w-[10px] block m-auto opacity-0"></span>
-                                                    <span
-                                                        class="text-slate-500 dark:text-slate-400 text-sm leading-6">Keep
-                                                        existing document</span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    @endif
-                                    <div class="col-span-12">
-                                        <label for="s6_number" class="form-label">S6 Number</label>
-                                        <input type="text" id="s6_number"
-                                            class="form-control @error('s6_number') !border-danger-500 @enderror"
-                                            wire:model="s6_number">
-                                        @error('s6_number')
+                                        @error('employee_s6_doc_file')
                                             <span class="text-danger-500 text-sm mt-1">{{ $message }}</span>
                                         @enderror
                                     </div>
-                                    <div class="col-span-12">
-                                        <label for="leaving_reason" class="form-label">Leaving Reason</label>
-                                        <select id="leaving_reason" class="form-control"
-                                            wire:model="leaving_reason">
-                                            @foreach ($employeeS6DocLeavingReasons as $reason)
-                                                <option value="{{ $reason }}">{{ $reason }}</option>
-                                            @endforeach
-                                        </select>
-                                        @error('leaving_reason')
-                                            <span class="text-danger-500 text-sm mt-1">{{ $message }}</span>
-                                        @enderror
+                                @endif
+                                @if ($employee->employeeS6Doc)
+                                    <div class="col-span-12 form-check">
+                                        <div class="checkbox-area">
+                                            <label class="inline-flex items-center cursor-pointer"
+                                                for="keep_existing_employee_s6_doc">
+                                                <input type="checkbox" class="hidden" name="checkbox"
+                                                    id="keep_existing_employee_s6_doc"
+                                                    wire:model.live="keep_existing_employee_s6_doc">
+                                                <span
+                                                    class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
+                                                    <img src="{{ asset('images/icon/ck-white.svg') }}"
+                                                        alt=""
+                                                        class="h-[10px] w-[10px] block m-auto opacity-0"></span>
+                                                <span
+                                                    class="text-slate-500 dark:text-slate-400 text-sm leading-6">Keep
+                                                    existing document</span>
+                                            </label>
+                                        </div>
                                     </div>
-                                    <div class="col-span-12 xl:col-span-6">
-                                        <label for="employee_s6_doc_issue_date" class="form-label">Issue
-                                            Date</label>
-                                        <input type="date"
-                                            class="form-control @error('employee_s6_doc_issue_date') !border-danger-500 @enderror"
-                                            wire:model="employee_s6_doc_issue_date">
-                                        @error('employee_s6_doc_issue_date')
-                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                    <div class="col-span-12 xl:col-span-6">
-                                        <label for="employee_s6_doc_expiry_date" class="form-label">Expiry Date (if
-                                            applicable)</label>
-                                        <input type="date"
-                                            class="form-control @error('employee_s6_doc_expiry_date') !border-danger-500 @enderror"
-                                            wire:model="employee_s6_doc_expiry_date">
-                                        @error('employee_s6_doc_expiry_date')
-                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
-                                        @enderror
-                                    </div>
+                                @endif
+                                <div class="col-span-12">
+                                    <label for="s6_number" class="form-label">S6 Number</label>
+                                    <input type="text" id="s6_number"
+                                        class="form-control @error('s6_number') !border-danger-500 @enderror"
+                                        wire:model="s6_number">
+                                    @error('s6_number')
+                                        <span class="text-danger-500 text-sm mt-1">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <div class="col-span-12">
+                                    <label for="leaving_reason" class="form-label">Leaving Reason</label>
+                                    <select id="leaving_reason" class="form-control" wire:model="leaving_reason">
+                                        @foreach ($employeeS6DocLeavingReasons as $reason)
+                                            <option value="{{ $reason }}">{{ $reason }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('leaving_reason')
+                                        <span class="text-danger-500 text-sm mt-1">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <div class="col-span-12 xl:col-span-6">
+                                    <label for="employee_s6_doc_issue_date" class="form-label">Issue
+                                        Date</label>
+                                    <input type="date"
+                                        class="form-control @error('employee_s6_doc_issue_date') !border-danger-500 @enderror"
+                                        wire:model="employee_s6_doc_issue_date">
+                                    @error('employee_s6_doc_issue_date')
+                                        <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <div class="col-span-12 xl:col-span-6">
+                                    <label for="employee_s6_doc_expiry_date" class="form-label">Expiry Date (if
+                                        applicable)</label>
+                                    <input type="date"
+                                        class="form-control @error('employee_s6_doc_expiry_date') !border-danger-500 @enderror"
+                                        wire:model="employee_s6_doc_expiry_date">
+                                    @error('employee_s6_doc_expiry_date')
+                                        <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                    @enderror
                                 </div>
                             </div>
-                            <!-- Modal footer -->
-                            <div
-                                class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
-                                <button wire:click="closeEditEmployeeS6DocModal" type="button"
-                                    class="btn inline-flex justify-center btn-outline-dark">Cancel</button>
-                                <button wire:click="updateEmployeeS6Doc" type="button"
-                                    wire:target='updateEmployeeS6Doc' wire:loading.remove
-                                    class="btn inline-flex justify-center btn-dark">{{ $editing_record_id ? 'Update' : 'Upload' }}</button>
-                                <button wire:loading wire:target="updateEmployeeS6Doc" type="button"
-                                    class="btn inline-flex justify-center btn-dark">
-                                    <span class="flex items-center">
-                                        <iconify-icon icon="line-md:loading-twotone-loop" width="25"
-                                            height="25"></iconify-icon>
-                                    </span>
-                                </button>
-                            </div>
+                        </div>
+                        <!-- Modal footer -->
+                        <div
+                            class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
+                            <button wire:click="closeEditEmployeeS6DocModal" type="button"
+                                class="btn inline-flex justify-center btn-outline-dark">Cancel</button>
+                            <button wire:click="updateEmployeeS6Doc" type="button"
+                                wire:target='updateEmployeeS6Doc' wire:loading.remove
+                                class="btn inline-flex justify-center btn-dark">{{ $editing_record_id ? 'Update' : 'Upload' }}</button>
+                            <button wire:loading wire:target="updateEmployeeS6Doc" type="button"
+                                class="btn inline-flex justify-center btn-dark">
+                                <span class="flex items-center">
+                                    <iconify-icon icon="line-md:loading-twotone-loop" width="25"
+                                        height="25"></iconify-icon>
+                                </span>
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
     @endif
 
     <!-- Police Record Edit Modal -->
     @if ($editPoliceRecordModal)
-        <div>
-            <div id="editPoliceRecordModal"
-                class="modal fade fixed top-0 left-0 show w-full h-full outline-none overflow-x-hidden overflow-y-auto"
-                tabindex="-1" aria-labelledby="editPoliceRecordModalLabel" aria-hidden="true" wire:ignore.self>
-                <div class="modal-dialog relative w-auto pointer-events-none">
-                    <div
-                        class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
-                        <div class="relative bg-white rounded-lg shadow dark:bg-slate-700">
-                            <!-- Modal header -->
-                            <div
-                                class="flex items-center justify-between p-5 border-b rounded-t dark:border-slate-600 bg-black-500">
-                                <h3 class="text-xl font-medium text-white dark:text-white capitalize">
-                                    {{ $editing_record_id ? 'Edit' : 'Add' }} Police Record
-                                </h3>
-                                <button wire:click="closeEditPoliceRecordModal" type="button"
-                                    class="text-slate-400 bg-transparent hover:text-slate-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-slate-600 dark:hover:text-white"
-                                    data-bs-dismiss="modal">
-                                    <svg aria-hidden="true" class="w-5 h-5" fill="#ffffff" viewBox="0 0 20 20"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path fill-rule="evenodd"
-                                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                            clip-rule="evenodd"></path>
-                                    </svg>
-                                    <span class="sr-only">Close modal</span>
-                                </button>
-                            </div>
 
-                            <!-- Modal body -->
-                            <div class="p-6 space-y-4">
-                                <div class="grid grid-cols-12 gap-4">
-                                    @if (!$keep_existing_police_record)
-                                        <div class="col-span-12">
-                                            <label for="police_record_file" class="form-label">Police Record
-                                                Document
-                                                <iconify-icon wire:loading wire:target="police_record_file"
-                                                    icon="line-md:loading-twotone-loop" width="18"
-                                                    height="18"></iconify-icon></label>
-                                            <div
-                                                class="border-2 border-dashed border-slate-200 rounded-md p-4 text-center">
-                                                @if ($police_record_file)
-                                                    <div class="flex items-center justify-center mb-3">
-                                                        @if (in_array($police_record_file->getClientOriginalExtension(), ['pdf']))
-                                                            <iconify-icon icon="mingcute:file-pdf-fill"
-                                                                width="48" height="48"
-                                                                class="text-red-500"></iconify-icon>
-                                                        @else
-                                                            <img src="{{ $police_record_file->temporaryUrl() }}"
-                                                                class="h-40 max-w-full rounded-md object-contain"
-                                                                alt="Police Record Preview">
-                                                        @endif
-                                                    </div>
-                                                    <p class="text-sm text-slate-500">
-                                                        {{ $police_record_file->getClientOriginalName() }}</p>
-                                                    <button type="button" class="text-sm text-red-500 mt-2"
-                                                        wire:click="$set('police_record_file', null)">
-                                                        Remove File
-                                                    </button>
-                                                @else
-                                                    @if ($editing_record_id)
-                                                        <div class="mb-3">
-                                                            <small class="text-muted">
-                                                                Current file: <a
-                                                                    href="{{ $employee->policeRecords->find($editing_record_id)->file_path }}"
-                                                                    target="_blank"
-                                                                    class="text-sm text-blue-500">View</a>
-                                                            </small>
-                                                        </div>
-                                                        @if (!$keep_existing_police_record)
-                                                            <label for="police_record_file_input"
-                                                                class="cursor-pointer block">
-                                                                <iconify-icon icon="mingcute:upload-line"
-                                                                    width="32" height="32"
-                                                                    class="text-slate-400 mx-auto"></iconify-icon>
-                                                                <p class="mt-2 text-sm text-slate-500">Click to upload
-                                                                </p>
-                                                                <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF
-                                                                    (Max
-                                                                    2MB)</p>
-                                                                <input id="police_record_file_input" type="file"
-                                                                    class="hidden" wire:model="police_record_file"
-                                                                    accept=".pdf,.jpg,.jpeg,.png">
-                                                            </label>
-                                                        @endif
+        <div id="editPoliceRecordModal"
+            class="modal fade fixed top-0 left-0 show w-full h-full outline-none overflow-x-hidden overflow-y-auto"
+            tabindex="-1" aria-labelledby="editPoliceRecordModalLabel" aria-hidden="true" wire:ignore.self>
+            <div class="modal-dialog relative w-auto pointer-events-none">
+                <div
+                    class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
+                    <div class="relative bg-white rounded-lg shadow dark:bg-slate-700">
+                        <!-- Modal header -->
+                        <div
+                            class="flex items-center justify-between p-5 border-b rounded-t dark:border-slate-600 bg-black-500">
+                            <h3 class="text-xl font-medium text-white dark:text-white capitalize">
+                                {{ $editing_record_id ? 'Edit' : 'Add' }} Police Record
+                            </h3>
+                            <button wire:click="closeEditPoliceRecordModal" type="button"
+                                class="text-slate-400 bg-transparent hover:text-slate-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-slate-600 dark:hover:text-white"
+                                data-bs-dismiss="modal">
+                                <svg aria-hidden="true" class="w-5 h-5" fill="#ffffff" viewBox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd"
+                                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                        clip-rule="evenodd"></path>
+                                </svg>
+                                <span class="sr-only">Close modal</span>
+                            </button>
+                        </div>
+
+                        <!-- Modal body -->
+                        <div class="p-6 space-y-4">
+                            <div class="grid grid-cols-12 gap-4">
+                                @if (!$keep_existing_police_record)
+                                    <div class="col-span-12">
+                                        <label for="police_record_file" class="form-label">Police Record
+                                            Document
+                                            <iconify-icon wire:loading wire:target="police_record_file"
+                                                icon="line-md:loading-twotone-loop" width="18"
+                                                height="18"></iconify-icon></label>
+                                        <div
+                                            class="border-2 border-dashed border-slate-200 rounded-md p-4 text-center">
+                                            @if ($police_record_file)
+                                                <div class="flex items-center justify-center mb-3">
+                                                    @if (in_array($police_record_file->getClientOriginalExtension(), ['pdf']))
+                                                        <iconify-icon icon="mingcute:file-pdf-fill" width="48"
+                                                            height="48" class="text-red-500"></iconify-icon>
                                                     @else
+                                                        <img src="{{ $police_record_file->temporaryUrl() }}"
+                                                            class="h-40 max-w-full rounded-md object-contain"
+                                                            alt="Police Record Preview">
+                                                    @endif
+                                                </div>
+                                                <p class="text-sm text-slate-500">
+                                                    {{ $police_record_file->getClientOriginalName() }}</p>
+                                                <button type="button" class="text-sm text-red-500 mt-2"
+                                                    wire:click="$set('police_record_file', null)">
+                                                    Remove File
+                                                </button>
+                                            @else
+                                                @if ($editing_record_id)
+                                                    <div class="mb-3">
+                                                        <small class="text-muted">
+                                                            Current file: <a
+                                                                href="{{ $employee->policeRecords->find($editing_record_id)->file_path }}"
+                                                                target="_blank"
+                                                                class="text-sm text-blue-500">View</a>
+                                                        </small>
+                                                    </div>
+                                                    @if (!$keep_existing_police_record)
                                                         <label for="police_record_file_input"
                                                             class="cursor-pointer block">
                                                             <iconify-icon icon="mingcute:upload-line" width="32"
                                                                 height="32"
                                                                 class="text-slate-400 mx-auto"></iconify-icon>
-                                                            <p class="mt-2 text-sm text-slate-500">Click to upload or
-                                                                drag
-                                                                and drop</p>
-                                                            <p class="text-xs text-slate-400">PDF, JPG, PNG (Max
-                                                                2MB)
+                                                            <p class="mt-2 text-sm text-slate-500">Click to upload
                                                             </p>
+                                                            <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF
+                                                                (Max
+                                                                2MB)</p>
                                                             <input id="police_record_file_input" type="file"
                                                                 class="hidden" wire:model="police_record_file"
                                                                 accept=".pdf,.jpg,.jpeg,.png">
                                                         </label>
                                                     @endif
+                                                @else
+                                                    <label for="police_record_file_input"
+                                                        class="cursor-pointer block">
+                                                        <iconify-icon icon="mingcute:upload-line" width="32"
+                                                            height="32"
+                                                            class="text-slate-400 mx-auto"></iconify-icon>
+                                                        <p class="mt-2 text-sm text-slate-500">Click to upload or
+                                                            drag
+                                                            and drop</p>
+                                                        <p class="text-xs text-slate-400">PDF, JPG, PNG (Max
+                                                            2MB)
+                                                        </p>
+                                                        <input id="police_record_file_input" type="file"
+                                                            class="hidden" wire:model="police_record_file"
+                                                            accept=".pdf,.jpg,.jpeg,.png">
+                                                    </label>
                                                 @endif
-                                            </div>
-                                            @error('police_record_file')
-                                                <span class="text-danger-500 text-sm mt-1">{{ $message }}</span>
-                                            @enderror
+                                            @endif
                                         </div>
-                                    @endif
-                                    @if ($editing_record_id)
-                                        <div class="col-span-12 form-check">
-                                            <div class="checkbox-area">
-                                                <label class="inline-flex items-center cursor-pointer"
-                                                    for="keep_existing_police_record">
-                                                    <input type="checkbox" class="hidden" name="checkbox"
-                                                        id="keep_existing_police_record"
-                                                        wire:model.live="keep_existing_police_record">
-                                                    <span
-                                                        class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
-                                                        <img src="{{ asset('images/icon/ck-white.svg') }}"
-                                                            alt=""
-                                                            class="h-[10px] w-[10px] block m-auto opacity-0"></span>
-                                                    <span
-                                                        class="text-slate-500 dark:text-slate-400 text-sm leading-6">Keep
-                                                        existing document</span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    @endif
-                                    <div class="col-span-12 xl:col-span-6">
-                                        <label for="police_record_issue_date" class="form-label">Issue
-                                            Date</label>
-                                        <input type="date"
-                                            class="form-control @error('police_record_issue_date') !border-danger-500 @enderror"
-                                            wire:model="police_record_issue_date">
-                                        @error('police_record_issue_date')
-                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @error('police_record_file')
+                                            <span class="text-danger-500 text-sm mt-1">{{ $message }}</span>
                                         @enderror
                                     </div>
-                                    <div class="col-span-12 xl:col-span-6">
-                                        <label for="police_record_expiry_date" class="form-label">Expiry Date (if
-                                            applicable)</label>
-                                        <input type="date"
-                                            class="form-control @error('police_record_expiry_date') !border-danger-500 @enderror"
-                                            wire:model="police_record_expiry_date">
-                                        @error('police_record_expiry_date')
-                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
-                                        @enderror
+                                @endif
+                                @if ($editing_record_id)
+                                    <div class="col-span-12 form-check">
+                                        <div class="checkbox-area">
+                                            <label class="inline-flex items-center cursor-pointer"
+                                                for="keep_existing_police_record">
+                                                <input type="checkbox" class="hidden" name="checkbox"
+                                                    id="keep_existing_police_record"
+                                                    wire:model.live="keep_existing_police_record">
+                                                <span
+                                                    class="h-4 w-4 border flex-none border-slate-100 dark:border-slate-800 rounded inline-flex ltr:mr-3 rtl:ml-3 relative transition-all duration-150 bg-slate-100 dark:bg-slate-900">
+                                                    <img src="{{ asset('images/icon/ck-white.svg') }}"
+                                                        alt=""
+                                                        class="h-[10px] w-[10px] block m-auto opacity-0"></span>
+                                                <span
+                                                    class="text-slate-500 dark:text-slate-400 text-sm leading-6">Keep
+                                                    existing document</span>
+                                            </label>
+                                        </div>
                                     </div>
+                                @endif
+                                <div class="col-span-12 xl:col-span-6">
+                                    <label for="police_record_issue_date" class="form-label">Issue
+                                        Date</label>
+                                    <input type="date"
+                                        class="form-control @error('police_record_issue_date') !border-danger-500 @enderror"
+                                        wire:model="police_record_issue_date">
+                                    @error('police_record_issue_date')
+                                        <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <div class="col-span-12 xl:col-span-6">
+                                    <label for="police_record_expiry_date" class="form-label">Expiry Date (if
+                                        applicable)</label>
+                                    <input type="date"
+                                        class="form-control @error('police_record_expiry_date') !border-danger-500 @enderror"
+                                        wire:model="police_record_expiry_date">
+                                    @error('police_record_expiry_date')
+                                        <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                    @enderror
                                 </div>
                             </div>
-                            <!-- Modal footer -->
-                            <div
-                                class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
-                                <button wire:click="closeEditPoliceRecordModal" type="button"
-                                    class="btn inline-flex justify-center btn-outline-dark">Cancel</button>
-                                <button wire:click="updatePoliceRecord" type="button"
-                                    wire:target='updatePoliceRecord' wire:loading.remove
-                                    class="btn inline-flex justify-center btn-dark">{{ $editing_record_id ? 'Update' : 'Upload' }}</button>
-                                <button wire:loading wire:target="updatePoliceRecord" type="button"
-                                    class="btn inline-flex justify-center btn-dark">
-                                    <span class="flex items-center">
-                                        <iconify-icon icon="line-md:loading-twotone-loop" width="25"
-                                            height="25"></iconify-icon>
-                                    </span>
-                                </button>
-                            </div>
+                        </div>
+                        <!-- Modal footer -->
+                        <div
+                            class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
+                            <button wire:click="closeEditPoliceRecordModal" type="button"
+                                class="btn inline-flex justify-center btn-outline-dark">Cancel</button>
+                            <button wire:click="updatePoliceRecord" type="button"
+                                wire:target='updatePoliceRecord' wire:loading.remove
+                                class="btn inline-flex justify-center btn-dark">{{ $editing_record_id ? 'Update' : 'Upload' }}</button>
+                            <button wire:loading wire:target="updatePoliceRecord" type="button"
+                                class="btn inline-flex justify-center btn-dark">
+                                <span class="flex items-center">
+                                    <iconify-icon icon="line-md:loading-twotone-loop" width="25"
+                                        height="25"></iconify-icon>
+                                </span>
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
     @endif
 
     <!-- HR Letter Edit Modal -->
@@ -6968,4 +6960,3 @@
         </div>
     @endif
 </div>
-

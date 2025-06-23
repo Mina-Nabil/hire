@@ -1365,7 +1365,7 @@ class Employee extends Model
         ?string $insurance_amount = null,
         ?string $academic_qualification = null,
         ?string $university = null,
-        ?int $graduation_year = null,
+        ?string $graduation_year = null,
         ?string $military_status = null,
         ?string $marital_status = null,
         ?int $salary_grade_id = null,

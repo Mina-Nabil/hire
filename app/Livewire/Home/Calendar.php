@@ -215,10 +215,17 @@ class Calendar extends Component
         $USER_TAGS = CalendarEventUser::TAGS;
         $USERS = User::all();
 
+        $loggedInUser = Auth::user();
+        if($loggedInUser->type == 'employee') {
+            $layout = 'components.layouts.employee';
+        } else {
+            $layout = 'components.layouts.app';
+        }
+
         return view('livewire.calendar', [
             'events' => $events,
             'USER_TAGS' => $USER_TAGS,
             'USERS' => $USERS
-        ]);
+        ])->layout($layout);
     }
 }

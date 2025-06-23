@@ -43,7 +43,6 @@ class EmployeeCreate extends Component
     // Employee Additional Info
     public $insurance_office_id;
     public $insurance_number;
-    public $insurance_amount;
     public $academic_qualification;
     public $university;
     public $graduation_year;
@@ -101,7 +100,6 @@ class EmployeeCreate extends Component
         // Employee additional info validation
         'insurance_office_id' => 'required|exists:insurance_offices,id',
         'insurance_number' => 'nullable|string|max:50',
-        'insurance_amount' => 'nullable|numeric',
         'academic_qualification' => 'nullable|string|max:255',
         'university' => 'nullable|string|max:255',
         'graduation_year' => 'nullable|integer|min:1900|max:2100',
@@ -387,7 +385,6 @@ class EmployeeCreate extends Component
             $employeeInfoData = [
                 'insurance_office_id' => $this->insurance_office_id,
                 'insurance_number' => $this->insurance_number,
-                'insurance_amount' => $this->insurance_amount,
                 'academic_qualification' => $this->academic_qualification,
                 'university' => $this->university,
                 'graduation_year' => $this->graduation_year,
@@ -598,7 +595,6 @@ class EmployeeCreate extends Component
         
         // Reset additional info
         $this->insurance_number = null;
-        $this->insurance_amount = null;
         $this->academic_qualification = null;
         $this->university = null;
         $this->graduation_year = null;

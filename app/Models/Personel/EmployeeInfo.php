@@ -11,6 +11,8 @@ class EmployeeInfo extends Model
     protected $table = 'employee_info';
     protected $fillable = [
         'employee_id',
+        'employee_code',
+        'device_id',
         'insurance_office_id',
         'insurance_number',
         'academic_qualification',

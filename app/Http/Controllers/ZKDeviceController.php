@@ -60,7 +60,9 @@ class ZKDeviceController extends Controller
                 $verify_mode = $parts[3] ?? null;
                 $work_code = $parts[4] ?? null;
 
-                $employee = Employee::where('device_id', $device_id)->first();
+                $employee = Employee::whereHas('info', function($query) use ($device_id) {
+                    $query->where('device_id', $device_id);
+                })->first();
                 if (!$employee) {
                     Log::warning("[ZKTeco] Employee with device_id {$device_id} not found.");
                     continue;

@@ -3333,15 +3333,6 @@
                                         @enderror
                                     </div>
                                     <div class="col-span-12 xl:col-span-6">
-                                        <label for="device_id" class="form-label">Device ID</label>
-                                        <input type="text"
-                                            class="form-control @error('device_id') !border-danger-500 @enderror"
-                                            wire:model="device_id">
-                                        @error('device_id')
-                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                    <div class="col-span-12 xl:col-span-6">
                                         <label for="id_number" class="form-label">ID Number</label>
                                         <input type="text"
                                             class="form-control @error('id_number') !border-danger-500 @enderror"
@@ -3544,6 +3535,20 @@
                                         @error('marital_status')
                                             <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
                                         @enderror
+                                    </div>
+                                    <div class="col-span-12 xl:col-span-6">
+                                        <label for="employee_code" class="form-label">Employee Code</label>
+                                        <input type="text"
+                                            class="form-control @error('employee_code') !border-danger-500 @enderror"
+                                            wire:model="employee_code">
+                                        @error('employee_code')
+                                    </div>
+                                    <div class="col-span-12 xl:col-span-6">
+                                        <label for="device_id" class="form-label">Device ID</label>
+                                        <input type="text"
+                                            class="form-control @error('device_id') !border-danger-500 @enderror"
+                                            wire:model="device_id">
+                                        @error('device_id')
                                     </div>
                                 </div>
                             </div>
@@ -6963,3 +6968,4 @@
         </div>
     @endif
 </div>
+

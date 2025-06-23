@@ -77,7 +77,6 @@ class EmployeeShow extends Component
     public $birth_date;
     public $employment_date;
     public $termination_date;
-    public $device_id;
 
     // Employee Info Edit Modal
     public $editEmployeeInfoModal = false;
@@ -399,7 +398,6 @@ class EmployeeShow extends Component
         $this->birth_date = $this->employee->birth_date ? Carbon::parse($this->employee->birth_date)->format('Y-m-d') : null;
         $this->employment_date = $this->employee->employment_date ? Carbon::parse($this->employee->employment_date)->format('Y-m-d') : null;
         $this->termination_date = $this->employee->termination_date ? Carbon::parse($this->employee->termination_date)->format('Y-m-d') : null;
-        $this->device_id = $this->employee->device_id;
         $this->editBaseInfoModal = true;
     }
 
@@ -437,7 +435,6 @@ class EmployeeShow extends Component
                 $this->birth_date,
                 $this->employment_date,
                 $this->employee->id_number,
-                $this->device_id,
                 $this->mother_name,
                 $this->termination_date ? Carbon::parse($this->termination_date) : null
             );
@@ -485,6 +482,8 @@ class EmployeeShow extends Component
             'graduation_year' => 'nullable|integer',
             'military_status' => 'nullable|string|max:50',
             'marital_status' => 'nullable|string|max:50',
+            'employee_code' => 'nullable|string|max:50',
+            'device_id' => 'nullable|string|max:50',
         ]);
 
             $res = $this->employee->updateEmployeeInfo(
@@ -494,7 +493,9 @@ class EmployeeShow extends Component
                 $this->university,
                 $this->graduation_year,
                 $this->military_status,
-                $this->marital_status
+                $this->marital_status,
+                $this->employee_code,
+                $this->device_id
             );
             if ($res) {
                 $this->closeEditEmployeeInfoModal();

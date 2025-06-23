@@ -1633,15 +1633,6 @@
                                         @enderror
                                     </div>
                                     <div class="col-span-12 xl:col-span-6">
-                                        <label for="device_id" class="form-label">Device ID</label>
-                                        <input type="text"
-                                            class="form-control @error('device_id') !border-danger-500 @enderror"
-                                            wire:model="device_id">
-                                        @error('device_id')
-                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                    <div class="col-span-12 xl:col-span-6">
                                         <label for="address" class="form-label">Address</label>
                                         <input type="text"
                                             class="form-control @error('address') !border-danger-500 @enderror"

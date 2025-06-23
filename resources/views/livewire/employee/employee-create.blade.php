@@ -282,6 +282,21 @@
                                 <span class="text-danger-500 text-xs">{{ $message }}</span>
                             @enderror
                         </div>
+
+                        <div class="input-area">
+                            <label for="employee_code" class="form-label">Employee Code</label>
+                            <input id="employee_code" type="text"
+                                class="form-control @error('employee_code') !border-danger-500 @enderror"
+                                wire:model="employee_code">
+                        </div>
+
+                        <div class="input-area">
+                            <label for="device_id" class="form-label">Device ID</label>
+                            <input id="device_id" type="text"
+                                class="form-control @error('device_id') !border-danger-500 @enderror"
+                                wire:model="device_id">
+                        </div>
+
                     </div>
                 </div>
 
@@ -290,8 +305,7 @@
                         <div class="col-span-12">
                             <label for="id_card_file" class="form-label">ID Card Document
                                 <iconify-icon wire:loading wire:target="id_card_file"
-                                    icon="line-md:loading-twotone-loop" width="18"
-                                    height="18"></iconify-icon>
+                                    icon="line-md:loading-twotone-loop" width="18" height="18"></iconify-icon>
                                 @if (isset($applicantDocuments['id_card_url']) && $applicantDocuments['id_card_url'])
                                     <span class="text-xs text-success-500 ml-2">(Loaded from applicant)</span>
                                 @endif
@@ -308,9 +322,10 @@
                                                     class="h-40 max-w-full rounded-md object-contain"
                                                     alt="ID Card Preview">
                                             @else
-                                                <div class="h-40 w-full bg-slate-100 rounded-md flex items-center justify-center">
-                                                    <iconify-icon icon="mingcute:file-image-fill" width="48" height="48"
-                                                        class="text-slate-400"></iconify-icon>
+                                                <div
+                                                    class="h-40 w-full bg-slate-100 rounded-md flex items-center justify-center">
+                                                    <iconify-icon icon="mingcute:file-image-fill" width="48"
+                                                        height="48" class="text-slate-400"></iconify-icon>
                                                 </div>
                                             @endif
                                         @endif
@@ -397,9 +412,10 @@
                                                     class="h-32 max-w-full rounded-md object-contain"
                                                     alt="Birth Certificate Preview">
                                             @else
-                                                <div class="h-32 w-full bg-slate-100 rounded-md flex items-center justify-center">
-                                                    <iconify-icon icon="mingcute:file-image-fill" width="48" height="48"
-                                                        class="text-slate-400"></iconify-icon>
+                                                <div
+                                                    class="h-32 w-full bg-slate-100 rounded-md flex items-center justify-center">
+                                                    <iconify-icon icon="mingcute:file-image-fill" width="48"
+                                                        height="48" class="text-slate-400"></iconify-icon>
                                                 </div>
                                             @endif
                                         @endif
@@ -417,7 +433,8 @@
                                         <p class="mt-2 text-sm text-slate-500">Click to upload or drag and drop</p>
                                         <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF (Max 10MB)</p>
                                         <input id="birth_certificate_file_input" type="file" class="hidden"
-                                            wire:model="birth_certificate_file" accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
+                                            wire:model="birth_certificate_file"
+                                            accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
                                     </label>
                                 @endif
                             </div>
@@ -447,9 +464,10 @@
                                                     class="h-32 max-w-full rounded-md object-contain"
                                                     alt="College Certificate Preview">
                                             @else
-                                                <div class="h-32 w-full bg-slate-100 rounded-md flex items-center justify-center">
-                                                    <iconify-icon icon="mingcute:file-image-fill" width="48" height="48"
-                                                        class="text-slate-400"></iconify-icon>
+                                                <div
+                                                    class="h-32 w-full bg-slate-100 rounded-md flex items-center justify-center">
+                                                    <iconify-icon icon="mingcute:file-image-fill" width="48"
+                                                        height="48" class="text-slate-400"></iconify-icon>
                                                 </div>
                                             @endif
                                         @endif
@@ -467,7 +485,8 @@
                                         <p class="mt-2 text-sm text-slate-500">Click to upload or drag and drop</p>
                                         <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF (Max 10MB)</p>
                                         <input id="college_certificate_file_input" type="file" class="hidden"
-                                            wire:model="college_certificate_file" accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
+                                            wire:model="college_certificate_file"
+                                            accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
                                     </label>
                                 @endif
                             </div>
@@ -497,9 +516,10 @@
                                                     class="h-32 max-w-full rounded-md object-contain"
                                                     alt="Army Certificate Preview">
                                             @else
-                                                <div class="h-32 w-full bg-slate-100 rounded-md flex items-center justify-center">
-                                                    <iconify-icon icon="mingcute:file-image-fill" width="48" height="48"
-                                                        class="text-slate-400"></iconify-icon>
+                                                <div
+                                                    class="h-32 w-full bg-slate-100 rounded-md flex items-center justify-center">
+                                                    <iconify-icon icon="mingcute:file-image-fill" width="48"
+                                                        height="48" class="text-slate-400"></iconify-icon>
                                                 </div>
                                             @endif
                                         @endif
@@ -517,7 +537,8 @@
                                         <p class="mt-2 text-sm text-slate-500">Click to upload or drag and drop</p>
                                         <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF (Max 10MB)</p>
                                         <input id="army_certificate_file_input" type="file" class="hidden"
-                                            wire:model="army_certificate_file" accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
+                                            wire:model="army_certificate_file"
+                                            accept=".pdf,.jpg,.jpeg,.png,.bmp,.gif">
                                     </label>
                                 @endif
                             </div>

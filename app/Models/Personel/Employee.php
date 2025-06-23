@@ -88,7 +88,6 @@ class Employee extends Model
     protected $fillable = [
         'user_id',
         'created_by',
-        'id_number',
         'name',
         'name_ar',
         'email',
@@ -97,6 +96,7 @@ class Employee extends Model
         'nationality',
         'gender',
         'birth_date',
+        'id_number',
         'image_url',
         'birth_place_id',
         'license_required',
@@ -105,7 +105,6 @@ class Employee extends Model
         'termination_date',
         'mother_name',
         'status',
-        'device_id',
     ];
 
     protected $casts = [
@@ -1313,7 +1312,7 @@ class Employee extends Model
      * @return Employee
      * @throws AppException
      */
-    public function updateBaseInfo(string $name, string $name_ar, string $email, string $phone, string $address, string $nationality, string $gender, $birth_date, $employment_date, string $id_number, ?string $device_id = null, ?string $mother_name = null, ?Carbon $termination_date = null)
+    public function updateBaseInfo(string $name, string $name_ar, string $email, string $phone, string $address, string $nationality, string $gender, $birth_date, $employment_date, string $id_number, ?string $mother_name = null, ?Carbon $termination_date = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -1335,7 +1334,6 @@ class Employee extends Model
                 'employment_date' => $employment_date,
                 'mother_name' => $mother_name,
                 'termination_date' => $termination_date,
-                'device_id' => $device_id,
             ]);
             AppLog::info('Employee Base Info Updated', 'Employee base info updated for employee: ' . $this->name, loggable: $this);
             return $this->fresh();
@@ -1360,8 +1358,20 @@ class Employee extends Model
      * @return EmployeeInfo
      * @throws AppException
      */
-    public function updateEmployeeInfo(int $insurance_office_id, ?string $insurance_number = null, ?string $insurance_amount = null, ?string $academic_qualification = null, ?string $university = null, ?int $graduation_year = null, ?string $military_status = null, ?string $marital_status = null, ?int $salary_grade_id = null, ?int $vacation_package_id = null)
-    {
+    public function updateEmployeeInfo(
+        int $insurance_office_id,
+        ?string $insurance_number = null,
+        ?string $insurance_amount = null,
+        ?string $academic_qualification = null,
+        ?string $university = null,
+        ?int $graduation_year = null,
+        ?string $military_status = null,
+        ?string $marital_status = null,
+        ?int $salary_grade_id = null,
+        ?int $vacation_package_id = null,
+        ?string $employee_code = null,
+        ?string $device_id = null
+    ) {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
         if (!$loggedInUser->can('update', $this)) {
@@ -1383,6 +1393,8 @@ class Employee extends Model
                     'military_status' => $military_status,
                     'marital_status' => $marital_status,
                     'gender' => $this->gender, // Copy from employee
+                    'employee_code' => $employee_code,
+                    'device_id' => $device_id,
                 ],
             );
             AppLog::info('Employee Info Updated', 'Employee info updated for employee: ' . $this->name, loggable: $this);

@@ -49,6 +49,8 @@ class EmployeeCreate extends Component
     public $graduation_year;
     public $military_status;
     public $marital_status;
+    public $employee_code;
+    public $device_id;
     
     // Username preview
     public $previewedUsername = '';
@@ -94,6 +96,8 @@ class EmployeeCreate extends Component
         'license_required' => 'boolean',
         'employment_date' => 'required|date',
         'mother_name' => 'nullable|string|max:255',
+        'employee_code' => 'nullable|string|max:50',
+        'device_id' => 'nullable|string|max:50',
         // Employee additional info validation
         'insurance_office_id' => 'required|exists:insurance_offices,id',
         'insurance_number' => 'nullable|string|max:50',
@@ -389,6 +393,8 @@ class EmployeeCreate extends Component
                 'graduation_year' => $this->graduation_year,
                 'military_status' => $this->military_status,
                 'marital_status' => $this->marital_status,
+                'employee_code' => $this->employee_code,
+                'device_id' => $this->device_id,
             ];
             
             // Create employee with info using the newly created user

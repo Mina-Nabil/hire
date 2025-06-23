@@ -63,7 +63,7 @@ class Interview extends Model
 
     public function getStatusClassAttribute()
     {
-        return match($this->status) {
+        return match ($this->status) {
             self::STATUS_PENDING => 'bg-info-200',
             self::STATUS_SCHEDULED => 'bg-warning-200',
             self::STATUS_COMPLETED => 'bg-success-200',
@@ -178,7 +178,7 @@ class Interview extends Model
      * @return InterviewFeedback
      */
     public function addFeedback(int $userId, string $result, int $rating, ?string $strengths, ?string $weaknesses, ?string $feedback): InterviewFeedback
-    {   
+    {
 
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -187,7 +187,7 @@ class Interview extends Model
         }
 
         try {
-            return $this->feedbacks()->updateOrCreate([ 
+            return $this->feedbacks()->updateOrCreate([
                 'interview_id' => $this->id,
                 'user_id' => $userId,
             ], [
@@ -214,10 +214,12 @@ class Interview extends Model
      * @param string|null $newZoomLink
      * @return bool
      */
-    public function reschedule(\DateTime $newDate, 
-    ?string $newType = null, 
-    ?string $newLocation = null, ?string $newZoomLink = null): bool
-    {
+    public function reschedule(
+        \DateTime $newDate,
+        ?string $newType = null,
+        ?string $newLocation = null,
+        ?string $newZoomLink = null
+    ): bool {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
         if (!$loggedInUser->can('update', $this)) {
@@ -226,7 +228,7 @@ class Interview extends Model
 
         try {
             $data = ['date' => $newDate, 'status' => self::STATUS_RESCHEDULED];
-            
+
             if ($newLocation) {
                 $data['location'] = $newLocation;
             }
@@ -234,11 +236,11 @@ class Interview extends Model
             if ($newType) {
                 $data['type'] = $newType;
             }
-            
+
             if ($newZoomLink !== null) {
                 $data['zoom_link'] = $newZoomLink;
             }
-            
+
             $updated = $this->update($data);
             AppLog::info('Interview Rescheduled', 'Interview rescheduled for applicant: ' . $this->application->applicant->full_name, loggable: $this);
             return $updated;
@@ -322,12 +324,19 @@ class Interview extends Model
     {
         $loggedInUser = Auth::user();
 
-        $query->where(function ($q) use ($loggedInUser) {
-            $q->where('user_id', $loggedInUser->id);
-            $q->orWhereHas('interviewers', function ($q) use ($loggedInUser) {
-                $q->where('user_id', $loggedInUser->id);
+        $vacancy = $this->application->vacancy;
+
+        $query->select('interviews.*')
+            ->join('applications', 'applications.id', '=', 'interviews.application_id')
+            ->join('vacancies', 'vacancies.id', '=', 'applications.vacancy_id')
+            ->where(function ($q) use ($loggedInUser) {
+                $q->where('user_id', $loggedInUser->id)
+                    ->orWhere('vacancies.hiring_manager_id', $loggedInUser->id)
+                    ->orWhere('vacancies.hr_manager_id', $loggedInUser->id)
+                    ->orWhereHas('interviewers', function ($q) use ($loggedInUser) {
+                        $q->where('user_id', $loggedInUser->id);
+                    });
             });
-        });
 
         return $query;
     }

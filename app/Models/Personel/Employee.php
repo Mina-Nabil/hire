@@ -1362,7 +1362,6 @@ class Employee extends Model
     public function updateEmployeeInfo(
         int $insurance_office_id,
         ?string $insurance_number = null,
-        ?string $insurance_amount = null,
         ?string $academic_qualification = null,
         ?string $university = null,
         ?string $graduation_year = null,
@@ -1387,7 +1386,6 @@ class Employee extends Model
                     'vacation_package_id' => $vacation_package_id,
                     'insurance_office_id' => $insurance_office_id,
                     'insurance_number' => $insurance_number,
-                    'insurance_amount' => $insurance_amount,
                     'academic_qualification' => $academic_qualification,
                     'university' => $university,
                     'graduation_year' => $graduation_year,

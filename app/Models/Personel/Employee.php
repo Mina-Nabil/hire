@@ -1360,15 +1360,15 @@ class Employee extends Model
      * @throws AppException
      */
     public function updateEmployeeInfo(
-        int $insurance_office_id,
+        string $insurance_office_id,
         ?string $insurance_number = null,
         ?string $academic_qualification = null,
         ?string $university = null,
         ?string $graduation_year = null,
         ?string $military_status = null,
         ?string $marital_status = null,
-        ?int $salary_grade_id = null,
-        ?int $vacation_package_id = null,
+        ?string $salary_grade_id = null,
+        ?string $vacation_package_id = null,
         ?string $employee_code = null,
         ?string $device_id = null
     ) {

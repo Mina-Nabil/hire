@@ -191,7 +191,7 @@ class Calendar extends Component
         foreach (Interview::userData()->get() as $t) {
             $events[] =  [
                 'id'        => "interview" . $t->id,
-                'title'     => "Interview with " . $t->applicant->name,
+                'title'     => "Interview with " . $t->application->applicant->name,
                 'backgroundColor' => '#75d193', //green
                 'allDay'    => false,
                 'start'     => (new Carbon($t->date))->toIso8601String(),

@@ -82,6 +82,15 @@
                 <ul class="sidebar-menu">
 
                     <li>
+                        <a class="navItem {{ request()->routeIs('calendar') ? 'active' : '' }}"
+                            href="{{ url('/calendar') }}">
+                            <span class="flex items-center">
+                                <iconify-icon class="nav-icon" icon="heroicons-outline:calendar"></iconify-icon>
+                                <span>Calendar</span>
+                            </span>
+                            </a>
+                    </li>
+                    <li>
                         <a class="navItem {{ request()->routeIs('recruitment.vacancies') ? 'active' : '' }}"
                             href="{{ url('/recruitment/vacancies') }}">
                             <span class="flex items-center">

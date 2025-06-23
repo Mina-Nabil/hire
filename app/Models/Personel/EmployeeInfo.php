@@ -21,6 +21,7 @@ class EmployeeInfo extends Model
         'military_status',
         'gender',
         'marital_status',
+        'device_id',
     ];
 
 

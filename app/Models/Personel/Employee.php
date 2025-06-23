@@ -1770,7 +1770,7 @@ class Employee extends Model
         }
 
         // 18. Labour Document
-        if ($docManagers->contains('doc_type', 'labourDocument') && $this->labourDocument->isEmpty()) {
+        if ($docManagers->contains('doc_type', 'labourDocument') && !$this->labourDocument) {
             $missingDocs[] = 'Labour Document';
         }
         return $missingDocs;

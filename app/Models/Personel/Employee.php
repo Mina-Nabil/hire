@@ -1555,7 +1555,7 @@ class Employee extends Model
                 // 15. Work Declaration expired
                 ->when($docManagers->contains('doc_type', 'workDeclaration'), fn($q) => $q->orWhereHas('workDeclarations', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
-                }))
+                }));
          
 
         });

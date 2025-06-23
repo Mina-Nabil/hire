@@ -241,7 +241,7 @@
                         </tr>
 
                         <!-- HR Letter -->
-                        <tr class="hover:bg-gray-50">
+                        {{-- <tr class="hover:bg-gray-50">
                             <td class="px-4 py-3 text-sm font-medium text-gray-900">HR Letter</td>
                             <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $hrLetterStats['total'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $hrLetterStats['valid'] }}</td>
@@ -273,7 +273,7 @@
                                 @endif
                             </td>
                             <td class="px-4 py-3 text-sm text-center">-</td>
-                        </tr>
+                        </tr> --}}
 
                         <!-- S1 Document -->
                         <tr class="hover:bg-gray-50">

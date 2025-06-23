@@ -148,7 +148,7 @@ class MigrationService
                         !$employment_date => 'Employment date is required',
                         true => null,
                     };
-                   
+
 
                     $employees[] = [
                         'name' => $employeeName,
@@ -291,6 +291,7 @@ class MigrationService
                 }
 
                 foreach ($employees as $employee) {
+                    $employee_code = $employee['employee_code'];
                     if (!$employee['not_valid']) {
                         $user = User::create([
                             'name' => $employee['name'],
@@ -314,8 +315,9 @@ class MigrationService
                             'birth_place_id' => $employee['city_id'],
                             'created_by' => 1,
                         ]);
+
                         $employee->info()->create([
-                            'employee_code' => $employee['employee_code'],
+                            'employee_code' => $employee_code,
                         ]);
                     }
                 }

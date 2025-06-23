@@ -1442,7 +1442,7 @@ class Employee extends Model
                 // 2. Birth Certificate
                 ->when($docManagers->contains('doc_type', 'birthCertificate'), fn($q) => $q->orWhereDoesntHave('birthCertificate'))
                 // 3. Employment Contract
-                ->when($docManagers->contains('doc_type', 'contract'), fn($q) => $q->orWhereDoesntHave('contracts'))
+                ->when($docManagers->contains('doc_type', 'employeeContract'), fn($q) => $q->orWhereDoesntHave('contracts'))
                 // 4. Army Service Paper - only for males with appropriate military status
                 ->when($docManagers->contains('doc_type', 'armyServicePaper'), fn($q) => $q->orWhere(function ($query) {
                     $query
@@ -1505,7 +1505,7 @@ class Employee extends Model
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
                 }))
                 // 3. Employment Contract expired
-                ->when($docManagers->contains('doc_type', 'contract'), fn($q) => $q->orWhereHas('contracts', function ($q) use ($today) {
+                ->when($docManagers->contains('doc_type', 'employeeContract'), fn($q) => $q->orWhereHas('contracts', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
                 }))
                 // 4. Army Service Paper expired
@@ -1583,7 +1583,7 @@ class Employee extends Model
                     $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
                 }))
                 // 3. Employment Contract near expiry
-                ->when($docManagers->contains('doc_type', 'contract'), fn($q) => $q->orWhereHas('contracts', function ($q) use ($today, $nearExpiryDate) {
+                ->when($docManagers->contains('doc_type', 'employeeContract'), fn($q) => $q->orWhereHas('contracts', function ($q) use ($today, $nearExpiryDate) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
                 }))
                 // 4. Army Service Paper near expiry
@@ -1714,9 +1714,9 @@ class Employee extends Model
             $missingDocs[] = 'Police Record';
         }
 
-        // 7. HR Letter
-        if ($docManagers->contains('doc_type', 'hrLetter') && $this->hrLetters->isEmpty()) {
-            $missingDocs[] = 'HR Letter';
+        // 7. Contract
+        if ($docManagers->contains('doc_type', 'employeeContract') && $this->contracts->isEmpty()) {
+            $missingDocs[] = 'Contract';
         }
 
         // 8. S1 Document
@@ -1798,7 +1798,7 @@ class Employee extends Model
         }
 
         // 3. Employment Contract
-        if ($docManagers->contains('doc_type', 'contract') && $this->contracts->isEmpty()) {
+        if ($docManagers->contains('doc_type', 'employeeContract') && $this->contracts->isEmpty()) {
             $expiredDocs[] = 'Employment Contract';
         }
 

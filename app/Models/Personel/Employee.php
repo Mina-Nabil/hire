@@ -1434,7 +1434,7 @@ class Employee extends Model
     public function scopeWithMissingDocuments($query)
     {
 
-        $docManagers = DocManager::where('is_required', true)->get();
+        $docManagers = DocManager::where('is_required', true)->where('is_active', true)->get();
         return $query->where(function ($query) use ($docManagers) {
             // 1. ID Card
             $query
@@ -1493,69 +1493,81 @@ class Employee extends Model
     public function scopeWithExpiredDocuments($query)
     {
         $today = now()->format('Y-m-d');
-
-        return $query->where(function ($query) use ($today) {
+        $docManagers = DocManager::where('is_required', true)->where('is_active', true)->get();
+        return $query->where(function ($query) use ($today, $docManagers) {
             // 1. ID Card expired
             $query
-                ->whereHas('idCard', function ($q) use ($today) {
+                ->when($docManagers->contains('doc_type', 'idCard'), fn($q) => $q->orWhereHas('idCard', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
-                })
+                }))
                 // 2. Birth Certificate expired
-                ->orWhereHas('birthCertificate', function ($q) use ($today) {
+                ->when($docManagers->contains('doc_type', 'birthCertificate'), fn($q) => $q->orWhereHas('birthCertificate', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
-                })
+                }))
                 // 3. Employment Contract expired
-                ->orWhereHas('contracts', function ($q) use ($today) {
+                ->when($docManagers->contains('doc_type', 'contract'), fn($q) => $q->orWhereHas('contracts', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
-                })
+                }))
                 // 4. Army Service Paper expired
-                ->orWhereHas('armyServicePaper', function ($q) use ($today) {
+                ->when($docManagers->contains('doc_type', 'armyServicePaper'), fn($q) => $q->orWhereHas('armyServicePaper', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
-                })
+                }))
                 // 5. Driver License expired
-                ->orWhereHas('driverLicense', function ($q) use ($today) {
+                ->when($docManagers->contains('doc_type', 'driverLicense'), fn($q) => $q->orWhereHas('driverLicense', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
-                })
+                }))
                 // 6. Police Record expired
-                ->orWhereHas('policeRecords', function ($q) use ($today) {
+                ->when($docManagers->contains('doc_type', 'policeRecord'), fn($q) => $q->orWhereHas('policeRecords', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
-                })
-                // 7. HR Letter expired
-                ->orWhereHas('hrLetters', function ($q) use ($today) {
-                    $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
-                })
+                }))
+                // // 7. HR Letter expired
+                // ->orWhereHas('hrLetters', function ($q) use ($today) {
+                //     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
+                // })
                 // 8. S1 Doc expired
-                ->orWhereHas('employeeS1Doc', function ($q) use ($today) {
+                ->when($docManagers->contains('doc_type', 'employeeS1Doc'), fn($q) => $q->orWhereHas('employeeS1Doc', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
-                })
+                }))
                 // 9. S2 Doc expired
-                ->orWhereHas('employeeS2Doc', function ($q) use ($today) {
+                ->when($docManagers->contains('doc_type', 'employeeS2Doc'), fn($q) => $q->orWhereHas('employeeS2Doc', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
-                })
+                }))
                 // 10. S6 Doc expired
-                ->orWhereHas('employeeS6Doc', function ($q) use ($today) {
+                ->when($docManagers->contains('doc_type', 'employeeS6Doc'), fn($q) => $q->orWhereHas('employeeS6Doc', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
-                })
+                }))
                 // 11. Medical Record expired
-                ->orWhereHas('medicalRecord', function ($q) use ($today) {
+                ->when($docManagers->contains('doc_type', 'medicalRecord'), fn($q) => $q->orWhereHas('medicalRecord', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
-                })
+                }))
                 // 12. External Medical Record expired
-                ->orWhereHas('externalMedicalRecord', function ($q) use ($today) {
+                ->when($docManagers->contains('doc_type', 'externalMedicalRecord'), fn($q) => $q->orWhereHas('externalMedicalRecord', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
-                })
+                }))
                 // 13. Practice Card expired
-                ->orWhereHas('practiceCard', function ($q) use ($today) {
+                ->when($docManagers->contains('doc_type', 'practiceCard'), fn($q) => $q->orWhereHas('practiceCard', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
-                })
+                }))
                 // 14. Syndicate Card expired
-                ->orWhereHas('syndicateCard', function ($q) use ($today) {
+                ->when($docManagers->contains('doc_type', 'syndicateCard'), fn($q) => $q->orWhereHas('syndicateCard', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
-                })
+                }))
                 // 15. Work Declaration expired
-                ->orWhereHas('workDeclarations', function ($q) use ($today) {
+                ->when($docManagers->contains('doc_type', 'workDeclaration'), fn($q) => $q->orWhereHas('workDeclarations', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
-                });
+                }))
+                // 16. Social Print expired
+                ->when($docManagers->contains('doc_type', 'socialPrint'), fn($q) => $q->orWhereHas('socialPrint', function ($q) use ($today) {
+                    $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
+                }))
+                // 17. College Certificate expired
+                ->when($docManagers->contains('doc_type', 'collegeCertificate'), fn($q) => $q->orWhereHas('collegeCertificate', function ($q) use ($today) {
+                    $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
+                }))
+                // 18. Labour Document expired
+                ->when($docManagers->contains('doc_type', 'labourDocument'), fn($q) => $q->orWhereHas('labourDocument', function ($q) use ($today) {
+                    $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
+                }));
         });
     }
 
@@ -1569,69 +1581,69 @@ class Employee extends Model
     {
         $today = now()->format('Y-m-d');
         $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
-
-        return $query->where(function ($query) use ($today, $nearExpiryDate) {
+        $docManagers = DocManager::where('is_required', true)->where('is_active', true)->get();
+        return $query->where(function ($query) use ($today, $nearExpiryDate, $docManagers) {
             // 1. ID Card near expiry
             $query
-                ->whereHas('idCard', function ($q) use ($today, $nearExpiryDate) {
+                ->when($docManagers->contains('doc_type', 'idCard'), fn($q) => $q->orWhereHas('idCard', function ($q) use ($today, $nearExpiryDate) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
-                })
+                }))
                 // 2. Birth Certificate near expiry
-                ->orWhereHas('birthCertificate', function ($q) use ($today, $nearExpiryDate) {
+                ->when($docManagers->contains('doc_type', 'birthCertificate'), fn($q) => $q->orWhereHas('birthCertificate', function ($q) use ($today, $nearExpiryDate) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
-                })
+                }))
                 // 3. Employment Contract near expiry
-                ->orWhereHas('contracts', function ($q) use ($today, $nearExpiryDate) {
+                ->when($docManagers->contains('doc_type', 'contract'), fn($q) => $q->orWhereHas('contracts', function ($q) use ($today, $nearExpiryDate) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
-                })
+                }))
                 // 4. Army Service Paper near expiry
-                ->orWhereHas('armyServicePaper', function ($q) use ($today, $nearExpiryDate) {
+                ->when($docManagers->contains('doc_type', 'armyServicePaper'), fn($q) => $q->orWhereHas('armyServicePaper', function ($q) use ($today, $nearExpiryDate) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
-                })
+                }))
                 // 5. Driver License near expiry
-                ->orWhereHas('driverLicense', function ($q) use ($today, $nearExpiryDate) {
+                ->when($docManagers->contains('doc_type', 'driverLicense'), fn($q) => $q->orWhereHas('driverLicense', function ($q) use ($today, $nearExpiryDate) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
-                })
+                }))
                 // 6. Police Record near expiry
-                ->orWhereHas('policeRecords', function ($q) use ($today, $nearExpiryDate) {
+                ->when($docManagers->contains('doc_type', 'policeRecord'), fn($q) => $q->orWhereHas('policeRecords', function ($q) use ($today, $nearExpiryDate) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
-                })
+                }))
                 // 7. HR Letter near expiry
-                ->orWhereHas('hrLetters', function ($q) use ($today, $nearExpiryDate) {
-                    $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
-                })
+                // ->orWhereHas('hrLetters', function ($q) use ($today, $nearExpiryDate) {
+                //     $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
+                // })
                 // 8. S1 Doc near expiry
-                ->orWhereHas('employeeS1Doc', function ($q) use ($today, $nearExpiryDate) {
+                ->when($docManagers->contains('doc_type', 'employeeS1Doc'), fn($q) => $q->orWhereHas('employeeS1Doc', function ($q) use ($today, $nearExpiryDate) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
-                })
+                }))
                 // 9. S2 Doc near expiry
-                ->orWhereHas('employeeS2Doc', function ($q) use ($today, $nearExpiryDate) {
+                ->when($docManagers->contains('doc_type', 'employeeS2Doc'), fn($q) => $q->orWhereHas('employeeS2Doc', function ($q) use ($today, $nearExpiryDate) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
-                })
+                }))
                 // 10. S6 Doc near expiry
-                ->orWhereHas('employeeS6Doc', function ($q) use ($today, $nearExpiryDate) {
+                ->when($docManagers->contains('doc_type', 'employeeS6Doc'), fn($q) => $q->orWhereHas('employeeS6Doc', function ($q) use ($today, $nearExpiryDate) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
-                })
+                }))
                 // 11. Medical Record near expiry
-                ->orWhereHas('medicalRecord', function ($q) use ($today, $nearExpiryDate) {
+                ->when($docManagers->contains('doc_type', 'medicalRecord'), fn($q) => $q->orWhereHas('medicalRecord', function ($q) use ($today, $nearExpiryDate) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
-                })
+                }))
                 // 12. External Medical Record near expiry
-                ->orWhereHas('externalMedicalRecord', function ($q) use ($today, $nearExpiryDate) {
+                ->when($docManagers->contains('doc_type', 'externalMedicalRecord'), fn($q) => $q->orWhereHas('externalMedicalRecord', function ($q) use ($today, $nearExpiryDate) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
-                })
+                }))
                 // 13. Practice Card near expiry
-                ->orWhereHas('practiceCard', function ($q) use ($today, $nearExpiryDate) {
+                ->when($docManagers->contains('doc_type', 'practiceCard'), fn($q) => $q->orWhereHas('practiceCard', function ($q) use ($today, $nearExpiryDate) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
-                })
+                }))
                 // 14. Syndicate Card near expiry
-                ->orWhereHas('syndicateCard', function ($q) use ($today, $nearExpiryDate) {
+                ->when($docManagers->contains('doc_type', 'syndicateCard'), fn($q) => $q->orWhereHas('syndicateCard', function ($q) use ($today, $nearExpiryDate) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
-                })
+                }))
                 // 15. Work Declaration near expiry
-                ->orWhereHas('workDeclarations', function ($q) use ($today, $nearExpiryDate) {
+                ->when($docManagers->contains('doc_type', 'workDeclaration'), fn($q) => $q->orWhereHas('workDeclarations', function ($q) use ($today, $nearExpiryDate) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
-                });
+                }));
         });
     }
 
@@ -1679,83 +1691,98 @@ class Employee extends Model
      */
     public function getMissingDocuments()
     {
+        $docManagers = DocManager::where('is_required', true)->where('is_active', true)->get();
         $missingDocs = [];
 
         // 1. ID Card
-        if (!$this->idCard) {
+        if ($docManagers->contains('doc_type', 'idCard') && !$this->idCard) {
             $missingDocs[] = 'ID Card';
         }
 
         // 2. Birth Certificate
-        if (!$this->birthCertificate) {
+        if ($docManagers->contains('doc_type', 'birthCertificate') && !$this->birthCertificate) {
             $missingDocs[] = 'Birth Certificate';
         }
 
         // 3. Employment Contract
-        if ($this->contracts->isEmpty()) {
+        if ($docManagers->contains('doc_type', 'contract') && $this->contracts->isEmpty()) {
             $missingDocs[] = 'Employment Contract';
         }
 
         // 4. Army Service Paper
-        if ($this->gender === Applicant::GENDER_MALE && ($this->info && in_array($this->info->military_status, [Applicant::MILITARY_STATUS_EXEMPTED, Applicant::MILITARY_STATUS_COMPLETED])) && !$this->armyServicePaper) {
+        if ($docManagers->contains('doc_type', 'armyServicePaper') && $this->gender === Applicant::GENDER_MALE && ($this->info && in_array($this->info->military_status, [Applicant::MILITARY_STATUS_EXEMPTED, Applicant::MILITARY_STATUS_COMPLETED])) && !$this->armyServicePaper) {
             $missingDocs[] = 'Army Service Paper';
         }
 
         // 5. Driver License
-        if ($this->license_required && !$this->driverLicense) {
+        if ($docManagers->contains('doc_type', 'driverLicense') && $this->license_required && !$this->driverLicense) {
             $missingDocs[] = 'Driver License';
         }
 
         // 6. Police Record
-        if ($this->policeRecords->isEmpty()) {
+        if ($docManagers->contains('doc_type', 'policeRecord') && $this->policeRecords->isEmpty()) {
             $missingDocs[] = 'Police Record';
         }
 
         // 7. HR Letter
-        if ($this->hrLetters->isEmpty()) {
+        if ($docManagers->contains('doc_type', 'hrLetter') && $this->hrLetters->isEmpty()) {
             $missingDocs[] = 'HR Letter';
         }
 
         // 8. S1 Document
-        if (!$this->employeeS1Doc) {
+        if ($docManagers->contains('doc_type', 'employeeS1Doc') && !$this->employeeS1Doc) {
             $missingDocs[] = 'S1 Document';
         }
 
         // 9. S2 Document
-        if ($this->employeeS2Doc->isEmpty()) {
+        if ($docManagers->contains('doc_type', 'employeeS2Doc') && $this->employeeS2Doc->isEmpty()) {
             $missingDocs[] = 'S2 Document';
         }
 
         // 10. S6 Document
-        if ($this->employeeS6Doc->isEmpty()) {
+        if ($docManagers->contains('doc_type', 'employeeS6Doc') && $this->employeeS6Doc->isEmpty()) {
             $missingDocs[] = 'S6 Document';
         }
 
         // 11. Medical Record
-        if (!$this->medicalRecord) {
+        if ($docManagers->contains('doc_type', 'medicalRecord') && !$this->medicalRecord) {
             $missingDocs[] = 'Medical Record';
         }
 
         // 12. External Medical Record
-        if (!$this->externalMedicalRecord) {
+        if ($docManagers->contains('doc_type', 'externalMedicalRecord') && !$this->externalMedicalRecord) {
             $missingDocs[] = 'External Medical Record';
         }
 
         // 13. Practice Card
-        if (!$this->practiceCard) {
+        if ($docManagers->contains('doc_type', 'practiceCard') && !$this->practiceCard) {
             $missingDocs[] = 'Practice Card';
         }
 
         // 14. Syndicate Card
-        if (!$this->syndicateCard) {
+        if ($docManagers->contains('doc_type', 'syndicateCard') && !$this->syndicateCard) {
             $missingDocs[] = 'Syndicate Card';
         }
 
         // 15. Work Declaration
-        if ($this->workDeclarations->isEmpty()) {
+        if ($docManagers->contains('doc_type', 'workDeclaration') && $this->workDeclarations->isEmpty()) {
             $missingDocs[] = 'Work Declaration';
         }
 
+        // 16. Social Print
+        if ($docManagers->contains('doc_type', 'socialPrint') && !$this->socialPrint) {
+            $missingDocs[] = 'Social Print';
+        }
+
+        // 17. College Certificate
+        if ($docManagers->contains('doc_type', 'collegeCertificate') && !$this->collegeCertificate) {
+            $missingDocs[] = 'College Certificate';
+        }
+
+        // 18. Labour Document
+        if ($docManagers->contains('doc_type', 'labourDocument') && $this->labourDocument->isEmpty()) {
+            $missingDocs[] = 'Labour Document';
+        }
         return $missingDocs;
     }
 
@@ -1768,98 +1795,122 @@ class Employee extends Model
     {
         $expiredDocs = [];
         $today = now();
+        $docManagers = DocManager::where('is_required', true)->where('is_active', true)->get();
 
         // 1. ID Card
-        if ($this->idCard && $this->idCard->expiry_date && $today->gt($this->idCard->expiry_date)) {
+        if ($docManagers->contains('doc_type', 'idCard') && $this->idCard && $this->idCard->expiry_date && $today->gt($this->idCard->expiry_date)) {
             $expiredDocs[] = 'ID Card';
         }
 
         // 2. Birth Certificate
-        if ($this->birthCertificate && $this->birthCertificate->expiry_date && $today->gt($this->birthCertificate->expiry_date)) {
+        if ($docManagers->contains('doc_type', 'birthCertificate') && $this->birthCertificate && $this->birthCertificate->expiry_date && $today->gt($this->birthCertificate->expiry_date)) {
             $expiredDocs[] = 'Birth Certificate';
         }
 
         // 3. Employment Contract
-        foreach ($this->contracts as $contract) {
-            if ($contract->expiry_date && $today->gt($contract->expiry_date)) {
-                $expiredDocs[] = 'Employment Contract';
-                break;
-            }
+        if ($docManagers->contains('doc_type', 'contract') && $this->contracts->isEmpty()) {
+            $expiredDocs[] = 'Employment Contract';
         }
 
         // 4. Army Service Paper
-        if ($this->armyServicePaper && $this->armyServicePaper->expiry_date && $today->gt($this->armyServicePaper->expiry_date)) {
+        if ($docManagers->contains('doc_type', 'armyServicePaper') && $this->armyServicePaper && $this->armyServicePaper->expiry_date && $today->gt($this->armyServicePaper->expiry_date)) {
             $expiredDocs[] = 'Army Service Paper';
         }
 
         // 5. Driver License
-        if ($this->driverLicense && $this->driverLicense->expiry_date && $today->gt($this->driverLicense->expiry_date)) {
+        if ($docManagers->contains('doc_type', 'driverLicense') && $this->driverLicense && $this->driverLicense->expiry_date && $today->gt($this->driverLicense->expiry_date)) {
             $expiredDocs[] = 'Driver License';
         }
 
         // 6. Police Record
-        foreach ($this->policeRecords as $record) {
-            if ($record->expiry_date && $today->gt($record->expiry_date)) {
-                $expiredDocs[] = 'Police Record';
-                break;
+        if ($docManagers->contains('doc_type', 'policeRecord')) {
+            foreach ($this->policeRecords as $record) {
+                if ($record->expiry_date && $today->gt($record->expiry_date)) {
+                    $expiredDocs[] = 'Police Record';
+                    break;
+                }
             }
         }
 
         // 7. HR Letter
-        foreach ($this->hrLetters as $letter) {
-            if ($letter->expiry_date && $today->gt($letter->expiry_date)) {
-                $expiredDocs[] = 'HR Letter';
-                break;
+        // foreach ($this->hrLetters as $letter) {
+        //     if ($letter->expiry_date && $today->gt($letter->expiry_date)) {
+        //         $expiredDocs[] = 'HR Letter';
+        //         break;
+        //     }
+        // }
+
+        // 8. S1 Document
+        if ($docManagers->contains('doc_type', 'employeeS1Doc')) {
+            if ($this->employeeS1Doc && $this->employeeS1Doc->expiry_date && $today->gt($this->employeeS1Doc->expiry_date)) {
+                $expiredDocs[] = 'S1 Document';
             }
         }
 
-        // 8. S1 Document
-        if ($this->employeeS1Doc && $this->employeeS1Doc->expiry_date && $today->gt($this->employeeS1Doc->expiry_date)) {
-            $expiredDocs[] = 'S1 Document';
-        }
-
         // 9. S2 Document
-        foreach ($this->employeeS2Doc as $doc) {
-            if ($doc->expiry_date && $today->gt($doc->expiry_date)) {
-                $expiredDocs[] = 'S2 Document';
-                break;
+        if ($docManagers->contains('doc_type', 'employeeS2Doc')) {
+            foreach ($this->employeeS2Doc as $doc) {
+                if ($doc->expiry_date && $today->gt($doc->expiry_date)) {
+                    $expiredDocs[] = 'S2 Document';
+                    break;
+                }
             }
         }
 
         // 10. S6 Document
-        foreach ($this->employeeS6Doc as $doc) {
-            if ($doc->expiry_date && $today->gt($doc->expiry_date)) {
-                $expiredDocs[] = 'S6 Document';
-                break;
+        if ($docManagers->contains('doc_type', 'employeeS6Doc')) {
+            foreach ($this->employeeS6Doc as $doc) {
+                if ($doc->expiry_date && $today->gt($doc->expiry_date)) {
+                    $expiredDocs[] = 'S6 Document';
+                    break;
+                }
             }
         }
 
         // 11. Medical Record
-        if ($this->medicalRecord && $this->medicalRecord->expiry_date && $today->gt($this->medicalRecord->expiry_date)) {
+        if ($docManagers->contains('doc_type', 'medicalRecord') && $this->medicalRecord && $this->medicalRecord->expiry_date && $today->gt($this->medicalRecord->expiry_date)) {
             $expiredDocs[] = 'Medical Record';
         }
 
         // 12. External Medical Record
-        if ($this->externalMedicalRecord && $this->externalMedicalRecord->expiry_date && $today->gt($this->externalMedicalRecord->expiry_date)) {
+        if ($docManagers->contains('doc_type', 'externalMedicalRecord') && $this->externalMedicalRecord && $this->externalMedicalRecord->expiry_date && $today->gt($this->externalMedicalRecord->expiry_date)) {
             $expiredDocs[] = 'External Medical Record';
         }
 
         // 13. Practice Card
-        if ($this->practiceCard && $this->practiceCard->expiry_date && $today->gt($this->practiceCard->expiry_date)) {
+        if ($docManagers->contains('doc_type', 'practiceCard') && $this->practiceCard && $this->practiceCard->expiry_date && $today->gt($this->practiceCard->expiry_date)) {
             $expiredDocs[] = 'Practice Card';
         }
 
         // 14. Syndicate Card
-        if ($this->syndicateCard && $this->syndicateCard->expiry_date && $today->gt($this->syndicateCard->expiry_date)) {
+        if ($docManagers->contains('doc_type', 'syndicateCard') && $this->syndicateCard && $this->syndicateCard->expiry_date && $today->gt($this->syndicateCard->expiry_date)) {
             $expiredDocs[] = 'Syndicate Card';
         }
 
         // 15. Work Declaration
-        foreach ($this->workDeclarations as $declaration) {
-            if ($declaration->expiry_date && $today->gt($declaration->expiry_date)) {
-                $expiredDocs[] = 'Work Declaration';
-                break;
+        if ($docManagers->contains('doc_type', 'workDeclaration')) {
+            foreach ($this->workDeclarations as $declaration) {
+                if ($declaration->expiry_date && $today->gt($declaration->expiry_date)) {
+                    $expiredDocs[] = 'Work Declaration';
+                    break;
+                }
             }
+        }
+
+
+        // 16. Social Print
+        if ($docManagers->contains('doc_type', 'socialPrint') && $this->socialPrint && $this->socialPrint->expiry_date && $today->gt($this->socialPrint->expiry_date)) {
+            $expiredDocs[] = 'Social Print';
+        }
+
+        // 17. College Certificate
+        if ($docManagers->contains('doc_type', 'collegeCertificate') && $this->collegeCertificate && $this->collegeCertificate->expiry_date && $today->gt($this->collegeCertificate->expiry_date)) {
+            $expiredDocs[] = 'College Certificate';
+        }
+
+        // 18. Labour Document
+        if ($docManagers->contains('doc_type', 'labourDocument') && $this->labourDocument && $this->labourDocument->expiry_date && $today->gt($this->labourDocument->expiry_date)) {
+            $expiredDocs[] = 'Labour Document';
         }
 
         return $expiredDocs;

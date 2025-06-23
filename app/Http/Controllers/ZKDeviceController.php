@@ -37,7 +37,7 @@ class ZKDeviceController extends Controller
         ]);
 
         try {
-            if ($request->query('table') !== 'OPERLOG') {
+            if ($request->query('table') !== 'OPERLOG' && $request->query('table') !== 'ATTLOG') {
                 return response('OK', 200); // Not an attendance log table
             }
 

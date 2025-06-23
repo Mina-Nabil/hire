@@ -1,5 +1,4 @@
 <div>
-
     <div class="flex justify-between flex-wrap items-center">
         <div class="md:mb-6 mb-4 flex space-x-3 rtl:space-x-reverse">
             <div>
@@ -33,9 +32,20 @@
                 <p class="text-xs text-slate-500 dark:text-slate-400">Employee</p>
             </div>
         </div>
+        @can('delete', $employee)
+        <div class="flex items-center gap-2">
+            <button wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to delete this employee?',color:'danger',callback:'deleteEmployee'})" class="btn btn-danger" >
+                <iconify-icon icon="mingcute:delete-fill" width="20" height="20"></iconify-icon>
+                Delete Employee
+                </button>
+                <iconify-icon wire:loading wire:target="deleteEmployee"
+                icon="line-md:loading-twotone-loop" width="18"
+                height="18"></iconify-icon>
+            </div>
+        @endcan
     </div>
 
-    <div class="grid grid-cols-12 gap-5">
+    <div class="grid grid-cols-12 gap-5 mt-5">
 
         <div class="xl:col-span-3 lg:col-span-4 col-span-12">
             <div class="card">

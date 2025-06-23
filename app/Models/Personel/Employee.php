@@ -1556,8 +1556,6 @@ class Employee extends Model
                 ->when($docManagers->contains('doc_type', 'workDeclaration'), fn($q) => $q->orWhereHas('workDeclarations', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
                 }));
-         
-
         });
     }
 
@@ -2024,9 +2022,9 @@ class Employee extends Model
         $today = now()->format('Y-m-d');
         $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
         $docManager = DocManager::where('is_required', true)
-        ->where('is_active', true)
-        ->where('doc_type', 'idCard')
-        ->first();
+            ->where('is_active', true)
+            ->where('doc_type', 'idCard')
+            ->first();
 
         // Get total employees
         $total = self::count();
@@ -2070,9 +2068,9 @@ class Employee extends Model
         $today = now()->format('Y-m-d');
         $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
         $docManager = DocManager::where('is_required', true)
-        ->where('is_active', true)
-        ->where('doc_type', 'birthCertificate')
-        ->first();
+            ->where('is_active', true)
+            ->where('doc_type', 'birthCertificate')
+            ->first();
 
         // Get total employees
         $total = self::count();
@@ -2134,9 +2132,9 @@ class Employee extends Model
         $today = now()->format('Y-m-d');
         $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
         $docManager = DocManager::where('is_required', true)
-        ->where('is_active', true)
-        ->where('doc_type', 'armyServicePaper')
-        ->first();
+            ->where('is_active', true)
+            ->where('doc_type', 'armyServicePaper')
+            ->first();
 
         // Get total employees
         $total = self::count();
@@ -2241,9 +2239,9 @@ class Employee extends Model
         $today = now()->format('Y-m-d');
         $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
         $docManager = DocManager::where('is_required', true)
-        ->where('is_active', true)
-        ->where('doc_type', 'employmentContract')
-        ->first();
+            ->where('is_active', true)
+            ->where('doc_type', 'employmentContract')
+            ->first();
 
         // Get total employees
         $total = self::count();
@@ -2287,9 +2285,9 @@ class Employee extends Model
         $today = now()->format('Y-m-d');
         $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
         $docManager = DocManager::where('is_required', true)
-        ->where('is_active', true)
-        ->where('doc_type', 'driverLicense')
-        ->first();
+            ->where('is_active', true)
+            ->where('doc_type', 'driverLicense')
+            ->first();
         // Get total employees
         $total = self::count();
 
@@ -2346,9 +2344,9 @@ class Employee extends Model
         $today = now()->format('Y-m-d');
         $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
         $docManager = DocManager::where('is_required', true)
-        ->where('is_active', true)
-        ->where('doc_type', 'policeRecord')
-        ->first();
+            ->where('is_active', true)
+            ->where('doc_type', 'policeRecord')
+            ->first();
         // Get total employees
         $total = self::count();
 
@@ -2429,9 +2427,9 @@ class Employee extends Model
         $today = now()->format('Y-m-d');
         $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
         $docManager = DocManager::where('is_required', true)
-        ->where('is_active', true)
-        ->where('doc_type', 'employeeS1Doc')
-        ->first();
+            ->where('is_active', true)
+            ->where('doc_type', 'employeeS1Doc')
+            ->first();
         // Get total employees
         $total = self::count();
 
@@ -2474,9 +2472,9 @@ class Employee extends Model
         $today = now()->format('Y-m-d');
         $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
         $docManager = DocManager::where('is_required', true)
-        ->where('is_active', true)
-        ->where('doc_type', 'employeeS2Doc')
-        ->first();
+            ->where('is_active', true)
+            ->where('doc_type', 'employeeS2Doc')
+            ->first();
         // Get total employees
         $total = self::count();
 
@@ -2519,9 +2517,9 @@ class Employee extends Model
         $today = now()->format('Y-m-d');
         $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
         $docManager = DocManager::where('is_required', true)
-        ->where('is_active', true)
-        ->where('doc_type', 'employeeS6Doc')
-        ->first();
+            ->where('is_active', true)
+            ->where('doc_type', 'employeeS6Doc')
+            ->first();
         // Get total employees
         $total = self::count();
 
@@ -2563,9 +2561,9 @@ class Employee extends Model
     {
         $total = self::count();
         $docManager = DocManager::where('is_required', true)
-        ->where('is_active', true)
-        ->where('doc_type', 'medicalRecord')
-        ->first();
+            ->where('is_active', true)
+            ->where('doc_type', 'medicalRecord')
+            ->first();
 
         $valid = $docManager ? self::whereHas('medicalRecord', function ($q) {
             $q->where('expiry_date', '>', now());
@@ -2616,14 +2614,14 @@ class Employee extends Model
     {
         $total = self::count();
         $docManager = DocManager::where('is_required', true)
-        ->where('is_active', true)
-        ->where('doc_type', 'externalMedicalRecord')
-        ->first();
+            ->where('is_active', true)
+            ->where('doc_type', 'externalMedicalRecord')
+            ->first();
         $valid =  self::whereHas('externalMedicalRecord', function ($q) {
             $q->where(function ($q) {
                 $q->whereNull('expiry_date')->orWhere('expiry_date', '>', now());
             });
-        })->count() ;
+        })->count();
         $expired = $docManager ? self::whereHas('externalMedicalRecord', function ($q) {
             $q->whereNotNull('expiry_date')->where('expiry_date', '<', now());
         })->count() : 0;
@@ -2652,9 +2650,9 @@ class Employee extends Model
     {
         $total = self::count();
         $docManager = DocManager::where('is_required', true)
-        ->where('is_active', true)
-        ->where('doc_type', 'practiceCard')
-        ->first();
+            ->where('is_active', true)
+            ->where('doc_type', 'practiceCard')
+            ->first();
         $valid = self::whereHas('practiceCard', function ($q) {
             $q->where(function ($q) {
                 $q->whereNull('expiry_date')->orWhere('expiry_date', '>', now());
@@ -2688,9 +2686,9 @@ class Employee extends Model
     {
         $total = self::count();
         $docManager = DocManager::where('is_required', true)
-        ->where('is_active', true)
-        ->where('doc_type', 'skillsQualification')
-        ->first();
+            ->where('is_active', true)
+            ->where('doc_type', 'skillsQualification')
+            ->first();
         $valid = self::whereHas('skillsQualifications', function ($q) {
             $q->where(function ($q) {
                 $q->whereNull('expiry_date')->orWhere('expiry_date', '>', now());
@@ -2724,9 +2722,9 @@ class Employee extends Model
     {
         $total = self::count();
         $docManager = DocManager::where('is_required', true)
-        ->where('is_active', true)
-        ->where('doc_type', 'syndicateCard')
-        ->first();
+            ->where('is_active', true)
+            ->where('doc_type', 'syndicateCard')
+            ->first();
         $valid = self::whereHas('syndicateCard', function ($q) {
             $q->where(function ($q) {
                 $q->whereNull('expiry_date')->orWhere('expiry_date', '>', now());
@@ -2763,11 +2761,11 @@ class Employee extends Model
 
         // Get total employees
         $total = self::count();
-        
+
         $docManager = DocManager::where('is_required', true)
-        ->where('is_active', true)
-        ->where('doc_type', 'workDeclaration')
-        ->first();
+            ->where('is_active', true)
+            ->where('doc_type', 'workDeclaration')
+            ->first();
 
         // Get employees with missing work declarations
         $missing = $docManager ? self::whereDoesntHave('workDeclarations')->count() : 0;
@@ -4914,5 +4912,47 @@ class Employee extends Model
         }
 
         return $vacationDays;
+    }
+
+    public function deleteEmployee()
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+
+        if (!$loggedInUser->can('delete', $this)) {
+            throw new AppException('You are not authorized to delete this employee');
+        }
+
+        DB::transaction(function () {
+            $this->delete();
+            $this->info()->delete();
+            $this->contracts()->delete();
+            $this->armyServicePaper()->delete();
+            $this->driverLicense()->delete();
+            $this->policeRecords()->delete();
+            $this->hrLetters()->delete();
+            $this->employeeS1Doc()->delete();
+            $this->employeeS2Doc()->delete();
+            $this->employeeS6Doc()->delete();
+            $this->medicalRecord()->delete();
+            $this->externalMedicalRecord()->delete();
+            $this->practiceCard()->delete();
+            $this->syndicateCard()->delete();
+            $this->workDeclarations()->delete();
+            $this->socialPrint()->delete();
+            $this->collegeCertificate()->delete();
+            $this->labourDocument()->delete();
+            $this->idCard()->delete();
+
+            $this->appliedVacations()->delete();
+            $this->vacationBenefits()->delete();
+            $this->workingDays()->delete();
+
+            $this->benefitConfiguration()->delete();
+
+
+            $this->delete();
+        });
+        return true;
     }
 }

@@ -211,19 +211,6 @@ class ZKDeviceController extends Controller
                 $query->where('device_id', $device_id);
             })->first();
             
-            // If not found, try to find by employee_code as fallback
-            if (!$employee) {
-                Log::info("[ZKTeco] Employee not found by device_id {$device_id}, trying employee_code");
-                $employee = Employee::whereHas('info', function($query) use ($device_id) {
-                    $query->where('employee_code', $device_id);
-                })->first();
-            }
-            
-            // If still not found, try to find by employee ID as fallback (device might be sending user IDs)
-            if (!$employee) {
-                Log::info("[ZKTeco] Employee not found by employee_code {$device_id}, trying employee ID");
-                $employee = Employee::find($device_id);
-            }
             
             // If still not found, log all available device_ids for debugging
             if (!$employee) {

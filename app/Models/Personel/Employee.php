@@ -1353,9 +1353,11 @@ class Employee extends Model
      * @param string|null $insurance_amount
      * @param string|null $academic_qualification
      * @param string|null $university
-     * @param int|null $graduation_year
+     * @param string|null $graduation_year
      * @param string|null $military_status
      * @param string|null $marital_status
+     * @param string|null $employee_code
+     * @param string|null $device_id
      * @return EmployeeInfo
      * @throws AppException
      */
@@ -1367,8 +1369,6 @@ class Employee extends Model
         ?string $graduation_year = null,
         ?string $military_status = null,
         ?string $marital_status = null,
-        ?string $salary_grade_id = null,
-        ?string $vacation_package_id = null,
         ?string $employee_code = null,
         ?string $device_id = null
     ) {
@@ -1382,8 +1382,6 @@ class Employee extends Model
             $employeeInfo = $this->info()->updateOrCreate(
                 ['employee_id' => $this->id],
                 [
-                    'salary_grade_id' => $salary_grade_id,
-                    'vacation_package_id' => $vacation_package_id,
                     'insurance_office_id' => $insurance_office_id,
                     'insurance_number' => $insurance_number,
                     'academic_qualification' => $academic_qualification,

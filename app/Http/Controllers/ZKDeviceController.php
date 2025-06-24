@@ -42,7 +42,25 @@ class ZKDeviceController extends Controller
                 return response('OK', 200); // Not an attendance log table
             }
 
+            // Log total employees for debugging
+            $totalEmployees = Employee::count();
+            $employeesWithDeviceId = Employee::whereHas('info', function($query) {
+                $query->whereNotNull('device_id');
+            })->count();
+            Log::info('[ZKTeco] Employee count for debugging', [
+                'total_employees' => $totalEmployees,
+                'employees_with_device_id' => $employeesWithDeviceId
+            ]);
+
             $body = $request->getContent();
+            
+            // Add detailed logging for debugging
+            Log::info('[ZKTeco] Processing attendance request', [
+                'body_length' => strlen($body),
+                'body_trimmed' => trim($body),
+                'body_starts_with_OPLOG' => str_starts_with(trim($body), 'OPLOG'),
+                'body_lines' => explode("\r\n", trim($body))
+            ]);
             
             // Handle new format that starts with "OPLOG"
             if (str_starts_with(trim($body), 'OPLOG')) {
@@ -97,14 +115,51 @@ class ZKDeviceController extends Controller
             $verify_mode = $parts[5] ?? null;
             $work_code = $parts[6] ?? null;
 
+            Log::info("[ZKTeco] Processing OPLOG entry", [
+                'device_id' => $device_id,
+                'timestamp' => $timestamp,
+                'punch_state' => $punch_state,
+                'verify_mode' => $verify_mode,
+                'work_code' => $work_code,
+                'raw_log' => $log
+            ]);
+
+            // First try to find employee by device_id in employee_info
             $employee = Employee::whereHas('info', function($query) use ($device_id) {
                 $query->where('device_id', $device_id);
             })->first();
             
+            // If not found, try to find by employee_code as fallback
             if (!$employee) {
-                Log::warning("[ZKTeco] Employee with device_id {$device_id} not found.");
+                Log::info("[ZKTeco] Employee not found by device_id {$device_id}, trying employee_code");
+                $employee = Employee::whereHas('info', function($query) use ($device_id) {
+                    $query->where('employee_code', $device_id);
+                })->first();
+            }
+            
+            // If still not found, try to find by employee ID as fallback (device might be sending user IDs)
+            if (!$employee) {
+                Log::info("[ZKTeco] Employee not found by employee_code {$device_id}, trying employee ID");
+                $employee = Employee::find($device_id);
+            }
+            
+            // If still not found, log all available device_ids for debugging
+            if (!$employee) {
+                Log::warning("[ZKTeco] Employee with device_id {$device_id} not found. Available device_ids:");
+                $allEmployees = Employee::with('info')->get();
+                foreach ($allEmployees as $emp) {
+                    if ($emp->info && $emp->info->device_id) {
+                        Log::warning("[ZKTeco] Employee {$emp->name} has device_id: {$emp->info->device_id}");
+                    }
+                }
                 continue;
             }
+
+            Log::info("[ZKTeco] Found employee", [
+                'employee_id' => $employee->id,
+                'employee_name' => $employee->name,
+                'device_id' => $employee->info->device_id ?? 'null'
+            ]);
 
             $punches_to_insert[] = [
                 'employee_id' => $employee->id,
@@ -142,14 +197,51 @@ class ZKDeviceController extends Controller
             $verify_mode = $parts[3] ?? null;
             $work_code = $parts[4] ?? null;
 
+            Log::info("[ZKTeco] Processing legacy format entry", [
+                'device_id' => $device_id,
+                'timestamp' => $timestamp,
+                'punch_state' => $punch_state,
+                'verify_mode' => $verify_mode,
+                'work_code' => $work_code,
+                'raw_log' => $log
+            ]);
+
+            // First try to find employee by device_id in employee_info
             $employee = Employee::whereHas('info', function($query) use ($device_id) {
                 $query->where('device_id', $device_id);
             })->first();
             
+            // If not found, try to find by employee_code as fallback
             if (!$employee) {
-                Log::warning("[ZKTeco] Employee with device_id {$device_id} not found.");
+                Log::info("[ZKTeco] Employee not found by device_id {$device_id}, trying employee_code");
+                $employee = Employee::whereHas('info', function($query) use ($device_id) {
+                    $query->where('employee_code', $device_id);
+                })->first();
+            }
+            
+            // If still not found, try to find by employee ID as fallback (device might be sending user IDs)
+            if (!$employee) {
+                Log::info("[ZKTeco] Employee not found by employee_code {$device_id}, trying employee ID");
+                $employee = Employee::find($device_id);
+            }
+            
+            // If still not found, log all available device_ids for debugging
+            if (!$employee) {
+                Log::warning("[ZKTeco] Employee with device_id {$device_id} not found. Available device_ids:");
+                $allEmployees = Employee::with('info')->get();
+                foreach ($allEmployees as $emp) {
+                    if ($emp->info && $emp->info->device_id) {
+                        Log::warning("[ZKTeco] Employee {$emp->name} has device_id: {$emp->info->device_id}");
+                    }
+                }
                 continue;
             }
+
+            Log::info("[ZKTeco] Found employee", [
+                'employee_id' => $employee->id,
+                'employee_name' => $employee->name,
+                'device_id' => $employee->info->device_id ?? 'null'
+            ]);
 
             $punches_to_insert[] = [
                 'employee_id' => $employee->id,

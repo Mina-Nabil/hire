@@ -38,6 +38,7 @@ class ZKDeviceController extends Controller
 
         try {
             if ($request->query('table') !== 'OPERLOG' && $request->query('table') !== 'ATTLOG') {
+                Log::info('[ZKTeco] Not an attendance log table: ' . $request->query('table'));
                 return response('OK', 200); // Not an attendance log table
             }
 
@@ -54,6 +55,8 @@ class ZKDeviceController extends Controller
             if (!empty($punches_to_insert)) {
                 DailyPunch::insert($punches_to_insert);
                 Log::info('[ZKTeco] Successfully inserted ' . count($punches_to_insert) . ' attendance punches.');
+            } else {
+                Log::info('[ZKTeco] No attendance punches to insert.');
             }
 
         } catch (\Exception $e) {

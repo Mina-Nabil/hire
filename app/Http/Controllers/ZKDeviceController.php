@@ -73,7 +73,7 @@ class ZKDeviceController extends Controller
             }
 
             if (!empty($punches_to_insert)) {
-                DailyPunch::insert($punches_to_insert);
+                DailyPunch::updateOrCreate($punches_to_insert);
                 Log::info('[ZKTeco] Successfully inserted ' . count($punches_to_insert) . ' attendance punches.');
             } else {
                 Log::info('[ZKTeco] No attendance punches to insert.');

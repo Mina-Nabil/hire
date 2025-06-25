@@ -2062,8 +2062,6 @@ class Employee extends Model
      */
     public static function getBirthCertificateStatistics()
     {
-        $today = now()->format('Y-m-d');
-        $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
         $docManager = DocManager::where('is_required', true)
             ->where('is_active', true)
             ->where('doc_type', 'birthCertificate')
@@ -2082,11 +2080,7 @@ class Employee extends Model
         $nearExpiry =  0;
 
         // Get employees with valid birth certificates
-        $valid = self::whereHas('birthCertificate', function ($q) use ($today, $nearExpiryDate) {
-            $q->where(function ($q) use ($today, $nearExpiryDate) {
-                $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
-            });
-        })->count();
+        $valid = self::whereHas('birthCertificate')->count();
 
         // Get counts by type
         $original = self::whereHas('birthCertificate', function ($q) {
@@ -2436,11 +2430,7 @@ class Employee extends Model
         $nearExpiry = 0;
 
         // Get employees with valid S1 documents
-        $valid = self::whereHas('employeeS1Doc', function ($q) use ($today, $nearExpiryDate) {
-            $q->where(function ($q) use ($today, $nearExpiryDate) {
-                $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
-            });
-        })->count();
+        $valid = self::whereHas('employeeS1Doc')->count();
 
         return [
             'total' => $total,
@@ -3091,7 +3081,7 @@ class Employee extends Model
 
         return [
             'status' => $status,
-            'details' => $status == self::DOC_STATUS_EXPIRED ? 'Birth certificate expired on ' . ($this->birthCertificate ? $this->birthCertificate->expiry_date : 'N/A') : ($status == self::DOC_STATUS_NEAR_EXPIRY ? 'Birth certificate will expire on ' . ($this->birthCertificate ? $this->birthCertificate->expiry_date : 'N/A') : ($status == self::DOC_STATUS_MISSING ? 'No birth certificate found' : 'Birth certificate is valid')),
+            'details' => $status == self::DOC_STATUS_MISSING ? 'No birth certificate found' : 'Birth certificate is valid',
         ];
     }
 
@@ -3157,7 +3147,7 @@ class Employee extends Model
 
         return [
             'status' => $status,
-            'details' => $status == self::DOC_STATUS_EXPIRED ? 'S1 document expired on ' . ($this->employeeS1Doc ? $this->employeeS1Doc->expiry_date : 'N/A') : ($status == self::DOC_STATUS_NEAR_EXPIRY ? 'S1 document will expire on ' . ($this->employeeS1Doc ? $this->employeeS1Doc->expiry_date : 'N/A') : ($status == self::DOC_STATUS_MISSING ? 'No S1 document found' : 'S1 document is valid')),
+            'details' => $status == self::DOC_STATUS_MISSING ? 'No S1 document found' : 'S1 document is valid',
         ];
     }
 

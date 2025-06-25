@@ -1071,20 +1071,6 @@
                                             {{ $employee->birthCertificate->issue_date }}
                                         </div>
                                     </div>
-                                    @if ($employee->birthCertificate->expiry_date)
-                                        <div class="mb-5 text-wrap">
-                                            <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Expiry
-                                                Date</label>
-                                            <div class="text-base text-slate-900 dark:text-white">
-                                                {{ $employee->birthCertificate->expiry_date }}
-                                                {{-- @if ($employee->birthCertificate->expiry_date?->isPast())
-                                                <span class="text-danger-500 text-xs font-medium">(Expired)</span>
-                                            @elseif ($employee->birthCertificate->expiry_date?->diffInDays(now()) < 30)
-                                                <span class="text-warning-500 text-xs font-medium">(Expiring soon)</span>
-                                            @endif --}}
-                                            </div>
-                                        </div>
-                                    @endif
                                 </div>
                                 <div class="xl:col-span-6 lg:col-span-6 md:col-span-6 col-span-12">
                                     <div class="mb-5 text-wrap">
@@ -1973,15 +1959,7 @@
                                             {{ $employee->employeeS1Doc->issue_date }}
                                         </div>
                                     </div>
-                                    @if ($employee->employeeS1Doc->expiry_date)
-                                        <div class="mb-5 text-wrap">
-                                            <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Expiry
-                                                Date</label>
-                                            <div class="text-base text-slate-900 dark:text-white">
-                                                {{ $employee->employeeS1Doc->expiry_date }}
-                                            </div>
-                                        </div>
-                                    @endif
+                                   
                                 </div>
                                 <div class="xl:col-span-6 lg:col-span-6 md:col-span-6 col-span-12">
                                     <div class="mb-5 text-wrap">
@@ -3975,17 +3953,7 @@
                                             <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
                                         @enderror
                                     </div>
-                                    <div class="col-span-12 xl:col-span-6">
-                                        <label for="birth_certificate_expiry_date" class="form-label">Expiry Date
-                                            (if
-                                            applicable)</label>
-                                        <input type="date"
-                                            class="form-control @error('birth_certificate_expiry_date') !border-danger-500 @enderror"
-                                            wire:model="birth_certificate_expiry_date">
-                                        @error('birth_certificate_expiry_date')
-                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
-                                        @enderror
-                                    </div>
+                                 
                                 </div>
                             </div>
                             <!-- Modal footer -->
@@ -4365,16 +4333,7 @@
                                         <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
                                     @enderror
                                 </div>
-                                <div class="col-span-12 xl:col-span-6">
-                                    <label for="employee_s1_doc_expiry_date" class="form-label">Expiry Date
-                                        (if applicable)</label>
-                                    <input type="date"
-                                        class="form-control @error('employee_s1_doc_expiry_date') !border-danger-500 @enderror"
-                                        wire:model="employee_s1_doc_expiry_date">
-                                    @error('employee_s1_doc_expiry_date')
-                                        <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
-                                    @enderror
-                                </div>
+                            
                             </div>
                         </div>
                         <!-- Modal footer -->

@@ -701,9 +701,6 @@ class EmployeeShow extends Component
         if ($this->employee->employeeS1Doc) {
             $this->s1_number = $this->employee->employeeS1Doc->s1_number;
             $this->employee_s1_doc_issue_date = $this->employee->employeeS1Doc->issue_date;
-            if ($this->employee->employeeS1Doc->expiry_date) {
-                $this->employee_s1_doc_expiry_date = $this->employee->employeeS1Doc->expiry_date;
-            }
         }
     }
 

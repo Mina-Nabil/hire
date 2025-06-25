@@ -2076,14 +2076,10 @@ class Employee extends Model
         $missing = $docManager ? self::whereDoesntHave('birthCertificate')->count() : 0;
 
         // Get employees with expired birth certificates
-        $expired = $docManager ? self::whereHas('birthCertificate', function ($q) use ($today) {
-            $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
-        })->count() : 0;
+        $expired =  0;
 
         // Get employees with birth certificates near expiry
-        $nearExpiry = $docManager ? self::whereHas('birthCertificate', function ($q) use ($today, $nearExpiryDate) {
-            $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
-        })->count() : 0;
+        $nearExpiry =  0;
 
         // Get employees with valid birth certificates
         $valid = self::whereHas('birthCertificate', function ($q) use ($today, $nearExpiryDate) {
@@ -2434,14 +2430,10 @@ class Employee extends Model
         $missing = $docManager ? self::whereDoesntHave('employeeS1Doc')->count() : 0;
 
         // Get employees with expired S1 documents
-        $expired = $docManager ? self::whereHas('employeeS1Doc', function ($q) use ($today) {
-            $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
-        })->count() : 0;
+        $expired = 0;
 
         // Get employees with S1 documents near expiry
-        $nearExpiry = $docManager ? self::whereHas('employeeS1Doc', function ($q) use ($today, $nearExpiryDate) {
-            $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
-        })->count() : 0;
+        $nearExpiry = 0;
 
         // Get employees with valid S1 documents
         $valid = self::whereHas('employeeS1Doc', function ($q) use ($today, $nearExpiryDate) {

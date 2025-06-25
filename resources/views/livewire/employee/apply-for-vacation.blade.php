@@ -1,6 +1,5 @@
 <div class="space-y-5 profile-page mx-auto" style="max-width: 1000px;">
     <div>
-        {{ print_r($errors->all()) }}
         <div class="card">
             <div class="card-header">
                 <h4 class="card-title">Apply for Vacation For ({{ $employee->name }})</h4>
@@ -14,7 +13,7 @@
                     <form wire:submit.prevent="openConfirmModal">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5 mt-5">
                             <!-- Vacation Type Selection -->
-                            <x-select wire:model.live="selectedEmployee" label="Employee*"
+                            <x-select wire:model.live="selectedEmployee" label="Change Employee"
                                 errorMessage="{{ $errors->first('selectedEmployee') }}"
                                 class="w-full {{ $errors->has('selectedEmployee') ? '!border-danger-500' : '' }}">
                                 <option value="">-- Select Employee --</option>

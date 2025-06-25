@@ -75,8 +75,26 @@ class ZKDeviceController extends Controller
             }
 
             if (!empty($punches_to_insert)) {
-                DailyPunch::updateOrCreate($punches_to_insert);
-                Log::info('[ZKTeco] Successfully inserted ' . count($punches_to_insert) . ' attendance punches.');
+                // Process each punch individually to avoid parameter conflicts
+                $insertedCount = 0;
+                foreach ($punches_to_insert as $punch) {
+                    try {
+                        DailyPunch::updateOrCreate(
+                            [
+                                'employee_id' => $punch['employee_id'],
+                                'punch_time' => $punch['punch_time'],
+                            ],
+                            $punch
+                        );
+                        $insertedCount++;
+                    } catch (\Exception $e) {
+                        Log::error('[ZKTeco] Error inserting individual punch: ' . $e->getMessage(), [
+                            'punch_data' => $punch,
+                            'exception' => $e
+                        ]);
+                    }
+                }
+                Log::info('[ZKTeco] Successfully processed ' . $insertedCount . ' attendance punches.');
             } else {
                 Log::info('[ZKTeco] No attendance punches to insert.');
             }

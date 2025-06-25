@@ -301,16 +301,110 @@ class ZKDeviceController extends Controller
         if (!$table) {
             Log::info('[ZKTeco] Device general ping/heartbeat', ['sn' => $deviceSN]);
             
-            // You can send commands here to request all data
-            // This will tell the device to send ALL attendance records from the beginning
-            $commands = [
-                "GET ATTLOG FROM 0"
-            ];
+            // Check if this is a fresh connection or repeated ping
+            static $commandSent = [];
             
-            return response(implode("\n", $commands) . "\n", 200);
+            if (!isset($commandSent[$deviceSN])) {
+                // First time - request attendance data
+                Log::info('[ZKTeco] Sending initial data request to device', ['sn' => $deviceSN]);
+                $commandSent[$deviceSN] = time();
+                
+                // Try different command formats that different ZKTeco devices understand
+                $command = "GET ATTLOG FROM 0";
+                
+                // Some devices need different syntax
+                // Alternative formats you can try:
+                // return response("GET ATTLOG\n", 200);
+                // return response("DATA QUERY ATTLOG\n", 200);
+                
+                return response($command . "\n", 200);
+            } else {
+                // Subsequent pings - just acknowledge to stop the loop
+                $timeSinceCommand = time() - $commandSent[$deviceSN];
+                Log::info('[ZKTeco] Subsequent ping - sending OK to prevent loop', [
+                    'sn' => $deviceSN, 
+                    'time_since_command' => $timeSinceCommand
+                ]);
+                
+                // Reset after 5 minutes to allow retry
+                if ($timeSinceCommand > 300) {
+                    unset($commandSent[$deviceSN]);
+                }
+                
+                return response("OK\n", 200);
+            }
         }
 
         Log::info('[ZKTeco] Unknown table request', ['table' => $table, 'sn' => $deviceSN]);
         return response("OK\n", 200);
+    }
+
+    /**
+     * Manual trigger to force device to send all attendance data
+     * Can be called via GET /iclock/force-sync?sn=DEVICE_SN
+     */
+    public function forceSync(Request $request)
+    {
+        $deviceSN = $request->input('sn');
+        
+        Log::info('[ZKTeco] Manual force sync triggered', ['sn' => $deviceSN]);
+        
+        // Reset the command tracking for this device
+        static $commandSent = [];
+        if (isset($commandSent[$deviceSN])) {
+            unset($commandSent[$deviceSN]);
+        }
+        
+        // Return commands to get all data
+        $commands = [
+            "GET ATTLOG FROM 0",
+            "GET OPERLOG FROM 0", 
+            "GET USERINFO FROM 0"
+        ];
+        
+        return response(implode("\n", $commands) . "\n", 200);
+    }
+
+    /**
+     * Check ZKTeco device status and recent activity
+     */
+    public function status(Request $request)
+    {
+        // Get recent attendance punches
+        $recentPunches = DailyPunch::with('employee')
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        // Get total employees with device IDs
+        $employeesWithDeviceId = Employee::whereHas('info', function ($query) {
+            $query->whereNotNull('device_id');
+        })->with('info')->get();
+
+        return response()->json([
+            'status' => 'ok',
+            'message' => 'ZKTeco Device Status',
+            'recent_punches' => $recentPunches->map(function ($punch) {
+                return [
+                    'employee_name' => $punch->employee->name ?? 'Unknown',
+                    'punch_time' => $punch->punch_time,
+                    'punch_state' => $punch->punch_state,
+                    'raw_log' => $punch->raw_log,
+                    'created_at' => $punch->created_at
+                ];
+            }),
+            'employees_with_device_ids' => $employeesWithDeviceId->map(function ($employee) {
+                return [
+                    'id' => $employee->id,
+                    'name' => $employee->name,
+                    'device_id' => $employee->info->device_id ?? null,
+                    'employee_code' => $employee->info->employee_code ?? null
+                ];
+            }),
+            'total_employees' => Employee::count(),
+            'employees_with_device_id_count' => $employeesWithDeviceId->count(),
+            'total_punches' => DailyPunch::count(),
+            'punches_today' => DailyPunch::whereDate('punch_time', today())->count()
+        ]);
     }
 }

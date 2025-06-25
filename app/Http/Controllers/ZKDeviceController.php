@@ -7,6 +7,7 @@ use App\Models\Personel\Employee;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class ZKDeviceController extends Controller
 {
@@ -126,12 +127,30 @@ class ZKDeviceController extends Controller
                 'raw_log' => $log
             ]);
 
-            // First try to find employee by device_id in employee_info
+            // First try to find employee by device_id in employee_info with better debugging
             $employee = Employee::whereHas('info', function ($query) use ($device_id) {
                 $query->where('device_id', $device_id);
-            })->first();
+            })->with('info')->first();
 
-            // If not found, try to find by employee_code as fallback
+            // If not found, try a direct database lookup to debug the relationship issue
+            if (!$employee) {
+                Log::info("[ZKTeco] Employee not found by device_id {$device_id} using relationship, trying direct lookup");
+                
+                // Direct lookup in employee_info table
+                $employeeInfo = DB::table('employee_info')->where('device_id', $device_id)->first();
+                if ($employeeInfo) {
+                    Log::info("[ZKTeco] Found employee_info record directly", [
+                        'employee_id' => $employeeInfo->employee_id,
+                        'device_id' => $employeeInfo->device_id
+                    ]);
+                    $employee = Employee::find($employeeInfo->employee_id);
+                    if ($employee) {
+                        Log::info("[ZKTeco] Found employee via direct lookup: {$employee->name}");
+                    }
+                }
+            }
+
+            // If still not found, try to find by employee_code as fallback
             if (!$employee) {
                 Log::info("[ZKTeco] Employee not found by device_id {$device_id}, trying employee_code");
                 $employee = Employee::whereHas('info', function ($query) use ($device_id) {

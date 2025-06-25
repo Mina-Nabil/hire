@@ -304,8 +304,7 @@ class ZKDeviceController extends Controller
             // You can send commands here to request all data
             // This will tell the device to send ALL attendance records from the beginning
             $commands = [
-                "GET ATTLOG FROM 0",
-                "GET OPERLOG FROM 0"
+                "GET ATTLOG FROM 0"
             ];
             
             return response(implode("\n", $commands) . "\n", 200);

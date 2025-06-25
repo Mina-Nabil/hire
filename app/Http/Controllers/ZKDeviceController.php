@@ -22,7 +22,9 @@ class ZKDeviceController extends Controller
 
         // Device Registration Ping (GET)
         if ($request->isMethod('get')) {
-            return response('GET ATTLOG FROM 0', 200);
+            if ($request->has('table') && $request->input('table') === 'OPERLOG') {
+                return response("GET ATTLOG FROM 0\n", 200); // force full resend
+            }
         }
     }
 
@@ -44,7 +46,7 @@ class ZKDeviceController extends Controller
 
             // Log total employees for debugging
             $totalEmployees = Employee::count();
-            $employeesWithDeviceId = Employee::whereHas('info', function($query) {
+            $employeesWithDeviceId = Employee::whereHas('info', function ($query) {
                 $query->whereNotNull('device_id');
             })->count();
             Log::info('[ZKTeco] Employee count for debugging', [
@@ -53,7 +55,7 @@ class ZKDeviceController extends Controller
             ]);
 
             $body = $request->getContent();
-            
+
             // Add detailed logging for debugging
             Log::info('[ZKTeco] Processing attendance request', [
                 'body_length' => strlen($body),
@@ -61,7 +63,7 @@ class ZKDeviceController extends Controller
                 'body_starts_with_OPLOG' => str_starts_with(trim($body), 'OPLOG'),
                 'body_lines' => explode("\r\n", trim($body))
             ]);
-            
+
             // Handle new format that starts with "OPLOG"
             if (str_starts_with(trim($body), 'OPLOG')) {
                 $punches_to_insert = $this->processOplogFormat($body);
@@ -76,7 +78,6 @@ class ZKDeviceController extends Controller
             } else {
                 Log::info('[ZKTeco] No attendance punches to insert.');
             }
-
         } catch (\Exception $e) {
             Log::error('[ZKTeco] Error processing attendance logs: ' . $e->getMessage(), ['exception' => $e]);
             // Still return OK to the device, so it doesn't keep sending the same data.
@@ -125,24 +126,24 @@ class ZKDeviceController extends Controller
             ]);
 
             // First try to find employee by device_id in employee_info
-            $employee = Employee::whereHas('info', function($query) use ($device_id) {
+            $employee = Employee::whereHas('info', function ($query) use ($device_id) {
                 $query->where('device_id', $device_id);
             })->first();
-            
+
             // If not found, try to find by employee_code as fallback
             if (!$employee) {
                 Log::info("[ZKTeco] Employee not found by device_id {$device_id}, trying employee_code");
-                $employee = Employee::whereHas('info', function($query) use ($device_id) {
+                $employee = Employee::whereHas('info', function ($query) use ($device_id) {
                     $query->where('employee_code', $device_id);
                 })->first();
             }
-            
+
             // If still not found, try to find by employee ID as fallback (device might be sending user IDs)
             if (!$employee) {
                 Log::info("[ZKTeco] Employee not found by employee_code {$device_id}, trying employee ID");
                 $employee = Employee::find($device_id);
             }
-            
+
             // If still not found, log all available device_ids for debugging
             if (!$employee) {
                 Log::warning("[ZKTeco] Employee with device_id {$device_id} not found. Available device_ids:");
@@ -207,11 +208,11 @@ class ZKDeviceController extends Controller
             ]);
 
             // First try to find employee by device_id in employee_info
-            $employee = Employee::whereHas('info', function($query) use ($device_id) {
+            $employee = Employee::whereHas('info', function ($query) use ($device_id) {
                 $query->where('device_id', $device_id);
             })->first();
-            
-            
+
+
             // If still not found, log all available device_ids for debugging
             if (!$employee) {
                 Log::warning("[ZKTeco] Employee with device_id {$device_id} not found. Available device_ids:");

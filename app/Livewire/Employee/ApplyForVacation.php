@@ -140,6 +140,10 @@ class ApplyForVacation extends Component
 
     public function openConfirmModal()
     {
+        if (empty($this->days)) {
+            $this->alertError('You must add at least one day for vacation');
+            return;
+        }
         $this->validate([
             'selectedBenefitId' => 'required',
             'days' => 'required|array|min:1',
@@ -148,10 +152,6 @@ class ApplyForVacation extends Component
             'description' => 'nullable|string|max:255',
         ]);
 
-        if (empty($this->days)) {
-            $this->alertError('You must add at least one day for vacation');
-            return;
-        }
 
         try {
             $this->selectedBenefit = VacationBenefit::findOrFail($this->selectedBenefitId);

@@ -544,12 +544,12 @@ class Employee extends Model
         $vacationBenefit->load('vacationDetail');
         $applyDeadline = $vacationBenefit->apply_deadline;
         $deadlineDate = Carbon::now()->addDays($applyDeadline)->setTime(23, 59, 59);
-        foreach ($days as $day) {
-            $dayDate = Carbon::parse($day['vacation_date']);
-            if ($dayDate->isBefore($deadlineDate)) {
-                throw new AppException('You cannot apply for vacation after the apply deadline');
-            }
-        }
+        // foreach ($days as $day) {
+        //     $dayDate = Carbon::parse($day['vacation_date']);
+        //     if ($dayDate->isBefore($deadlineDate)) {
+        //         throw new AppException('You cannot apply for vacation after the apply deadline');
+        //     }
+        // }
 
 
         try {

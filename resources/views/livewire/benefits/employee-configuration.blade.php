@@ -298,7 +298,7 @@
                                         <div class="col-md-5 font-weight-bold">Working Days:</div>
                                         <div class="col-md-7">
                                             @foreach ($employee->workingDays as $day)
-                                                {{ ucfirst($day->day) }}
+                                                {{ ucfirst($day->type) }} @if (!$loop->last), @endif
                                             @endforeach
                                         </div>
                                     </div>

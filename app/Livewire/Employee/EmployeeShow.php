@@ -534,14 +534,12 @@ class EmployeeShow extends Component
         if ($this->keep_existing_birth_certificate && $this->employee->birthCertificate) {
             $this->validate([
                 'birth_certificate_issue_date' => 'required|date',
-                'birth_certificate_expiry_date' => 'nullable|date|after:birth_certificate_issue_date',
                 'birth_certificate_type' => 'required|in:' . implode(',', BirthCertificate::TYPES),
             ]);
         } else {
             $this->validate([
                 'birth_certificate_file' => 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
                 'birth_certificate_issue_date' => 'required|date',
-                'birth_certificate_expiry_date' => 'nullable|date|after:birth_certificate_issue_date',
                 'birth_certificate_type' => 'required|in:' . implode(',', BirthCertificate::TYPES),
             ]);
         }
@@ -571,8 +569,7 @@ class EmployeeShow extends Component
             $res = $this->employee->setBirthCertificate(
                 $path,
                 Carbon::parse($this->birth_certificate_issue_date),
-                $this->birth_certificate_type,
-                $this->birth_certificate_expiry_date ? Carbon::parse($this->birth_certificate_expiry_date) : null
+                $this->birth_certificate_type
             );
             if ($res) {
                 $this->closeEditBirthCertificateModal();
@@ -725,14 +722,12 @@ class EmployeeShow extends Component
             $this->validate([
                 's1_number' => 'required|string|max:50',
                 'employee_s1_doc_issue_date' => 'required|date',
-                'employee_s1_doc_expiry_date' => 'required|date|after:employee_s1_doc_issue_date',
             ]);
         } else {
             $this->validate([
                 'employee_s1_doc_file' => 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
                 's1_number' => 'required|string|max:50',
                 'employee_s1_doc_issue_date' => 'required|date',
-                'employee_s1_doc_expiry_date' => 'required|date|after:employee_s1_doc_issue_date',
             ]);
         }
 
@@ -759,7 +754,6 @@ class EmployeeShow extends Component
             $res = $this->employee->setEmployeeS1Doc(
                 $path,
                 Carbon::parse($this->employee_s1_doc_issue_date),
-                $this->employee_s1_doc_expiry_date ? Carbon::parse($this->employee_s1_doc_expiry_date) : null,
                 $this->s1_number
             );
 

@@ -18,13 +18,11 @@ class EmployeeS1Doc extends Model
         'created_by',
         'file_path',
         'issue_date',
-        'expiry_date',
         's1_number'
     ];
 
     protected $casts = [
         'issue_date' => 'date',
-        'expiry_date' => 'date',
     ];
 
 

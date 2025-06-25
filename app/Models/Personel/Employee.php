@@ -635,7 +635,7 @@ class Employee extends Model
         }
     }
 
-    public function setBirthCertificate($file_path, Carbon $issue_date, $type = BirthCertificate::TYPE_ORIGINAL, ?Carbon $expiry_date = null)
+    public function setBirthCertificate($file_path, Carbon $issue_date, $type = BirthCertificate::TYPE_ORIGINAL)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -652,7 +652,6 @@ class Employee extends Model
                     'created_by' => $loggedInUser->id,
                     'file_path' => $file_path,
                     'issue_date' => $issue_date,
-                    'expiry_date' => $expiry_date,
                     'type' => $type,
                 ],
             );
@@ -754,7 +753,7 @@ class Employee extends Model
         }
     }
 
-    public function setEmployeeS1Doc($file_path, Carbon $issue_date, ?Carbon $expiry_date = null, string $s1_number)
+    public function setEmployeeS1Doc($file_path, Carbon $issue_date, string $s1_number)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -771,7 +770,6 @@ class Employee extends Model
                     'created_by' => $loggedInUser->id,
                     'file_path' => $file_path,
                     'issue_date' => $issue_date,
-                    'expiry_date' => $expiry_date,
                     's1_number' => $s1_number,
                 ],
             );

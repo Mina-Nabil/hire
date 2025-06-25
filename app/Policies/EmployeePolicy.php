@@ -113,6 +113,12 @@ class EmployeePolicy
      */
     public function setDocs(User $user, Employee $employee, $docType = null): bool
     {
+
+        // allow admin and hr to upload docs
+        if ($user->is_admin || $user->is_hr) {
+            return true;
+        }
+
         $employeeCanUpload = false;
 
         switch ($docType) {
@@ -184,10 +190,6 @@ class EmployeePolicy
                 $employeeCanUpload = false;
         }
 
-        // Only allow employee if they are uploading the first instance
-        if ($user->is_admin || $user->is_hr) {
-            return true;
-        }
         // For employees, only allow if $employeeCanUpload is true
         return $employeeCanUpload;
     }

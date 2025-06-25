@@ -21,10 +21,9 @@ class ZKDeviceController extends Controller
         ]);
 
         // Device Registration Ping (GET)
-        if ($request->isMethod('get')) {
-            if ($request->query('table') === 'OPERLOG') {
-                return response("GET ATTLOG FROM 0\n", 200); // force full resend
-            }
+
+        if ($request->query('table') === 'OPERLOG') {
+            return response("GET ATTLOG FROM 0\n", 200); // force full resend
         } else {
             return response('OK', 200);
         }

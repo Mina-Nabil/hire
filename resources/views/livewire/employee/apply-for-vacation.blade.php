@@ -1,5 +1,6 @@
 <div class="space-y-5 profile-page mx-auto" style="max-width: 1000px;">
     <div>
+        {{ $errors->all() }}
         <div class="card">
             <div class="card-header">
                 <h4 class="card-title">Apply for Vacation For ({{ $employee->name }})</h4>

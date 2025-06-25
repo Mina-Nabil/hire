@@ -143,8 +143,7 @@
                                     </td>
                                     <td class="table-td">
                                         <div class="flex space-x-2">
-                                            <button
-                                                wire:click="openVacationDetailsModal({{ $appliedVacation->id }})"
+                                            <button wire:click="openVacationDetailsModal({{ $appliedVacation->id }})"
                                                 class="action-btn text-info-500" title="View Details">
                                                 <iconify-icon icon="heroicons:information-circle"></iconify-icon>
                                             </button>
@@ -266,7 +265,8 @@
                         <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-3">Vacation Details</h3>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="text-sm font-medium text-slate-600 dark:text-slate-300">Vacation Benefit</label>
+                                <label class="text-sm font-medium text-slate-600 dark:text-slate-300">Vacation
+                                    Benefit</label>
                                 <p class="mt-1 text-slate-900 dark:text-white">
                                     {{ $selectedAppliedVacation->vacationBenefit ? $selectedAppliedVacation->vacationBenefit->name : 'N/A' }}
                                 </p>
@@ -286,7 +286,13 @@
                             <div>
                                 <label class="text-sm font-medium text-slate-600 dark:text-slate-300">Days</label>
                                 <p class="mt-1 text-slate-900 dark:text-white font-medium">
-                                    {{ $selectedAppliedVacation->days ?? 0 }}
+                                <ul>
+                                    @foreach ($selectedAppliedVacation->vacationDays as $day)
+                                        <li>
+                                            {{ $day->vacation_date }} ({{ $day->hours }} hours)
+                                        </li>
+                                    @endforeach
+                                </ul>
                                 </p>
                             </div>
                             <div>
@@ -296,7 +302,8 @@
                                 </p>
                             </div>
                             <div>
-                                <label class="text-sm font-medium text-slate-600 dark:text-slate-300">New Balance</label>
+                                <label class="text-sm font-medium text-slate-600 dark:text-slate-300">New
+                                    Balance</label>
                                 <p class="mt-1 text-slate-900 dark:text-white font-medium">
                                     {{ $selectedAppliedVacation->new_balance ?? 0 }}
                                 </p>
@@ -318,7 +325,8 @@
                     @if ($selectedAppliedVacation->note && !empty(trim($selectedAppliedVacation->note)))
                         <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-4">
                             <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-3">Notes</h3>
-                            <p class="text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{{ $selectedAppliedVacation->note }}</p>
+                            <p class="text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
+                                {{ $selectedAppliedVacation->note }}</p>
                         </div>
                     @endif
 
@@ -327,13 +335,15 @@
                         <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-3">Timeline</h3>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="text-sm font-medium text-slate-600 dark:text-slate-300">Applied Date</label>
+                                <label class="text-sm font-medium text-slate-600 dark:text-slate-300">Applied
+                                    Date</label>
                                 <p class="mt-1 text-slate-900 dark:text-white">
                                     {{ $selectedAppliedVacation->created_at ? $selectedAppliedVacation->created_at->format('M d, Y h:i A') : 'N/A' }}
                                 </p>
                             </div>
                             <div>
-                                <label class="text-sm font-medium text-slate-600 dark:text-slate-300">Last Updated</label>
+                                <label class="text-sm font-medium text-slate-600 dark:text-slate-300">Last
+                                    Updated</label>
                                 <p class="mt-1 text-slate-900 dark:text-white">
                                     {{ $selectedAppliedVacation->updated_at ? $selectedAppliedVacation->updated_at->format('M d, Y h:i A') : 'N/A' }}
                                 </p>

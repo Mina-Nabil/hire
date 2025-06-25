@@ -1494,10 +1494,6 @@ class Employee extends Model
                 ->when($docManagers->contains('doc_type', 'idCard'), fn($q) => $q->orWhereHas('idCard', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
                 }))
-                // 2. Birth Certificate expired
-                ->when($docManagers->contains('doc_type', 'birthCertificate'), fn($q) => $q->orWhereHas('birthCertificate', function ($q) use ($today) {
-                    $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
-                }))
                 // 3. Employment Contract expired
                 ->when($docManagers->contains('doc_type', 'employeeContract'), fn($q) => $q->orWhereHas('contracts', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
@@ -1518,10 +1514,6 @@ class Employee extends Model
                 // ->orWhereHas('hrLetters', function ($q) use ($today) {
                 //     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
                 // })
-                // 8. S1 Doc expired
-                ->when($docManagers->contains('doc_type', 'employeeS1Doc'), fn($q) => $q->orWhereHas('employeeS1Doc', function ($q) use ($today) {
-                    $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
-                }))
                 // 9. S2 Doc expired
                 ->when($docManagers->contains('doc_type', 'employeeS2Doc'), fn($q) => $q->orWhereHas('employeeS2Doc', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);

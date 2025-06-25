@@ -951,7 +951,7 @@ class Employee extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this->externalMedicalRecord()->first())) {
+        if (!$loggedInUser->can('setDocs', [$this, 'externalMedicalRecord'])) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 
@@ -990,7 +990,7 @@ class Employee extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this->practiceCard()->first())) {
+        if (!$loggedInUser->can('setDocs', [$this, 'practiceCard'])) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 
@@ -1028,7 +1028,7 @@ class Employee extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this->skillsQualifications()->first())) {
+        if (!$loggedInUser->can('setDocs', [$this, 'skillsQualifications'])) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 
@@ -1066,7 +1066,7 @@ class Employee extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this->syndicateCard()->first())) {
+        if (!$loggedInUser->can('setDocs', [$this, 'syndicateCard'])) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 
@@ -1104,7 +1104,7 @@ class Employee extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('setDocs', $this->workDeclarations()->first())) {
+        if (!$loggedInUser->can('setDocs', [$this, 'workDeclarations'])) {
             throw new AppException('You dont have permission to set docs for this employee');
         }
 

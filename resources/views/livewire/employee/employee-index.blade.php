@@ -62,7 +62,7 @@
                                         {{ __('Name') }}
                                     </th>
                                     <th scope="col" class=" table-th ">
-                                        {{ __('Email') }}
+                                        {{ __('Employment') }}
                                     </th>
                                     <th scope="col" class=" table-th ">
                                         {{ __('Phone') }}
@@ -85,7 +85,7 @@
                                             {{ $employee->name }}
                                         </td>
                                         <td class="table-td">
-                                            {{ $employee->email }}
+                                            {{ $employee->employment_date ? $employee->employment_date->format('d/m/Y') : '-' }}
                                         </td>
                                         <td class="table-td">
                                             {{ $employee->phone }}

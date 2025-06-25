@@ -1659,6 +1659,9 @@ class Employee extends Model
                 foreach ($splittedSearch as $search) {
                     $q->where('name', 'like', '%' . $search . '%')
                         ->orWhere('email', 'like', '%' . $search . '%')
+                        ->orWhereHas('info', function ($q) use ($search) {
+                            $q->where('employee_code', 'like', '%' . $search . '%');
+                        })
                         ->orWhere('phone', 'like', '%' . $search . '%');
                 }
             });

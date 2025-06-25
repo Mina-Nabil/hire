@@ -274,7 +274,7 @@ class ZKDeviceController extends Controller
             'info' => $request->input('INFO'),
             'table' => $request->input('table')
         ]);
-
+        return response("OK\n", 200);
         $deviceSN = $request->input('SN');
         $table = $request->input('table');
 

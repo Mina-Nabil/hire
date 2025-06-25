@@ -28,4 +28,19 @@ class EmployeeIndex extends Component
     {
         $this->resetPage();
     }
+
+    public function exportToExcel()
+    {
+        try {
+            return Employee::exportToExcel();
+        } catch (\Exception $e) {
+            report($e);
+            $this->alert('error', 'Export failed: ' . $e->getMessage());
+        }
+    }
+
+    public function importEmployees()
+    {
+        return redirect()->route('employees.import');
+    }
 } 

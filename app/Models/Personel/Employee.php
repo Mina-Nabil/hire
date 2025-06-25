@@ -1362,7 +1362,7 @@ class Employee extends Model
      * @throws AppException
      */
     public function updateEmployeeInfo(
-        string $insurance_office_id,
+        ?string $insurance_office_id = null,
         ?string $insurance_number = null,
         ?string $academic_qualification = null,
         ?string $university = null,
@@ -4950,5 +4950,193 @@ class Employee extends Model
             $this->delete();
         });
         return true;
+    }
+
+    /**
+     * Export employees to Excel format
+     * 
+     * @param array $filters Optional filters for the export
+     * @return BinaryFileResponse
+     */
+    public static function exportToExcel()
+    {
+        $query = Employee::with(['info', 'birthPlace']);
+
+        $employees = $query->get();
+
+        $exportData = [];
+
+        foreach ($employees as $employee) {
+            $exportData[] = [
+                'id' => $employee->id,
+                'name' => $employee->name,
+                'name_ar' => $employee->name_ar,
+                'email' => $employee->email,
+                'phone' => $employee->phone,
+                'address' => $employee->address,
+                'nationality' => $employee->nationality,
+                'gender' => $employee->gender,
+                'birth_date' => $employee->birth_date ? $employee->birth_date->format('Y-m-d') : null,
+                'employment_date' => $employee->employment_date ? $employee->employment_date->format('Y-m-d') : null,
+                'id_number' => $employee->id_number,
+                'mother_name' => $employee->mother_name,
+                'license_required' => $employee->license_required,
+                'status' => $employee->status,
+                'birth_place_id' => $employee->birthPlace->name,
+                'insurance_office_id' => $employee->info->insuranceOffice->name ?? null,
+                'insurance_number' => $employee->info->insurance_number ?? null,
+                'academic_qualification' => $employee->info->academic_qualification ?? null,
+                'university' => $employee->info->university ?? null,
+                'graduation_year' => $employee->info->graduation_year ?? null,
+                'military_status' => $employee->info->military_status ?? null,
+                'marital_status' => $employee->info->marital_status ?? null,
+                'employee_code' => $employee->info->employee_code ?? null,
+                'device_id' => $employee->info->device_id ?? null,
+            ];
+        }
+
+
+        // Create new spreadsheet
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $activeSheet = $spreadsheet->getActiveSheet();
+
+        // Set up headers
+        $activeSheet->setCellValue('A1', 'ID');
+        $activeSheet->setCellValue('B1', 'Name');
+        $activeSheet->setCellValue('C1', 'Name AR');
+        $activeSheet->setCellValue('D1', 'Email');
+        $activeSheet->setCellValue('E1', 'Phone');
+        $activeSheet->setCellValue('F1', 'Address');
+        $activeSheet->setCellValue('G1', 'Nationality');
+        $activeSheet->setCellValue('H1', 'Gender');
+        $activeSheet->setCellValue('I1', 'Birth Date');
+        $activeSheet->setCellValue('J1', 'Employment Date');
+        $activeSheet->setCellValue('K1', 'ID Number');
+        $activeSheet->setCellValue('L1', 'Mother Name');
+        $activeSheet->setCellValue('M1', 'Birth Place');
+        $activeSheet->setCellValue('N1', 'Insurance Office');
+        $activeSheet->setCellValue('O1', 'Insurance Number');
+        $activeSheet->setCellValue('P1', 'Academic Qualification');
+        $activeSheet->setCellValue('Q1', 'University');
+        $activeSheet->setCellValue('R1', 'Graduation Year');
+        $activeSheet->setCellValue('S1', 'Military Status');
+        $activeSheet->setCellValue('T1', 'Marital Status');
+        $activeSheet->setCellValue('U1', 'Employee Code');
+        $activeSheet->setCellValue('V1', 'Device ID');
+
+        // Style the header row
+        $headerStyle = [
+            'font' => [
+                'bold' => true,
+                'color' => ['rgb' => 'FFFFFF'],
+            ],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '4472C4']
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000']
+                ]
+            ]
+        ];
+
+        $activeSheet->getStyle('A1:X1')->applyFromArray($headerStyle);
+
+        // Auto-size columns to fit content
+        foreach (range('A', 'X') as $column) {
+            $activeSheet->getColumnDimension($column)->setAutoSize(true);
+        }
+
+        $rowIndex = 3;
+        foreach ($exportData as $data) {
+            $activeSheet->setCellValue('A' . $rowIndex, $data['id']);
+            $activeSheet->setCellValue('B' . $rowIndex, $data['name']);
+            $activeSheet->setCellValue('C' . $rowIndex, $data['name_ar']);
+            $activeSheet->setCellValue('D' . $rowIndex, $data['email']);
+            $activeSheet->setCellValue('E' . $rowIndex, $data['phone']);
+            $activeSheet->setCellValue('F' . $rowIndex, $data['address']);
+            $activeSheet->setCellValue('G' . $rowIndex, $data['nationality']);
+            $activeSheet->setCellValue('H' . $rowIndex, $data['gender']);
+            $activeSheet->setCellValue('I' . $rowIndex, $data['birth_date']);
+            $activeSheet->setCellValue('J' . $rowIndex, $data['employment_date']);
+            $activeSheet->setCellValue('K' . $rowIndex, $data['id_number']);
+            $activeSheet->setCellValue('L' . $rowIndex, $data['mother_name']);
+            $activeSheet->setCellValue('M' . $rowIndex, $data['birth_place_id']);
+            $activeSheet->setCellValue('N' . $rowIndex, $data['insurance_office_id']);
+            $activeSheet->setCellValue('O' . $rowIndex, $data['insurance_number']);
+            $activeSheet->setCellValue('P' . $rowIndex, $data['academic_qualification']);
+            $activeSheet->setCellValue('Q' . $rowIndex, $data['university']);
+            $activeSheet->setCellValue('R' . $rowIndex, $data['graduation_year']);
+            $activeSheet->setCellValue('S' . $rowIndex, $data['military_status']);
+            $activeSheet->setCellValue('T' . $rowIndex, $data['marital_status']);
+            $activeSheet->setCellValue('U' . $rowIndex, $data['employee_code']);
+            $activeSheet->setCellValue('V' . $rowIndex, $data['device_id']);
+            $rowIndex++;
+        }
+
+        $citiesSheet = $spreadsheet->createSheet();
+        $citiesSheet->setTitle('Cities');
+        $citiesSheet->setCellValue('A1', 'Name');
+
+        $cities = City::all();
+
+        $rowIndex = 2;
+        foreach ($cities as $city) {
+            $citiesSheet->setCellValue('A' . $rowIndex, $city->name);
+            $rowIndex++;
+        }
+
+        $insuranceOfficesSheet = $spreadsheet->createSheet();
+        $insuranceOfficesSheet->setTitle('Insurance Offices');
+        $insuranceOfficesSheet->setCellValue('A1', 'Name');
+
+        $insuranceOffices = InsuranceOffice::all();
+
+        $rowIndex = 2;
+        foreach ($insuranceOffices as $insuranceOffice) {
+            $insuranceOfficesSheet->setCellValue('A' . $rowIndex, $insuranceOffice->name);
+            $rowIndex++;
+        }
+
+        $maritalStatusesSheet = $spreadsheet->createSheet();
+        $maritalStatusesSheet->setTitle('Marital Statuses');
+        $maritalStatusesSheet->setCellValue('A1', 'Name');
+
+        $maritalStatuses = Applicant::MARITAL_STATUS;
+
+        $rowIndex = 2;
+        foreach ($maritalStatuses as $maritalStatus) {
+            $maritalStatusesSheet->setCellValue('A' . $rowIndex, $maritalStatus);
+            $rowIndex++;
+        }
+
+        $militaryStatusesSheet = $spreadsheet->createSheet();
+        $militaryStatusesSheet->setTitle('Military Statuses');
+        $militaryStatusesSheet->setCellValue('A1', 'Name');
+
+        $militaryStatuses = Applicant::MILITARY_STATUS;
+
+        $rowIndex = 2;
+        foreach ($militaryStatuses as $militaryStatus) {
+            $militaryStatusesSheet->setCellValue('A' . $rowIndex, $militaryStatus);
+            $rowIndex++;
+        }
+
+
+
+        // Create writer
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+
+        // Save the file
+        $filename = 'employees_export_' . date('Y-m-d_H-i-s') . '.xlsx';
+        $writer->save($filename);
+
+        return response()->download($filename)->deleteFileAfterSend(true);
     }
 }

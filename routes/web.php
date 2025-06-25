@@ -102,6 +102,7 @@ Route::group(['middleware' => ['auth', 'type:admin|hr']], function () {
     Route::get('/employees', EmployeeIndex::class)->name('employees');
     Route::get('/employees/create', EmployeeCreate::class)->name('employees.create');
     Route::get('/employees/create/from-applicant/{applicant_id}', EmployeeCreate::class)->name('employees.create.from-applicant');
+    Route::get('/employees/import', App\Livewire\Employee\ImportEmployees::class)->name('employees.import');
     Route::get('/employees/dashboard', EmployeeDashboard::class)->name('employees.dashboard');
     Route::get('/employees/reports/missing-documents', MissingDocReport::class)->name('employees.reports.missing-documents');
     Route::get('/employees/{id}', EmployeeShow::class)->name('employees.show');

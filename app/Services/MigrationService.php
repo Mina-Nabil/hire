@@ -18,6 +18,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class MigrationService
@@ -313,7 +314,9 @@ class MigrationService
                             'id_number' => $employee['id_number'],
                             'employment_date' => Carbon::parse($employee['employment_date'])->format('Y-m-d'),
                             'birth_place_id' => $employee['city_id'],
-                            'created_by' => 1,
+                            'license_required' => false, // Default value
+                            'status' => Employee::STATUS_ACTIVE, // Default status
+                            'created_by' => Auth::id() ?? 1, // Current user or default admin
                         ]);
 
                         $employee->info()->create([
@@ -383,5 +386,447 @@ class MigrationService
             AppLog::error('Failed to import data', $e->getMessage());
             throw new AppException('Failed to import data');
         }
+    }
+
+    /**
+     * Load employee data from Excel file and validate it
+     * Stage 1: Load and validate data, determine if employee is new/updated/has errors
+     * 
+     * @param string $file Path to the Excel file
+     * @return array Array containing validated employee data with status and errors
+     * @throws AppException
+     */
+    public static function LoadEmployeeData($file): array
+    {
+        $results = [
+            'total_rows' => 0,
+            'new_employees' => [],
+            'updated_employees' => [],
+            'errors' => [],
+            'summary' => [
+                'new_count' => 0,
+                'update_count' => 0,
+                'error_count' => 0
+            ]
+        ];
+
+        try {
+            $spreadsheet = IOFactory::load($file);
+            if (!$spreadsheet) {
+                throw new AppException('Failed to read Excel file');
+            }
+
+            $activeSheet = $spreadsheet->getActiveSheet();
+            $highestRow = $activeSheet->getHighestRow();
+            
+            // Skip header row, start from row 3 (assuming row 1 is headers, row 2 might be empty)
+            for ($row = 3; $row <= $highestRow; $row++) {
+                $results['total_rows']++;
+
+                // Extract data from Excel columns (based on the export format)
+                $employeeData = [
+                    'row_number' => $row,
+                    'id' => $activeSheet->getCell('A' . $row)->getValue(),
+                    'name' => trim($activeSheet->getCell('B' . $row)->getValueString()),
+                    'name_ar' => trim($activeSheet->getCell('C' . $row)->getValueString()),
+                    'email' => trim($activeSheet->getCell('D' . $row)->getValueString()),
+                    'phone' => trim($activeSheet->getCell('E' . $row)->getValueString()),
+                    'address' => trim($activeSheet->getCell('F' . $row)->getValueString()),
+                    'nationality' => trim($activeSheet->getCell('G' . $row)->getValueString()),
+                    'gender' => trim($activeSheet->getCell('H' . $row)->getValueString()),
+                    'birth_date' => $activeSheet->getCell('I' . $row)->getValue(),
+                    'employment_date' => $activeSheet->getCell('J' . $row)->getValue(),
+                    'id_number' => trim($activeSheet->getCell('K' . $row)->getValueString()),
+                    'mother_name' => trim($activeSheet->getCell('L' . $row)->getValueString()),
+                    'birth_place_name' => trim($activeSheet->getCell('M' . $row)->getValueString()),
+                    'insurance_office_name' => trim($activeSheet->getCell('N' . $row)->getValueString()),
+                    'insurance_number' => trim($activeSheet->getCell('O' . $row)->getValueString()),
+                    'academic_qualification' => trim($activeSheet->getCell('P' . $row)->getValueString()),
+                    'university' => trim($activeSheet->getCell('Q' . $row)->getValueString()),
+                    'graduation_year' => trim($activeSheet->getCell('R' . $row)->getValueString()),
+                    'military_status' => trim($activeSheet->getCell('S' . $row)->getValueString()),
+                    'marital_status' => trim($activeSheet->getCell('T' . $row)->getValueString()),
+                    'employee_code' => trim($activeSheet->getCell('U' . $row)->getValueString()),
+                    'device_id' => trim($activeSheet->getCell('V' . $row)->getValueString()),
+                ];
+
+                // Skip empty rows
+                if (empty($employeeData['name']) && empty($employeeData['email'])) {
+                    $results['total_rows']--;
+                    continue;
+                }
+
+                // Validate and process the employee data
+                $processedData = self::validateAndProcessEmployeeData($employeeData);
+
+                // Categorize the employee based on validation results
+                if (!empty($processedData['errors'])) {
+                    $results['errors'][] = $processedData;
+                    $results['summary']['error_count']++;
+                } elseif ($processedData['is_new']) {
+                    $results['new_employees'][] = $processedData;
+                    $results['summary']['new_count']++;
+                } else {
+                    $results['updated_employees'][] = $processedData;
+                    $results['summary']['update_count']++;
+                }
+            }
+
+            AppLog::info('Employee data loaded successfully', [
+                'total_rows' => $results['total_rows'],
+                'new_employees' => $results['summary']['new_count'],
+                'updated_employees' => $results['summary']['update_count'],
+                'errors' => $results['summary']['error_count']
+            ]);
+
+            return $results;
+
+        } catch (Exception $e) {
+            AppLog::error('Failed to load employee data', $e->getMessage());
+            throw new AppException('Failed to load employee data: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Validate and process individual employee data
+     * 
+     * @param array $employeeData Raw employee data from Excel
+     * @return array Processed employee data with validation results
+     */
+    private static function validateAndProcessEmployeeData(array $employeeData): array
+    {
+        $errors = [];
+        $warnings = [];
+        $processedData = $employeeData;
+
+        // Required field validation
+        $requiredFields = [
+            'name' => 'Employee name is required',
+            'name_ar' => 'Employee Arabic name is required',
+            'email' => 'Email is required',
+            'phone' => 'Phone number is required',
+            'address' => 'Address is required',
+            'nationality' => 'Nationality is required',
+            'gender' => 'Gender is required',
+            'id_number' => 'ID number is required'
+        ];
+
+        foreach ($requiredFields as $field => $message) {
+            if (empty($employeeData[$field])) {
+                $errors[] = $message;
+            }
+        }
+
+        // Gender validation
+        if (!empty($employeeData['gender']) && !in_array(strtolower($employeeData['gender']), ['male', 'female'])) {
+            $errors[] = 'Gender must be either Male or Female';
+        }
+
+        // Date validation and formatting
+        try {
+            if (!empty($employeeData['birth_date'])) {
+                if (is_numeric($employeeData['birth_date'])) {
+                    // Excel date format
+                    $birthDate = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($employeeData['birth_date']);
+                    $processedData['birth_date'] = $birthDate->format('Y-m-d');
+                } else {
+                    // Try to parse as string
+                    $birthDate = Carbon::parse($employeeData['birth_date']);
+                    $processedData['birth_date'] = $birthDate->format('Y-m-d');
+                }
+            }
+        } catch (Exception $e) {
+            $errors[] = 'Invalid birth date format';
+        }
+
+        try {
+            if (!empty($employeeData['employment_date'])) {
+                if (is_numeric($employeeData['employment_date'])) {
+                    // Excel date format
+                    $employmentDate = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($employeeData['employment_date']);
+                    $processedData['employment_date'] = $employmentDate->format('Y-m-d');
+                } else {
+                    // Try to parse as string
+                    $employmentDate = Carbon::parse($employeeData['employment_date']);
+                    $processedData['employment_date'] = $employmentDate->format('Y-m-d');
+                }
+            }
+        } catch (Exception $e) {
+            $errors[] = 'Invalid employment date format';
+        }
+
+        // Check if birth place exists
+        if (!empty($employeeData['birth_place_name'])) {
+            $birthPlace = City::where('name', $employeeData['birth_place_name'])->first();
+            if (!$birthPlace) {
+                $errors[] = 'Birth place "' . $employeeData['birth_place_name'] . '" not found in system';
+            } else {
+                $processedData['birth_place_id'] = $birthPlace->id;
+            }
+        }
+
+        // Check if insurance office exists (if provided)
+        if (!empty($employeeData['insurance_office_name'])) {
+            $insuranceOffice = \App\Models\Base\InsuranceOffice::where('name', $employeeData['insurance_office_name'])->first();
+            if (!$insuranceOffice) {
+                $warnings[] = 'Insurance office "' . $employeeData['insurance_office_name'] . '" not found in system';
+            } else {
+                $processedData['insurance_office_id'] = $insuranceOffice->id;
+            }
+        }
+
+        // Determine if this is a new employee or update
+        $existingEmployee = null;
+        $isNew = true;
+
+        // First try to find by ID (if provided and not empty)
+        if (!empty($employeeData['id']) && is_numeric($employeeData['id'])) {
+            $existingEmployee = Employee::find($employeeData['id']);
+            if ($existingEmployee) {
+                $isNew = false;
+            }
+        }
+
+        // If not found by email, try by ID number
+        if (!$existingEmployee && !empty($employeeData['id_number'])) {
+            $existingEmployee = Employee::where('id_number', $employeeData['id_number'])->first();
+            if ($existingEmployee) {
+                $isNew = false;
+                $processedData['id'] = $existingEmployee->id;
+                $warnings[] = 'Employee found by ID number';
+            }
+        }
+
+        // If not found by ID number, try by employee code
+        if (!$existingEmployee && !empty($employeeData['employee_code'])) {
+            $existingEmployee = Employee::whereHas('info', function($query) use ($employeeData) {
+                $query->where('employee_code', $employeeData['employee_code']);
+            })->first();
+            if ($existingEmployee) {
+                $isNew = false;
+                $processedData['id'] = $existingEmployee->id;
+                $warnings[] = 'Employee found by employee code, but other details may differ';
+            }
+        }
+
+        // Check for duplicate email/ID number if this is a new employee
+        if ($isNew) {
+            if (!empty($employeeData['id_number'])) {
+                $idExists = Employee::where('id_number', $employeeData['id_number'])->exists();
+                if ($idExists) {
+                    $errors[] = 'ID number already exists in system';
+                }
+            }
+        }
+
+        $processedData['is_new'] = $isNew;
+        $processedData['existing_employee'] = $existingEmployee;
+        $processedData['errors'] = $errors;
+        $processedData['warnings'] = $warnings;
+
+        return $processedData;
+    }
+
+    /**
+     * Save valid employee data to the database
+     * Stage 2: Import new employees and update existing ones
+     * 
+     * @param array $employeeData The validated employee data from LoadEmployeeData
+     * @return array Results of the save operation
+     * @throws AppException
+     */
+    public static function SaveEmployeeData(array $employeeData): array
+    {
+        $results = [
+            'created_count' => 0,
+            'updated_count' => 0,
+            'created_employees' => [],
+            'updated_employees' => [],
+            'errors' => []
+        ];
+
+        try {
+            DB::transaction(function () use ($employeeData, &$results) {
+                
+                // Process new employees
+                foreach ($employeeData['new_employees'] as $newEmployeeData) {
+                    try {
+                        $results['created_employees'][] = self::createNewEmployee($newEmployeeData);
+                        $results['created_count']++;
+                    } catch (Exception $e) {
+                        $results['errors'][] = [
+                            'row' => $newEmployeeData['row_number'],
+                            'type' => 'create_error',
+                            'message' => 'Failed to create employee: ' . $e->getMessage(),
+                            'data' => $newEmployeeData
+                        ];
+                    }
+                }
+
+                // Process employee updates
+                foreach ($employeeData['updated_employees'] as $updateEmployeeData) {
+                    try {
+                        $results['updated_employees'][] = self::updateExistingEmployee($updateEmployeeData);
+                        $results['updated_count']++;
+                    } catch (Exception $e) {
+                        $results['errors'][] = [
+                            'row' => $updateEmployeeData['row_number'],
+                            'type' => 'update_error',
+                            'message' => 'Failed to update employee: ' . $e->getMessage(),
+                            'data' => $updateEmployeeData
+                        ];
+                    }
+                }
+            });
+
+            AppLog::info('Employee data saved successfully', [
+                'created_count' => $results['created_count'],
+                'updated_count' => $results['updated_count'],
+                'errors_count' => count($results['errors'])
+            ]);
+
+            return $results;
+
+        } catch (Exception $e) {
+            AppLog::error('Failed to save employee data', $e->getMessage());
+            throw new AppException('Failed to save employee data: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Create a new employee from Excel data
+     * 
+     * @param array $employeeData Validated employee data
+     * @return Employee The created employee
+     * @throws Exception
+     */
+    private static function createNewEmployee(array $employeeData): Employee
+    {
+        // Generate username from name
+        $nameParts = explode(' ', $employeeData['name']);
+        $firstName = isset($nameParts[0]) ? $nameParts[0] : '';
+        $lastName = isset($nameParts[count($nameParts) - 1]) ? $nameParts[count($nameParts) - 1] : '';
+
+        // Convert to lowercase and remove non-alphanumeric characters
+        $firstName = preg_replace('/[^a-z0-9]/', '', strtolower($firstName));
+        $lastName = preg_replace('/[^a-z0-9]/', '', strtolower($lastName));
+
+        // Generate base username
+        $baseUsername = $firstName . $lastName;
+
+        // Ensure username is not empty
+        if (empty($baseUsername)) {
+            $baseUsername = 'employee' . rand(100, 999);
+        }
+
+        // Ensure the username is unique
+        $username = $baseUsername;
+        $i = 1;
+        while (User::where('username', $username)->exists()) {
+            $username = $baseUsername . $i;
+            $i++;
+        }
+
+        // Create user account
+        $user = User::create([
+            'name' => $employeeData['name'],
+            'username' => $username,
+            'password' => 'pass@123', // Default password
+            'type' => User::TYPE_EMPLOYEE,
+        ]);
+
+        // Create employee record
+        $employee = Employee::create([
+            'user_id' => $user->id,
+            'name' => $employeeData['name'],
+            'name_ar' => $employeeData['name_ar'],
+            'email' => $employeeData['email'],
+            'phone' => $employeeData['phone'],
+            'address' => $employeeData['address'],
+            'nationality' => $employeeData['nationality'],
+            'gender' => $employeeData['gender'],
+            'birth_date' => $employeeData['birth_date'],
+            'employment_date' => $employeeData['employment_date'],
+            'id_number' => $employeeData['id_number'],
+            'mother_name' => $employeeData['mother_name'],
+            'birth_place_id' => $employeeData['birth_place_id'] ?? null,
+            'license_required' => false, // Default value
+            'status' => Employee::STATUS_ACTIVE, // Default status
+            'created_by' => Auth::id() ?? 1, // Current user or default admin
+        ]);
+
+        // Create employee info record
+        $employee->info()->create([
+            'insurance_office_id' => $employeeData['insurance_office_id'] ?? null,
+            'insurance_number' => $employeeData['insurance_number'],
+            'academic_qualification' => $employeeData['academic_qualification'],
+            'university' => $employeeData['university'],
+            'graduation_year' => $employeeData['graduation_year'],
+            'military_status' => $employeeData['military_status'],
+            'marital_status' => $employeeData['marital_status'],
+            'employee_code' => $employeeData['employee_code'],
+            'device_id' => $employeeData['device_id'],
+        ]);
+
+        AppLog::info('New employee created from import', [
+            'employee_id' => $employee->id,
+            'name' => $employee->name,
+            'email' => $employee->email,
+            'row_number' => $employeeData['row_number']
+        ]);
+
+        return $employee;
+    }
+
+    /**
+     * Update an existing employee from Excel data
+     * 
+     * @param array $employeeData Validated employee data
+     * @return Employee The updated employee
+     * @throws Exception
+     */
+    private static function updateExistingEmployee(array $employeeData): Employee
+    {
+        $employee = Employee::find($employeeData['id']);
+        if (!$employee) {
+            throw new Exception('Employee not found for update');
+        }
+
+        // Update base employee information
+        $employee->updateBaseInfo(
+            $employeeData['name'],
+            $employeeData['name_ar'],
+            $employeeData['email'],
+            $employeeData['phone'],
+            $employeeData['address'],
+            $employeeData['nationality'],
+            $employeeData['gender'],
+            $employeeData['birth_date'],
+            $employeeData['employment_date'],
+            $employeeData['id_number'],
+            $employeeData['mother_name']
+        );
+
+        // Update employee info
+        $employee->updateEmployeeInfo(
+            $employeeData['insurance_office_id'] ?? null,
+            $employeeData['insurance_number'],
+            $employeeData['academic_qualification'],
+            $employeeData['university'],
+            $employeeData['graduation_year'],
+            $employeeData['military_status'],
+            $employeeData['marital_status'],
+            $employeeData['employee_code'],
+            $employeeData['device_id']
+        );
+
+        AppLog::info('Employee updated from import', [
+            'employee_id' => $employee->id,
+            'name' => $employee->name,
+            'email' => $employee->email,
+            'row_number' => $employeeData['row_number']
+        ]);
+
+        return $employee;
     }
 }

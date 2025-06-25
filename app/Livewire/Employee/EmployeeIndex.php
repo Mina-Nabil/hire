@@ -16,6 +16,7 @@ class EmployeeIndex extends Component
     public function render()
     {
         $employees = Employee::search($this->search)
+            ->with('info')
             ->orderBy('name')
             ->paginate(10);
 

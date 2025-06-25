@@ -56,6 +56,9 @@
                                 class=" border-t border-slate-100 dark:border-slate-800 bg-slate-200 dark:bg-slate-700">
                                 <tr>
                                     <th scope="col" class=" table-th ">
+                                        {{ __('Code') }}
+                                    </th>
+                                    <th scope="col" class=" table-th ">
                                         {{ __('Name') }}
                                     </th>
                                     <th scope="col" class=" table-th ">
@@ -75,6 +78,9 @@
                             <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
                                 @forelse ($employees as $employee)
                                     <tr>
+                                        <td class="table-td">
+                                            {{ $employee->info->employee_code ?? 'N/A' }}
+                                        </td>
                                         <td class="table-td">
                                             {{ $employee->name }}
                                         </td>

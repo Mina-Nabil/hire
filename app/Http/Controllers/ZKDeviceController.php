@@ -22,7 +22,7 @@ class ZKDeviceController extends Controller
 
         // Device Registration Ping (GET)
         if ($request->isMethod('get')) {
-            if ($request->has('table') && $request->query('table') === 'OPERLOG') {
+            if ($request->query('table') === 'OPERLOG') {
                 return response("GET ATTLOG FROM 0\n", 200); // force full resend
             }
         }
@@ -82,9 +82,7 @@ class ZKDeviceController extends Controller
             Log::error('[ZKTeco] Error processing attendance logs: ' . $e->getMessage(), ['exception' => $e]);
             // Still return OK to the device, so it doesn't keep sending the same data.
         }
-        if ($request->has('table') && $request->query('table') === 'OPERLOG') {
-            return response("GET ATTLOG FROM 0\n", 200); // force full resend
-        }
+        return response("GET ATTLOG FROM 0\n", 200); // force full resend
         return response('OK', 200);
     }
 

@@ -1562,10 +1562,7 @@ class Employee extends Model
                 ->when($docManagers->contains('doc_type', 'idCard'), fn($q) => $q->orWhereHas('idCard', function ($q) use ($today, $nearExpiryDate) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
                 }))
-                // 2. Birth Certificate near expiry
-                ->when($docManagers->contains('doc_type', 'birthCertificate'), fn($q) => $q->orWhereHas('birthCertificate', function ($q) use ($today, $nearExpiryDate) {
-                    $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
-                }))
+
                 // 3. Employment Contract near expiry
                 ->when($docManagers->contains('doc_type', 'employeeContract'), fn($q) => $q->orWhereHas('contracts', function ($q) use ($today, $nearExpiryDate) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
@@ -1586,10 +1583,7 @@ class Employee extends Model
                 // ->orWhereHas('hrLetters', function ($q) use ($today, $nearExpiryDate) {
                 //     $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
                 // })
-                // 8. S1 Doc near expiry
-                ->when($docManagers->contains('doc_type', 'employeeS1Doc'), fn($q) => $q->orWhereHas('employeeS1Doc', function ($q) use ($today, $nearExpiryDate) {
-                    $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
-                }))
+
                 // 9. S2 Doc near expiry
                 ->when($docManagers->contains('doc_type', 'employeeS2Doc'), fn($q) => $q->orWhereHas('employeeS2Doc', function ($q) use ($today, $nearExpiryDate) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);

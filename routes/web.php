@@ -51,7 +51,7 @@ Route::group(['middleware' => ['auth', 'type:employee|hr|admin']], function () {
     Route::get('/employee/documents', EmployeeDocumentView::class)->name('employee.documents');
     Route::get('/employee/overtime-requests', EmployeeOvertimeRequests::class)->name('employee.overtime-requests');
     Route::get('/attendance/applied-vacation', App\Livewire\Attendance\ShowAppliedVacation::class)->name('applied-vacation.index');
-
+    Route::get('/attendance', App\Livewire\Attendance\ShowAttendance::class)->name('attendance.index');
     Route::get('/recruitment/vacancies/{id}', VacancyShow::class)->name('recruitment.vacancies.show');
     Route::get('/recruitment/vacancies', VacancyIndex::class)->name('recruitment.vacancies');
 
@@ -71,7 +71,7 @@ Route::group(['middleware' => ['auth', 'type:admin|hr']], function () {
     Route::get('/payrolls/submit-attendance', App\Livewire\Attendance\AddSheet::class)->name('submit-attendance');
     Route::get('/attendance/bus-arrivals', App\Livewire\Attendance\AddBusArrivals::class)->name('attendance.bus-arrivals');
     Route::get('/attendance/bus-arrivals/records', App\Livewire\Attendance\ShowBusArrivals::class)->name('attendance.bus-arrivals.records');
-    Route::get('/attendance', App\Livewire\Attendance\ShowAttendance::class)->name('attendance.index');
+
     Route::get('/attendance/overtime', App\Livewire\Attendance\ShowOvertime::class)->name('overtime.index');
     Route::get('/payrolls', App\Livewire\Payrolls\PayrollIndex::class)->name('payrolls.index');
     Route::get('/payrolls/create', App\Livewire\Payrolls\CreatePayroll::class)->name('payrolls.create');

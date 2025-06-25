@@ -679,11 +679,11 @@ class MigrationService
                 }
             });
 
-            AppLog::info('Employee data saved successfully', [
+            AppLog::info('Employee data saved successfully', print_r([
                 'created_count' => $results['created_count'],
                 'updated_count' => $results['updated_count'],
                 'errors_count' => count($results['errors'])
-            ]);
+            ]));
 
             return $results;
 

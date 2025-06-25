@@ -54,6 +54,9 @@ class AppLog extends Model
 
     private static function addLog($level, $title, $desc, $user_id = null, ?Model $loggable = null)
     {
+        if (is_array($desc)) {
+            $desc = json_encode($desc);
+        }
         $newLog = new self([
             "title"     =>  $title,
             "level"     =>  $level,

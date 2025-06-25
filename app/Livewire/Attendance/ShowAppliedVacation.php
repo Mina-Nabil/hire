@@ -21,6 +21,8 @@ class ShowAppliedVacation extends Component
     public $selectedAppliedVacation = null;
     public $rejectNote = '';
 
+    protected $listeners = ['approve'];
+
     public function toggleFilters()
     {
         $this->showFilters = !$this->showFilters;

@@ -21,7 +21,7 @@ class ShowAppliedVacation extends Component
     public $selectedAppliedVacation = null;
     public $rejectNote = '';
 
-    protected $listeners = ['approve'];
+    protected $listeners = ['approveVacation'];
 
     public function toggleFilters()
     {
@@ -47,7 +47,7 @@ class ShowAppliedVacation extends Component
         $this->rejectNote = '';
     }
 
-    public function approve($appliedVacationId)
+    public function approveVacation($appliedVacationId)
     {
         try {
             $appliedVacation = AppliedVacation::findOrFail($appliedVacationId);

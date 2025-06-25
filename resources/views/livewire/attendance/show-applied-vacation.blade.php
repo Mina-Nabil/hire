@@ -152,7 +152,7 @@
                                             @endif
                                             @can('approve', $appliedVacation)
                                                 <button
-                                                    wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to approve this vacation?',color:'success',callback:'approve',params:{{ $appliedVacation->id }}})"
+                                                    wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to approve this vacation?',color:'success',callback:'approveVacation',params:{{ $appliedVacation->id }}})"
                                                     class="action-btn text-success-500" title="Approve">
                                                     <iconify-icon icon="heroicons:check"></iconify-icon>
                                                 </button>

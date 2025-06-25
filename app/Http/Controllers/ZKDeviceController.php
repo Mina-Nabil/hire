@@ -12,20 +12,8 @@ class ZKDeviceController extends Controller
 {
     public function ping(Request $request)
     {
-        // Log all incoming data
-        Log::info('[ZKTeco Device Request]', [
-            'method' => $request->method(),
-            'query'  => $request->query(),
-            'body'   => $request->getContent(),
-            'all'    => $request->all()
-        ]);
+        return response("GET ATTLOG FROM 0\n", 200); // force full resend
 
-        // Device Registration Ping (GET)
-        if ($request->isMethod('get')) {
-            if ($request->has('table') && $request->input('table') === 'OPERLOG') {
-                return response("GET ATTLOG FROM 0\n", 200); // force full resend
-            }
-        }
     }
 
     public function attendance(Request $request)

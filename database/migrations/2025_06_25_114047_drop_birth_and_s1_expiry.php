@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('birth_certificates', function (Blueprint $table) {
-            $table->dropColumn('expiry_date');
-        });
+        // Schema::table('birth_certificates', function (Blueprint $table) {
+        //     $table->dropColumn('expiry_date');
+        // });
 
-        Schema::table('s1_certificates', function (Blueprint $table) {
+        Schema::table('employee_s1_docs', function (Blueprint $table) {
             $table->dropColumn('expiry_date');
         });
     }
@@ -29,7 +29,7 @@ return new class extends Migration
             $table->date('expiry_date')->nullable();
         });
 
-        Schema::table('s1_certificates', function (Blueprint $table) {
+        Schema::table('employee_s1_docs', function (Blueprint $table) {
             $table->date('expiry_date')->nullable();
         });
     }

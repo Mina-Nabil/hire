@@ -84,8 +84,7 @@ class ZKDeviceController extends Controller
             Log::error('[ZKTeco] Error processing attendance logs: ' . $e->getMessage(), ['exception' => $e]);
             // Still return OK to the device, so it doesn't keep sending the same data.
         }
-        return response("GET ATTLOG FROM 0\n", 200); // force full resend
-        // return response('OK', 200);
+        return response('OK', 200);
     }
 
     /**
@@ -264,5 +263,55 @@ class ZKDeviceController extends Controller
         }
 
         return $punches_to_insert;
+    }
+
+    public function getRequest(Request $request)
+    {
+        Log::info('[ZKTeco getrequest]', [
+            'all_params' => $request->all(),
+            'query_params' => $request->query(),
+            'sn' => $request->input('SN'),
+            'info' => $request->input('INFO'),
+            'table' => $request->input('table')
+        ]);
+
+        $deviceSN = $request->input('SN');
+        $table = $request->input('table');
+
+        // Handle different types of requests from the device
+        if ($table === 'OPERLOG') {
+            Log::info('[ZKTeco] Device requesting OPERLOG table data', ['sn' => $deviceSN]);
+            // Command to get all operation logs (attendance data)
+            return response("GET OPERLOG FROM 0\n", 200);
+        }
+
+        if ($table === 'ATTLOG') {
+            Log::info('[ZKTeco] Device requesting ATTLOG table data', ['sn' => $deviceSN]);
+            // Command to get all attendance logs
+            return response("GET ATTLOG FROM 0\n", 200);
+        }
+
+        // If device is asking for user data
+        if ($table === 'USERINFO') {
+            Log::info('[ZKTeco] Device requesting USERINFO table data', ['sn' => $deviceSN]);
+            return response("GET USERINFO FROM 0\n", 200);
+        }
+
+        // For general ping/heartbeat without specific table
+        if (!$table) {
+            Log::info('[ZKTeco] Device general ping/heartbeat', ['sn' => $deviceSN]);
+            
+            // You can send commands here to request all data
+            // This will tell the device to send ALL attendance records from the beginning
+            $commands = [
+                "GET ATTLOG FROM 0",
+                "GET OPERLOG FROM 0"
+            ];
+            
+            return response(implode("\n", $commands) . "\n", 200);
+        }
+
+        Log::info('[ZKTeco] Unknown table request', ['table' => $table, 'sn' => $deviceSN]);
+        return response("OK\n", 200);
     }
 }

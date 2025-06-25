@@ -928,6 +928,12 @@
                                     <div class="text-base text-slate-900 dark:text-white font-bold">
                                         {{ $employee->info?->marital_status ?? 'N/A' }}</div>
                                 </div>
+                                <div class="mb-5 text-wrap">
+                                    <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Employee
+                                        Code</label>
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
+                                        {{ $employee->info?->employee_code ?? 'N/A' }}</div>
+                                </div>
                             </div>
                         </div>
                     </div>

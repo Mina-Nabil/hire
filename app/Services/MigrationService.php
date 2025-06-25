@@ -679,11 +679,11 @@ class MigrationService
                 }
             });
 
-            AppLog::info('Employee data saved successfully', print_r([
+            AppLog::info('Employee data saved successfully', [
                 'created_count' => $results['created_count'],
                 'updated_count' => $results['updated_count'],
                 'errors_count' => count($results['errors'])
-            ]));
+            ]);
 
             return $results;
 
@@ -765,7 +765,7 @@ class MigrationService
             'military_status' => $employeeData['military_status'],
             'marital_status' => $employeeData['marital_status'],
             'employee_code' => $employeeData['employee_code'],
-            'device_id' => $employeeData['device_id'],
+            'device_id' => $employeeData['device_id'] ?? null,
         ]);
 
         AppLog::info('New employee created from import', [

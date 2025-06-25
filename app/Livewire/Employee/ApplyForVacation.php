@@ -107,7 +107,7 @@ class ApplyForVacation extends Component
         }
 
         $currentDate = $startDate->copy();
-        $employeeWorkingDays = $this->employee->workingDays()->get()->pluck('day')->toArray();
+        $employeeWorkingDays = $this->employee->workingDays()->get()->pluck('type')->toArray();
 
         while ($currentDate->lte($endDate)) {
 
@@ -141,9 +141,14 @@ class ApplyForVacation extends Component
     public function openConfirmModal()
     {
         if (empty($this->days)) {
-            $this->alertError('You must add at least one day for vacation');
+            $this->generateDays();
+        }
+
+        if (empty($this->days)) {
+            $this->alertError('You must select a date range which covers at least one working day');
             return;
         }
+
         $this->validate([
             'selectedBenefitId' => 'required',
             'days' => 'required|array|min:1',

@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Schema::table('birth_certificates', function (Blueprint $table) {
-        //     $table->dropColumn('expiry_date');
-        // });
+        Schema::table('birth_certificates', function (Blueprint $table) {
+            $table->dropColumn('expiry_date');
+        });
 
         Schema::table('employee_s1_docs', function (Blueprint $table) {
             $table->dropColumn('expiry_date');

@@ -22,7 +22,7 @@ class ZKDeviceController extends Controller
 
         // Device Registration Ping (GET)
         if ($request->isMethod('get')) {
-            return response('OK', 200);
+            return response('GET ATTLOG FROM 0', 200);
         }
     }
 

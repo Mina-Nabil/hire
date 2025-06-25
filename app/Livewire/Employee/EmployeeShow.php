@@ -1218,7 +1218,7 @@ class EmployeeShow extends Component
         ];
 
         if (!$this->keep_existing_driver_license) {
-            $validationRules['driver_license_file'] = 'required|file|mimes:pdf,jpg,jpeg,png|max:2048';
+            $validationRules['driver_license_file'] = 'required|file|mimes:pdf,jpg,jpeg,png|max:10240';
         }
 
         $this->validate($validationRules);
@@ -2637,7 +2637,7 @@ class EmployeeShow extends Component
         $this->validate([
             'other_document_name' => 'required|string|max:255',
             'other_document_issue_date' => 'required|date',
-            'other_document_file' => $this->keep_existing_other_document ? 'nullable' : 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'other_document_file' => $this->keep_existing_other_document ? 'nullable' : 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
         ]);
         // dd($this->keep_existing_other_document);
         try {

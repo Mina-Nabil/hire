@@ -474,6 +474,17 @@ class VacancyIndex extends Component
         $this->slots = [];
     }
 
+    public function updatedPositionId($value)
+    {
+        $selectedPosition = Position::find($value);
+        $this->jobResponsibilities = $selectedPosition->job_responsibilities;
+        $this->arabicJobResponsibilities = $selectedPosition->arabic_job_responsibilities;
+        $this->jobQualifications = $selectedPosition->job_qualifications;
+        $this->arabicJobQualifications = $selectedPosition->arabic_job_qualifications;
+        $this->jobBenefits = $selectedPosition->job_benefits;
+        $this->arabicJobBenefits = $selectedPosition->arabic_job_benefits;
+    }
+
     public function showVacancy($id)
     {
         return $this->dispatch('openNewTab', route('recruitment.vacancies.show', $id));

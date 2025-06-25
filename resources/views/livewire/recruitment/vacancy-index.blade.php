@@ -136,7 +136,7 @@
                                         <label for="positionId" class="form-label">Position</label>
                                         <select id="positionId"
                                             class="form-control @error('positionId') !border-danger-500 @enderror"
-                                            wire:model="positionId">
+                                            wire:model.live="positionId">
                                             <option value="">Select a position</option>
                                             @foreach ($positions as $position)
                                                 <option value="{{ $position->id }}">{{ $position->name }}</option>

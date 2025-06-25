@@ -18,6 +18,7 @@ class ShowAppliedVacation extends Component
     public $showFilters = false;
     public $status = '';
     public $showRejectModal = false;
+    public $showVacationDetailsModal = false;
     public $selectedAppliedVacation = null;
     public $rejectNote = '';
 
@@ -45,6 +46,18 @@ class ShowAppliedVacation extends Component
         $this->showRejectModal = false;
         $this->selectedAppliedVacation = null;
         $this->rejectNote = '';
+    }
+
+    public function openVacationDetailsModal($appliedVacationId)
+    {
+        $this->selectedAppliedVacation = AppliedVacation::with(['employee', 'vacationBenefit', 'payroll'])->findOrFail($appliedVacationId);
+        $this->showVacationDetailsModal = true;
+    }
+
+    public function closeVacationDetailsModal()
+    {
+        $this->showVacationDetailsModal = false;
+        $this->selectedAppliedVacation = null;
     }
 
     public function approveVacation($appliedVacationId)

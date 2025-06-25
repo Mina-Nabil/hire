@@ -143,13 +143,11 @@
                                     </td>
                                     <td class="table-td">
                                         <div class="flex space-x-2">
-                                            @if ($appliedVacation->note && !empty(trim($appliedVacation->note)))
-                                                <button
-                                                    wire:click="$dispatch('showInfoModal', {title: 'Vacation Note', message: 'Test', color: 'info'})"
-                                                    class="action-btn text-info-500" title="Info">
-                                                    <iconify-icon icon="heroicons:information-circle"></iconify-icon>
-                                                </button>
-                                            @endif
+                                            <button
+                                                wire:click="openVacationDetailsModal({{ $appliedVacation->id }})"
+                                                class="action-btn text-info-500" title="View Details">
+                                                <iconify-icon icon="heroicons:information-circle"></iconify-icon>
+                                            </button>
                                             @can('approve', $appliedVacation)
                                                 <button
                                                     wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to approve this vacation?',color:'success',callback:'approveVacation',params:{{ $appliedVacation->id }}})"
@@ -227,6 +225,126 @@
                 <x-secondary-button wire:click="closeRejectModal">Cancel</x-secondary-button>
                 <x-primary-button wire:click.prevent="confirmReject" loadingFunction="confirmReject">Reject
                     Vacation</x-primary-button>
+            </x-slot>
+        </x-modal>
+    @endif
+
+    @if ($showVacationDetailsModal)
+        <x-modal wire:model="showVacationDetailsModal">
+            <x-slot name="title">Vacation Details</x-slot>
+            <!-- Modal body -->
+            <div class="p-6 space-y-6">
+                @if ($selectedAppliedVacation)
+                    <!-- Employee Information -->
+                    <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-4">
+                        <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-3">Employee Information</h3>
+                        <div class="flex items-center space-x-4">
+                            @if ($selectedAppliedVacation->employee && $selectedAppliedVacation->employee->full_image_url)
+                                <div class="flex-none">
+                                    <div class="h-16 w-16 rounded-full overflow-hidden">
+                                        <img src="{{ $selectedAppliedVacation->employee->full_image_url }}"
+                                            alt="{{ $selectedAppliedVacation->employee->name }}"
+                                            class="h-full w-full object-cover">
+                                    </div>
+                                </div>
+                            @endif
+                            <div>
+                                <p class="font-medium text-slate-900 dark:text-white">
+                                    {{ $selectedAppliedVacation->employee ? $selectedAppliedVacation->employee->name : 'N/A' }}
+                                </p>
+                                @if ($selectedAppliedVacation->employee)
+                                    <p class="text-sm text-slate-600 dark:text-slate-300">
+                                        {{ $selectedAppliedVacation->employee->email }}
+                                    </p>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vacation Details -->
+                    <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-4">
+                        <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-3">Vacation Details</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-sm font-medium text-slate-600 dark:text-slate-300">Vacation Benefit</label>
+                                <p class="mt-1 text-slate-900 dark:text-white">
+                                    {{ $selectedAppliedVacation->vacationBenefit ? $selectedAppliedVacation->vacationBenefit->name : 'N/A' }}
+                                </p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-slate-600 dark:text-slate-300">Status</label>
+                                <div class="mt-1">
+                                    @if ($selectedAppliedVacation->status === 'pending')
+                                        <span class="badge badge-warning">Pending</span>
+                                    @elseif ($selectedAppliedVacation->status === 'approved')
+                                        <span class="badge badge-success">Approved</span>
+                                    @else
+                                        <span class="badge badge-danger">Rejected</span>
+                                    @endif
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-slate-600 dark:text-slate-300">Days</label>
+                                <p class="mt-1 text-slate-900 dark:text-white font-medium">
+                                    {{ $selectedAppliedVacation->days ?? 0 }}
+                                </p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-slate-600 dark:text-slate-300">Hours</label>
+                                <p class="mt-1 text-slate-900 dark:text-white font-medium">
+                                    {{ $selectedAppliedVacation->hours ?? 0 }}
+                                </p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-slate-600 dark:text-slate-300">New Balance</label>
+                                <p class="mt-1 text-slate-900 dark:text-white font-medium">
+                                    {{ $selectedAppliedVacation->new_balance ?? 0 }}
+                                </p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-slate-600 dark:text-slate-300">Payroll</label>
+                                <p class="mt-1 text-slate-900 dark:text-white">
+                                    @if ($selectedAppliedVacation->payroll)
+                                        {{ $selectedAppliedVacation->payroll->title }}
+                                    @else
+                                        <span class="text-slate-400">No payroll assigned</span>
+                                    @endif
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Information -->
+                    @if ($selectedAppliedVacation->note && !empty(trim($selectedAppliedVacation->note)))
+                        <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-4">
+                            <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-3">Notes</h3>
+                            <p class="text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{{ $selectedAppliedVacation->note }}</p>
+                        </div>
+                    @endif
+
+                    <!-- Timestamps -->
+                    <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-4">
+                        <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-3">Timeline</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-sm font-medium text-slate-600 dark:text-slate-300">Applied Date</label>
+                                <p class="mt-1 text-slate-900 dark:text-white">
+                                    {{ $selectedAppliedVacation->created_at ? $selectedAppliedVacation->created_at->format('M d, Y h:i A') : 'N/A' }}
+                                </p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-slate-600 dark:text-slate-300">Last Updated</label>
+                                <p class="mt-1 text-slate-900 dark:text-white">
+                                    {{ $selectedAppliedVacation->updated_at ? $selectedAppliedVacation->updated_at->format('M d, Y h:i A') : 'N/A' }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            </div>
+            <!-- Modal footer -->
+            <x-slot name="footer">
+                <x-secondary-button wire:click="closeVacationDetailsModal">Close</x-secondary-button>
             </x-slot>
         </x-modal>
     @endif

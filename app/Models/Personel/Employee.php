@@ -553,7 +553,7 @@ class Employee extends Model
 
 
         try {
-            DB::transaction(function () use ($hours_count, $days, $currentBalance, $vacationBenefit, $is_approved) {
+            DB::transaction(function () use ($hours_count, $days, $currentBalance, $vacationBenefit, $is_approved, $loggedInUser) {
                 $appliedVacation = $this->appliedVacations()->create([
                     'vacation_benefit_id' => $vacationBenefit->id,
                     'hours' => $hours_count,
@@ -568,6 +568,9 @@ class Employee extends Model
                     'current_balance' => $currentBalance - $hours_count,
                 ]);
                 AppLog::info('Vacation Applied', 'Vacation applied for employee: ' . $this->name, loggable: $this);
+                if ($loggedInUser->can('approve', $appliedVacation)) {
+                    $appliedVacation->approve();
+                }
             });
         } catch (Exception $e) {
             report($e);

@@ -1959,7 +1959,7 @@
                                             {{ $employee->employeeS1Doc->issue_date }}
                                         </div>
                                     </div>
-                                   
+
                                 </div>
                                 <div class="xl:col-span-6 lg:col-span-6 md:col-span-6 col-span-12">
                                     <div class="mb-5 text-wrap">
@@ -3658,8 +3658,7 @@
                                                         </small>
                                                     </div>
                                                     @if (!$keep_existing_file)
-                                                        <label for="id_card_file_input"
-                                                            class="cursor-pointer block"  
+                                                        <label for="id_card_file_input" class="cursor-pointer block"
                                                             x-data="{
                                                                 dropping: false,
                                                             }"
@@ -3674,8 +3673,7 @@
                                                                         const files = $event.dataTransfer.files
     
                                                                         @this.upload('id_card_file', files[0])
-                                                                    "
-                                                            >
+                                                                    ">
                                                             <iconify-icon icon="mingcute:upload-line" width="32"
                                                                 height="32"
                                                                 class="text-slate-400 mx-auto"></iconify-icon>
@@ -3871,8 +3869,7 @@
                                                         @endif
                                                     @else
                                                         <label for="birth_certificate_file_input"
-                                                            class="cursor-pointer block" 
-                                                            x-data="{
+                                                            class="cursor-pointer block" x-data="{
                                                                 dropping: false,
                                                             }"
                                                             x-on:dragover.prevent="dropping = true"
@@ -3886,8 +3883,7 @@
                                                                         const files = $event.dataTransfer.files
     
                                                                         @this.upload('birth_certificate_file', files[0])
-                                                                    "
-                                                            >
+                                                                    ">
                                                             <iconify-icon icon="mingcute:upload-line" width="32"
                                                                 height="32"
                                                                 class="text-slate-400 mx-auto"></iconify-icon>
@@ -3953,7 +3949,7 @@
                                             <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
                                         @enderror
                                     </div>
-                                 
+
                                 </div>
                             </div>
                             <!-- Modal footer -->
@@ -4069,8 +4065,7 @@
                                                         @endif
                                                     @else
                                                         <label for="army_service_paper_file_input"
-                                                            class="cursor-pointer block" 
-                                                            x-data="{
+                                                            class="cursor-pointer block" x-data="{
                                                                 dropping: false,
                                                             }"
                                                             x-on:dragover.prevent="dropping = true"
@@ -4084,8 +4079,7 @@
                                                                         const files = $event.dataTransfer.files
     
                                                                         @this.upload('army_service_paper_file', files[0])
-                                                                    "
-                                                            >
+                                                                    ">
                                                             <iconify-icon icon="mingcute:upload-line" width="32"
                                                                 height="32"
                                                                 class="text-slate-400 mx-auto"></iconify-icon>
@@ -4333,7 +4327,7 @@
                                         <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
                                     @enderror
                                 </div>
-                            
+
                             </div>
                         </div>
                         <!-- Modal footer -->

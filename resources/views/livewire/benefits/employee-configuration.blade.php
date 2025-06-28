@@ -178,6 +178,18 @@
                                         {{ $employee->termination_date ? $employee->termination_date->format('d/m/Y') : '-' }}
                                     </div>
                                 </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4 font-weight-bold">Release Date:</div>
+                                    <div class="col-md-8">
+                                        {{ $employee->release_date ? $employee->release_date->format('d/m/Y') : '-' }}
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4 font-weight-bold">Absent Date:</div>
+                                    <div class="col-md-8">
+                                        {{ $employee->absent_date ? $employee->absent_date->format('d/m/Y') : '-' }}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1705,6 +1717,26 @@
                                             class="form-control @error('termination_date') !border-danger-500 @enderror"
                                             wire:model="termination_date">
                                         @error('termination_date')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+
+                                    <div class="col-span-12 xl:col-span-6">
+                                        <label for="release_date" class="form-label">Release Date</label>
+                                        <input type="date"
+                                            class="form-control @error('release_date') !border-danger-500 @enderror"
+                                            wire:model="release_date">
+                                        @error('release_date')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+
+                                    <div class="col-span-12 xl:col-span-6">
+                                        <label for="absent_date" class="form-label">Absent Date</label>
+                                        <input type="date"
+                                            class="form-control @error('absent_date') !border-danger-500 @enderror"
+                                            wire:model="absent_date">
+                                        @error('absent_date')
                                             <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
                                         @enderror
                                     </div>

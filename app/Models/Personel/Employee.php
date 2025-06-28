@@ -104,6 +104,8 @@ class Employee extends Model
         'employment_date',
         'applicant_id',
         'termination_date',
+        'release_date',
+        'absent_date',
         'mother_name',
         'status',
     ];
@@ -111,7 +113,9 @@ class Employee extends Model
     protected $casts = [
         'employment_date' => 'date',
         'birth_date' => 'date',
-        'termination_date' => 'date'
+        'termination_date' => 'date',
+        'release_date' => 'date',
+        'absent_date' => 'date'
     ];
 
     protected static function booted()
@@ -1315,7 +1319,7 @@ class Employee extends Model
      * @return Employee
      * @throws AppException
      */
-    public function updateBaseInfo(string $name, string $name_ar, string $email, string $phone, string $address, string $nationality, string $gender, $birth_date, $employment_date, string $id_number, ?string $mother_name = null, ?Carbon $termination_date = null)
+    public function updateBaseInfo(string $name, string $name_ar, string $email, string $phone, string $address, string $nationality, string $gender, $birth_date, $employment_date, string $id_number, ?string $mother_name = null, ?Carbon $termination_date = null, ?Carbon $release_date = null, ?Carbon $absent_date = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -1337,6 +1341,8 @@ class Employee extends Model
                 'employment_date' => $employment_date,
                 'mother_name' => $mother_name,
                 'termination_date' => $termination_date,
+                'release_date' => $release_date,
+                'absent_date' => $absent_date,
             ]);
             AppLog::info('Employee Base Info Updated', 'Employee base info updated for employee: ' . $this->name, loggable: $this);
             return $this->fresh();

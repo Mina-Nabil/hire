@@ -251,7 +251,7 @@ class Employee extends Model
      */
     public function applyVacationPackage(VacationPackage $vacationPackage, $vacation_benefits, bool $delete_old_conf = true)
     {
-        foreach ($vacation_benefits as $applied_vacation_benefit) {
+        foreach ($vacation_benefits as &$applied_vacation_benefit) {
             $vacation_benefit = VacationDetail::find($applied_vacation_benefit['vacation_detail_id']);
             if (!($applied_vacation_benefit['inc_rate'] >= $vacation_benefit->inc_rate_min
                 && $applied_vacation_benefit['inc_rate'] <= $vacation_benefit->inc_rate_max)) {
@@ -266,6 +266,10 @@ class Employee extends Model
                 throw new AppException('Hour price is not in the range of the ' . $vacation_benefit->name);
             }
             $applied_vacation_benefit['type'] = $vacation_benefit->type;
+            // Set automatic_add_to_balance to false if not explicitly provided
+            if (!isset($applied_vacation_benefit['automatic_add_to_balance'])) {
+                $applied_vacation_benefit['automatic_add_to_balance'] = false;
+            }
         }
 
         try {
@@ -463,7 +467,8 @@ class Employee extends Model
         float $max_balance,
         string $type,
         Carbon $start_date,
-        ?int $apply_deadline = null
+        ?int $apply_deadline = null,
+        bool $automatic_add_to_balance = false
     ) {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -481,6 +486,7 @@ class Employee extends Model
                 'type' => $type,
                 'start_date' => $start_date,
                 'apply_deadline' => $apply_deadline,
+                'automatic_add_to_balance' => $automatic_add_to_balance,
             ]);
             AppLog::info('Custom Vacation Benefit Added', 'Custom vacation benefit added for employee: ' . $this->name, loggable: $this);
         } catch (Exception $e) {

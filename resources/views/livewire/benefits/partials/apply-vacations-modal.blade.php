@@ -97,6 +97,15 @@
                                         <div class="col-span-3">
                                             <div class="flex justify-between items-center mb-2">
                                                 <p class="font-bold">{{ $benefit['name'] }}</p>
+                                                <div class="flex items-center">
+                                                    <label class="flex items-center text-sm">
+                                                        <input type="checkbox" 
+                                                               wire:change="toggleAutomaticAddToBalance({{ $index }})"
+                                                               @if($benefit['automatic_add_to_balance']) checked @endif
+                                                               class="form-checkbox text-blue-600">
+                                                        <span class="ml-2 text-gray-600">Auto-add balance for extra attendance</span>
+                                                    </label>
+                                                </div>
                                             </div>
                                             <div class="grid grid-cols-3 gap-4">
                                                 @if (!$benefit['is_disabled'])
@@ -151,6 +160,17 @@
                                     </div>
                                 </div>
                             @endforeach
+                            
+                            @if ($selectedPackage && count($vacationBenefits) > 0)
+                                <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                                        <p class="text-sm text-blue-700">
+                                            <strong>Auto-add for extra attendance:</strong> Only one vacation benefit can be set to automatically add days for extra attendance. When enabled, this benefit will receive additional days when the employee has extra attendance days beyond their required working days.
+                                        </p>
+                                    </div>
+                                </div>
+                            @endif
                         @endif
                     </div>
                 </div>

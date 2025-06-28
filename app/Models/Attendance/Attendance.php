@@ -3,7 +3,10 @@
 namespace App\Models\Attendance;
 
 use App\Exceptions\AppException;
+use App\Models\Attendance\PublicHoliday;
 use App\Models\Benefits\Configurations\BenefitConfiguration;
+use App\Models\Benefits\Vacations\VacationBenefit;
+use App\Models\Benefits\Vacations\GainedVacation;
 use App\Models\Personel\Employee;
 use App\Models\Users\AppLog;
 use App\Models\Users\User;
@@ -219,10 +222,13 @@ class Attendance extends Model
     {
         try {
             DB::transaction(function () use ($attendance) {
-                foreach ($attendance as $attendance) {
-                    if (!isset($attendance['error']) || !$attendance['error']) {
-                        $attendanceRecord = Attendance::create($attendance);
+                foreach ($attendance as $attendanceData) {
+                    if (!isset($attendanceData['error']) || !$attendanceData['error']) {
+                        $attendanceRecord = Attendance::create($attendanceData);
                         $attendanceRecord->generateOvertime();
+
+                        // Check if employee worked on a day they shouldn't have and add vacation balance
+                        $attendanceRecord->checkExtraAttendanceAndAddVacationBalance();
                     }
                 }
             });
@@ -420,6 +426,126 @@ class Attendance extends Model
             report($e);
             AppLog::error('Failed to reject attendance', $e->getMessage());
             throw new AppException('Failed to reject attendance: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Check if employee worked on a day they shouldn't have and add vacation balance if applicable
+     * 
+     * @return void
+     * @throws AppException
+     */
+    public function checkExtraAttendanceAndAddVacationBalance()
+    {
+        $attendanceDate = Carbon::parse($this->date);
+
+        // Find the vacation benefit with automatic_add_to_balance = true
+        $vacationBenefit = VacationBenefit::where('employee_id', $this->employee_id)
+            ->where('automatic_add_to_balance', true)
+            ->whereNull('end_date') // Only active benefits
+            ->orWhere('end_date', '>=', $attendanceDate)
+            ->first();
+
+        if (!$vacationBenefit) {
+            // No vacation benefit with automatic_add_to_balance enabled
+            return;
+        }
+
+
+        // Check if employee should work on this date
+        if ($this->shouldEmployeeWorkOnDate($this->employee, $attendanceDate)) {
+            // Employee should work on this day, no extra balance needed
+            return;
+        }
+
+        // Employee shouldn't work on this day but did - add vacation balance
+        $this->addVacationBalanceForExtraAttendance($attendanceDate);
+    }
+
+    /**
+     * Check if employee should work on the given date based on their working days configuration and public holidays
+     * (Copied from ProcessDailyAttendanceJob)
+     */
+    private function shouldEmployeeWorkOnDate(Employee $employee, Carbon $date): bool
+    {
+        // First check if it's a public holiday - no one works on public holidays
+        $isPublicHoliday = PublicHoliday::where('date', $date->format('Y-m-d'))->exists();
+        if ($isPublicHoliday) {
+            return false;
+        }
+
+        // Get the day of week (e.g., 'sunday', 'monday', etc.)
+        $dayOfWeek = strtolower($date->format('l'));
+
+        // Check if employee has working days configured
+        if (!$employee->workingDays || $employee->workingDays->isEmpty()) {
+            // If no working days configured, assume they work Monday to Friday
+            return !in_array($dayOfWeek, ['friday', 'saturday']);
+        }
+
+        // Check if this day is in their working days
+        return $employee->workingDays->contains('type', $dayOfWeek);
+    }
+
+    /**
+     * Add vacation balance to the employee's vacation benefit that has automatic_add_to_balance enabled
+     * 
+     * @param Carbon $attendanceDate
+     * @return void
+     * @throws AppException
+     */
+    private function addVacationBalanceForExtraAttendance(Carbon $attendanceDate)
+    {
+        // Find the vacation benefit with automatic_add_to_balance = true
+        $vacationBenefit = VacationBenefit::where('employee_id', $this->employee_id)
+            ->where('automatic_add_to_balance', true)
+            ->whereNull('end_date') // Only active benefits
+            ->orWhere('end_date', '>=', $attendanceDate)
+            ->first();
+
+        if (!$vacationBenefit) {
+            // No vacation benefit with automatic_add_to_balance enabled
+            return;
+        }
+
+        try {
+            // Calculate hours to add based on employee's daily working hours
+            $benefitConfig = $this->employee->benefitConfiguration;
+            $hoursToAdd = $benefitConfig ? $benefitConfig->daily_working_hours : 8; // Default to 8 hours
+
+            // Check if adding these hours would exceed max balance
+            $newBalance = $vacationBenefit->current_balance + $hoursToAdd;
+            if ($newBalance > $vacationBenefit->max_balance) {
+                $hoursToAdd = $vacationBenefit->max_balance - $vacationBenefit->current_balance;
+                if ($hoursToAdd <= 0) {
+                    // Already at max balance, no need to add
+                    return;
+                }
+                $newBalance = $vacationBenefit->max_balance;
+            }
+
+            // Update vacation benefit balance
+            $vacationBenefit->update([
+                'current_balance' => $newBalance
+            ]);
+
+            // Create a gained vacation record for tracking
+            GainedVacation::create([
+                'employee_id' => $this->employee_id,
+                'vacation_benefit_id' => $vacationBenefit->id,
+                'days' => $hoursToAdd / 8, // Convert hours to days for display purposes
+                'new_balance' => $newBalance,
+            ]);
+
+            AppLog::info(
+                'Added vacation balance for extra attendance',
+                "Employee: {$this->employee->name}, Date: {$attendanceDate->format('Y-m-d')}, Hours Added: {$hoursToAdd}, New Balance: {$newBalance}",
+                loggable: $this
+            );
+        } catch (Exception $e) {
+            report($e);
+            AppLog::error('Failed to add vacation balance for extra attendance', $e->getMessage(), loggable: $this);
+            throw new AppException('Failed to add vacation balance for extra attendance: ' . $e->getMessage());
         }
     }
 }

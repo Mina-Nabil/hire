@@ -30,6 +30,7 @@ class VacationBenefit extends Model
         'start_date',
         'end_date',
         'apply_deadline',
+        'automatic_add_to_balance',
     ];
 
     protected $casts = [
@@ -72,7 +73,7 @@ class VacationBenefit extends Model
     }
 
     ///model functions
-    public function updateBenefit(string $name, string $type, float $inc_rate, float $hour_price, float $max_balance)
+    public function updateBenefit(string $name, string $type, float $inc_rate, float $hour_price, float $max_balance, bool $automatic_add_to_balance = false)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -124,7 +125,8 @@ class VacationBenefit extends Model
                 'type' => $type,
                 'inc_rate' => $inc_rate,
                 'hour_price' => $hour_price,
-                'max_balance' => $max_balance
+                'max_balance' => $max_balance,
+                'automatic_add_to_balance' => $automatic_add_to_balance,
             ]);
             AppLog::info('Vacation Benefit Updated', "$name updated for $this->employee->name", loggable: $this);
         } catch (Exception $e) {

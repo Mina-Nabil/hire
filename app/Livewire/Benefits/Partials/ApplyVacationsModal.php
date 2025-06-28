@@ -63,6 +63,7 @@ class ApplyVacationsModal extends Component
                 'max_balance_max' => $tmpVacationDetail->max_balance_max,
                 'hour_price_min' => $tmpVacationDetail->hour_price_min,
                 'hour_price_max' => $tmpVacationDetail->hour_price_max,
+                'automatic_add_to_balance' => $benefit->automatic_add_to_balance ?? false,
                 'is_disabled' => true,
             ];
         })->toArray();
@@ -117,6 +118,7 @@ class ApplyVacationsModal extends Component
                 'hour_price' => $detail->hour_price_min,
                 'hour_price_min' => $detail->hour_price_min,
                 'hour_price_max' => $detail->hour_price_max,
+                'automatic_add_to_balance' => false,
                 'is_disabled' => false,
                 'type' => $detail->type
             ];
@@ -168,6 +170,22 @@ class ApplyVacationsModal extends Component
         }
     }
 
+    public function toggleAutomaticAddToBalance($index)
+    {
+        // If this benefit is being checked, uncheck all others
+        if (!$this->vacationBenefits[$index]['automatic_add_to_balance']) {
+            // First, set all to false
+            foreach ($this->vacationBenefits as $key => $benefit) {
+                $this->vacationBenefits[$key]['automatic_add_to_balance'] = false;
+            }
+            // Then set only this one to true
+            $this->vacationBenefits[$index]['automatic_add_to_balance'] = true;
+        } else {
+            // If unchecking, just set to false
+            $this->vacationBenefits[$index]['automatic_add_to_balance'] = false;
+        }
+    }
+
     public function applyVacationPackage()
     {
         $this->validate([
@@ -176,6 +194,7 @@ class ApplyVacationsModal extends Component
             'vacationBenefits.*.max_balance' => 'required|numeric',
             'vacationBenefits.*.hour_price' => 'required|numeric',
             'vacationBenefits.*.current_balance' => 'required|numeric',
+            'vacationBenefits.*.automatic_add_to_balance' => 'boolean',
             'packageStartDate' => 'required|date',
             'packageEndDate' => 'nullable|date|after:packageStartDate',
         ], [
@@ -186,6 +205,13 @@ class ApplyVacationsModal extends Component
             'packageStartDate' => 'Start Date#:position is required',
             'packageEndDate' => 'End Date#:position is required',
         ]);
+
+        // Custom validation: only one vacation benefit can have automatic_add_to_balance = true
+        $automaticAddCount = collect($this->vacationBenefits)->where('automatic_add_to_balance', true)->count();
+        if ($automaticAddCount > 1) {
+            $this->addError('vacationBenefits', 'Only one vacation benefit can be set to automatically add balance for extra attendance.');
+            return;
+        }
         try {
 
             foreach ($this->vacationBenefits as &$benefit) {

@@ -931,11 +931,6 @@ class EmployeeShow extends Component
         $this->resetValidation();
         $s6Doc = $this->employee->employeeS6Doc()->first();
 
-        if ($s6Doc->employee_id != $this->employee->id) {
-            $this->alertError('Invalid record');
-            return;
-        }
-
         if ($s6Doc) {
             $this->s6_number = $s6Doc->s6_number;
             $this->leaving_reason = $s6Doc->leaving_reason;
@@ -2631,16 +2626,16 @@ class EmployeeShow extends Component
      */
     public function updateOtherDocument()
     {
-        $this->validate([
-            'other_document_name' => 'required|string|max:255',
-            'other_document_issue_date' => 'required|date',
-            'other_document_file' => $this->keep_existing_other_document ? 'nullable' : 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
-        ]);
-        // dd($this->keep_existing_other_document);
+
         try {
             $path = null;
 
             if ($this->editing_other_document_id) {
+                $this->validate([
+                    'other_document_name' => 'required|string|max:255',
+                    'other_document_issue_date' => 'required|date',
+                    'other_document_file' => $this->keep_existing_other_document ? 'nullable' : 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
+                ]);
                 $otherDocument = \App\Models\Personel\Docs\OtherDocument::findOrFail($this->editing_other_document_id);
 
                 if (!$this->keep_existing_other_document) {
@@ -2667,14 +2662,24 @@ class EmployeeShow extends Component
 
                 $this->alertSuccess('Other document updated successfully!');
             } else {
-                $path = $this->other_document_file->store(Employee::FILES_DIRECTORY . '/other_documents', 's3');
 
-                //create new record
-                $this->employee->setOtherDocument(
-                    $this->other_document_name,
-                    $path,
-                    Carbon::parse($this->other_document_issue_date)
-                );
+                $this->validate([
+                    'other_document_name' => 'required|string|max:255',
+                    'other_document_issue_date' => 'required|date',
+                    'other_document_file.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
+                ]);
+                $i = 1;
+                foreach ($this->other_document_file as $file) {
+                    if (!$file) continue;
+                    $path = $file->store(Employee::FILES_DIRECTORY . '/other_documents', 's3');
+                    //create new record
+                    $this->employee->setOtherDocument(
+                        $this->other_document_name . ' ' . $i,
+                        $path,
+                        Carbon::parse($this->other_document_issue_date)
+                    );
+                    $i++;
+                }
 
                 $this->alertSuccess('Other document created successfully!');
             }

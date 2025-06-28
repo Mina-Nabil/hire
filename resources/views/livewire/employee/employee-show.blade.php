@@ -3078,9 +3078,6 @@
         </div>
     </div>
 
-    <!-- Driver License Section -->
-
-
     <!-- Driver License Edit Modal -->
     @if ($editDriverLicenseModal)
         <div>
@@ -3151,7 +3148,21 @@
                                                     </div>
                                                     @if (!$keep_existing_driver_license)
                                                         <label for="driver_license_file_input"
-                                                            class="cursor-pointer block">
+                                                            class="cursor-pointer block" x-data="{
+                                                                dropping: false,
+                                                            }"
+                                                            x-on:dragover.prevent="dropping = true"
+                                                            x-on:dragleave.prevent="dropping = false"
+                                                            x-on:drop="dropping = false"
+                                                            x-on:drop.prevent="
+                                                                if ($event.dataTransfer.files.length !== 1) {
+                                                                    return
+                                                                }
+
+                                                                const files = $event.dataTransfer.files
+
+                                                                @this.upload('driver_license_file', files[0])
+                                                                ">
                                                             <iconify-icon icon="mingcute:upload-line" width="32"
                                                                 height="32"
                                                                 class="text-slate-400 mx-auto"></iconify-icon>
@@ -3666,14 +3677,13 @@
                                                             x-on:dragleave.prevent="dropping = false"
                                                             x-on:drop="dropping = false"
                                                             x-on:drop.prevent="
-                                                                        if ($event.dataTransfer.files.length !== 1) {
-                                                                            return
-                                                                        }
-    
-                                                                        const files = $event.dataTransfer.files
-    
-                                                                        @this.upload('id_card_file', files[0])
-                                                                    ">
+                                                            if ($event.dataTransfer.files.length !== 1) {
+                                                                return
+                                                            }
+                                                            const files = $event.dataTransfer.files
+
+                                                            @this.upload('id_card_file', files[0])
+                                                        ">
                                                             <iconify-icon icon="mingcute:upload-line" width="32"
                                                                 height="32"
                                                                 class="text-slate-400 mx-auto"></iconify-icon>
@@ -3688,7 +3698,22 @@
                                                         </label>
                                                     @endif
                                                 @else
-                                                    <label for="id_card_file_input" class="cursor-pointer block">
+                                                    <label for="id_card_file_input" class="cursor-pointer block"
+                                                        x-data="{
+                                                            dropping: false,
+                                                        }"
+                                                        x-on:dragover.prevent="dropping = true"
+                                                        x-on:dragleave.prevent="dropping = false"
+                                                        x-on:drop="dropping = false"
+                                                        x-on:drop.prevent="
+                                                                if ($event.dataTransfer.files.length !== 1) {
+                                                                    return
+                                                                }
+
+                                                                const files = $event.dataTransfer.files
+
+                                                                @this.upload('id_card_file', files[0])
+                                                            ">
                                                         <iconify-icon icon="mingcute:upload-line" width="32"
                                                             height="32"
                                                             class="text-slate-400 mx-auto"></iconify-icon>
@@ -3852,7 +3877,20 @@
                                                         </div>
                                                         @if (!$keep_existing_birth_certificate)
                                                             <label for="birth_certificate_file_input"
-                                                                class="cursor-pointer block">
+                                                                class="cursor-pointer block" x-data="{
+                                                                    dropping: false,
+                                                                }"
+                                                                x-on:dragover.prevent="dropping = true"
+                                                                x-on:dragleave.prevent="dropping = false"
+                                                                x-on:drop="dropping = false"
+                                                                x-on:drop.prevent="
+                                                                    if ($event.dataTransfer.files.length !== 1) {
+                                                                        return
+                                                                    }
+                                                                        const files = $event.dataTransfer.files
+
+                                                                    @this.upload('birth_certificate_file', files[0])
+                                                                ">
                                                                 <iconify-icon icon="mingcute:upload-line"
                                                                     width="32" height="32"
                                                                     class="text-slate-400 mx-auto"></iconify-icon>
@@ -4048,7 +4086,21 @@
                                                         </div>
                                                         @if (!$keep_existing_army_service_paper)
                                                             <label for="army_service_paper_file_input"
-                                                                class="cursor-pointer block">
+                                                                class="cursor-pointer block" x-data="{
+                                                                    dropping: false,
+                                                                }"
+                                                                x-on:dragover.prevent="dropping = true"
+                                                                x-on:dragleave.prevent="dropping = false"
+                                                                x-on:drop="dropping = false"
+                                                                x-on:drop.prevent="
+                                                                            if ($event.dataTransfer.files.length !== 1) {
+                                                                                return
+                                                                            }
+        
+                                                                            const files = $event.dataTransfer.files
+        
+                                                                            @this.upload('army_service_paper_file', files[0])
+                                                                        ">
                                                                 <iconify-icon icon="mingcute:upload-line"
                                                                     width="32" height="32"
                                                                     class="text-slate-400 mx-auto"></iconify-icon>
@@ -4250,7 +4302,20 @@
                                                     </div>
                                                     @if (!$keep_existing_employee_s1_doc)
                                                         <label for="employee_s1_doc_file_input"
-                                                            class="cursor-pointer block">
+                                                            class="cursor-pointer block" x-data="{
+                                                                dropping: false,
+                                                            }"
+                                                            x-on:dragover.prevent="dropping = true"
+                                                            x-on:dragleave.prevent="dropping = false"
+                                                            x-on:drop="dropping = false"
+                                                            x-on:drop.prevent="
+                                                                if ($event.dataTransfer.files.length !== 1) {
+                                                                    return
+                                                                }
+                                                                        const files = $event.dataTransfer.files
+
+                                                                    @this.upload('employee_s1_doc_file', files[0])
+                                                            ">
                                                             <iconify-icon icon="mingcute:upload-line" width="32"
                                                                 height="32"
                                                                 class="text-slate-400 mx-auto"></iconify-icon>
@@ -4266,7 +4331,20 @@
                                                     @endif
                                                 @else
                                                     <label for="employee_s1_doc_file_input"
-                                                        class="cursor-pointer block">
+                                                        class="cursor-pointer block" x-data="{
+                                                            dropping: false,
+                                                        }"
+                                                        x-on:dragover.prevent="dropping = true"
+                                                        x-on:dragleave.prevent="dropping = false"
+                                                        x-on:drop="dropping = false"
+                                                        x-on:drop.prevent="
+                                                            if ($event.dataTransfer.files.length !== 1) {
+                                                                return
+                                                            }
+                                                                        const files = $event.dataTransfer.files
+
+                                                                    @this.upload('employee_s1_doc_file', files[0])
+                                                        ">
                                                         <iconify-icon icon="mingcute:upload-line" width="32"
                                                             height="32"
                                                             class="text-slate-400 mx-auto"></iconify-icon>
@@ -4431,8 +4509,21 @@
                                                     Remove File
                                                 </button>
                                             @else
-                                                <label for="employee_s2_doc_file_input"
-                                                    class="cursor-pointer block">
+                                                <label for="employee_s2_doc_file_input" class="cursor-pointer block"
+                                                    x-data="{
+                                                        dropping: false,
+                                                    }" x-on:dragover.prevent="dropping = true"
+                                                    x-on:dragleave.prevent="dropping = false"
+                                                    x-on:drop="dropping = false"
+                                                    x-on:drop.prevent="
+                                                                if ($event.dataTransfer.files.length !== 1) {
+                                                                    return
+                                                                }
+
+                                                                const files = $event.dataTransfer.files
+
+                                                                @this.upload('employee_s2_doc_file', files[0])
+                                                            ">
                                                     <iconify-icon icon="mingcute:upload-line" width="32"
                                                         height="32"
                                                         class="text-slate-400 mx-auto"></iconify-icon>
@@ -4518,7 +4609,6 @@
 
     <!-- Employee S6 Doc Edit Modal -->
     @if ($editEmployeeS6DocModal)
-
         <div id="editEmployeeS6DocModal"
             class="modal fade fixed top-0 left-0 show w-full h-full outline-none overflow-x-hidden overflow-y-auto"
             tabindex="-1" aria-labelledby="editEmployeeS6DocModalLabel" aria-hidden="true" wire:ignore.self>
@@ -4585,7 +4675,21 @@
                                                     </div>
                                                     @if (!$keep_existing_employee_s6_doc)
                                                         <label for="employee_s6_doc_file_input"
-                                                            class="cursor-pointer block">
+                                                            class="cursor-pointer block" x-data="{
+                                                                dropping: false,
+                                                            }"
+                                                            x-on:dragover.prevent="dropping = true"
+                                                            x-on:dragleave.prevent="dropping = false"
+                                                            x-on:drop="dropping = false"
+                                                            x-on:drop.prevent="
+                                                                    if ($event.dataTransfer.files.length !== 1) {
+                                                                        return
+                                                                    }
+    
+                                                                    const files = $event.dataTransfer.files
+    
+                                                                    @this.upload('employee_s6_doc_file', files[0])
+                                                                    ">
                                                             <iconify-icon icon="mingcute:upload-line" width="32"
                                                                 height="32"
                                                                 class="text-slate-400 mx-auto"></iconify-icon>
@@ -4601,7 +4705,21 @@
                                                     @endif
                                                 @else
                                                     <label for="employee_s6_doc_file_input"
-                                                        class="cursor-pointer block">
+                                                        class="cursor-pointer block" x-data="{
+                                                            dropping: false,
+                                                        }"
+                                                        x-on:dragover.prevent="dropping = true"
+                                                        x-on:dragleave.prevent="dropping = false"
+                                                        x-on:drop="dropping = false"
+                                                        x-on:drop.prevent="
+                                                                    if ($event.dataTransfer.files.length !== 1) {
+                                                                        return
+                                                                    }
+    
+                                                                    const files = $event.dataTransfer.files
+    
+                                                                    @this.upload('employee_s6_doc_file', files[0])
+                                                                    ">
                                                         <iconify-icon icon="mingcute:upload-line" width="32"
                                                             height="32"
                                                             class="text-slate-400 mx-auto"></iconify-icon>
@@ -4705,12 +4823,10 @@
                 </div>
             </div>
         </div>
-
     @endif
 
     <!-- Police Record Edit Modal -->
     @if ($editPoliceRecordModal)
-
         <div id="editPoliceRecordModal"
             class="modal fade fixed top-0 left-0 show w-full h-full outline-none overflow-x-hidden overflow-y-auto"
             tabindex="-1" aria-labelledby="editPoliceRecordModalLabel" aria-hidden="true" wire:ignore.self>
@@ -4778,7 +4894,21 @@
                                                     </div>
                                                     @if (!$keep_existing_police_record)
                                                         <label for="police_record_file_input"
-                                                            class="cursor-pointer block">
+                                                            class="cursor-pointer block" x-data="{
+                                                                dropping: false,
+                                                            }"
+                                                            x-on:dragover.prevent="dropping = true"
+                                                            x-on:dragleave.prevent="dropping = false"
+                                                            x-on:drop="dropping = false"
+                                                            x-on:drop.prevent="
+                                                                    if ($event.dataTransfer.files.length !== 1) {
+                                                                        return
+                                                                    }
+    
+                                                                    const files = $event.dataTransfer.files
+    
+                                                                    @this.upload('police_record_file', files[0])
+                                                                    ">
                                                             <iconify-icon icon="mingcute:upload-line" width="32"
                                                                 height="32"
                                                                 class="text-slate-400 mx-auto"></iconify-icon>
@@ -4794,7 +4924,21 @@
                                                     @endif
                                                 @else
                                                     <label for="police_record_file_input"
-                                                        class="cursor-pointer block">
+                                                        class="cursor-pointer block" x-data="{
+                                                            dropping: false,
+                                                        }"
+                                                        x-on:dragover.prevent="dropping = true"
+                                                        x-on:dragleave.prevent="dropping = false"
+                                                        x-on:drop="dropping = false"
+                                                        x-on:drop.prevent="
+                                                                    if ($event.dataTransfer.files.length !== 1) {
+                                                                        return
+                                                                    }
+    
+                                                                    const files = $event.dataTransfer.files
+    
+                                                                    @this.upload('police_record_file', files[0])
+                                                                    ">
                                                         <iconify-icon icon="mingcute:upload-line" width="32"
                                                             height="32"
                                                             class="text-slate-400 mx-auto"></iconify-icon>
@@ -4951,7 +5095,22 @@
                                                         </div>
                                                         @if (!$keep_existing_hr_letter)
                                                             <label for="hr_letter_file_input"
-                                                                class="cursor-pointer block">
+                                                                class="cursor-pointer block"
+                                                                x-data="{
+                                                                    dropping: false,
+                                                                }"
+                                                                x-on:dragover.prevent="dropping = true"
+                                                                x-on:dragleave.prevent="dropping = false"
+                                                                x-on:drop="dropping = false"
+                                                                x-on:drop.prevent="
+                                                                    if ($event.dataTransfer.files.length !== 1) {
+                                                                        return
+                                                                    }
+    
+                                                                    const files = $event.dataTransfer.files
+    
+                                                                    @this.upload('hr_letter_file', files[0])
+                                                                    ">
                                                                 <iconify-icon icon="mingcute:upload-line"
                                                                     width="32" height="32"
                                                                     class="text-slate-400 mx-auto"></iconify-icon>
@@ -4967,7 +5126,21 @@
                                                         @endif
                                                     @else
                                                         <label for="hr_letter_file_input"
-                                                            class="cursor-pointer block">
+                                                            class="cursor-pointer block" x-data="{
+                                                                dropping: false,
+                                                            }"
+                                                            x-on:dragover.prevent="dropping = true"
+                                                            x-on:dragleave.prevent="dropping = false"
+                                                            x-on:drop="dropping = false"
+                                                            x-on:drop.prevent="
+                                                                    if ($event.dataTransfer.files.length !== 1) {
+                                                                        return
+                                                                    }
+    
+                                                                    const files = $event.dataTransfer.files
+    
+                                                                    @this.upload('hr_letter_file', files[0])
+                                                                    ">
                                                             <iconify-icon icon="mingcute:upload-line" width="32"
                                                                 height="32"
                                                                 class="text-slate-400 mx-auto"></iconify-icon>
@@ -5126,7 +5299,22 @@
                                                         </div>
                                                         @if (!$keep_existing_employee_contract)
                                                             <label for="employee_contract_file_input"
-                                                                class="cursor-pointer block">
+                                                                class="cursor-pointer block"
+                                                                x-data="{
+                                                                    dropping: false,
+                                                                }"
+                                                                x-on:dragover.prevent="dropping = true"
+                                                                x-on:dragleave.prevent="dropping = false"
+                                                                x-on:drop="dropping = false"
+                                                                x-on:drop.prevent="
+                                                                    if ($event.dataTransfer.files.length !== 1) {
+                                                                        return
+                                                                    }
+    
+                                                                    const files = $event.dataTransfer.files
+    
+                                                                    @this.upload('employee_contract_file', files[0])
+                                                                    ">
                                                                 <iconify-icon icon="mingcute:upload-line"
                                                                     width="32" height="32"
                                                                     class="text-slate-400 mx-auto"></iconify-icon>
@@ -5143,7 +5331,21 @@
                                                         @endif
                                                     @else
                                                         <label for="employee_contract_file_input"
-                                                            class="cursor-pointer block">
+                                                            class="cursor-pointer block" x-data="{
+                                                                dropping: false,
+                                                            }"
+                                                            x-on:dragover.prevent="dropping = true"
+                                                            x-on:dragleave.prevent="dropping = false"
+                                                            x-on:drop="dropping = false"
+                                                            x-on:drop.prevent="
+                                                                    if ($event.dataTransfer.files.length !== 1) {
+                                                                        return
+                                                                    }
+    
+                                                                    const files = $event.dataTransfer.files
+    
+                                                                    @this.upload('employee_contract_file', files[0])
+                                                                    ">
                                                             <iconify-icon icon="mingcute:upload-line" width="32"
                                                                 height="32"
                                                                 class="text-slate-400 mx-auto"></iconify-icon>
@@ -5316,7 +5518,22 @@
                                                         </div>
                                                         @if (!$keep_existing_medical_record)
                                                             <label for="medical_record_file_input"
-                                                                class="cursor-pointer block">
+                                                                class="cursor-pointer block"
+                                                                x-data="{
+                                                                    dropping: false,
+                                                                }"
+                                                                x-on:dragover.prevent="dropping = true"
+                                                                x-on:dragleave.prevent="dropping = false"
+                                                                x-on:drop="dropping = false"
+                                                                x-on:drop.prevent="
+                                                                    if ($event.dataTransfer.files.length !== 1) {
+                                                                        return
+                                                                    }
+    
+                                                                    const files = $event.dataTransfer.files
+    
+                                                                    @this.upload('medical_record_file', files[0])
+                                                                    ">
                                                                 <iconify-icon icon="mingcute:upload-line"
                                                                     width="32" height="32"
                                                                     class="text-slate-400 mx-auto"></iconify-icon>
@@ -5332,7 +5549,21 @@
                                                         @endif
                                                     @else
                                                         <label for="medical_record_file_input"
-                                                            class="cursor-pointer block">
+                                                            class="cursor-pointer block" x-data="{
+                                                                dropping: false,
+                                                            }"
+                                                            x-on:dragover.prevent="dropping = true"
+                                                            x-on:dragleave.prevent="dropping = false"
+                                                            x-on:drop="dropping = false"
+                                                            x-on:drop.prevent="
+                                                                    if ($event.dataTransfer.files.length !== 1) {
+                                                                        return
+                                                                    }
+    
+                                                                    const files = $event.dataTransfer.files
+    
+                                                                    @this.upload('medical_record_file', files[0])
+                                                                    ">
                                                             <iconify-icon icon="mingcute:upload-line" width="32"
                                                                 height="32"
                                                                 class="text-slate-400 mx-auto"></iconify-icon>
@@ -5567,7 +5798,22 @@
                                                         </div>
                                                         @if (!$keep_existing_external_medical_record)
                                                             <label for="external_medical_record_file_input"
-                                                                class="cursor-pointer block">
+                                                                class="cursor-pointer block"
+                                                                x-data="{
+                                                                    dropping: false,
+                                                                }"
+                                                                x-on:dragover.prevent="dropping = true"
+                                                                x-on:dragleave.prevent="dropping = false"
+                                                                x-on:drop="dropping = false"
+                                                                x-on:drop.prevent="
+                                                                    if ($event.dataTransfer.files.length !== 1) {
+                                                                        return
+                                                                    }
+    
+                                                                    const files = $event.dataTransfer.files
+    
+                                                                    @this.upload('external_medical_record_file', files[0])
+                                                                    ">
                                                                 <iconify-icon icon="mingcute:upload-line"
                                                                     width="32" height="32"
                                                                     class="text-slate-400 mx-auto"></iconify-icon>
@@ -5584,7 +5830,21 @@
                                                         @endif
                                                     @else
                                                         <label for="external_medical_record_file_input"
-                                                            class="cursor-pointer block">
+                                                            class="cursor-pointer block" x-data="{
+                                                                dropping: false,
+                                                            }"
+                                                            x-on:dragover.prevent="dropping = true"
+                                                            x-on:dragleave.prevent="dropping = false"
+                                                            x-on:drop="dropping = false"
+                                                            x-on:drop.prevent="
+                                                                    if ($event.dataTransfer.files.length !== 1) {
+                                                                        return
+                                                                    }
+    
+                                                                    const files = $event.dataTransfer.files
+    
+                                                                    @this.upload('external_medical_record_file', files[0])
+                                                                    ">
                                                             <iconify-icon icon="mingcute:upload-line" width="32"
                                                                 height="32"
                                                                 class="text-slate-400 mx-auto"></iconify-icon>
@@ -5774,7 +6034,22 @@
                                                         @endif
                                                         <div class="flex items-center justify-center">
                                                             <label
-                                                                class="cursor-pointer flex flex-col items-center justify-center w-full h-40 rounded-lg  text-slate-500 hover:border-primary-500 transition-colors duration-150">
+                                                                class="cursor-pointer flex flex-col items-center justify-center w-full h-40 rounded-lg  text-slate-500 hover:border-primary-500 transition-colors duration-150"
+                                                                x-data="{
+                                                                    dropping: false,
+                                                                }"
+                                                                x-on:dragover.prevent="dropping = true"
+                                                                x-on:dragleave.prevent="dropping = false"
+                                                                x-on:drop="dropping = false"
+                                                                x-on:drop.prevent="
+                                                                    if ($event.dataTransfer.files.length !== 1) {
+                                                                        return
+                                                                    }
+    
+                                                                    const files = $event.dataTransfer.files
+    
+                                                                    @this.upload('practice_card_file', files[0])
+                                                                    ">
                                                                 <div
                                                                     class="flex flex-col items-center justify-center">
                                                                     <iconify-icon
@@ -5787,7 +6062,7 @@
                                                                 </div>
                                                                 <input id="practice_card_file" type="file"
                                                                     class="hidden" accept="image/*,.pdf"
-                                                                    wire:model.live="practice_card_file" />
+                                                                    wire:model.live="practice_card_file">
                                                             </label>
                                                         </div>
                                                     @endif
@@ -5941,7 +6216,22 @@
                                                         @endif
                                                         <div class="flex items-center justify-center">
                                                             <label
-                                                                class="cursor-pointer flex flex-col items-center justify-center w-full h-40 rounded-lg text-slate-500 hover:border-primary-500 transition-colors duration-150">
+                                                                class="cursor-pointer flex flex-col items-center justify-center w-full h-40 rounded-lg text-slate-500 hover:border-primary-500 transition-colors duration-150"
+                                                                x-data="{
+                                                                    dropping: false,
+                                                                }"
+                                                                x-on:dragover.prevent="dropping = true"
+                                                                x-on:dragleave.prevent="dropping = false"
+                                                                x-on:drop="dropping = false"
+                                                                x-on:drop.prevent="
+                                                                    if ($event.dataTransfer.files.length !== 1) {
+                                                                        return
+                                                                    }
+    
+                                                                    const files = $event.dataTransfer.files
+    
+                                                                    @this.upload('skills_qualification_file', files[0])
+                                                                    ">
                                                                 <div
                                                                     class="flex flex-col items-center justify-center">
                                                                     <iconify-icon
@@ -5954,7 +6244,7 @@
                                                                 </div>
                                                                 <input id="skills_qualification_file" type="file"
                                                                     class="hidden" accept="image/*,.pdf"
-                                                                    wire:model.live="skills_qualification_file" />
+                                                                    wire:model.live="skills_qualification_file">
                                                             </label>
                                                         </div>
                                                     @endif
@@ -6106,7 +6396,22 @@
                                                         @endif
                                                         <div class="flex items-center justify-center">
                                                             <label
-                                                                class="cursor-pointer flex flex-col items-center justify-center w-full h-40 rounded-lg text-slate-500 hover:border-primary-500 transition-colors duration-150">
+                                                                class="cursor-pointer flex flex-col items-center justify-center w-full h-40 rounded-lg text-slate-500 hover:border-primary-500 transition-colors duration-150"
+                                                                x-data="{
+                                                                    dropping: false,
+                                                                }"
+                                                                x-on:dragover.prevent="dropping = true"
+                                                                x-on:dragleave.prevent="dropping = false"
+                                                                x-on:drop="dropping = false"
+                                                                x-on:drop.prevent="
+                                                                    if ($event.dataTransfer.files.length !== 1) {
+                                                                        return
+                                                                    }
+    
+                                                                    const files = $event.dataTransfer.files
+    
+                                                                    @this.upload('syndicate_card_file', files[0])
+                                                                    ">
                                                                 <div
                                                                     class="flex flex-col items-center justify-center">
                                                                     <iconify-icon
@@ -6119,7 +6424,7 @@
                                                                 </div>
                                                                 <input id="syndicate_card_file" type="file"
                                                                     class="hidden" accept="image/*,.pdf"
-                                                                    wire:model.live="syndicate_card_file" />
+                                                                    wire:model.live="syndicate_card_file">
                                                             </label>
                                                         </div>
                                                     @endif
@@ -6251,7 +6556,22 @@
                                                         </div>
                                                         @if (!$keep_existing_work_declaration)
                                                             <label for="work_declaration_file_input"
-                                                                class="cursor-pointer block">
+                                                                class="cursor-pointer block"
+                                                                x-data="{
+                                                                    dropping: false,
+                                                                }"
+                                                                x-on:dragover.prevent="dropping = true"
+                                                                x-on:dragleave.prevent="dropping = false"
+                                                                x-on:drop="dropping = false"
+                                                                x-on:drop.prevent="
+                                                                    if ($event.dataTransfer.files.length !== 1) {
+                                                                        return
+                                                                    }
+    
+                                                                    const files = $event.dataTransfer.files
+    
+                                                                    @this.upload('work_declaration_file', files[0])
+                                                                    ">
                                                                 <iconify-icon icon="mingcute:upload-line"
                                                                     width="32" height="32"
                                                                     class="text-slate-400 mx-auto"></iconify-icon>
@@ -6268,7 +6588,21 @@
                                                         @endif
                                                     @else
                                                         <label for="work_declaration_file_input"
-                                                            class="cursor-pointer block">
+                                                            class="cursor-pointer block" x-data="{
+                                                                dropping: false,
+                                                            }"
+                                                            x-on:dragover.prevent="dropping = true"
+                                                            x-on:dragleave.prevent="dropping = false"
+                                                            x-on:drop="dropping = false"
+                                                            x-on:drop.prevent="
+                                                            if ($event.dataTransfer.files.length !== 1) {
+                                                                return
+                                                            }
+
+                                                            const files = $event.dataTransfer.files
+
+                                                            @this.upload('work_declaration_file', files[0])
+                                                            ">
                                                             <iconify-icon icon="mingcute:upload-line" width="32"
                                                                 height="32"
                                                                 class="text-slate-400 mx-auto"></iconify-icon>
@@ -6447,7 +6781,22 @@
                                                         @endif
                                                         <div class="flex items-center justify-center">
                                                             <label
-                                                                class="cursor-pointer flex flex-col items-center justify-center w-full h-40 rounded-lg text-slate-500 hover:border-primary-500 transition-colors duration-150">
+                                                                class="cursor-pointer flex flex-col items-center justify-center w-full h-40 rounded-lg text-slate-500 hover:border-primary-500 transition-colors duration-150"
+                                                                x-data="{
+                                                                    dropping: false,
+                                                                }"
+                                                                x-on:dragover.prevent="dropping = true"
+                                                                x-on:dragleave.prevent="dropping = false"
+                                                                x-on:drop="dropping = false"
+                                                                x-on:drop.prevent="
+                                                                    if ($event.dataTransfer.files.length !== 1) {
+                                                                        return
+                                                                    }
+    
+                                                                    const files = $event.dataTransfer.files
+    
+                                                                    @this.upload('labour_document_file', files[0])
+                                                                    ">
                                                                 <div
                                                                     class="flex flex-col items-center justify-center">
                                                                     <iconify-icon
@@ -6460,7 +6809,7 @@
                                                                 </div>
                                                                 <input id="labour_document_file" type="file"
                                                                     class="hidden" accept="image/*,.pdf"
-                                                                    wire:model.live="labour_document_file" />
+                                                                    wire:model.live="labour_document_file">
                                                             </label>
                                                         </div>
                                                     @endif
@@ -6602,7 +6951,22 @@
                                                         @endif
                                                         <div class="flex items-center justify-center">
                                                             <label
-                                                                class="cursor-pointer flex flex-col items-center justify-center w-full h-40 rounded-lg text-slate-500 hover:border-primary-500 transition-colors duration-150">
+                                                                class="cursor-pointer flex flex-col items-center justify-center w-full h-40 rounded-lg text-slate-500 hover:border-primary-500 transition-colors duration-150"
+                                                                x-data="{
+                                                                    dropping: false,
+                                                                }"
+                                                                x-on:dragover.prevent="dropping = true"
+                                                                x-on:dragleave.prevent="dropping = false"
+                                                                x-on:drop="dropping = false"
+                                                                x-on:drop.prevent="
+                                                                    if ($event.dataTransfer.files.length !== 1) {
+                                                                        return
+                                                                    }
+    
+                                                                    const files = $event.dataTransfer.files
+    
+                                                                    @this.upload('college_certificate_file', files[0])
+                                                                    ">
                                                                 <div
                                                                     class="flex flex-col items-center justify-center">
                                                                     <iconify-icon
@@ -6615,7 +6979,7 @@
                                                                 </div>
                                                                 <input id="college_certificate_file" type="file"
                                                                     class="hidden" accept="image/*,.pdf"
-                                                                    wire:model.live="college_certificate_file" />
+                                                                    wire:model.live="college_certificate_file">
                                                             </label>
                                                         </div>
                                                     @endif
@@ -6755,7 +7119,22 @@
                                                         @endif
                                                         <div class="flex items-center justify-center">
                                                             <label
-                                                                class="cursor-pointer flex flex-col items-center justify-center w-full h-40 rounded-lg text-slate-500 hover:border-primary-500 transition-colors duration-150">
+                                                                class="cursor-pointer flex flex-col items-center justify-center w-full h-40 rounded-lg text-slate-500 hover:border-primary-500 transition-colors duration-150"
+                                                                x-data="{
+                                                                    dropping: false,
+                                                                }"
+                                                                x-on:dragover.prevent="dropping = true"
+                                                                x-on:dragleave.prevent="dropping = false"
+                                                                x-on:drop="dropping = false"
+                                                                x-on:drop.prevent="
+                                                                    if ($event.dataTransfer.files.length !== 1) {
+                                                                        return
+                                                                    }
+    
+                                                                    const files = $event.dataTransfer.files
+    
+                                                                    @this.upload('social_print_file', files[0])
+                                                                    ">
                                                                 <div
                                                                     class="flex flex-col items-center justify-center">
                                                                     <iconify-icon
@@ -6768,7 +7147,7 @@
                                                                 </div>
                                                                 <input id="social_print_file" type="file"
                                                                     class="hidden" accept="image/*,.pdf"
-                                                                    wire:model.live="social_print_file" />
+                                                                    wire:model.live="social_print_file">
                                                             </label>
                                                         </div>
                                                     @endif
@@ -6887,23 +7266,26 @@
                                             <div
                                                 class="border-2 border-dashed border-slate-200 rounded-md p-4 text-center">
                                                 @if ($other_document_file)
-                                                    <div class="flex items-center justify-center mb-3">
-                                                        @if (in_array($other_document_file->getClientOriginalExtension(), ['pdf']))
-                                                            <iconify-icon icon="mingcute:file-pdf-fill"
-                                                                width="48" height="48"
-                                                                class="text-red-500"></iconify-icon>
-                                                        @else
-                                                            <img src="{{ $other_document_file->temporaryUrl() }}"
-                                                                class="h-40 max-w-full rounded-md object-contain"
-                                                                alt="Other Document Preview">
-                                                        @endif
-                                                    </div>
-                                                    <p class="text-sm text-slate-500">
-                                                        {{ $other_document_file->getClientOriginalName() }}</p>
-                                                    <button type="button" class="text-sm text-red-500 mt-2"
-                                                        wire:click="$set('other_document_file', null)">
-                                                        Remove File
-                                                    </button>
+                                                    @foreach ($other_document_file as $key => $file)
+                                                    @if(!$file) @continue @endif
+                                                        <div class="flex items-center justify-center mb-3">
+                                                            @if (in_array($file->getClientOriginalExtension(), ['pdf']))
+                                                                <iconify-icon icon="mingcute:file-pdf-fill"
+                                                                    width="48" height="48"
+                                                                    class="text-red-500"></iconify-icon>
+                                                            @else
+                                                                <img src="{{ $file->temporaryUrl() }}"
+                                                                    class="h-40 max-w-full rounded-md object-contain"
+                                                                    alt="Other Document Preview">
+                                                            @endif
+                                                        </div>
+                                                        <p class="text-sm text-slate-500">
+                                                            {{ $file->getClientOriginalName() }}</p>
+                                                        <button type="button" class="text-sm text-red-500 mt-2"
+                                                            wire:click="$set('other_document_file.{{ $key }}', null)">
+                                                            Remove File
+                                                        </button>
+                                                    @endforeach
                                                 @else
                                                     @if ($editing_other_document_id)
                                                         <div class="mb-3">
@@ -6917,7 +7299,22 @@
 
                                                         @if (!$keep_existing_other_document)
                                                             <label for="other_document_file_input"
-                                                                class="cursor-pointer block">
+                                                                class="cursor-pointer block"
+                                                                x-data="{
+                                                                    dropping: false,
+                                                                }"
+                                                                x-on:dragover.prevent="dropping = true"
+                                                                x-on:dragleave.prevent="dropping = false"
+                                                                x-on:drop="dropping = false"
+                                                                x-on:drop.prevent="
+                                                                if ($event.dataTransfer.files.length !== 1) {
+                                                                    return
+                                                                }
+
+                                                                const files = $event.dataTransfer.files
+
+                                                                @this.upload('other_document_file', files[0])
+                                                                ">
                                                                 <iconify-icon icon="mingcute:upload-line"
                                                                     width="32" height="32"
                                                                     class="text-slate-400 mx-auto"></iconify-icon>
@@ -6937,15 +7334,13 @@
                                                             <iconify-icon icon="mingcute:upload-line" width="32"
                                                                 height="32"
                                                                 class="text-slate-400 mx-auto"></iconify-icon>
-                                                            <p class="mt-2 text-sm text-slate-500">Click to upload or
-                                                                drag
-                                                                and drop</p>
+                                                            <p class="mt-2 text-sm text-slate-500">Click to upload</p>
                                                             <p class="text-xs text-slate-400">PDF, JPG, PNG, GIF (Max
                                                                 2MB)
                                                             </p>
                                                             <input id="other_document_file_input" type="file"
                                                                 class="hidden" wire:model="other_document_file"
-                                                                accept=".pdf,.jpg,.jpeg,.png">
+                                                                accept=".pdf,.jpg,.jpeg,.png" multiple>
                                                         </label>
                                                     @endif
                                                 @endif

@@ -118,8 +118,7 @@
 
                                                 <x-text-input label="Current Balance* (in hours)" type="number"
                                                     wire:model="vacationBenefits.{{ $index }}.current_balance"
-                                                    errorMessage="{{ $errors->first('vacationBenefits.' . $index . '.current_balance') }}"
-                                                    disabled />
+                                                    errorMessage="{{ $errors->first('vacationBenefits.' . $index . '.current_balance') }}" />
 
                                                 @if (!$benefit['is_disabled'])
                                                     <x-text-input label="Hour Price*" type="number"

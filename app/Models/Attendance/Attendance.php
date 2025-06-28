@@ -138,6 +138,7 @@ class Attendance extends Model
 
             if (!$sheet->getCell('B' . $row)->getValue()) continue; //if the start time is empty, skip the row
             $attendanceStartDate = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($sheet->getCell('B' . $row)->getValue());
+
             $attendanceEndDate = $sheet->getCell('C' . $row)->getValue() ? \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($sheet->getCell('C' . $row)->getValue()) : null;
             $extraHours = $sheet->getCell('D' . $row)->getValue();
 
@@ -166,7 +167,7 @@ class Attendance extends Model
             if ($attendanceType == BenefitConfiguration::ATTENDANCE_CALCULATION_IN_ONLY) {
                 $hours = $employee->benefitConfiguration->daily_working_hours;
             } else {
-                $hours = abs(round(Carbon::parse($attendanceEndDate)->diffInDays(Carbon::parse($attendanceStartDate)), 2));
+                $hours = abs(round(Carbon::parse($attendanceEndDate)->diffInHours(Carbon::parse($attendanceStartDate)), 2));
             }
 
 

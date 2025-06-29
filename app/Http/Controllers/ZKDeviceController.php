@@ -282,6 +282,16 @@ class ZKDeviceController extends Controller
 
     public function getRequest(Request $request)
     {
-        return response('OK', 200);
+        // Log the polling request for debugging
+        Log::info('[ZKTeco Device Polling]', [
+            'method' => $request->method(),
+            'query'  => $request->query(),
+            'SN' => $request->query('SN'),
+            'user_agent' => $request->userAgent()
+        ]);
+        
+        // Return 'NONE' to tell the device there are no commands
+        // This should reduce or stop the polling frequency
+        return response('NONE', 200);
     }
 }

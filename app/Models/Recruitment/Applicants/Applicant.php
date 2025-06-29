@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -73,11 +74,11 @@ class Applicant extends Model
     const MARITAL_STATUS_DIVORCED = 'Divorced';
     const MARITAL_STATUS_WIDOWER = 'Widowed';
     const MARITAL_STATUS = [
-      self::MARITAL_STATUS_SINGLE, 
-      self::MARITAL_STATUS_MARRIED,
-      self::MARITAL_STATUS_DIVORCED,
-      self::MARITAL_STATUS_WIDOWER,
-    ];  
+        self::MARITAL_STATUS_SINGLE,
+        self::MARITAL_STATUS_MARRIED,
+        self::MARITAL_STATUS_DIVORCED,
+        self::MARITAL_STATUS_WIDOWER,
+    ];
 
     const MILITARY_STATUS_EXEMPTED = 'Exempted';
     const MILITARY_STATUS_DRAFTED = 'Drafted';
@@ -235,7 +236,7 @@ class Applicant extends Model
     {
         return $this->hasOne(ApplicantHealth::class);
     }
-    
+
     /**
      * Get all documents for this applicant
      */
@@ -294,6 +295,12 @@ class Applicant extends Model
      */
     public function updatePersonalInfo(array $data): bool
     {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('update', $this)) {
+            throw new AppException(__('misc.not_authorized'));
+        }
+
         try {
             $updated = $this->update($data);
             AppLog::info('Applicant Updated', 'Applicant. ' . $this->full_name . ' updated successfully', loggable: $this);
@@ -314,8 +321,14 @@ class Applicant extends Model
      */
     public function updateCv(string $cvUrl): bool
     {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('update', $this)) {
+            throw new AppException(__('misc.not_authorized'));
+        }
+
         try {
-            if($this->cv_url){
+            if ($this->cv_url) {
                 Storage::disk('s3')->delete($this->cv_url);
             }
             $this->cv_url = $cvUrl;
@@ -337,6 +350,12 @@ class Applicant extends Model
      */
     public function setEducations(array $educations): Applicant
     {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('update', $this)) {
+            throw new AppException(__('misc.not_authorized'));
+        }
+
         try {
             return DB::transaction(function () use ($educations) {
                 // Delete existing educations
@@ -366,6 +385,12 @@ class Applicant extends Model
      */
     public function setTrainings(array $trainings): Applicant
     {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('update', $this)) {
+            throw new AppException(__('misc.not_authorized'));
+        }
+
         try {
             return DB::transaction(function () use ($trainings) {
                 // Delete existing trainings
@@ -395,6 +420,12 @@ class Applicant extends Model
      */
     public function setExperiences(array $experiences): Applicant
     {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('update', $this)) {
+            throw new AppException(__('misc.not_authorized'));
+        }
+
         try {
             return DB::transaction(function () use ($experiences) {
                 // Delete existing experiences
@@ -424,6 +455,12 @@ class Applicant extends Model
      */
     public function setLanguages(array $languages): Applicant
     {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('update', $this)) {
+            throw new AppException(__('misc.not_authorized'));
+        }
+
         try {
             return DB::transaction(function () use ($languages) {
                 // Delete existing languages
@@ -453,6 +490,12 @@ class Applicant extends Model
      */
     public function setReferences(array $references): Applicant
     {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('update', $this)) {
+            throw new AppException(__('misc.not_authorized'));
+        }
+
         try {
             return DB::transaction(function () use ($references) {
                 // Delete existing references
@@ -482,6 +525,12 @@ class Applicant extends Model
      */
     public function setSkills(array $skills): Applicant
     {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('update', $this)) {
+            throw new AppException(__('misc.not_authorized'));
+        }
+
         try {
             return DB::transaction(function () use ($skills) {
                 // Delete existing skills
@@ -512,6 +561,12 @@ class Applicant extends Model
      */
     public function setHealth(bool $hasHealthIssues, ?string $healthIssues = null): ApplicantHealth
     {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('update', $this)) {
+            throw new AppException(__('misc.not_authorized'));
+        }
+
         try {
             return DB::transaction(function () use ($hasHealthIssues, $healthIssues) {
                 $healthRecord = $this->health()->updateOrCreate(
@@ -539,6 +594,12 @@ class Applicant extends Model
      */
     public function setImage(string $imageUrl): bool
     {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('update', $this)) {
+            throw new AppException(__('misc.not_authorized'));
+        }
+
         try {
             $image = $this->update(['image_url' => $imageUrl]);
             AppLog::info('Applicant Image Updated', 'Applicant. ' . $this->full_name . ' image updated successfully', loggable: $this);
@@ -558,6 +619,12 @@ class Applicant extends Model
      */
     public function setSignature(string $signatureUrl): bool
     {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('update', $this)) {
+            throw new AppException(__('misc.not_authorized'));
+        }
+
         try {
             $signature = $this->update([
                 'signature_url' => $signatureUrl,
@@ -714,13 +781,13 @@ class Applicant extends Model
     public function scopeWithAcceptedOffersNotHired($query)
     {
         return $query->whereHas('applications', function ($q) {
-            $q->whereHas('jobOffer', function($offerQuery) {
+            $q->whereHas('jobOffer', function ($offerQuery) {
                 $today = now()->format('Y-m-d');
                 $offerQuery
-                        ->whereDate('expiry_date', '>=', $today)
-                        ->where('status', JobOffer::STATUS_ACCEPTED);
+                    ->whereDate('expiry_date', '>=', $today)
+                    ->where('status', JobOffer::STATUS_ACCEPTED);
             })
-            ->where('is_hired', false);
+                ->where('is_hired', false);
         });
     }
 
@@ -733,11 +800,11 @@ class Applicant extends Model
     {
 
         return $this->applications()
-            ->whereHas('jobOffer', function($offerQuery) {
+            ->whereHas('jobOffer', function ($offerQuery) {
                 $today = now()->format('Y-m-d');
                 $offerQuery
-                        ->whereDate('expiry_date', '>=', $today)
-                        ->where('status', JobOffer::STATUS_ACCEPTED);
+                    ->whereDate('expiry_date', '>=', $today)
+                    ->where('status', JobOffer::STATUS_ACCEPTED);
             })
             ->where('status', Application::STATUS_OFFER)
             ->exists() && !$this->is_hired;
@@ -752,7 +819,7 @@ class Applicant extends Model
     public function setIdCard(string $idCardUrl): bool
     {
         try {
-            if($this->id_card_url){
+            if ($this->id_card_url) {
                 Storage::disk('s3')->delete($this->id_card_url);
             }
             $idCard = $this->update(['id_card_url' => $idCardUrl]);
@@ -774,7 +841,7 @@ class Applicant extends Model
     public function setBirthCertificate(string $birthCertificateUrl): bool
     {
         try {
-            if($this->birth_certificate_url){
+            if ($this->birth_certificate_url) {
                 Storage::disk('s3')->delete($this->birth_certificate_url);
             }
             $birthCertificate = $this->update(['birth_certificate_url' => $birthCertificateUrl]);
@@ -796,7 +863,7 @@ class Applicant extends Model
     public function setCollegeCertificate(string $collegeCertificateUrl): bool
     {
         try {
-            if($this->college_certificate_url){
+            if ($this->college_certificate_url) {
                 Storage::disk('s3')->delete($this->college_certificate_url);
             }
             $collegeCertificate = $this->update(['college_certificate_url' => $collegeCertificateUrl]);
@@ -818,7 +885,7 @@ class Applicant extends Model
     public function setArmyCertificate(string $armyCertificateUrl): bool
     {
         try {
-            if($this->army_certificate_url){
+            if ($this->army_certificate_url) {
                 Storage::disk('s3')->delete($this->army_certificate_url);
             }
             $armyCertificate = $this->update(['army_certificate_url' => $armyCertificateUrl]);

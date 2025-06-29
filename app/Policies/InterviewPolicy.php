@@ -21,7 +21,7 @@ class InterviewPolicy
      */
     public function view(User $user, Interview $interview): bool
     {
-        return $user->is_admin || $user->is_hr;
+        return $user->is_admin || $user->is_hr ;
     }
 
     /**

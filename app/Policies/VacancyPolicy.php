@@ -37,7 +37,7 @@ class VacancyPolicy
      */
     public function update(User $user, Vacancy $vacancy): bool
     {
-        return $user->is_admin || $user->is_hr || $user->id === $vacancy->assigned_to || $user->id === $vacancy->hiring_manager_id || $user->id === $vacancy->hr_manager_id;
+        return $user->is_admin || $user->is_hr;
     }
 
     /**

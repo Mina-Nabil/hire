@@ -169,6 +169,7 @@ class Attendance extends Model
                 ];
                 continue;
             }
+            if (!$employee->benefitConfiguration)  throw new AppException('Employee ' . $employee->name . ' has no benefit configuration');
 
             $attendanceType = $employee->benefitConfiguration->attendance_calculation;
 

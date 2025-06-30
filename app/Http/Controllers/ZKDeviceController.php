@@ -311,6 +311,9 @@ class ZKDeviceController extends Controller
             'all' => $request->all()
         ]);
 
+        return response('OK', 200);
+
+
         try {
             // Check if device is registered/authorized (optional validation)
             if (empty($serialNumber)) {

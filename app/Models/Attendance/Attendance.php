@@ -145,7 +145,7 @@ class Attendance extends Model
             $attendanceStartDate = new Carbon(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($sheet->getCell('C' . $row)->getValue()));
             $attendanceEndDate = $sheet->getCell('D' . $row)->getValue() ? new Carbon(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($sheet->getCell('D' . $row)->getValue())) : null;
 
-            $extraHours = $sheet->getCell('D' . $row)->getValue();
+            $extraHours = $sheet->getCell('E' . $row)->getValue();
 
             $attendanceStartDate = $attendanceDay->copy()->setTimeFromTimeString($attendanceStartDate->format('H:i'));
             $attendanceEndDate = $attendanceDay->copy()->setTimeFromTimeString($attendanceEndDate->format('h:i') . ' PM');

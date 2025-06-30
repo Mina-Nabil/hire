@@ -140,10 +140,15 @@ class Attendance extends Model
             if (!$employeeName) continue;
 
             if (!$sheet->getCell('B' . $row)->getValue()) continue; //if the start time is empty, skip the row
-            $attendanceStartDate = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($sheet->getCell('B' . $row)->getValue());
 
-            $attendanceEndDate = $sheet->getCell('C' . $row)->getValue() ? \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($sheet->getCell('C' . $row)->getValue()) : null;
+            $attendanceDay = new Carbon(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($sheet->getCell('B' . $row)->getValue()));
+            $attendanceStartDate = new Carbon(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($sheet->getCell('C' . $row)->getValue()));
+            $attendanceEndDate = $sheet->getCell('D' . $row)->getValue() ? new Carbon(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($sheet->getCell('D' . $row)->getValue())) : null;
+
             $extraHours = $sheet->getCell('D' . $row)->getValue();
+
+            $attendanceStartDate = $attendanceDay->setTimeFromTimeString($attendanceStartDate->format('H:i'));
+            $attendanceEndDate = $attendanceDay->setTimeFromTimeString($attendanceEndDate->format('H:i'));
 
             $employee = Employee::where('name', $employeeName)->first();
             if (!$employee) {

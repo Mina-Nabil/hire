@@ -292,6 +292,7 @@ class ZKDeviceController extends Controller
         
         // Return 'NONE' to tell the device there are no commands
         // This should reduce or stop the polling frequency
-        return response('NONE', 200);
+        $time = Carbon::now()->format('Y-m-d H:i:s');
+        return response('C:SETTIME ' . $time, 200);
     }
 }

@@ -311,7 +311,7 @@ class ZKDeviceController extends Controller
             'all' => $request->all()
         ]);
 
-        return response('OK', 200);
+        return response('-1002', 200);
 
 
         try {

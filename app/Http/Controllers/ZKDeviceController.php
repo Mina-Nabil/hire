@@ -282,6 +282,7 @@ class ZKDeviceController extends Controller
 
     public function getRequest(Request $request)
     {
+        return response('NONE', 200);
         // Log the polling request for debugging
         Log::info('[ZKTeco Device Polling]', [
             'method' => $request->method(),
@@ -311,7 +312,7 @@ class ZKDeviceController extends Controller
             'all' => $request->all()
         ]);
 
-        return response('-1002', 200);
+        return response('NONE', 200);
 
 
         try {

@@ -4138,7 +4138,7 @@ class Employee extends Model
     ): float {
         // If no time constraints are set, use the actual hours worked
         if (!$workingDayStartMin || !$workingDayStartMax || !$workingDayEndMin || !$workingDayEndMax) {
-            return $attendanceStart->diffInHours($attendanceEnd, true);
+            return $attendanceStart->diffInHours($attendanceEnd);
         }
 
         // Parse the allowed time ranges

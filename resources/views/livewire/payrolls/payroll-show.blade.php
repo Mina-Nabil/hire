@@ -396,7 +396,7 @@
                                                     {{ $attendance->hours ? $attendance->hours . 'h' : 'N/A' }}
                                                     @if ($attendance->penalized_hours > 0)
                                                         <span>
-                                                            - ({{ number_format($attendance->penalized_hours * 60, 0) }}minutes)
+                                                            - ({{ $attendance->penalized_hours > 1 ? number_format($attendance->penalized_hours * 60, 0) . " min" : number_format($attendance->penalized_hours, 0) . " h" }})
                                                         </span>
                                                     @endif
                                                 </span>

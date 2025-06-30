@@ -4035,6 +4035,7 @@ class Employee extends Model
 
         // Get missed working hours (full days with no attendance) - already excludes public holidays
         $missedHours = $this->getMissedWorkingHours($startDate, $endDate, true);
+        Log::info('missed hours', ['missedHours' => $missedHours]);
 
         // Get all attendance records for the period
         $attendanceQuery = $this->attendances()
@@ -4183,6 +4184,7 @@ class Employee extends Model
 
         // Calculate valid hours, ensuring it's not negative
         $validHours = max(0, $effectiveStart->diffInHours($effectiveEnd, true));
+        Log::info('valid hours', ['validHours' => $validHours]);
 
         // Additional penalty for arriving late (after allowed start max)
         if ($attendanceStart->gt($allowedStartMax)) {
@@ -4195,6 +4197,7 @@ class Employee extends Model
             $earlyHours = $allowedEndMin->diffInHours($attendanceEnd, true);
             $validHours += max(0, $validHours - $earlyHours);
         }
+        Log::info('valid hours 2', ['validHours' => $validHours]);
 
         return $validHours;
     }

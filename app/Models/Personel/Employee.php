@@ -4110,10 +4110,14 @@ class Employee extends Model
                 $attendance->penalized_hours = $penaltyHoursForDay;
                 $attendance->save();
             }
-
+            if($this->id == 1) {
+                Log::info('penalty hours for day', ['penaltyHoursForDay' => $penaltyHoursForDay]);
+            }
             $totalPenaltyHours += $penaltyHoursForDay;
         }
-
+        if($this->id == 1) {
+            Log::info('total penalty hours 2', ['totalPenaltyHours' => $totalPenaltyHours]);
+        }
         return $totalPenaltyHours;
     }
 
@@ -4685,7 +4689,7 @@ class Employee extends Model
 
         // Get total penalty hours
         $totalPenaltyHours = $this->getTotalPenaltyHours($startDate, $endDate, $payrollId);
-        Log::info('total penalty hours', ['totalPenaltyHours' => $totalPenaltyHours]);
+
         if ($totalPenaltyHours <= 0) {
             return [
                 'total_penalty_hours' => 0,

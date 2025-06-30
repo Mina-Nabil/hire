@@ -282,17 +282,52 @@ class ZKDeviceController extends Controller
 
     public function getRequest(Request $request)
     {
+        $serialNumber = $request->query('SN');
+        $requestBody = $request->getContent();
+        
         // Log the polling request for debugging
         Log::info('[ZKTeco Device Polling]', [
             'method' => $request->method(),
             'query'  => $request->query(),
-            'SN' => $request->query('SN'),
+            'body'   => $requestBody,
+            'SN' => $serialNumber,
             'user_agent' => $request->userAgent()
         ]);
 
-        // Return 'NONE' to tell the device there are no commands
-        // This should reduce or stop the polling frequency
-        return response('NONE', 200);
+        try {
+            // Check if this is a command response from the device (has body with ID= and Return=)
+            if (!empty($requestBody) && (strpos($requestBody, 'ID=') !== false && strpos($requestBody, 'Return=') !== false)) {
+                $this->handleCommandResponse($serialNumber, $requestBody);
+                
+                // For command responses, just acknowledge with OK
+                Log::info('[ZKTeco] Acknowledging command response via getrequest', ['SN' => $serialNumber]);
+                return response('OK', 200);
+            }
+
+            // This is a command polling request - check if we have commands to send
+            $commands = $this->getDeviceCommands($serialNumber);
+            
+            if (count($commands) > 0) {
+                $response = implode("\r\n", $commands);
+                Log::info('[ZKTeco] Sending commands to device via getrequest', [
+                    'SN' => $serialNumber,
+                    'commands' => $commands,
+                    'response' => $response
+                ]);
+                return response($response, 200);
+            }
+
+            // Return 'NONE' to tell the device there are no commands
+            // This should reduce or stop the polling frequency
+            return response('NONE', 200);
+            
+        } catch (\Exception $e) {
+            Log::error('[ZKTeco] Error processing getrequest: ' . $e->getMessage(), [
+                'SN' => $serialNumber,
+                'exception' => $e
+            ]);
+            return response('NONE', 200); // Return NONE even on error to prevent device loops
+        }
     }
 
     public function deviceCmd(Request $request)

@@ -134,6 +134,7 @@ Route::group(['middleware' => 'guest'], function () {
     Route::match(['put', 'post'], '/iclock/cdata', [ZKDeviceController::class, 'attendance']);
     Route::get('/iclock/getrequest', [ZKDeviceController::class, 'getRequest']);
     Route::post('/iclock/getrequest', [ZKDeviceController::class, 'getRequest']);
+    Route::match(['get', 'post'], '/iclock/devicecmd', [ZKDeviceController::class, 'deviceCmd']);
     
     // Additional ZKTeco endpoints for better compatibility
     Route::match(['get', 'post'], '/iclock/ping', [ZKDeviceController::class, 'ping']);

@@ -295,4 +295,100 @@ class ZKDeviceController extends Controller
         $time = Carbon::now()->format('Y-m-d H:i:s');
         return response('C:SETTIME ' . $time, 200);
     }
+
+    public function deviceCmd(Request $request)
+    {
+        $serialNumber = $request->query('SN');
+        
+        // Log all incoming device command requests for debugging
+        Log::info('[ZKTeco Device Command Request]', [
+            'method' => $request->method(),
+            'query'  => $request->query(),
+            'body'   => $request->getContent(),
+            'SN' => $serialNumber,
+            'user_agent' => $request->userAgent(),
+            'all' => $request->all()
+        ]);
+
+        try {
+            // Check if device is registered/authorized (optional validation)
+            if (empty($serialNumber)) {
+                Log::warning('[ZKTeco] Device command request without serial number');
+                return response('ERROR: Missing serial number', 400);
+            }
+
+            // Here you can implement device-specific command logic
+            // For now, we'll return common commands that ZKTeco devices expect
+
+            $commands = $this->getDeviceCommands($serialNumber);
+            
+            if (count($commands) > 0) {
+                $response = implode("\r\n", $commands);
+                Log::info('[ZKTeco] Sending commands to device', [
+                    'SN' => $serialNumber,
+                    'commands' => $commands,
+                    'response' => $response
+                ]);
+                return response($response, 200);
+            }
+
+            // If no commands are pending, return OK or appropriate response
+            Log::info('[ZKTeco] No commands pending for device', ['SN' => $serialNumber]);
+            return response('OK', 200);
+
+        } catch (\Exception $e) {
+            Log::error('[ZKTeco] Error processing device command request: ' . $e->getMessage(), [
+                'SN' => $serialNumber,
+                'exception' => $e
+            ]);
+            return response('ERROR', 500);
+        }
+    }
+
+    /**
+     * Get pending commands for a specific device
+     * You can customize this method based on your requirements
+     */
+    private function getDeviceCommands($serialNumber)
+    {
+        $commands = [];
+        
+        // Common commands that ZKTeco devices might need:
+        
+        // 1. Request OPLOG data starting from record 0
+        $commands[] = "DATA QUERY OPLOG";
+        
+        // 2. Time synchronization (most common)
+        $currentTime = Carbon::now()->format('Y-m-d H:i:s');
+        $commands[] = "C:{$serialNumber}:SETTIME {$currentTime}";
+        
+        // 3. You can add more commands based on your needs:
+        // $commands[] = "C:{$serialNumber}:RESTART";  // Restart device
+        // $commands[] = "C:{$serialNumber}:CLEAR DATA"; // Clear attendance data
+        // $commands[] = "C:{$serialNumber}:ENABLE DEVICE"; // Enable device
+        // $commands[] = "C:{$serialNumber}:DISABLE DEVICE"; // Disable device
+        
+        // 4. Alternative OPLOG request formats (uncomment if needed):
+        // $commands[] = "DATA QUERY OPLOG 0";  // Request starting from record 0
+        // $commands[] = "GET OPLOG";  // Simple get command
+        
+        // 5. You could also check a database table for pending commands
+        // Example: Check a 'device_commands' table for pending commands for this device
+        /*
+        $pendingCommands = DB::table('device_commands')
+            ->where('device_serial', $serialNumber)
+            ->where('executed', false)
+            ->get();
+            
+        foreach ($pendingCommands as $cmd) {
+            $commands[] = $cmd->command;
+            // Mark as executed
+            DB::table('device_commands')
+                ->where('id', $cmd->id)
+                ->update(['executed' => true, 'executed_at' => now()]);
+        }
+        */
+        
+        return $commands;
+    }
 }

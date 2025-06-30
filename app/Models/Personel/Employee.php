@@ -56,6 +56,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Personel\Docs\EmployeeHrLetterRequest;
 use App\Models\Users\AppLog;
+use Illuminate\Support\Facades\Log;
 
 class Employee extends Model
 {

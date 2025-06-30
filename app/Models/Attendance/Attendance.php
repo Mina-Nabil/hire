@@ -147,8 +147,8 @@ class Attendance extends Model
 
             $extraHours = $sheet->getCell('D' . $row)->getValue();
 
-            $attendanceStartDate = $attendanceDay->setTimeFromTimeString($attendanceStartDate->format('H:i'));
-            $attendanceEndDate = $attendanceDay->setTimeFromTimeString($attendanceEndDate->format('H:i'));
+            $attendanceStartDate = $attendanceDay->copy()->setTimeFromTimeString($attendanceStartDate->format('H:i'));
+            $attendanceEndDate = $attendanceDay->copy()->setTimeFromTimeString($attendanceEndDate->format('H:i'));
 
             $employee = Employee::where('name', $employeeName)->first();
             if (!$employee) {

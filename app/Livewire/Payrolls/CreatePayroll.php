@@ -87,7 +87,7 @@ class CreatePayroll extends Component
     {
         $this->payrollMonth = Carbon::now()->month;
         $this->departments = Department::orderBy('name')->get();
-        $this->startDate = Carbon::now()->setDay(25)->subMonth()->format('Y-m-d');
+        $this->startDate = Carbon::now()->setDay(26)->subMonth()->format('Y-m-d');
         $this->endDate = Carbon::now()->setDay(25)->format('Y-m-d');
         $this->ensureArrays();
     }

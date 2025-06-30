@@ -4035,7 +4035,6 @@ class Employee extends Model
 
         // Get missed working hours (full days with no attendance) - already excludes public holidays
         $missedHours = $this->getMissedWorkingHours($startDate, $endDate, true);
-        Log::info('missed hours', ['missedHours' => $missedHours]);
 
         // Get all attendance records for the period
         $attendanceQuery = $this->attendances()
@@ -4689,6 +4688,9 @@ class Employee extends Model
 
         // Get total penalty hours
         $totalPenaltyHours = $this->getTotalPenaltyHours($startDate, $endDate, $payrollId);
+        if($this->id == 1) {
+            Log::info('total penalty hours', ['totalPenaltyHours' => $totalPenaltyHours]);
+        }
 
         if ($totalPenaltyHours <= 0) {
             return [

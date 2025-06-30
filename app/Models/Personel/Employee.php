@@ -3837,7 +3837,9 @@ class Employee extends Model
     {
         $missedDays = $this->getMissedWorkingDays($startDate, $endDate, $deleteOldMissedDays, $payrollId);
         $dailyHours = $this->benefitConfiguration?->daily_working_hours ?? 8;
-
+        if($this->id == 1) {
+            Log::info('missed days', ['missedDays' => $missedDays->count()]);
+        }
         return $missedDays->count() * $dailyHours;
     }
 

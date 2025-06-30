@@ -299,12 +299,13 @@ class ZKDeviceController extends Controller
     public function deviceCmd(Request $request)
     {
         $serialNumber = $request->query('SN');
+        $requestBody = $request->getContent();
         
         // Log all incoming device command requests for debugging
         Log::info('[ZKTeco Device Command Request]', [
             'method' => $request->method(),
             'query'  => $request->query(),
-            'body'   => $request->getContent(),
+            'body'   => $requestBody,
             'SN' => $serialNumber,
             'user_agent' => $request->userAgent(),
             'all' => $request->all()
@@ -315,6 +316,11 @@ class ZKDeviceController extends Controller
             if (empty($serialNumber)) {
                 Log::warning('[ZKTeco] Device command request without serial number');
                 return response('ERROR: Missing serial number', 400);
+            }
+
+            // Check if this is a command response from the device
+            if (!empty($requestBody)) {
+                $this->handleCommandResponse($serialNumber, $requestBody);
             }
 
             // Here you can implement device-specific command logic
@@ -346,6 +352,36 @@ class ZKDeviceController extends Controller
     }
 
     /**
+     * Handle command response from device
+     */
+    private function handleCommandResponse($serialNumber, $responseBody)
+    {
+        // Parse the response body to understand what command was executed
+        // Format appears to be: ID=COMMANDNAME&Return=RETURNCODE&CMD=
+        parse_str($responseBody, $parsed);
+        
+        if (isset($parsed['ID']) && isset($parsed['Return'])) {
+            $commandId = $parsed['ID'];
+            $returnCode = $parsed['Return'];
+            
+            Log::info('[ZKTeco] Device command response received', [
+                'SN' => $serialNumber,
+                'command_id' => $commandId,
+                'return_code' => $returnCode,
+                'response_body' => $responseBody
+            ]);
+            
+            // Store command execution result (you can save this to database if needed)
+            $cacheKey = "device_cmd_executed_{$serialNumber}_{$commandId}";
+            cache()->put($cacheKey, [
+                'executed_at' => now(),
+                'return_code' => $returnCode,
+                'response' => $responseBody
+            ], 3600); // Cache for 1 hour
+        }
+    }
+
+    /**
      * Get pending commands for a specific device
      * You can customize this method based on your requirements
      */
@@ -353,26 +389,60 @@ class ZKDeviceController extends Controller
     {
         $commands = [];
         
-        // Common commands that ZKTeco devices might need:
+        // Check if we've already sent OPLOG command recently
+        $oplogSentKey = "oplog_sent_{$serialNumber}";
+        $oplogSent = cache()->get($oplogSentKey, false);
         
-        // 1. Request OPLOG data starting from record 0
-        $commands[] = "DATA QUERY OPLOG";
+        // Only send OPLOG command if we haven't sent it in the last 5 minutes
+        if (!$oplogSent) {
+            Log::info('[ZKTeco] Sending OPLOG request to device', ['SN' => $serialNumber]);
+            $commands[] = "DATA QUERY OPLOG";
+            
+            // Mark OPLOG as sent for 5 minutes
+            cache()->put($oplogSentKey, true, 300);
+        }
         
-        // 2. Time synchronization (most common)
-        $currentTime = Carbon::now()->format('Y-m-d H:i:s');
-        $commands[] = "C:{$serialNumber}:SETTIME {$currentTime}";
+        // Check if we need to send time sync (only if not sent recently or if time is significantly different)
+        $timeSyncKey = "time_sync_sent_{$serialNumber}";
+        $lastTimeSync = cache()->get($timeSyncKey, null);
         
-        // 3. You can add more commands based on your needs:
+        $currentTime = Carbon::now();
+        $shouldSendTimeSync = false;
+        
+        if (!$lastTimeSync) {
+            $shouldSendTimeSync = true;
+        } else {
+            // Send time sync if last one was more than 1 hour ago
+            $lastSyncTime = Carbon::parse($lastTimeSync);
+            if ($currentTime->diffInMinutes($lastSyncTime) > 60) {
+                $shouldSendTimeSync = true;
+            }
+        }
+        
+        if ($shouldSendTimeSync) {
+            $timeCommand = "C:{$serialNumber}:SETTIME " . $currentTime->format('Y-m-d H:i:s');
+            $commands[] = $timeCommand;
+            
+            // Mark time sync as sent
+            cache()->put($timeSyncKey, $currentTime->toDateTimeString(), 3600);
+            
+            Log::info('[ZKTeco] Sending time sync to device', [
+                'SN' => $serialNumber,
+                'time' => $currentTime->format('Y-m-d H:i:s')
+            ]);
+        }
+        
+        // You can add more conditional commands based on your needs:
         // $commands[] = "C:{$serialNumber}:RESTART";  // Restart device
         // $commands[] = "C:{$serialNumber}:CLEAR DATA"; // Clear attendance data
         // $commands[] = "C:{$serialNumber}:ENABLE DEVICE"; // Enable device
         // $commands[] = "C:{$serialNumber}:DISABLE DEVICE"; // Disable device
         
-        // 4. Alternative OPLOG request formats (uncomment if needed):
+        // Alternative OPLOG request formats (uncomment if needed):
         // $commands[] = "DATA QUERY OPLOG 0";  // Request starting from record 0
         // $commands[] = "GET OPLOG";  // Simple get command
         
-        // 5. You could also check a database table for pending commands
+        // You could also check a database table for pending commands
         // Example: Check a 'device_commands' table for pending commands for this device
         /*
         $pendingCommands = DB::table('device_commands')

@@ -340,7 +340,7 @@ class CreatePayroll extends Component
             $directDeductionAmount = $penaltyData['direct_deduction_amount'];
             $usedApprovedVacations = $penaltyData['used_approved_vacations'];
             $availableVacationBenefits = $penaltyData['available_vacation_benefits'];
-            Log::info('penalty data', ['penaltyData' => $penaltyData]);
+            // Log::info('penalty data', ['penaltyData' => $penaltyData]);
             // Convert total hours to days for display purposes
             $totalPenaltyDays = $dailyWorkingHours > 0 ? $totalPenaltyHours / $dailyWorkingHours : 0;
 

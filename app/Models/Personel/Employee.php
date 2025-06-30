@@ -4681,7 +4681,7 @@ class Employee extends Model
 
         // Get total penalty hours
         $totalPenaltyHours = $this->getTotalPenaltyHours($startDate, $endDate, $payrollId);
-
+        Log::info('total penalty hours', ['totalPenaltyHours' => $totalPenaltyHours]);
         if ($totalPenaltyHours <= 0) {
             return [
                 'total_penalty_hours' => 0,

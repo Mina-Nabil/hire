@@ -4186,13 +4186,13 @@ class Employee extends Model
         // Additional penalty for arriving late (after allowed start max)
         if ($attendanceStart->gt($allowedStartMax)) {
             $lateHours = $attendanceStart->diffInHours($allowedStartMax, true);
-            $validHours = max(0, $validHours - $lateHours);
+            $validHours += max(0, $validHours - $lateHours);
         }
 
         // Additional penalty for leaving early (before allowed end min)
         if ($attendanceEnd->lt($allowedEndMin)) {
             $earlyHours = $allowedEndMin->diffInHours($attendanceEnd, true);
-            $validHours = max(0, $validHours - $earlyHours);
+            $validHours += max(0, $validHours - $earlyHours);
         }
 
         return $validHours;

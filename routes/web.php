@@ -136,6 +136,12 @@ Route::group(['middleware' => 'guest'], function () {
     Route::post('/iclock/getrequest', [ZKDeviceController::class, 'getRequest']);
     Route::match(['get', 'post'], '/iclock/devicecmd', [ZKDeviceController::class, 'deviceCmd']);
     
+    // Test route to manually force specific time formats (for debugging)
+    Route::get('/test-time-format/{serialNumber}/{formatIndex?}', function($serialNumber, $formatIndex = 6) {
+        $controller = new \App\Http\Controllers\ZKDeviceController();
+        return $controller->forceTimeFormat($serialNumber, $formatIndex);
+    });
+    
     // Additional ZKTeco endpoints for better compatibility
     Route::match(['get', 'post'], '/iclock/ping', [ZKDeviceController::class, 'ping']);
     Route::match(['get', 'post'], '/iclock', [ZKDeviceController::class, 'ping']);

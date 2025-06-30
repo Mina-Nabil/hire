@@ -289,19 +289,17 @@ class ZKDeviceController extends Controller
             'SN' => $request->query('SN'),
             'user_agent' => $request->userAgent()
         ]);
-        // return response('NONE', 200);
 
         // Return 'NONE' to tell the device there are no commands
         // This should reduce or stop the polling frequency
-        $time = Carbon::now()->format('Y-m-d H:i:s');
-        return response('C:SETTIME ' . $time, 200);
+        return response('NONE', 200);
     }
 
     public function deviceCmd(Request $request)
     {
         $serialNumber = $request->query('SN');
         $requestBody = $request->getContent();
-
+        
         // Log all incoming device command requests for debugging
         Log::info('[ZKTeco Device Command Request]', [
             'method' => $request->method(),
@@ -312,12 +310,6 @@ class ZKDeviceController extends Controller
             'all' => $request->all()
         ]);
 
-        $time = Carbon::now()->format('Y-m-d H:i:s');
-        return response('C:SETTIME ' . $time, 200);
-
-        return response('NONE', 200);
-
-
         try {
             // Check if device is registered/authorized (optional validation)
             if (empty($serialNumber)) {
@@ -325,16 +317,18 @@ class ZKDeviceController extends Controller
                 return response('ERROR: Missing serial number', 400);
             }
 
-            // Check if this is a command response from the device
-            if (!empty($requestBody)) {
+            // Check if this is a command response from the device (has body with ID= and Return=)
+            if (!empty($requestBody) && (strpos($requestBody, 'ID=') !== false && strpos($requestBody, 'Return=') !== false)) {
                 $this->handleCommandResponse($serialNumber, $requestBody);
+                
+                // For command responses, just acknowledge with OK
+                Log::info('[ZKTeco] Acknowledging command response', ['SN' => $serialNumber]);
+                return response('OK', 200);
             }
 
-            // Here you can implement device-specific command logic
-            // For now, we'll return common commands that ZKTeco devices expect
-
+            // This is a command request - get pending commands for the device
             $commands = $this->getDeviceCommands($serialNumber);
-
+            
             if (count($commands) > 0) {
                 $response = implode("\r\n", $commands);
                 Log::info('[ZKTeco] Sending commands to device', [
@@ -345,9 +339,10 @@ class ZKDeviceController extends Controller
                 return response($response, 200);
             }
 
-            // If no commands are pending, return OK or appropriate response
+            // If no commands are pending, return NONE
             Log::info('[ZKTeco] No commands pending for device', ['SN' => $serialNumber]);
-            return response('OK', 200);
+            return response('NONE', 200);
+
         } catch (\Exception $e) {
             Log::error('[ZKTeco] Error processing device command request: ' . $e->getMessage(), [
                 'SN' => $serialNumber,
@@ -365,23 +360,91 @@ class ZKDeviceController extends Controller
         // Parse the response body to understand what command was executed
         // Format appears to be: ID=COMMANDNAME&Return=RETURNCODE&CMD=
         parse_str($responseBody, $parsed);
-
+        
         if (isset($parsed['ID']) && isset($parsed['Return'])) {
             $commandId = $parsed['ID'];
             $returnCode = $parsed['Return'];
-
+            
+            // Interpret return codes
+            $status = 'unknown';
+            $message = '';
+            
+            switch ($returnCode) {
+                case '1':
+                    $status = 'success';
+                    $message = 'Command executed successfully';
+                    break;
+                case '-1002':
+                    $status = 'error';
+                    $message = 'Command format error or invalid parameter';
+                    break;
+                case '-1003':
+                    $status = 'error';
+                    $message = 'Command not supported';
+                    break;
+                case '-1004':
+                    $status = 'error';
+                    $message = 'Access denied';
+                    break;
+                default:
+                    $status = 'unknown';
+                    $message = "Unknown return code: {$returnCode}";
+            }
+            
             Log::info('[ZKTeco] Device command response received', [
                 'SN' => $serialNumber,
                 'command_id' => $commandId,
                 'return_code' => $returnCode,
+                'status' => $status,
+                'message' => $message,
                 'response_body' => $responseBody
             ]);
-
+            
+            // If SETTIME failed with -1002, we might need to adjust the format
+            if ($commandId === 'SETTIME' && $returnCode === '-1002') {
+                Log::warning('[ZKTeco] SETTIME command failed - trying next format', [
+                    'SN' => $serialNumber,
+                    'return_code' => $returnCode,
+                    'message' => 'Command format error - will try different format on next attempt'
+                ]);
+                
+                // Mark this format as failed and increment the counter
+                $failedFormatKey = "time_format_failed_{$serialNumber}";
+                $currentFailedCount = cache()->get($failedFormatKey, 0);
+                cache()->put($failedFormatKey, $currentFailedCount + 1, 3600);
+                
+                // Clear the time sync cache so it will try again with new format
+                $timeSyncKey = "time_sync_sent_{$serialNumber}";
+                cache()->forget($timeSyncKey);
+                
+                Log::info('[ZKTeco] Will try format #' . (($currentFailedCount + 1) % 6) . ' on next request', [
+                    'SN' => $serialNumber,
+                    'failed_attempts' => $currentFailedCount + 1
+                ]);
+            }
+            
+            // If SETTIME succeeded, save the working format
+            if ($commandId === 'SETTIME' && $returnCode === '1') {
+                $formatUsedKey = "time_format_used_{$serialNumber}";
+                $workingFormat = cache()->get($formatUsedKey, 0);
+                
+                Log::info('[ZKTeco] SETTIME command succeeded - format works!', [
+                    'SN' => $serialNumber,
+                    'working_format_index' => $workingFormat
+                ]);
+                
+                // Save the working format permanently
+                cache()->put("time_format_working_{$serialNumber}", $workingFormat, 86400); // 24 hours
+                cache()->forget("time_format_failed_{$serialNumber}"); // Clear failed counter
+            }
+            
             // Store command execution result (you can save this to database if needed)
             $cacheKey = "device_cmd_executed_{$serialNumber}_{$commandId}";
             cache()->put($cacheKey, [
                 'executed_at' => now(),
                 'return_code' => $returnCode,
+                'status' => $status,
+                'message' => $message,
                 'response' => $responseBody
             ], 3600); // Cache for 1 hour
         }
@@ -426,15 +489,120 @@ class ZKDeviceController extends Controller
         }
 
         if ($shouldSendTimeSync) {
-            $timeCommand = "C:{$serialNumber}:SETTIME " . $currentTime->format('Y-m-d H:i:s');
+            // Check if we have a known working format for this device
+            $workingFormatKey = "time_format_working_{$serialNumber}";
+            $workingFormat = cache()->get($workingFormatKey, null);
+            
+            // Check if there's a manually forced format
+            $forcedFormatKey = "force_format_{$serialNumber}";
+            $forcedFormat = cache()->get($forcedFormatKey, null);
+            
+            // Get the last failed format for this device to try a different one
+            $failedFormatKey = "time_format_failed_{$serialNumber}";
+            $lastFailedFormat = cache()->get($failedFormatKey, 0);
+            
+            // Different time formats that ZKTeco devices might accept
+            $timeFormats = [
+                // Format 0: Standard format with colons and dashes
+                [
+                    'format' => 'Y-m-d H:i:s',
+                    'command' => "C:{$serialNumber}:SETTIME {time}",
+                    'description' => 'Standard format: C:SN:SETTIME YYYY-MM-DD HH:MM:SS'
+                ],
+                // Format 1: With slashes instead of dashes
+                [
+                    'format' => 'Y/m/d H:i:s', 
+                    'command' => "C:{$serialNumber}:SETTIME {time}",
+                    'description' => 'Slash format: C:SN:SETTIME YYYY/MM/DD HH:MM:SS'
+                ],
+                // Format 2: US format
+                [
+                    'format' => 'm/d/Y H:i:s',
+                    'command' => "C:{$serialNumber}:SETTIME {time}",
+                    'description' => 'US format: C:SN:SETTIME MM/DD/YYYY HH:MM:SS'
+                ],
+                // Format 3: Without seconds
+                [
+                    'format' => 'Y-m-d H:i',
+                    'command' => "C:{$serialNumber}:SETTIME {time}",
+                    'description' => 'No seconds: C:SN:SETTIME YYYY-MM-DD HH:MM'
+                ],
+                // Format 4: Simple SETTIME without C:SN prefix
+                [
+                    'format' => 'Y-m-d H:i:s',
+                    'command' => "SETTIME {time}",
+                    'description' => 'Simple format: SETTIME YYYY-MM-DD HH:MM:SS'
+                ],
+                // Format 5: Unix timestamp
+                [
+                    'format' => 'timestamp',
+                    'command' => "C:{$serialNumber}:SETTIME {time}",
+                    'description' => 'Unix timestamp: C:SN:SETTIME 1735545612'
+                ],
+                // Format 6: MB10-VL specific format (newer devices)
+                [
+                    'format' => 'Y-m-d H:i:s',
+                    'command' => "CMD=SETTIME&SN={$serialNumber}&TIME={time}",
+                    'description' => 'MB10-VL format: CMD=SETTIME&SN=xxx&TIME=YYYY-MM-DD HH:MM:SS'
+                ],
+                // Format 7: Alternative newer format
+                [
+                    'format' => 'YmdHis',
+                    'command' => "C:{$serialNumber}:SETTIME {time}",
+                    'description' => 'Compact format: C:SN:SETTIME YYYYMMDDHHMMSS'
+                ],
+                // Format 8: ISO 8601 format (T separator)
+                [
+                    'format' => 'Y-m-d\TH:i:s',
+                    'command' => "C:{$serialNumber}:SETTIME {time}",
+                    'description' => 'ISO format: C:SN:SETTIME YYYY-MM-DDTHH:MM:SS'
+                ]
+            ];
+            
+            // Use working format if we have one, otherwise try the next format after failures
+            if ($workingFormat !== null) {
+                $formatIndex = $workingFormat;
+                Log::info('[ZKTeco] Using known working format', ['SN' => $serialNumber, 'format_index' => $formatIndex]);
+            } elseif ($forcedFormat !== null) {
+                $formatIndex = $forcedFormat;
+                Log::info('[ZKTeco] Using manually forced format', ['SN' => $serialNumber, 'format_index' => $formatIndex]);
+                // Clear the forced format after using it once
+                cache()->forget($forcedFormatKey);
+            } else {
+                $formatIndex = $lastFailedFormat % count($timeFormats);
+                Log::info('[ZKTeco] Trying format (no working format known)', ['SN' => $serialNumber, 'format_index' => $formatIndex, 'failed_attempts' => $lastFailedFormat]);
+                
+                // For MB10-VL devices, start with format 6 (newer format) instead of 0
+                if ($lastFailedFormat == 0 && strpos($serialNumber, 'ADZV') === 0) {
+                    $formatIndex = 6; // Try MB10-VL specific format first
+                    Log::info('[ZKTeco] MB10-VL device detected - trying newer format first', ['SN' => $serialNumber, 'format_index' => $formatIndex]);
+                }
+            }
+            
+            $selectedFormat = $timeFormats[$formatIndex];
+            
+            // Generate time string based on format
+            if ($selectedFormat['format'] === 'timestamp') {
+                $timeString = $currentTime->timestamp;
+            } else {
+                $timeString = $currentTime->format($selectedFormat['format']);
+            }
+            
+            $timeCommand = str_replace('{time}', $timeString, $selectedFormat['command']);
             $commands[] = $timeCommand;
-
-            // Mark time sync as sent
+            
+            // Mark time sync as sent and store which format we tried
             cache()->put($timeSyncKey, $currentTime->toDateTimeString(), 3600);
-
+            cache()->put("time_format_used_{$serialNumber}", $formatIndex, 3600);
+            
             Log::info('[ZKTeco] Sending time sync to device', [
                 'SN' => $serialNumber,
-                'time' => $currentTime->format('Y-m-d H:i:s')
+                'time' => $timeString,
+                'format_index' => $formatIndex,
+                'format_description' => $selectedFormat['description'],
+                'command' => $timeCommand,
+                'using_working_format' => ($workingFormat !== null),
+                'previous_failed_attempts' => $lastFailedFormat
             ]);
         }
 
@@ -466,5 +634,28 @@ class ZKDeviceController extends Controller
         */
 
         return $commands;
+    }
+
+    /**
+     * Helper method to manually force a specific time format for testing
+     * Usage: Call this method to test a specific format for your device
+     */
+    public function forceTimeFormat($serialNumber, $formatIndex = 6)
+    {
+        // Clear any existing format restrictions
+        cache()->forget("time_format_working_{$serialNumber}");
+        cache()->forget("time_format_failed_{$serialNumber}");
+        cache()->forget("time_sync_sent_{$serialNumber}");
+        
+        // Force the specific format
+        cache()->put("force_format_{$serialNumber}", $formatIndex, 300); // 5 minutes
+        
+        Log::info('[ZKTeco] Manually forcing time format', [
+            'SN' => $serialNumber,
+            'forced_format_index' => $formatIndex,
+            'duration' => '5 minutes'
+        ]);
+        
+        return "Format {$formatIndex} will be tried on next device request";
     }
 }

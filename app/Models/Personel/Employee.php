@@ -4184,22 +4184,22 @@ class Employee extends Model
 
         // Calculate valid hours, ensuring it's not negative
         $validHours = max(0, $effectiveStart->diffInHours($effectiveEnd, true));
-        Log::info('valid hours', ['validHours' => $validHours]);
-
-        // Additional penalty for arriving late (after allowed start max)
-        if ($attendanceStart->gt($allowedStartMax)) {
-            $lateHours = $attendanceStart->diffInHours($allowedStartMax, true);
-            $validHours += max(0, $validHours - $lateHours);
-        }
-
-        // Additional penalty for leaving early (before allowed end min)
-        if ($attendanceEnd->lt($allowedEndMin)) {
-            $earlyHours = $allowedEndMin->diffInHours($attendanceEnd, true);
-            $validHours += max(0, $validHours - $earlyHours);
-        }
-        Log::info('valid hours 2', ['validHours' => $validHours]);
-
         return $validHours;
+        
+        // // Additional penalty for arriving late (after allowed start max)
+        // if ($attendanceStart->gt($allowedStartMax)) {
+        //     $lateHours = $attendanceStart->diffInHours($allowedStartMax, true);
+        //     $validHours += max(0, $validHours - $lateHours);
+        // }
+
+        // // Additional penalty for leaving early (before allowed end min)
+        // if ($attendanceEnd->lt($allowedEndMin)) {
+        //     $earlyHours = $allowedEndMin->diffInHours($attendanceEnd, true);
+        //     $validHours += max(0, $validHours - $earlyHours);
+        // }
+        // Log::info('valid hours 2', ['validHours' => $validHours]);
+
+        // return $validHours;
     }
 
     /**

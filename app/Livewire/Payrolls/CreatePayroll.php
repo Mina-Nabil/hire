@@ -342,7 +342,7 @@ class CreatePayroll extends Component
             $availableVacationBenefits = $penaltyData['available_vacation_benefits'];
             // Log::info('penalty data', ['penaltyData' => $penaltyData]);
             // Convert total hours to days for display purposes
-            $totalPenaltyDays = $dailyWorkingHours > 0 ? $totalPenaltyHours / $dailyWorkingHours : 0;
+            $totalPenaltyDays = $dailyWorkingHours > 0 ? ($totalPenaltyHours / $dailyWorkingHours) : 0;
 
             // The penalty amount is now only the direct deduction amount (after vacation offset)
             $penaltyAmount = $directDeductionAmount;

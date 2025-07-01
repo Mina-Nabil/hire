@@ -2052,7 +2052,7 @@ class Employee extends Model
         })->count() : 0;
 
         // Get employees with valid ID cards
-        $valid = 12 ; //$baseQuery->whereHas('idCard')->count();
+        $valid = $baseQuery->whereHas('idCard')->count();
 
         return [
             'total' => $total,

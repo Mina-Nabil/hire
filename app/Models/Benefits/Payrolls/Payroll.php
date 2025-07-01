@@ -34,6 +34,11 @@ class Payroll extends Model
         'total_vacation_amount',
         'total_employees',
         'total_tax_amount',
+        'total_employee_insurance',
+        'total_employer_insurance',
+        'total_employee_medical',
+        'total_penalties_amount',
+        'total_overtime_amount',
         'total_after_tax_amount',
         'status',
     ];

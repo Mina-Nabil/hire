@@ -70,8 +70,10 @@ class ApplyForVacation extends Component
 
     public function loadVacationBenefits()
     {
+        $now = Carbon::now();
         $this->vacationBenefits = $this->employee->vacationBenefits()
-            ->whereNull('end_date')
+            ->where('start_date', '<=', $now)
+            ->where('end_date', '>=', $now)
             ->where('current_balance', '>', 0)
             ->get();
     }

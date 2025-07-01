@@ -59,6 +59,29 @@
                 </div>
 
                 <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-4">
+                    <h5 class="text-sm font-medium text-slate-500 dark:text-slate-300 mb-1">Employee Insurance</h5>
+                    <div class="text-base font-semibold">{{ number_format($payroll->total_employee_insurance, 2) }}</div>
+                </div>
+
+                <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-4">
+                    <h5 class="text-sm font-medium text-slate-500 dark:text-slate-300 mb-1">Employer Insurance</h5>
+                    <div class="text-base font-semibold">{{ number_format($payroll->total_employer_insurance, 2) }}</div>
+                </div>
+
+                <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-4">
+                    <h5 class="text-sm font-medium text-slate-500 dark:text-slate-300 mb-1">Employee Medical</h5>
+                    <div class="text-base font-semibold">{{ number_format($payroll->total_employee_medical, 2) }}</div>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-4">
+                    <h5 class="text-sm font-medium text-slate-500 dark:text-slate-300 mb-1">Penalties Amount</h5>
+                    <div class="text-base font-semibold">{{ number_format($payroll->total_penalties_amount, 2) }}</div>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-4">
+                    <h5 class="text-sm font-medium text-slate-500 dark:text-slate-300 mb-1">Tax Amount</h5>
+                    <div class="text-base font-semibold">{{ number_format($payroll->total_tax_amount, 2) }}</div>
+                </div>
+
+                <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-4">
                     <h5 class="text-sm font-medium text-slate-500 dark:text-slate-300 mb-1">Status</h5>
                     <div class="text-base font-semibold">
                         @if ($payroll->status === \App\Models\Benefits\Payrolls\Payroll::STATUS_APPROVED)

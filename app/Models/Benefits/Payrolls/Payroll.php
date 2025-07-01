@@ -292,7 +292,7 @@ class Payroll extends Model
                     'position' => $employeeData['position'] ?? 'Unknown',
                     'department' => $employeeData['department'] ?? 'Unknown',
                     'tax_amount' => $taxAmount,
-                    'after_tax_salary' => $employeeData['net_after_deductions'] - $taxAmount,
+                    'after_tax_salary' => ($employeeData['net_after_deductions'] - $taxAmount),
                 ]);
 
                 // Create benefit payments for this employee using only base benefits data

@@ -3816,7 +3816,7 @@ class Employee extends Model
         // Return the difference - days that should have been worked but weren't
         $missingDays = collect(array_diff($period, $attendedDates));
         $missingDays->each(function ($date) {
-            $this->missingDays()->updateOrCreate([
+            $this->missingDays()->firstOrCreate([
                 'date' => $date,
             ], [
                 'hours' => $this->benefitConfiguration?->daily_working_hours ?? 8,

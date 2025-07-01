@@ -2052,11 +2052,7 @@ class Employee extends Model
         })->count() : 0;
 
         // Get employees with valid ID cards
-        $valid = $baseQuery->whereHas('idCard', function ($q) use ($today, $nearExpiryDate) {
-            $q->where(function ($q) use ($today, $nearExpiryDate) {
-                $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
-            });
-        })->count();
+        $valid = $baseQuery->whereHas('idCard')->count();
 
         return [
             'total' => $total,

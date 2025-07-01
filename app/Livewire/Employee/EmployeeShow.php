@@ -7,6 +7,7 @@ use App\Models\Base\DocManager;
 use App\Models\Base\InsuranceOffice;
 use App\Models\Personel\Docs\ArmyServicePaper;
 use App\Models\Personel\Docs\BirthCertificate;
+use App\Models\Personel\Docs\CollegeCertificate;
 use App\Models\Personel\Docs\EmployeeS6Doc;
 use App\Models\Personel\Docs\OtherDocument;
 use App\Models\Personel\Docs\PoliceRecord;

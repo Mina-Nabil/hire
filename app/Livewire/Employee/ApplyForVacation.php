@@ -74,7 +74,7 @@ class ApplyForVacation extends Component
         $this->vacationBenefits = $this->employee->vacationBenefits()
             ->where('start_date', '<=', $now)
             ->where('end_date', '>=', $now)
-            ->where('current_balance', '>', 0)
+            // ->where('current_balance', '>', 0)
             ->get();
     }
 

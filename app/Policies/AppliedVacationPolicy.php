@@ -24,6 +24,11 @@ class AppliedVacationPolicy
     {
         return $user->is_admin || $user->is_hr;
     }
+    
+    public function applyLateForAny(User $user): bool
+    {
+        return $user->is_admin || $user->is_hr;
+    }
 
 
     /**

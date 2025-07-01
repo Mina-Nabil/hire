@@ -13,10 +13,10 @@
                     <form wire:submit.prevent="openConfirmModal">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5 mt-5">
                             <!-- Vacation Type Selection -->
-                            <x-select wire:model.live="selectedEmployee" label="Change Employee"
+                            <x-select wire:model.live="selectedEmployee" label="Select Another Employee"
                                 errorMessage="{{ $errors->first('selectedEmployee') }}"
                                 class="w-full {{ $errors->has('selectedEmployee') ? '!border-danger-500' : '' }}">
-                                <option value="">-- Select Employee --</option>
+                                <option value="">-- You are applying for yourself --</option>
                                 @foreach ($childrenEmployees as $e)
                                     <option value="{{ $e->id }}">
                                         {{ $e->name }}

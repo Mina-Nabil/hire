@@ -2810,13 +2810,7 @@ class Employee extends Model
 
     public function getChildrenEmployeesAttribute()
     {
-        return $this->position?->children()
-            ->with('employee')
-            ->whereHas('employee')
-            ->get()
-            ->map(function ($position) {
-                return $position->employee;
-            });
+        return self::where('manager_id', $this->id)->get();
     }
 
     //// relations ////

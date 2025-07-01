@@ -37,7 +37,7 @@ class WorkDeclaration extends Model
      * @param Carbon $expiry_date
      * @return bool
      */
-    public function updateRecord($file_path, Carbon $issue_date, Carbon $expiry_date)
+    public function updateRecord($file_path, Carbon $issue_date, ?Carbon $expiry_date = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();

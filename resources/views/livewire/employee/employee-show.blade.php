@@ -2801,6 +2801,12 @@
                                 <h5 class="card-title text-slate-900 dark:text-white">College Certificate - Issue Date
                                     {{ $employee->collegeCertificate->issue_date }}</h5>
                             </div>
+
+
+                                <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
+                                <h5 class="card-title text-slate-900 dark:text-white">Type: {{ $employee->collegeCertificate->type }}</h5>
+                            </div>
+
                             <div class="card-body p-4">
                                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                                     <!-- Document Preview -->
@@ -6998,6 +7004,21 @@
                                                 id="college_certificate_issue_date"
                                                 wire:model="college_certificate_issue_date">
                                             @error('college_certificate_issue_date')
+                                                <span class="text-danger-500 text-sm">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
+                                        <div class="col-span-12">
+                                            <label for="college_certificate_type" class="form-label">Type</label>
+                                            <select name="college_certificate_type" id="college_certificate_type"
+                                                class="form-control @error('college_certificate_type') !border-danger-500 @enderror"
+                                                wire:model="college_certificate_type">
+                                                <option value="">Select Type</option>
+                                                @foreach ($college_certificate_types as $type)
+                                                    <option value="{{ $type }}">{{ $type }}</option>
+                                                @endforeach
+                                            </select>
+                                            @error('college_certificate_type')
                                                 <span class="text-danger-500 text-sm">{{ $message }}</span>
                                             @enderror
                                         </div>

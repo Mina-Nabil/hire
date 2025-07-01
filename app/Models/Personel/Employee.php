@@ -1115,7 +1115,7 @@ class Employee extends Model
      * @return bool
      * @throws AppException
      */
-    public function setWorkDeclaration($file_path, Carbon $issue_date, Carbon $expiry_date)
+    public function setWorkDeclaration($file_path, Carbon $issue_date, ?Carbon $expiry_date = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -1181,7 +1181,7 @@ class Employee extends Model
      * @return bool
      * @throws AppException
      */
-    public function setCollegeCertificate($file_path, Carbon $issue_date)
+    public function setCollegeCertificate($file_path, Carbon $issue_date, ?string $type = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -1196,6 +1196,7 @@ class Employee extends Model
                     'created_by' => $loggedInUser->id,
                     'file_path' => $file_path,
                     'issue_date' => $issue_date,
+                    'type' => $type,
                 ]
             );
             AppLog::info('College Certificate Set', 'College certificate set for employee: ' . $this->name, loggable: $this);
@@ -1432,6 +1433,10 @@ class Employee extends Model
                     $q->where('termination_date', '>=', $start_date);
                 });
         });
+    }
+    public function scopeStatusActive($query)
+    {
+        return $query->where('status', self::STATUS_ACTIVE);
     }
 
     public function scopeUnemployed($query)
@@ -2029,24 +2034,25 @@ class Employee extends Model
             ->where('doc_type', 'idCard')
             ->first();
 
+        $baseQuery = self::current()->statusActive();
         // Get total employees
-        $total = self::count();
+        $total = $baseQuery->count();
 
         // Get employees with missing ID cards
-        $missing = $docManager ? self::whereDoesntHave('idCard')->count() : 0;
+        $missing = $docManager ? $baseQuery->whereDoesntHave('idCard')->count() : 0;
 
         // Get employees with expired ID cards
-        $expired = $docManager ? self::whereHas('idCard', function ($q) use ($today) {
+        $expired = $docManager ? $baseQuery->whereHas('idCard', function ($q) use ($today) {
             $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
         })->count() : 0;
 
         // Get employees with ID cards near expiry
-        $nearExpiry = $docManager ? self::whereHas('idCard', function ($q) use ($today, $nearExpiryDate) {
+        $nearExpiry = $docManager ? $baseQuery->whereHas('idCard', function ($q) use ($today, $nearExpiryDate) {
             $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
         })->count() : 0;
 
         // Get employees with valid ID cards
-        $valid = self::whereHas('idCard', function ($q) use ($today, $nearExpiryDate) {
+        $valid = $baseQuery->whereHas('idCard', function ($q) use ($today, $nearExpiryDate) {
             $q->where(function ($q) use ($today, $nearExpiryDate) {
                 $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
             });
@@ -2073,11 +2079,13 @@ class Employee extends Model
             ->where('doc_type', 'birthCertificate')
             ->first();
 
+        $baseQuery = self::current()->statusActive();
+
         // Get total employees
-        $total = self::count();
+        $total = $baseQuery->count();
 
         // Get employees with missing birth certificates
-        $missing = $docManager ? self::whereDoesntHave('birthCertificate')->count() : 0;
+        $missing = $docManager ? $baseQuery->whereDoesntHave('birthCertificate')->count() : 0;
 
         // Get employees with expired birth certificates
         $expired =  0;
@@ -2086,18 +2094,18 @@ class Employee extends Model
         $nearExpiry =  0;
 
         // Get employees with valid birth certificates
-        $valid = self::whereHas('birthCertificate')->count();
+        $valid = $baseQuery->whereHas('birthCertificate')->count();
 
         // Get counts by type
-        $original = self::whereHas('birthCertificate', function ($q) {
+        $original = $baseQuery->whereHas('birthCertificate', function ($q) {
             $q->where('type', 'Original');
         })->count();
 
-        $verifiedCopy = self::whereHas('birthCertificate', function ($q) {
+        $verifiedCopy = $baseQuery->whereHas('birthCertificate', function ($q) {
             $q->where('type', 'Verified Copy');
         })->count();
 
-        $copy = self::whereHas('birthCertificate', function ($q) {
+        $copy = $baseQuery->whereHas('birthCertificate', function ($q) {
             $q->where('type', 'Copy');
         })->count();
 
@@ -2129,17 +2137,19 @@ class Employee extends Model
             ->where('doc_type', 'armyServicePaper')
             ->first();
 
+        $baseQuery = self::current()->statusActive();
+
         // Get total employees
-        $total = self::count();
+        $total = $baseQuery->count();
 
         // Get female employees (not required to have army service paper)
-        $females = self::where('gender', 'female')->count();
+        $females = $baseQuery->where('gender', 'female')->count();
 
         // Get male employees (required to have army service paper)
-        $males = self::where('gender', 'male')->count();
+        $males = $baseQuery->where('gender', 'male')->count();
 
         // Get male employees with missing army service papers
-        $missing = $docManager ? self::where('gender', 'male')
+        $missing = $docManager ? $baseQuery->where('gender', 'male')
             ->whereDoesntHave('armyServicePaper')
             ->whereHas('info', function ($q) {
                 $q->whereIn('military_status', ['exempt', 'completed']);
@@ -2147,7 +2157,7 @@ class Employee extends Model
             ->count() : 0;
 
         // Get male employees with expired army service papers
-        $expired = $docManager ? self::where('gender', 'male')
+        $expired = $docManager ? $baseQuery->where('gender', 'male')
             ->whereHas('armyServicePaper', function ($q) use ($today) {
                 $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
             })
@@ -2157,7 +2167,7 @@ class Employee extends Model
             ->count() : 0;
 
         // Get male employees with army service papers near expiry
-        $nearExpiry = $docManager ? self::where('gender', 'male')
+        $nearExpiry = $docManager ? $baseQuery->where('gender', 'male')
             ->whereHas('armyServicePaper', function ($q) use ($today, $nearExpiryDate) {
                 $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
             })
@@ -2167,7 +2177,7 @@ class Employee extends Model
             ->count() : 0;
 
         // Get male employees with valid army service papers
-        $valid = self::where('gender', 'male')
+        $valid = $baseQuery->where('gender', 'male')
             ->whereHas('armyServicePaper', function ($q) use ($today, $nearExpiryDate) {
                 $q->where(function ($q) use ($today, $nearExpiryDate) {
                     $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
@@ -2179,7 +2189,7 @@ class Employee extends Model
             ->count();
 
         // Get counts by type
-        $original = self::where('gender', 'male')
+        $original = $baseQuery->where('gender', 'male')
             ->whereHas('armyServicePaper', function ($q) {
                 $q->where('type', 'Original');
             })
@@ -2188,7 +2198,7 @@ class Employee extends Model
             })
             ->count();
 
-        $verifiedCopy = self::where('gender', 'male')
+        $verifiedCopy = $baseQuery->where('gender', 'male')
             ->whereHas('armyServicePaper', function ($q) {
                 $q->where('type', 'Verified Copy');
             })
@@ -2197,7 +2207,7 @@ class Employee extends Model
             })
             ->count();
 
-        $copy = self::where('gender', 'male')
+        $copy = $baseQuery->where('gender', 'male')
             ->whereHas('armyServicePaper', function ($q) {
                 $q->where('type', 'Copy');
             })
@@ -2236,24 +2246,26 @@ class Employee extends Model
             ->where('doc_type', 'employmentContract')
             ->first();
 
+        $baseQuery = self::current()->statusActive();
+
         // Get total employees
-        $total = self::count();
+        $total = $baseQuery->count();
 
         // Get employees with missing contracts
-        $missing = $docManager ? self::whereDoesntHave('contracts')->count() : 0;
+        $missing = $docManager ? $baseQuery->whereDoesntHave('contracts')->count() : 0;
 
         // Get employees with expired contracts
-        $expired = $docManager ? self::whereHas('contracts', function ($q) use ($today) {
+        $expired = $docManager ? $baseQuery->whereHas('contracts', function ($q) use ($today) {
             $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
         })->count() : 0;
 
         // Get employees with contracts near expiry
-        $nearExpiry = $docManager ? self::whereHas('contracts', function ($q) use ($today, $nearExpiryDate) {
+        $nearExpiry = $docManager ? $baseQuery->whereHas('contracts', function ($q) use ($today, $nearExpiryDate) {
             $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
         })->count() : 0;
 
         // Get employees with valid contracts
-        $valid = self::whereHas('contracts', function ($q) use ($today, $nearExpiryDate) {
+        $valid = $baseQuery->whereHas('contracts', function ($q) use ($today, $nearExpiryDate) {
             $q->where(function ($q) use ($today, $nearExpiryDate) {
                 $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
             });
@@ -2281,34 +2293,37 @@ class Employee extends Model
             ->where('is_active', true)
             ->where('doc_type', 'driverLicense')
             ->first();
+
+        $baseQuery = self::current()->statusActive();
+
         // Get total employees
-        $total = self::count();
+        $total = $baseQuery->count();
 
         // Get employees who require a driver license
-        $required = self::where('license_required', true)->count();
+        $required = $baseQuery->where('license_required', true)->count();
 
         // Get employees who don't require a driver license
-        $notRequired = self::where('license_required', false)->count();
+        $notRequired = $baseQuery->where('license_required', false)->count();
 
         // Get employees with missing driver licenses (only for those who require it)
-        $missing = $docManager ? self::where('license_required', true)->whereDoesntHave('driverLicense')->count() : 0;
+        $missing = $docManager ? $baseQuery->where('license_required', true)->whereDoesntHave('driverLicense')->count() : 0;
 
         // Get employees with expired driver licenses (only for those who require it)
-        $expired = $docManager ? self::where('license_required', true)
+        $expired = $docManager ? $baseQuery->where('license_required', true)
             ->whereHas('driverLicense', function ($q) use ($today) {
                 $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
             })
             ->count() : 0;
 
         // Get employees with driver licenses near expiry (only for those who require it)
-        $nearExpiry = $docManager ? self::where('license_required', true)
+        $nearExpiry = $docManager ? $baseQuery->where('license_required', true)
             ->whereHas('driverLicense', function ($q) use ($today, $nearExpiryDate) {
                 $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
             })
             ->count() : 0;
 
         // Get employees with valid driver licenses (only for those who require it)
-        $valid = self::where('license_required', true)
+        $valid = $baseQuery->where('license_required', true)
             ->whereHas('driverLicense', function ($q) use ($today, $nearExpiryDate) {
                 $q->where(function ($q) use ($today, $nearExpiryDate) {
                     $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
@@ -2340,24 +2355,27 @@ class Employee extends Model
             ->where('is_active', true)
             ->where('doc_type', 'policeRecord')
             ->first();
+
+        $baseQuery = self::current()->statusActive();
+
         // Get total employees
-        $total = self::count();
+        $total = $baseQuery->count();
 
         // Get employees with missing police records
-        $missing = $docManager ? self::whereDoesntHave('policeRecords')->count() : 0;
+        $missing = $docManager ? $baseQuery->whereDoesntHave('policeRecords')->count() : 0;
 
         // Get employees with expired police records
-        $expired = $docManager ? self::whereHas('policeRecords', function ($q) use ($today) {
+        $expired = $docManager ? $baseQuery->whereHas('policeRecords', function ($q) use ($today) {
             $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
         })->count() : 0;
 
         // Get employees with police records near expiry
-        $nearExpiry = $docManager ? self::whereHas('policeRecords', function ($q) use ($today, $nearExpiryDate) {
+        $nearExpiry = $docManager ? $baseQuery->whereHas('policeRecords', function ($q) use ($today, $nearExpiryDate) {
             $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
         })->count() : 0;
 
         // Get employees with valid police records
-        $valid = self::whereHas('policeRecords', function ($q) use ($today, $nearExpiryDate) {
+        $valid = $baseQuery->whereHas('policeRecords', function ($q) use ($today, $nearExpiryDate) {
             $q->where(function ($q) use ($today, $nearExpiryDate) {
                 $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
             });
@@ -2382,8 +2400,10 @@ class Employee extends Model
         $today = now()->format('Y-m-d');
         $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
 
+        $baseQuery = self::current()->statusActive();
+
         // Get total employees
-        $total = self::count();
+        $total = $baseQuery->count();
 
         // Get employees with missing HR letters
         $missing = 0;
@@ -2395,7 +2415,7 @@ class Employee extends Model
         $nearExpiry = 0;
 
         // Get employees with valid HR letters
-        $valid = self::whereHas('hrLetters', function ($q) use ($today, $nearExpiryDate) {
+        $valid = $baseQuery->whereHas('hrLetters', function ($q) use ($today, $nearExpiryDate) {
             $q->where(function ($q) use ($today, $nearExpiryDate) {
                 $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
             });
@@ -2423,11 +2443,14 @@ class Employee extends Model
             ->where('is_active', true)
             ->where('doc_type', 'employeeS1Doc')
             ->first();
+
+        $baseQuery = self::current()->statusActive();
+
         // Get total employees
-        $total = self::count();
+        $total = $baseQuery->count();
 
         // Get employees with missing S1 documents
-        $missing = $docManager ? self::whereDoesntHave('employeeS1Doc')->count() : 0;
+        $missing = $docManager ? $baseQuery->whereDoesntHave('employeeS1Doc')->count() : 0;
 
         // Get employees with expired S1 documents
         $expired = 0;
@@ -2436,7 +2459,7 @@ class Employee extends Model
         $nearExpiry = 0;
 
         // Get employees with valid S1 documents
-        $valid = self::whereHas('employeeS1Doc')->count();
+        $valid = $baseQuery->whereHas('employeeS1Doc')->count();
 
         return [
             'total' => $total,
@@ -2460,24 +2483,27 @@ class Employee extends Model
             ->where('is_active', true)
             ->where('doc_type', 'employeeS2Doc')
             ->first();
+
+        $baseQuery = self::current()->statusActive();
+
         // Get total employees
-        $total = self::count();
+        $total = $baseQuery->count();
 
         // Get employees with missing S2 documents
-        $missing = $docManager ? self::whereDoesntHave('employeeS2Doc')->count() : 0;
+        $missing = $docManager ? $baseQuery->whereDoesntHave('employeeS2Doc')->count() : 0;
 
         // Get employees with expired S2 documents
-        $expired = $docManager ? self::whereHas('employeeS2Doc', function ($q) use ($today) {
+        $expired = $docManager ? $baseQuery->whereHas('employeeS2Doc', function ($q) use ($today) {
             $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
         })->count() : 0;
 
         // Get employees with S2 documents near expiry
-        $nearExpiry = $docManager ? self::whereHas('employeeS2Doc', function ($q) use ($today, $nearExpiryDate) {
+        $nearExpiry = $docManager ? $baseQuery->whereHas('employeeS2Doc', function ($q) use ($today, $nearExpiryDate) {
             $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
         })->count() : 0;
 
         // Get employees with valid S2 documents
-        $valid = self::whereHas('employeeS2Doc', function ($q) use ($today, $nearExpiryDate) {
+        $valid = $baseQuery->whereHas('employeeS2Doc', function ($q) use ($today, $nearExpiryDate) {
             $q->where(function ($q) use ($today, $nearExpiryDate) {
                 $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
             });
@@ -2505,24 +2531,27 @@ class Employee extends Model
             ->where('is_active', true)
             ->where('doc_type', 'employeeS6Doc')
             ->first();
+
+        $baseQuery = self::current()->statusActive();
+
         // Get total employees
-        $total = self::count();
+        $total = $baseQuery->count();
 
         // Get employees with missing S6 documents
-        $missing = $docManager ? self::whereDoesntHave('employeeS6Doc')->count() : 0;
+        $missing = $docManager ? $baseQuery->whereDoesntHave('employeeS6Doc')->count() : 0;
 
         // Get employees with expired S6 documents
-        $expired = $docManager ? self::whereHas('employeeS6Doc', function ($q) use ($today) {
+        $expired = $docManager ? $baseQuery->whereHas('employeeS6Doc', function ($q) use ($today) {
             $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
         })->count() : 0;
 
         // Get employees with S6 documents near expiry
-        $nearExpiry = $docManager ? self::whereHas('employeeS6Doc', function ($q) use ($today, $nearExpiryDate) {
+        $nearExpiry = $docManager ? $baseQuery->whereHas('employeeS6Doc', function ($q) use ($today, $nearExpiryDate) {
             $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
         })->count() : 0;
 
         // Get employees with valid S6 documents
-        $valid = self::whereHas('employeeS6Doc', function ($q) use ($today, $nearExpiryDate) {
+        $valid = $baseQuery->whereHas('employeeS6Doc', function ($q) use ($today, $nearExpiryDate) {
             $q->where(function ($q) use ($today, $nearExpiryDate) {
                 $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
             });
@@ -2544,38 +2573,41 @@ class Employee extends Model
      */
     public static function getMedicalRecordStatistics()
     {
-        $total = self::count();
         $docManager = DocManager::where('is_required', true)
             ->where('is_active', true)
             ->where('doc_type', 'medicalRecord')
             ->first();
 
-        $valid = $docManager ? self::whereHas('medicalRecord', function ($q) {
+        $baseQuery = self::current()->statusActive();
+
+        $total = $baseQuery->count();
+
+        $valid = $docManager ? $baseQuery->whereHas('medicalRecord', function ($q) {
             $q->where('expiry_date', '>', now());
         })->count() : 0;
-        $expired = $docManager ? self::whereHas('medicalRecord', function ($q) {
+        $expired = $docManager ? $baseQuery->whereHas('medicalRecord', function ($q) {
             $q->where('expiry_date', '<', now());
         })->count() : 0;
-        $missing = $docManager ? self::whereDoesntHave('medicalRecord')->count() : 0;
-        $nearExpiry = $docManager ? self::whereHas('medicalRecord', function ($q) {
+        $missing = $docManager ? $baseQuery->whereDoesntHave('medicalRecord')->count() : 0;
+        $nearExpiry = $docManager ? $baseQuery->whereHas('medicalRecord', function ($q) {
             $q->where('expiry_date', '>', now())->where('expiry_date', '<', now()->addDays(self::NEAR_EXPIRY_DAYS));
         })->count() : 0;
 
         // Count by status
         $byStatus = [
-            'Not Covered' => self::whereHas('medicalRecord', function ($q) {
+            'Not Covered' => $baseQuery->whereHas('medicalRecord', function ($q) {
                 $q->where('status', 'Not Covered');
             })->count(),
-            'Examination' => self::whereHas('medicalRecord', function ($q) {
+            'Examination' => $baseQuery->whereHas('medicalRecord', function ($q) {
                 $q->where('status', 'Examination');
             })->count(),
-            'Issuing' => self::whereHas('medicalRecord', function ($q) {
+            'Issuing' => $baseQuery->whereHas('medicalRecord', function ($q) {
                 $q->where('status', 'Issuing');
             })->count(),
-            'Covered' => self::whereHas('medicalRecord', function ($q) {
+            'Covered' => $baseQuery->whereHas('medicalRecord', function ($q) {
                 $q->where('status', 'Covered');
             })->count(),
-            'External Cover' => self::whereHas('medicalRecord', function ($q) {
+            'External Cover' => $baseQuery->whereHas('medicalRecord', function ($q) {
                 $q->where('status', 'External Cover');
             })->count(),
         ];
@@ -2597,21 +2629,24 @@ class Employee extends Model
      */
     public static function getExternalMedicalRecordStatistics()
     {
-        $total = self::count();
         $docManager = DocManager::where('is_required', true)
             ->where('is_active', true)
             ->where('doc_type', 'externalMedicalRecord')
             ->first();
-        $valid =  self::whereHas('externalMedicalRecord', function ($q) {
+
+        $baseQuery = self::current()->statusActive();
+
+        $total = $baseQuery->count();
+        $valid = $baseQuery->whereHas('externalMedicalRecord', function ($q) {
             $q->where(function ($q) {
                 $q->whereNull('expiry_date')->orWhere('expiry_date', '>', now());
             });
         })->count();
-        $expired = $docManager ? self::whereHas('externalMedicalRecord', function ($q) {
+        $expired = $docManager ? $baseQuery->whereHas('externalMedicalRecord', function ($q) {
             $q->whereNotNull('expiry_date')->where('expiry_date', '<', now());
         })->count() : 0;
-        $missing = $docManager ? self::whereDoesntHave('externalMedicalRecord')->count() : 0;
-        $nearExpiry = $docManager ? self::whereHas('externalMedicalRecord', function ($q) {
+        $missing = $docManager ? $baseQuery->whereDoesntHave('externalMedicalRecord')->count() : 0;
+        $nearExpiry = $docManager ? $baseQuery->whereHas('externalMedicalRecord', function ($q) {
             $q->whereNotNull('expiry_date')
                 ->where('expiry_date', '>', now())
                 ->where('expiry_date', '<', now()->addDays(self::NEAR_EXPIRY_DAYS));
@@ -2633,21 +2668,24 @@ class Employee extends Model
      */
     public static function getPracticeCardStatistics()
     {
-        $total = self::count();
         $docManager = DocManager::where('is_required', true)
             ->where('is_active', true)
             ->where('doc_type', 'practiceCard')
             ->first();
-        $valid = self::whereHas('practiceCard', function ($q) {
+
+        $baseQuery = self::current()->statusActive();
+
+        $total = $baseQuery->count();
+        $valid = $baseQuery->whereHas('practiceCard', function ($q) {
             $q->where(function ($q) {
                 $q->whereNull('expiry_date')->orWhere('expiry_date', '>', now());
             });
         })->count();
-        $expired = $docManager ? self::whereHas('practiceCard', function ($q) {
+        $expired = $docManager ? $baseQuery->whereHas('practiceCard', function ($q) {
             $q->whereNotNull('expiry_date')->where('expiry_date', '<', now());
         })->count() : 0;
-        $missing = $docManager ? self::whereDoesntHave('practiceCard')->count() : 0;
-        $nearExpiry = $docManager ? self::whereHas('practiceCard', function ($q) {
+        $missing = $docManager ? $baseQuery->whereDoesntHave('practiceCard')->count() : 0;
+        $nearExpiry = $docManager ? $baseQuery->whereHas('practiceCard', function ($q) {
             $q->whereNotNull('expiry_date')
                 ->where('expiry_date', '>', now())
                 ->where('expiry_date', '<', now()->addDays(self::NEAR_EXPIRY_DAYS));
@@ -2669,21 +2707,24 @@ class Employee extends Model
      */
     public static function getSkillsQualificationStatistics()
     {
-        $total = self::count();
         $docManager = DocManager::where('is_required', true)
             ->where('is_active', true)
             ->where('doc_type', 'skillsQualification')
             ->first();
-        $valid = self::whereHas('skillsQualifications', function ($q) {
+
+        $baseQuery = self::current()->statusActive();
+
+        $total = $baseQuery->count();
+        $valid = $baseQuery->whereHas('skillsQualifications', function ($q) {
             $q->where(function ($q) {
                 $q->whereNull('expiry_date')->orWhere('expiry_date', '>', now());
             });
         })->count();
-        $expired = $docManager ? self::whereHas('skillsQualifications', function ($q) {
+        $expired = $docManager ? $baseQuery->whereHas('skillsQualifications', function ($q) {
             $q->whereNotNull('expiry_date')->where('expiry_date', '<', now());
         })->count() : 0;
-        $missing = $docManager ? self::whereDoesntHave('skillsQualifications')->count() : 0;
-        $nearExpiry = $docManager ? self::whereHas('skillsQualifications', function ($q) {
+        $missing = $docManager ? $baseQuery->whereDoesntHave('skillsQualifications')->count() : 0;
+        $nearExpiry = $docManager ? $baseQuery->whereHas('skillsQualifications', function ($q) {
             $q->whereNotNull('expiry_date')
                 ->where('expiry_date', '>', now())
                 ->where('expiry_date', '<', now()->addDays(self::NEAR_EXPIRY_DAYS));
@@ -2705,21 +2746,24 @@ class Employee extends Model
      */
     public static function getSyndicateCardStatistics()
     {
-        $total = self::count();
         $docManager = DocManager::where('is_required', true)
             ->where('is_active', true)
             ->where('doc_type', 'syndicateCard')
             ->first();
-        $valid = self::whereHas('syndicateCard', function ($q) {
+
+        $baseQuery = self::current()->statusActive();
+
+        $total = $baseQuery->count();
+        $valid = $baseQuery->whereHas('syndicateCard', function ($q) {
             $q->where(function ($q) {
                 $q->whereNull('expiry_date')->orWhere('expiry_date', '>', now());
             });
         })->count();
-        $expired = $docManager ? self::whereHas('syndicateCard', function ($q) {
+        $expired = $docManager ? $baseQuery->whereHas('syndicateCard', function ($q) {
             $q->whereNotNull('expiry_date')->where('expiry_date', '<', now());
         })->count() : 0;
-        $missing = $docManager ? self::whereDoesntHave('syndicateCard')->count() : 0;
-        $nearExpiry = $docManager ? self::whereHas('syndicateCard', function ($q) {
+        $missing = $docManager ? $baseQuery->whereDoesntHave('syndicateCard')->count() : 0;
+        $nearExpiry = $docManager ? $baseQuery->whereHas('syndicateCard', function ($q) {
             $q->whereNotNull('expiry_date')
                 ->where('expiry_date', '>', now())
                 ->where('expiry_date', '<', now()->addDays(self::NEAR_EXPIRY_DAYS));
@@ -2744,29 +2788,31 @@ class Employee extends Model
         $today = now()->format('Y-m-d');
         $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
 
-        // Get total employees
-        $total = self::count();
-
         $docManager = DocManager::where('is_required', true)
             ->where('is_active', true)
             ->where('doc_type', 'workDeclaration')
             ->first();
 
+        $baseQuery = self::current()->statusActive();
+
+        // Get total employees
+        $total = $baseQuery->count();
+
         // Get employees with missing work declarations
-        $missing = $docManager ? self::whereDoesntHave('workDeclarations')->count() : 0;
+        $missing = $docManager ? $baseQuery->whereDoesntHave('workDeclarations')->count() : 0;
 
         // Get employees with expired work declarations
-        $expired = $docManager ? self::whereHas('workDeclarations', function ($q) use ($today) {
+        $expired = $docManager ? $baseQuery->whereHas('workDeclarations', function ($q) use ($today) {
             $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
         })->count() : 0;
 
         // Get employees with work declarations near expiry
-        $nearExpiry = $docManager ? self::whereHas('workDeclarations', function ($q) use ($today, $nearExpiryDate) {
+        $nearExpiry = $docManager ? $baseQuery->whereHas('workDeclarations', function ($q) use ($today, $nearExpiryDate) {
             $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
         })->count() : 0;
 
         // Get employees with valid work declarations
-        $valid = self::whereHas('workDeclarations', function ($q) use ($today, $nearExpiryDate) {
+        $valid = $baseQuery->whereHas('workDeclarations', function ($q) use ($today, $nearExpiryDate) {
             $q->where(function ($q) use ($today, $nearExpiryDate) {
                 $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
             });
@@ -4238,7 +4284,7 @@ class Employee extends Model
 
         return $penaltyHours;
     }
-    
+
     /**
      * Get approved overtime hours in a date range
      *

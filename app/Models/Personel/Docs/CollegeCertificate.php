@@ -16,9 +16,21 @@ class CollegeCertificate extends Model
     const MORPH_NAME = 'college_certificate';
     const DOC_TYPE = 'collegeCertificate';
 
+
+    const TYPE_COPY = 'Copy';
+    const TYPE_VERIFIED_COPY = 'Verified Copy';
+    const TYPE_ORIGINAL = 'Original';
+
+    const TYPES = [
+        self::TYPE_COPY,
+        self::TYPE_VERIFIED_COPY,
+        self::TYPE_ORIGINAL,
+    ];
+
     protected $fillable = [
         'employee_id',
         'created_by',
+        'type',
         'file_path',
         'issue_date',
     ];
@@ -34,7 +46,7 @@ class CollegeCertificate extends Model
      * @param Carbon $issue_date
      * @return bool
      */
-    public function updateRecord($file_path, Carbon $issue_date)
+    public function updateRecord($file_path, Carbon $issue_date, ?string $type = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -46,6 +58,7 @@ class CollegeCertificate extends Model
             $this->update([
                 'file_path' => $file_path,
                 'issue_date' => $issue_date,
+                'type' => $type,
                 'created_by' => Auth::id(), // Track who updated it
             ]);
             AppLog::info('College Certificate Updated', 'College certificate updated for employee: ' . $this->employee->name, loggable: $this);
@@ -80,4 +93,4 @@ class CollegeCertificate extends Model
             throw new AppException('Error deleting college certificate');
         }
     }
-} 
+}

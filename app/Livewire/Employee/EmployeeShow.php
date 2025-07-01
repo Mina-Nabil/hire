@@ -235,6 +235,8 @@ class EmployeeShow extends Component
     public $college_certificate_file;
     public $college_certificate_issue_date;
     public $keep_existing_college_certificate = false;
+    public $college_certificate_type;
+    public $college_certificate_types;
 
     // Social Print Properties
     public $showEditSocialPrintModal = false;
@@ -291,6 +293,7 @@ class EmployeeShow extends Component
         $this->armyServicePaperTypes = ArmyServicePaper::TYPES;
         $this->employeeS6DocLeavingReasons = EmployeeS6Doc::LEAVING_REASONS;
         $this->statuses = Employee::STATUS_LIST;
+        $this->college_certificate_types = CollegeCertificate::TYPES;
     }
 
     public function openEditIdCardModal()
@@ -2131,13 +2134,13 @@ class EmployeeShow extends Component
         if ($this->keep_existing_work_declaration && $this->editing_work_declaration_id) {
             $this->validate([
                 'work_declaration_issue_date' => 'required|date',
-                'work_declaration_expiry_date' => 'required|date|after:work_declaration_issue_date',
+                'work_declaration_expiry_date' => 'nullable|date|after:work_declaration_issue_date',
             ]);
         } else {
             $this->validate([
                 'work_declaration_file' => 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
                 'work_declaration_issue_date' => 'required|date',
-                'work_declaration_expiry_date' => 'required|date|after:work_declaration_issue_date',
+                'work_declaration_expiry_date' => 'nullable|date|after:work_declaration_issue_date',
             ]);
         }
 
@@ -2182,7 +2185,7 @@ class EmployeeShow extends Component
                 $res = $this->employee->setWorkDeclaration(
                     $filePath,
                     Carbon::parse($this->work_declaration_issue_date),
-                    Carbon::parse($this->work_declaration_expiry_date)
+                    $this->work_declaration_expiry_date ? Carbon::parse($this->work_declaration_expiry_date) : null
                 );
 
                 $this->alertSuccess('Work Declaration has been created successfully!');
@@ -2390,6 +2393,7 @@ class EmployeeShow extends Component
         $this->validate([
             'college_certificate_issue_date' => 'required|date',
             'college_certificate_file' => $this->keep_existing_college_certificate ? 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif' : 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
+            'college_certificate_type' => 'nullable|string|in:' . implode(',', \App\Models\Personel\Docs\CollegeCertificate::TYPES),
         ]);
 
         try {
@@ -2410,7 +2414,8 @@ class EmployeeShow extends Component
 
             $this->employee->setCollegeCertificate(
                 $filePath,
-                Carbon::parse($this->college_certificate_issue_date)
+                Carbon::parse($this->college_certificate_issue_date),
+                $this->college_certificate_type
             );
 
             $this->closeEditCollegeCertificateModal();

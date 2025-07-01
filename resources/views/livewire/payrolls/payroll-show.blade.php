@@ -589,7 +589,7 @@
                     <!-- Penalties Tab -->
                     <div x-show="activeTab === 'penalties'" class="mt-4">
                         @if (($selectedPayrollEmployee->total_penalty_hours ?? 0) > 0)
-                            {{-- <!-- Penalty Summary Cards -->
+                            <!-- Penalty Summary Cards -->
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                                 <div class="bg-warning-50 dark:bg-warning-900/20 rounded-lg p-4 text-center">
                                     <div class="text-2xl font-bold text-warning-600 dark:text-warning-400">
@@ -745,7 +745,7 @@
                                         @endif
                                     </tbody>
                                 </table>
-                            </div> --}}
+                            </div>
                         @else
                             <div class="text-center py-8">
                                 <div class="flex flex-col items-center">

@@ -34,6 +34,7 @@ class Payroll extends Model
         'total_vacation_amount',
         'total_employees',
         'total_tax_amount',
+        'total_after_tax_amount',
         'status',
     ];
 
@@ -203,6 +204,11 @@ class Payroll extends Model
         $totalEmployees = count($payrollData);
         $benefitPaymentIds = [];
         $totalTaxAmount = 0;
+        $totalEmployerInsurance = 0;
+        $totalEmployeeMedical = 0;
+        $totalPenaltiesAmount = 0;
+        $totalOvertimeAmount = 0;
+        $totalEmployeeInsurance = 0;
 
         // Use DB::transaction as described with a function that uses the variables
         DB::transaction(function () use (
@@ -216,6 +222,11 @@ class Payroll extends Model
             &$totalVacationAmount,
             &$totalEmployees,
             &$totalTaxAmount,
+            &$totalEmployerInsurance,
+            &$totalEmployeeMedical,
+            &$totalPenaltiesAmount,
+            &$totalOvertimeAmount,
+            &$totalEmployeeInsurance,
             &$benefitPaymentIds
         ) {
             // 1. Create the payroll record
@@ -277,6 +288,7 @@ class Payroll extends Model
                     'position' => $employeeData['position'] ?? 'Unknown',
                     'department' => $employeeData['department'] ?? 'Unknown',
                     'tax_amount' => $taxAmount,
+                    'after_tax_salary' => $employeeData['net_after_deductions'] - $taxAmount,
                 ]);
 
                 // Create benefit payments for this employee using only base benefits data
@@ -286,8 +298,12 @@ class Payroll extends Model
                 }
 
                 // Add employee's net payment to the total
-                $totalPaid += $employeeData['net_after_deductions'] ?? 0;
-
+                $totalPaid += $employeeData['after_tax_salary'] ?? 0;
+                $totalEmployeeInsurance += $employeeData['employee_insurance'] ?? 0;
+                $totalEmployerInsurance += $employeeData['employer_insurance'] ?? 0;
+                $totalEmployeeMedical += $employeeData['employee_medical'] ?? 0;
+                $totalPenaltiesAmount += $employeeData['penalties_amount'] ?? 0;
+                $totalOvertimeAmount += $employeeData['overtime_amount'] ?? 0;
                 $totalTaxAmount += $taxAmount;
 
                 // Link extra payments to this payroll
@@ -336,6 +352,12 @@ class Payroll extends Model
                 'total_vacation_amount' => $totalVacationAmount,
                 'total_employees' => $totalEmployees,
                 'total_tax_amount' => $totalTaxAmount,
+                'total_after_tax_amount' => $totalPaid,
+                'total_employee_insurance' => $totalEmployeeInsurance,
+                'total_employer_insurance' => $totalEmployerInsurance,
+                'total_employee_medical' => $totalEmployeeMedical,
+                'total_penalties_amount' => $totalPenaltiesAmount,
+                'total_overtime_amount' => $totalOvertimeAmount,
             ]);
 
             // Log the creation of the payroll

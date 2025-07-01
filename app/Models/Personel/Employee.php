@@ -3804,8 +3804,10 @@ class Employee extends Model
         // Otherwise, only include unassigned attendance records
         if ($payrollId !== null) {
             $attendanceQuery->where(function ($query) use ($payrollId) {
-                $query->whereNull('payroll_id')
-                    ->orWhere('payroll_id', $payrollId);
+                $query->where(function ($q) use ($payrollId) {
+                    $q->whereNull('payroll_id')
+                        ->orWhere('payroll_id', $payrollId);
+                });
             });
         } else {
             $attendanceQuery->whereNull('payroll_id');
@@ -3816,7 +3818,7 @@ class Employee extends Model
         // Return the difference - days that should have been worked but weren't
         $missingDays = collect(array_diff($period, $attendedDates));
         $missingDays->each(function ($date) {
-            $this->missingDays()->firstOrCreate([
+            $this->missingDays()->updateOrCreate([
                 'date' => $date,
             ], [
                 'hours' => $this->benefitConfiguration?->daily_working_hours ?? 8,

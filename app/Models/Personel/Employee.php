@@ -2036,29 +2036,27 @@ class Employee extends Model
 
         $baseQuery = self::current()->statusActive();
         // Get total employees
-        $total = $baseQuery->count();
+        $total = $baseQuery->clone()->count();
 
         // Get employees with missing ID cards
-        $missing = $docManager ? $baseQuery->whereDoesntHave('idCard')->count() : 0;
+        $missing = $docManager ? $baseQuery->clone()->whereDoesntHave('idCard')->count() : 0;
 
         // Get employees with expired ID cards
-        $expired = $docManager ? $baseQuery->whereHas('idCard', function ($q) use ($today) {
+        $expired = $docManager ? $baseQuery->clone()->whereHas('idCard', function ($q) use ($today) {
             $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
         })->count() : 0;
 
         // Get employees with ID cards near expiry
-        $nearExpiry = $docManager ? $baseQuery->whereHas('idCard', function ($q) use ($today, $nearExpiryDate) {
+        $nearExpiry = $docManager ? $baseQuery->clone()->whereHas('idCard', function ($q) use ($today, $nearExpiryDate) {
             $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
         })->count() : 0;
 
         // Get employees with valid ID cards
-        $valid = $baseQuery->join('id_cards', 'employees.id', '=', 'id_cards.employee_id')
-            // ->where(function ($q) use ($today, $nearExpiryDate) {
-            //     $q->whereNull('id_cards.expiry_date')->orWhere('id_cards.expiry_date', '>', $nearExpiryDate);
-            // })
-            ->selectRaw('COUNT(DISTINCT employees.id) as total')
-            ->first()
-            ->total;
+        $valid = $baseQuery->clone()->whereHas('idCard', function ($q) use ($today, $nearExpiryDate) {
+            $q->where(function ($q) use ($today, $nearExpiryDate) {
+                $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
+            });
+        })->count();
 
         return [
             'total' => $total,

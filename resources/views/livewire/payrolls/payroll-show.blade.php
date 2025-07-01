@@ -60,12 +60,14 @@
 
                 <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-4">
                     <h5 class="text-sm font-medium text-slate-500 dark:text-slate-300 mb-1">Employee Insurance</h5>
-                    <div class="text-base font-semibold">{{ number_format($payroll->total_employee_insurance, 2) }}</div>
+                    <div class="text-base font-semibold">{{ number_format($payroll->total_employee_insurance, 2) }}
+                    </div>
                 </div>
 
                 <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-4">
                     <h5 class="text-sm font-medium text-slate-500 dark:text-slate-300 mb-1">Employer Insurance</h5>
-                    <div class="text-base font-semibold">{{ number_format($payroll->total_employer_insurance, 2) }}</div>
+                    <div class="text-base font-semibold">{{ number_format($payroll->total_employer_insurance, 2) }}
+                    </div>
                 </div>
 
                 <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-4">
@@ -471,6 +473,33 @@
                                 </tbody>
                             </table>
                         </div>
+                        <!-- Missing Days Table -->
+                        <div class="overflow-x-auto mt-4">
+                            <table class="min-w-full divide-y divide-slate-100 dark:divide-slate-700">
+                                <thead>
+                                    <tr>
+                                        <th class="table-th">Missed Day</th>
+                                        <th class="table-th">Hours</th>
+                                    </tr>
+                                </thead>
+                                <tbody
+                                    class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
+                                    @forelse($employeeMissingDays as $missingDay)
+                                        <tr>
+                                            <td class="table-td">
+                                                {{ \Carbon\Carbon::parse($missingDay->date)->format('d M Y') }}
+                                            </td>
+                                            <td class="table-td">{{ $missingDay->hours }}</td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="2" class="table-td text-center py-4">No missing days
+                                                found</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
                     <!-- Benefit Payments Tab -->
@@ -714,34 +743,6 @@
                                                 </td>
                                             </tr>
                                         @endif
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <!-- Missing Days Table -->
-                            <div class="overflow-x-auto mt-4">
-                                <table class="min-w-full divide-y divide-slate-100 dark:divide-slate-700">
-                                    <thead>
-                                        <tr>
-                                            <th class="table-th">Missed Day</th>
-                                            <th class="table-th">Hours</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody
-                                        class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
-                                        @forelse($employeeMissingDays as $missingDay)
-                                            <tr>
-                                                <td class="table-td">
-                                                    {{ \Carbon\Carbon::parse($missingDay->date)->format('d M Y') }}
-                                                </td>
-                                                <td class="table-td">{{ $missingDay->hours }}</td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="2" class="table-td text-center py-4">No missing days
-                                                    found</td>
-                                            </tr>
-                                        @endforelse
                                     </tbody>
                                 </table>
                             </div>

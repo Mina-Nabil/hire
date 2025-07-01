@@ -3754,7 +3754,7 @@ class Employee extends Model
      * @param Carbon|string $endDate End date of the range
      * @return \Illuminate\Support\Collection Collection of dates that were working days but had no attendance
      */
-    public function getMissedWorkingDays($startDate, $endDate, $deleteOldMissedDays = false, $payrollId = null)
+    public function getMissedWorkingDays($startDate, $endDate, $deleteOldMissedDays = false)
     {
         $startDate = $startDate instanceof Carbon ? $startDate : Carbon::parse($startDate);
         $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
@@ -3800,19 +3800,6 @@ class Employee extends Model
             ->where('date', '<=', $endDate->format('Y-m-d'))
             ->where('is_approved', true);
 
-        // If payrollId is provided, include attendance records for that payroll
-        // Otherwise, only include unassigned attendance records
-        if ($payrollId !== null) {
-            $attendanceQuery->where(function ($query) use ($payrollId) {
-                $query->where(function ($q) use ($payrollId) {
-                    $q->whereNull('payroll_id')
-                        ->orWhere('payroll_id', $payrollId);
-                });
-            });
-        } else {
-            $attendanceQuery->whereNull('payroll_id');
-        }
-
         $attendedDates = $attendanceQuery->pluck('date')->toArray();
 
         // Return the difference - days that should have been worked but weren't
@@ -3834,9 +3821,9 @@ class Employee extends Model
      * @param Carbon|string $endDate End date of the range
      * @return float Total hours that should have been worked but weren't
      */
-    public function getMissedWorkingHours($startDate, $endDate, $deleteOldMissedDays = false, $payrollId = null)
+    public function getMissedWorkingHours($startDate, $endDate, $deleteOldMissedDays = false)
     {
-        $missedDays = $this->getMissedWorkingDays($startDate, $endDate, $deleteOldMissedDays, $payrollId);
+        $missedDays = $this->getMissedWorkingDays($startDate, $endDate, $deleteOldMissedDays);
         $dailyHours = $this->benefitConfiguration?->daily_working_hours ?? 8;
         if ($this->id == 1) {
             Log::info('missed days', ['missedDays' => $missedDays->count()]);
@@ -3853,7 +3840,7 @@ class Employee extends Model
      * @param int|null $payrollId Optional payroll ID to include attendance records that belong to this payroll
      * @return float Deduction amount
      */
-    public function calculateMissedHoursDeduction($startDate, $endDate, $hourlyRate = null, $payrollId = null)
+    public function calculateMissedHoursDeduction($startDate, $endDate, $hourlyRate = null)
     {
         if ($hourlyRate === null) {
             // Calculate hourly rate based on gross salary
@@ -3864,7 +3851,7 @@ class Employee extends Model
             $hourlyRate = $grossSalary / ($workingDaysPerMonth * $dailyHours);
         }
 
-        $missedHours = $this->getMissedWorkingHours($startDate, $endDate, true, $payrollId);
+        $missedHours = $this->getMissedWorkingHours($startDate, $endDate, true);
         return $missedHours * $hourlyRate;
     }
 
@@ -4012,7 +3999,7 @@ class Employee extends Model
      * @param int|null $payrollId Optional payroll ID to include attendance records that belong to this payroll
      * @return float Total hours to be penalized
      */
-    public function getTotalPenaltyHours($startDate, $endDate, $payrollId = null)
+    public function getTotalPenaltyHours($startDate, $endDate)
     {
         $startDate = $startDate instanceof Carbon ? $startDate : Carbon::parse($startDate);
         $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
@@ -4044,17 +4031,6 @@ class Employee extends Model
             ->where('date', '>=', $startDate->format('Y-m-d'))
             ->where('date', '<=', $endDate->format('Y-m-d'))
             ->where('is_approved', true);
-
-        // If payrollId is provided, include attendance records for that payroll
-        // Otherwise, only include unassigned attendance records
-        if ($payrollId !== null) {
-            $attendanceQuery->where(function ($query) use ($payrollId) {
-                $query->whereNull('payroll_id')
-                    ->orWhere('payroll_id', $payrollId);
-            });
-        } else {
-            $attendanceQuery->whereNull('payroll_id');
-        }
 
         $attendances = $attendanceQuery->get();
 
@@ -4262,31 +4238,7 @@ class Employee extends Model
 
         return $penaltyHours;
     }
-
-    /**
-     * Calculate total penalty deduction based on all attendance issues
-     *
-     * @param Carbon|string $startDate Start date of the range
-     * @param Carbon|string $endDate End date of the range
-     * @param float $hourlyRate The hourly rate for deduction calculation
-     * @param int|null $payrollId Optional payroll ID to include attendance records that belong to this payroll
-     * @return float Total deduction amount
-     */
-    public function calculateTotalPenaltyDeduction($startDate, $endDate, $hourlyRate = null, $payrollId = null)
-    {
-        if ($hourlyRate === null) {
-            // Calculate hourly rate based on gross salary
-            $grossSalary = $this->benefitConfiguration->gross_salary ?? 0;
-            $workingDaysPerMonth = $this->getWorkingDaysInPeriod($startDate, $endDate);
-            $dailyHours = $this->benefitConfiguration->daily_working_hours ?? 8;
-
-            $hourlyRate = $grossSalary / ($workingDaysPerMonth * $dailyHours);
-        }
-
-        $totalPenaltyHours = $this->getTotalPenaltyHours($startDate, $endDate, $payrollId);
-        return $totalPenaltyHours * $hourlyRate;
-    }
-
+    
     /**
      * Get approved overtime hours in a date range
      *
@@ -4672,7 +4624,7 @@ class Employee extends Model
      * @param int|null $payrollId Optional payroll ID to include attendance records that belong to this payroll
      * @return array Array containing penalty breakdown and available vacation benefits
      */
-    public function calculatePenaltyWithVacationOffset($startDate, $endDate, $hourlyRate = null, $payrollId = null)
+    public function calculatePenaltyWithVacationOffset($startDate, $endDate, $hourlyRate = null)
     {
         $startDate = $startDate instanceof Carbon ? $startDate : Carbon::parse($startDate);
         $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
@@ -4690,7 +4642,7 @@ class Employee extends Model
         }
 
         // Get total penalty hours
-        $totalPenaltyHours = $this->getTotalPenaltyHours($startDate, $endDate, $payrollId);
+        $totalPenaltyHours = $this->getTotalPenaltyHours($startDate, $endDate);
         if ($this->id == 1) {
             Log::info('total penalty hours', ['totalPenaltyHours' => $totalPenaltyHours]);
         }

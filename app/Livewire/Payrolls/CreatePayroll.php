@@ -355,9 +355,6 @@ class CreatePayroll extends Component
             // Get extra payments
             $extraPayments = $employee->getNegativeExtraPayments($this->startDate, $this->endDate);
 
-            // Alternatively, use the new penalty calculation function (uncomment if needed)
-            // $penaltyAmount = $employee->calculateTotalPenaltyDeduction($this->startDate, $this->endDate);
-
             // Calculate overtime
             $overtimeHours = 0;
             $overtimeRate = $employee->benefitConfiguration->overtime_rate ?? 1.5;

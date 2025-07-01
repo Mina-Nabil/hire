@@ -179,7 +179,6 @@ class PayrollShow extends Component
             $this->payroll->start_date,
             $this->payroll->end_date,
             $hourlyRate, // use the same hourly rate calculation as CreatePayroll
-            $this->payroll->id // pass the payroll ID to include attendance records
         );
         
         // Get penalty breakdown data

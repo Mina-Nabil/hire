@@ -16,7 +16,6 @@ return new class extends Migration
         });
 
         Schema::table('payrolls', function (Blueprint $table) {
-            $table->decimal('total_after_tax_amount', 10, 2)->nullable();
             $table->decimal('total_employee_insurance', 10, 2)->nullable();
             $table->decimal('total_employer_insurance', 10, 2)->nullable();
             $table->decimal('total_employee_medical', 10, 2)->nullable();

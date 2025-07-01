@@ -38,8 +38,7 @@ class Payroll extends Model
         'total_employer_insurance',
         'total_employee_medical',
         'total_penalties_amount',
-        'total_overtime_amount',
-        'total_after_tax_amount',
+        'total_overtime_amount'
         'status',
     ];
 
@@ -357,7 +356,6 @@ class Payroll extends Model
                 'total_vacation_amount' => $totalVacationAmount,
                 'total_employees' => $totalEmployees,
                 'total_tax_amount' => $totalTaxAmount,
-                'total_after_tax_amount' => $totalPaid,
                 'total_employee_insurance' => $totalEmployeeInsurance,
                 'total_employer_insurance' => $totalEmployerInsurance,
                 'total_employee_medical' => $totalEmployeeMedical,

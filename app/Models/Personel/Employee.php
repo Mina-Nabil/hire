@@ -2245,7 +2245,7 @@ class Employee extends Model
         $nearExpiryDate = now()->addDays(self::NEAR_EXPIRY_DAYS)->format('Y-m-d');
         $docManager = DocManager::where('is_required', true)
             ->where('is_active', true)
-            ->where('doc_type', 'employmentContract')
+            ->where('doc_type', 'employeeContract')
             ->first();
 
         $baseQuery = self::current()->statusActive();

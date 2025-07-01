@@ -556,12 +556,13 @@ class Employee extends Model
         $vacationBenefit->load('vacationDetail');
         $applyDeadline = $vacationBenefit->apply_deadline;
         $deadlineDate = Carbon::now()->addDays($applyDeadline)->setTime(23, 59, 59);
-        
+
         if (!$loggedInUser->can('applyLateForAny', AppliedVacation::class)) {
-        foreach ($days as $day) {
-            $dayDate = Carbon::parse($day['vacation_date']);
-            if ($dayDate->isBefore($deadlineDate)) {
-                throw new AppException('You cannot apply for vacation after the apply deadline');
+            foreach ($days as $day) {
+                $dayDate = Carbon::parse($day['vacation_date']);
+                if ($dayDate->isBefore($deadlineDate)) {
+                    throw new AppException('You cannot apply for vacation after the apply deadline');
+                }
             }
         }
 
@@ -3839,7 +3840,7 @@ class Employee extends Model
     {
         $missedDays = $this->getMissedWorkingDays($startDate, $endDate, $deleteOldMissedDays, $payrollId);
         $dailyHours = $this->benefitConfiguration?->daily_working_hours ?? 8;
-        if($this->id == 1) {
+        if ($this->id == 1) {
             Log::info('missed days', ['missedDays' => $missedDays->count()]);
         }
         return $missedDays->count() * $dailyHours;
@@ -4113,12 +4114,12 @@ class Employee extends Model
                 $attendance->penalized_hours = $penaltyHoursForDay;
                 $attendance->save();
             }
-            if($this->id == 1) {
+            if ($this->id == 1) {
                 Log::info('penalty hours for day', ['penaltyHoursForDay' => $penaltyHoursForDay]);
             }
             $totalPenaltyHours += $penaltyHoursForDay;
         }
-        if($this->id == 1) {
+        if ($this->id == 1) {
             Log::info('total penalty hours 2', ['totalPenaltyHours' => $totalPenaltyHours]);
         }
         return $totalPenaltyHours;
@@ -4192,7 +4193,7 @@ class Employee extends Model
         // Calculate valid hours, ensuring it's not negative
         $validHours = max(0, $effectiveStart->diffInHours($effectiveEnd, true));
         return $validHours;
-        
+
         // // Additional penalty for arriving late (after allowed start max)
         // if ($attendanceStart->gt($allowedStartMax)) {
         //     $lateHours = $attendanceStart->diffInHours($allowedStartMax, true);
@@ -4692,7 +4693,7 @@ class Employee extends Model
 
         // Get total penalty hours
         $totalPenaltyHours = $this->getTotalPenaltyHours($startDate, $endDate, $payrollId);
-        if($this->id == 1) {
+        if ($this->id == 1) {
             Log::info('total penalty hours', ['totalPenaltyHours' => $totalPenaltyHours]);
         }
 

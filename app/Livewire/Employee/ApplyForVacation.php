@@ -11,6 +11,7 @@ use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 #[Title('Apply for Vacation')]
 class ApplyForVacation extends Component
@@ -44,6 +45,7 @@ class ApplyForVacation extends Component
             }
         } else {
             $this->childrenEmployees = $this->employee->childrenEmployees;
+            Log::info('childrenEmployees', [$this->childrenEmployees]);
         }
 
         if ($this->employee) {

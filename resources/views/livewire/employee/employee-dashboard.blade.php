@@ -22,7 +22,7 @@
                     <tbody class="divide-y divide-gray-200">
                         <!-- ID Card -->
                         <tr class="hover:bg-gray-50">
-                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ getDocumentName('idCard', 'ID Card') }}</td>
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $this->getDocumentName('idCard', 'ID Card') }}</td>
                             <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $idCardStats['total'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $idCardStats['valid'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
@@ -57,7 +57,7 @@
 
                         <!-- Birth Certificate -->
                         <tr class="hover:bg-gray-50">
-                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ getDocumentName('birthCertificate', 'Birth Certificate') }}</td>
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $this->getDocumentName('birthCertificate', 'Birth Certificate') }}</td>
                             <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $birthCertificateStats['total'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $birthCertificateStats['valid'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
@@ -96,7 +96,7 @@
 
                         <!-- Army Service Paper -->
                         <tr class="hover:bg-gray-50">
-                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ getDocumentName('armyServicePaper', 'Army Service Paper') }}</td>
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $this->getDocumentName('armyServicePaper', 'Army Service Paper') }}</td>
                             <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $armyServicePaperStats['total'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $armyServicePaperStats['valid'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
@@ -134,7 +134,7 @@
 
                         <!-- Employment Contract -->
                         <tr class="hover:bg-gray-50">
-                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ getDocumentName('employmentContract', 'Employment Contract') }}</td>
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $this->getDocumentName('employmentContract', 'Employment Contract') }}</td>
                             <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $employmentContractStats['total'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $employmentContractStats['valid'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
@@ -169,7 +169,7 @@
 
                         <!-- Driver License -->
                         <tr class="hover:bg-gray-50">
-                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ getDocumentName('driverLicense', 'Driver License') }}</td>
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $this->getDocumentName('driverLicense', 'Driver License') }}</td>
                             <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $driverLicenseStats['total'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $driverLicenseStats['valid'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
@@ -207,7 +207,7 @@
 
                         <!-- Police Record -->
                         <tr class="hover:bg-gray-50">
-                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ getDocumentName('policeRecord', 'Police Record') }}</td>
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $this->getDocumentName('policeRecord', 'Police Record') }}</td>
                             <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $policeRecordStats['total'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $policeRecordStats['valid'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
@@ -277,7 +277,7 @@
 
                         <!-- S1 Document -->
                         <tr class="hover:bg-gray-50">
-                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ getDocumentName('s1Doc', 'S1 Document') }}</td>
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $this->getDocumentName('s1Doc', 'S1 Document') }}</td>
                             <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $s1DocStats['total'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $s1DocStats['valid'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
@@ -312,7 +312,7 @@
 
                         <!-- S2 Document -->
                         <tr class="hover:bg-gray-50">
-                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ getDocumentName('s2Doc', 'S2 Document') }}</td>
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $this->getDocumentName('s2Doc', 'S2 Document') }}</td>
                             <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $s2DocStats['total'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $s2DocStats['valid'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
@@ -347,7 +347,7 @@
 
                         <!-- S6 Document -->
                         <tr class="hover:bg-gray-50">
-                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ getDocumentName('s6Doc', 'S6 Document') }}</td>
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $this->getDocumentName('s6Doc', 'S6 Document') }}</td>
                             <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $s6DocStats['total'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $s6DocStats['valid'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
@@ -382,7 +382,7 @@
 
                         <!-- Medical Record -->
                         <tr class="hover:bg-gray-50">
-                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ getDocumentName('medicalRecord', 'Medical Record') }}</td>
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $this->getDocumentName('medicalRecord', 'Medical Record') }}</td>
                             <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $medicalRecordStats['total'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $medicalRecordStats['valid'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
@@ -423,7 +423,7 @@
 
                         <!-- External Medical Record -->
                         <tr class="hover:bg-gray-50">
-                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ getDocumentName('externalMedicalRecord', 'External Medical Record') }}</td>
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $this->getDocumentName('externalMedicalRecord', 'External Medical Record') }}</td>
                             <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $externalMedicalRecordStats['total'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $externalMedicalRecordStats['valid'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
@@ -458,7 +458,7 @@
 
                         <!-- Practice Card -->
                         <tr class="hover:bg-gray-50">
-                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ getDocumentName('practiceCard', 'Practice Card') }}</td>
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $this->getDocumentName('practiceCard', 'Practice Card') }}</td>
                             <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $practiceCardStats['total'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $practiceCardStats['valid'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
@@ -493,7 +493,7 @@
 
                         <!-- Skills Qualification -->
                         <tr class="hover:bg-gray-50">
-                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ getDocumentName('skillsQualification', 'Skills Qualification') }}</td>
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $this->getDocumentName('skillsQualification', 'Skills Qualification') }}</td>
                             <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $skillsQualificationStats['total'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $skillsQualificationStats['valid'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
@@ -528,7 +528,7 @@
 
                         <!-- Syndicate Card -->
                         <tr class="hover:bg-gray-50">
-                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ getDocumentName('syndicateCard', 'Syndicate Card') }}</td>
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $this->getDocumentName('syndicateCard', 'Syndicate Card') }}</td>
                             <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $syndicateCardStats['total'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $syndicateCardStats['valid'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">
@@ -563,7 +563,7 @@
 
                         <!-- Work Declaration -->
                         <tr class="hover:bg-gray-50">
-                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ getDocumentName('workDeclaration', 'Work Declaration') }}</td>
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $this->getDocumentName('workDeclaration', 'Work Declaration') }}</td>
                             <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $workDeclarationStats['total'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $workDeclarationStats['valid'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-warning-600 font-semibold">

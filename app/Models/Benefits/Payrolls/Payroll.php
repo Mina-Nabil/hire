@@ -254,8 +254,9 @@ class Payroll extends Model
                     continue; // Skip if employee not found
                 }
 
-                $taxAmount = self::calculateTaxAmount($employeeData['net_after_deductions']);
-
+                $netAmountBeforeTax = ($employeeData['net_after_deductions'] ?? 0) + ($employeeData['overtime_amount'] ?? 0);
+                $taxAmount = self::calculateTaxAmount($netAmountBeforeTax);
+                $netAmountAfterTax = $netAmountBeforeTax + $taxAmount;
 
                 // Create payroll_employee record with fields that exist in the database schema
                 $payrollEmployee = $payroll->payrollEmployees()->create([
@@ -286,13 +287,13 @@ class Payroll extends Model
                     'extra_payments' => $employeeData['extra_payments'] ?? 0,
                     'adj_amount' => $employeeData['adj_amount'] ?? 0,
                     'adj_desc' => $employeeData['adj_desc'] ?? '',
-                    'net_after_deductions' => $employeeData['net_after_deductions'] ?? 0,
+                    'net_after_deductions' => $netAmountBeforeTax,
                     'employee_base_benefits' => $employeeData['employee_base_benefits'] ?? 0,
                     'other_base_benefits' => $employeeData['other_base_benefits'] ?? 0,
                     'position' => $employeeData['position'] ?? 'Unknown',
                     'department' => $employeeData['department'] ?? 'Unknown',
                     'tax_amount' => $taxAmount,
-                    'after_tax_salary' => ($employeeData['net_after_deductions'] - $taxAmount),
+                    'after_tax_salary' => $netAmountAfterTax,
                 ]);
 
                 // Create benefit payments for this employee using only base benefits data
@@ -302,7 +303,7 @@ class Payroll extends Model
                 }
 
                 // Add employee's net payment to the total
-                $totalPaid += $employeeData['after_tax_salary'] ?? 0;
+                $totalPaid += $netAmountAfterTax;
                 $totalEmployeeInsurance += $employeeData['employee_insurance'] ?? 0;
                 $totalEmployerInsurance += $employeeData['employer_insurance'] ?? 0;
                 $totalEmployeeMedical += $employeeData['employee_medical'] ?? 0;

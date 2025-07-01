@@ -73,7 +73,10 @@ class ApplyForVacation extends Component
         $now = Carbon::now();
         $this->vacationBenefits = $this->employee->vacationBenefits()
             ->where('start_date', '<=', $now)
-            ->where('end_date', '>=', $now)
+            ->where(function ($query) use ($now) {
+                $query->where('end_date', '>=', $now)
+                    ->orWhereNull('end_date');
+            })
             // ->where('current_balance', '>', 0)
             ->get();
     }

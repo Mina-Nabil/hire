@@ -2810,7 +2810,9 @@ class Employee extends Model
 
     public function getChildrenEmployeesAttribute()
     {
-        return self::where('manager_id', $this->id)->get();
+        return self::whereHas('info', function ($q) {
+            $q->where('manager_id', $this->id);
+        })->get();
     }
 
     //// relations ////

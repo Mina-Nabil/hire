@@ -33,6 +33,16 @@
                     </div>
                 @endif
 
+                @can('view', $payroll)
+                    <button type="button" class="btn btn-primary btn-sm" wire:click="exportPayroll">
+                        <span class="flex items-center">
+                            <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2"
+                                icon="heroicons-outline:document-download"></iconify-icon>
+                            Export Excel
+                        </span>
+                    </button>
+                @endcan
+
                 <a href="{{ route('payrolls.index') }}">
                     <button class="btn inline-flex justify-center btn-light btn-sm">Back to Payrolls</button>
                 </a>

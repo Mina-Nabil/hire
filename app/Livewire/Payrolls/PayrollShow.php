@@ -427,6 +427,13 @@ class PayrollShow extends Component
         $this->alertSuccess('Adjustment updated successfully.');
     }
     
+    public function exportPayroll()
+    {
+        $this->authorize('view', $this->payroll);
+        
+        return $this->payroll->exportToExcel();
+    }
+    
     public function render()
     {
         $data = [];

@@ -316,9 +316,9 @@ class ZKDeviceController extends Controller
                 ]);
                 return response($response, 200);
             }
-
-            // Return 'NONE' to tell the device there are no commands
-            // This should reduce or stop the polling frequency
+        
+        // Return 'NONE' to tell the device there are no commands
+        // This should reduce or stop the polling frequency
             return response('NONE', 200);
             
         } catch (\Exception $e) {

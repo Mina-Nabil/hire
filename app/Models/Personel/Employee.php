@@ -3513,8 +3513,6 @@ class Employee extends Model
         return $summary;
     }
 
-    public function importEmployeesFromCSV($file_path) {}
-
     /**
      * Create a new employee with basic information and optional employee info
      *

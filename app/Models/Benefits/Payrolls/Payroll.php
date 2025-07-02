@@ -11,6 +11,10 @@ use App\Models\Users\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Response;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class Payroll extends Model
 {
@@ -446,5 +450,348 @@ class Payroll extends Model
     public function getTitleAttribute()
     {
         return 'Payroll ' . $this->start_date->format('Y-m-d') . ' -> ' . $this->end_date->format('Y-m-d');
+    }
+
+    /**
+     * Export payroll to Excel format with multiple sheets
+     * 
+     * @return BinaryFileResponse
+     */
+    public function exportToExcel()
+    {
+        // Create new spreadsheet
+        $spreadsheet = new Spreadsheet();
+        
+        // Remove default worksheet
+        $spreadsheet->removeSheetByIndex(0);
+        
+        // 1. Create Payroll Summary Sheet
+        $this->createPayrollSummarySheet($spreadsheet);
+        
+        // 2. Create Employee Overview Sheet
+        $this->createEmployeeOverviewSheet($spreadsheet);
+        
+        // 3. Create individual employee sheets
+        $this->createEmployeeDetailSheets($spreadsheet);
+        
+        // Set the first sheet as active
+        $spreadsheet->setActiveSheetIndex(0);
+        
+        // Create writer
+        $writer = new Xlsx($spreadsheet);
+        
+        // Save the file
+        $filename = storage_path('payroll_export_' . $this->id . '_' . date('Y-m-d_H-i-s') . '.xlsx');
+        $writer->save($filename);
+        
+        return response()->download($filename)->deleteFileAfterSend(true);
+    }
+    
+    /**
+     * Create the payroll summary sheet
+     */
+    private function createPayrollSummarySheet($spreadsheet)
+    {
+        $summarySheet = $spreadsheet->createSheet();
+        $summarySheet->setTitle('Payroll Summary');
+        
+        // Header styling
+        $headerStyle = [
+            'font' => [
+                'bold' => true,
+                'size' => 14,
+                'color' => ['rgb' => 'FFFFFF'],
+            ],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '4472C4']
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER
+            ]
+        ];
+        
+        // Title
+        $summarySheet->setCellValue('A1', 'Payroll Summary Report');
+        $summarySheet->mergeCells('A1:B1');
+        $summarySheet->getStyle('A1:B1')->applyFromArray($headerStyle);
+        
+        // Basic Information
+        $summarySheet->setCellValue('A3', 'Period:');
+        $summarySheet->setCellValue('B3', $this->start_date->format('M d, Y') . ' - ' . $this->end_date->format('M d, Y'));
+        
+        $summarySheet->setCellValue('A4', 'Status:');
+        $summarySheet->setCellValue('B4', ucfirst($this->status));
+        
+        $summarySheet->setCellValue('A5', 'Created By:');
+        $summarySheet->setCellValue('B5', $this->creator->name ?? 'N/A');
+        
+        $summarySheet->setCellValue('A6', 'Created At:');
+        $summarySheet->setCellValue('B6', $this->created_at->format('M d, Y H:i'));
+        
+        // Financial Summary
+        $summarySheet->setCellValue('A8', 'Financial Summary');
+        $summarySheet->mergeCells('A8:B8');
+        $summarySheet->getStyle('A8:B8')->applyFromArray($headerStyle);
+        
+        $row = 10;
+        $financialData = [
+            'Total Employees' => $this->total_employees,
+            'Total Paid' => number_format($this->total_paid, 2),
+            'Employee Insurance' => number_format($this->total_employee_insurance, 2),
+            'Employer Insurance' => number_format($this->total_employer_insurance, 2),
+            'Employee Medical' => number_format($this->total_employee_medical, 2),
+            'Penalties Amount' => number_format($this->total_penalties_amount, 2),
+            'Tax Amount' => number_format($this->total_tax_amount, 2),
+            'Overtime Amount' => number_format($this->total_overtime_amount, 2),
+        ];
+        
+        foreach ($financialData as $label => $value) {
+            $summarySheet->setCellValue('A' . $row, $label . ':');
+            $summarySheet->setCellValue('B' . $row, $value);
+            $row++;
+        }
+        
+        // Auto-size columns
+        foreach (range('A', 'B') as $column) {
+            $summarySheet->getColumnDimension($column)->setAutoSize(true);
+        }
+    }
+    
+    /**
+     * Create the employee overview sheet
+     */
+    private function createEmployeeOverviewSheet($spreadsheet)
+    {
+        $overviewSheet = $spreadsheet->createSheet();
+        $overviewSheet->setTitle('Employee Overview');
+        
+        // Headers
+        $headers = [
+            'A1' => 'Employee Name',
+            'B1' => 'Position',
+            'C1' => 'Department', 
+            'D1' => 'Gross Salary',
+            'E1' => 'Social Insurance Salary',
+            'F1' => 'Other Amount',
+            'G1' => 'Absence Hours',
+            'H1' => 'Absence Deduction',
+            'I1' => 'Extra Payments',
+            'J1' => 'Overtime Hours',
+            'K1' => 'Overtime Amount',
+            'L1' => 'Adjustment Amount',
+            'M1' => 'Adjustment Description',
+            'N1' => 'Before Tax',
+            'O1' => 'Tax Amount',
+            'P1' => 'Net After Tax'
+        ];
+        
+        foreach ($headers as $cell => $header) {
+            $overviewSheet->setCellValue($cell, $header);
+        }
+        
+        // Style headers
+        $headerStyle = [
+            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '4472C4']
+            ],
+            'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER]
+        ];
+        
+        $overviewSheet->getStyle('A1:P1')->applyFromArray($headerStyle);
+        
+        // Data rows
+        $row = 2;
+        $payrollEmployees = $this->payrollEmployees()->with('employee')->get();
+        
+        foreach ($payrollEmployees as $payrollEmployee) {
+            $overviewSheet->setCellValue('A' . $row, $payrollEmployee->employee->name ?? 'N/A');
+            $overviewSheet->setCellValue('B' . $row, $payrollEmployee->position);
+            $overviewSheet->setCellValue('C' . $row, $payrollEmployee->department);
+            $overviewSheet->setCellValue('D' . $row, number_format($payrollEmployee->gross_salary, 2));
+            $overviewSheet->setCellValue('E' . $row, number_format($payrollEmployee->insurance_amount, 2));
+            $overviewSheet->setCellValue('F' . $row, number_format($payrollEmployee->other_amount, 2));
+            $overviewSheet->setCellValue('G' . $row, number_format($payrollEmployee->total_penalty_hours ?? 0, 1) . 'h');
+            $overviewSheet->setCellValue('H' . $row, number_format($payrollEmployee->direct_deduction_amount ?? 0, 2));
+            $overviewSheet->setCellValue('I' . $row, number_format($payrollEmployee->extra_payments, 2));
+            $overviewSheet->setCellValue('J' . $row, number_format($payrollEmployee->overtime_hours, 2) . 'h');
+            $overviewSheet->setCellValue('K' . $row, number_format($payrollEmployee->overtime_amount, 2));
+            $overviewSheet->setCellValue('L' . $row, number_format($payrollEmployee->adj_amount, 2));
+            $overviewSheet->setCellValue('M' . $row, $payrollEmployee->adj_desc ?? '');
+            $overviewSheet->setCellValue('N' . $row, number_format($payrollEmployee->net_after_deductions, 2));
+            $overviewSheet->setCellValue('O' . $row, number_format($payrollEmployee->tax_amount, 2));
+            $overviewSheet->setCellValue('P' . $row, number_format($payrollEmployee->after_tax_salary, 2));
+            $row++;
+        }
+        
+        // Add totals row
+        $totalRow = $row;
+        $overviewSheet->setCellValue('A' . $totalRow, 'TOTALS');
+        $overviewSheet->setCellValue('B' . $totalRow, $this->total_employees . ' employees');
+        $overviewSheet->setCellValue('D' . $totalRow, number_format($payrollEmployees->sum('gross_salary'), 2));
+        $overviewSheet->setCellValue('E' . $totalRow, number_format($payrollEmployees->sum('insurance_amount'), 2));
+        $overviewSheet->setCellValue('F' . $totalRow, number_format($payrollEmployees->sum('other_amount'), 2));
+        $overviewSheet->setCellValue('H' . $totalRow, number_format($payrollEmployees->sum('direct_deduction_amount'), 2));
+        $overviewSheet->setCellValue('I' . $totalRow, number_format($payrollEmployees->sum('extra_payments'), 2));
+        $overviewSheet->setCellValue('J' . $totalRow, number_format($payrollEmployees->sum('overtime_hours'), 2) . 'h');
+        $overviewSheet->setCellValue('K' . $totalRow, number_format($payrollEmployees->sum('overtime_amount'), 2));
+        $overviewSheet->setCellValue('L' . $totalRow, number_format($payrollEmployees->sum('adj_amount'), 2));
+        $overviewSheet->setCellValue('N' . $totalRow, number_format($payrollEmployees->sum('net_after_deductions'), 2));
+        $overviewSheet->setCellValue('O' . $totalRow, number_format($payrollEmployees->sum('tax_amount'), 2));
+        $overviewSheet->setCellValue('P' . $totalRow, number_format($payrollEmployees->sum('after_tax_salary'), 2));
+        
+        // Style totals row
+        $totalStyle = [
+            'font' => ['bold' => true],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'F0F0F0']
+            ]
+        ];
+        $overviewSheet->getStyle('A' . $totalRow . ':P' . $totalRow)->applyFromArray($totalStyle);
+        
+        // Auto-size columns
+        foreach (range('A', 'P') as $column) {
+            $overviewSheet->getColumnDimension($column)->setAutoSize(true);
+        }
+    }
+    
+    /**
+     * Create individual employee detail sheets
+     */
+    private function createEmployeeDetailSheets($spreadsheet)
+    {
+        $payrollEmployees = $this->payrollEmployees()->with('employee')->get();
+        
+        foreach ($payrollEmployees as $payrollEmployee) {
+            $employee = $payrollEmployee->employee;
+            if (!$employee) continue;
+            
+            // Create sheet for employee
+            $employeeSheet = $spreadsheet->createSheet();
+            $safeSheetName = substr(preg_replace('/[^A-Za-z0-9 ]/', '', $employee->name), 0, 31);
+            $employeeSheet->setTitle($safeSheetName);
+            
+            // Employee info header
+            $employeeSheet->setCellValue('A1', 'Employee Details: ' . $employee->name);
+            $employeeSheet->mergeCells('A1:F1');
+            
+            $headerStyle = [
+                'font' => ['bold' => true, 'size' => 14, 'color' => ['rgb' => 'FFFFFF']],
+                'fill' => [
+                    'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                    'startColor' => ['rgb' => '4472C4']
+                ],
+                'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER]
+            ];
+            $employeeSheet->getStyle('A1:F1')->applyFromArray($headerStyle);
+            
+            // Employee summary
+            $employeeSheet->setCellValue('A3', 'Position:');
+            $employeeSheet->setCellValue('B3', $payrollEmployee->position);
+            $employeeSheet->setCellValue('A4', 'Department:');
+            $employeeSheet->setCellValue('B4', $payrollEmployee->department);
+            $employeeSheet->setCellValue('A5', 'Gross Salary:');
+            $employeeSheet->setCellValue('B5', number_format($payrollEmployee->gross_salary, 2));
+            $employeeSheet->setCellValue('A6', 'Net After Tax:');
+            $employeeSheet->setCellValue('B6', number_format($payrollEmployee->after_tax_salary, 2));
+            
+            // Attendance Records
+            $employeeSheet->setCellValue('A8', 'Attendance Records');
+            $employeeSheet->mergeCells('A8:F8');
+            $employeeSheet->getStyle('A8:F8')->applyFromArray($headerStyle);
+            
+            // Attendance headers
+            $attendanceHeaders = [
+                'A10' => 'Day',
+                'B10' => 'Date', 
+                'C10' => 'Check In',
+                'D10' => 'Check Out',
+                'E10' => 'Total Hours',
+                'F10' => 'Status'
+            ];
+            
+            foreach ($attendanceHeaders as $cell => $header) {
+                $employeeSheet->setCellValue($cell, $header);
+            }
+            $employeeSheet->getStyle('A10:F10')->applyFromArray([
+                'font' => ['bold' => true],
+                'fill' => [
+                    'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                    'startColor' => ['rgb' => 'E0E0E0']
+                ]
+            ]);
+            
+            // Get attendance records for this payroll period
+            $attendanceRecords = $employee->attendances()
+                ->whereBetween('date', [$this->start_date, $this->end_date])
+                ->orderBy('date')
+                ->get();
+            
+            $row = 11;
+            foreach ($attendanceRecords as $attendance) {
+                $date = \Carbon\Carbon::parse($attendance->date);
+                $employeeSheet->setCellValue('A' . $row, $date->format('l'));
+                $employeeSheet->setCellValue('B' . $row, $date->format('d/m/Y'));
+                $employeeSheet->setCellValue('C' . $row, $attendance->start_time ? \Carbon\Carbon::parse($attendance->start_time)->format('H:i A') : 'N/A');
+                $employeeSheet->setCellValue('D' . $row, $attendance->end_time ? \Carbon\Carbon::parse($attendance->end_time)->format('H:i A') : 'N/A');
+                
+                $hoursText = $attendance->hours ? $attendance->hours . 'h' : 'N/A';
+                if ($attendance->penalized_hours > 0) {
+                    $penaltyText = $attendance->penalized_hours > 1.0 
+                        ? number_format($attendance->penalized_hours, 0) . 'h' 
+                        : number_format($attendance->penalized_hours * 60, 2) . 'min';
+                    $hoursText .= ' -(' . $penaltyText . ')';
+                }
+                $employeeSheet->setCellValue('E' . $row, $hoursText);
+                
+                $status = 'Present';
+                if ($attendance->status === 'absent') $status = 'Absent';
+                elseif ($attendance->status === 'late') $status = 'Late';
+                elseif (!$attendance->is_approved) $status = 'Pending';
+                
+                $employeeSheet->setCellValue('F' . $row, $status);
+                $row++;
+            }
+            
+            // Missing Days section
+            $missingDaysStartRow = $row + 2;
+            $employeeSheet->setCellValue('A' . $missingDaysStartRow, 'Missing Days');
+            $employeeSheet->mergeCells('A' . $missingDaysStartRow . ':B' . $missingDaysStartRow);
+            $employeeSheet->getStyle('A' . $missingDaysStartRow . ':B' . $missingDaysStartRow)->applyFromArray($headerStyle);
+            
+            // Missing days headers
+            $missingDaysHeaderRow = $missingDaysStartRow + 2;
+            $employeeSheet->setCellValue('A' . $missingDaysHeaderRow, 'Missed Day');
+            $employeeSheet->setCellValue('B' . $missingDaysHeaderRow, 'Hours');
+            $employeeSheet->getStyle('A' . $missingDaysHeaderRow . ':B' . $missingDaysHeaderRow)->applyFromArray([
+                'font' => ['bold' => true],
+                'fill' => [
+                    'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                    'startColor' => ['rgb' => 'E0E0E0']
+                ]
+            ]);
+            
+            // Get missing days for this payroll period
+            $missingDays = $employee->missingDays()
+                ->whereBetween('date', [$this->start_date, $this->end_date])
+                ->orderBy('date')
+                ->get();
+            
+            $missingRow = $missingDaysHeaderRow + 1;
+            foreach ($missingDays as $missingDay) {
+                $employeeSheet->setCellValue('A' . $missingRow, \Carbon\Carbon::parse($missingDay->date)->format('d M Y'));
+                $employeeSheet->setCellValue('B' . $missingRow, $missingDay->hours);
+                $missingRow++;
+            }
+            
+            // Auto-size columns
+            foreach (range('A', 'F') as $column) {
+                $employeeSheet->getColumnDimension($column)->setAutoSize(true);
+            }
+        }
     }
 }

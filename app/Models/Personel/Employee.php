@@ -2159,7 +2159,10 @@ class Employee extends Model
         // Get male employees with expired army service papers
         $expired = $docManager ? $baseQuery->clone()->where('gender', 'male')
             ->whereHas('armyServicePaper', function ($q) use ($today) {
-                $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
+                $q->where(function ($q) use ($today) {
+                    $q->whereNotNull('expiry_date')
+                        ->where('expiry_date', '<=', $today);
+                });
             })
             // ->whereHas('info', function ($q) {
             //     $q->whereIn('military_status', ['exempt', 'completed']);
@@ -2171,21 +2174,23 @@ class Employee extends Model
             ->whereHas('armyServicePaper', function ($q) use ($today, $nearExpiryDate) {
                 $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
             })
-            ->whereHas('info', function ($q) {
-                $q->whereIn('military_status', ['exempt', 'completed']);
-            })
+            // ->whereHas('info', function ($q) {
+            //     $q->whereIn('military_status', ['exempt', 'completed']);
+            // })
             ->count() : 0;
 
         // Get male employees with valid army service papers
         $valid = $baseQuery->clone()->where('gender', 'male')
             ->whereHas('armyServicePaper', function ($q) use ($today, $nearExpiryDate) {
                 $q->where(function ($q) use ($today, $nearExpiryDate) {
-                    $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
+                    $q->where(function ($q) use ($nearExpiryDate) {
+                        $q->whereNull('expiry_date')->orWhere('expiry_date', '>', $nearExpiryDate);
+                    });
                 });
             })
-            ->whereHas('info', function ($q) {
-                $q->whereIn('military_status', ['exempt', 'completed']);
-            })
+            // ->whereHas('info', function ($q) {
+            //     $q->whereIn('military_status', ['exempt', 'completed']);
+            // })
             ->count();
 
         // Get counts by type

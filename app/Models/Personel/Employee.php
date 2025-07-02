@@ -1147,7 +1147,7 @@ class Employee extends Model
      * @return bool
      * @throws AppException
      */
-    public function setLabourDocument($file_path, Carbon $issue_date)
+    public function setLabourDocument($file_path, Carbon $issue_date, ?Carbon $registration_date = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -1162,6 +1162,7 @@ class Employee extends Model
                     'created_by' => $loggedInUser->id,
                     'file_path' => $file_path,
                     'issue_date' => $issue_date,
+                    'registration_date' => $registration_date,
                 ]
             );
             AppLog::info('Labour Document Set', 'Labour document set for employee: ' . $this->name, loggable: $this);

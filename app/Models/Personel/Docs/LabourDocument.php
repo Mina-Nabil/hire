@@ -21,10 +21,12 @@ class LabourDocument extends Model
         'created_by',
         'file_path',
         'issue_date',
+        'registration_date',
     ];
 
     protected $casts = [
         'issue_date' => 'date',
+        'registration_date' => 'datetime',
     ];
 
     /**
@@ -32,9 +34,10 @@ class LabourDocument extends Model
      * 
      * @param string $file_path
      * @param Carbon $issue_date
+     * @param Carbon|null $registration_date
      * @return bool
      */
-    public function updateRecord($file_path, Carbon $issue_date)
+    public function updateRecord($file_path, Carbon $issue_date, ?Carbon $registration_date = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -46,6 +49,7 @@ class LabourDocument extends Model
             $this->update([
                 'file_path' => $file_path,
                 'issue_date' => $issue_date,
+                'registration_date' => $registration_date,
                 'created_by' => Auth::id(), // Track who updated it
             ]);
             AppLog::info('Labour Document Updated', 'Labour document updated for employee: ' . $this->employee->name, loggable: $this);

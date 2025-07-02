@@ -6837,6 +6837,17 @@
                                                 <span class="text-danger-500 text-sm">{{ $message }}</span>
                                             @enderror
                                         </div>
+                                        <div class="col-span-12">
+                                            <label for="labour_document_registration_date" class="form-label">Registration
+                                                Date</label>
+                                            <input type="date"
+                                                class="form-control @error('labour_document_registration_date') !border-danger-500 @enderror"
+                                                id="labour_document_registration_date"
+                                                wire:model="labour_document_registration_date">
+                                            @error('labour_document_registration_date')
+                                                <span class="text-danger-500 text-sm">{{ $message }}</span>
+                                            @enderror
+                                        </div>
                                     </div>
                                 </div>
                                 <!-- Modal footer -->

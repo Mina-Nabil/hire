@@ -229,6 +229,7 @@ class EmployeeShow extends Component
     public $showEditLabourDocumentModal = false;
     public $labour_document_file;
     public $labour_document_issue_date;
+    public $labour_document_registration_date;
     public $keep_existing_labour_document = false;
 
     // College Certificate Properties
@@ -2251,6 +2252,7 @@ class EmployeeShow extends Component
 
         if ($this->employee->labourDocument) {
             $this->labour_document_issue_date = $this->employee->labourDocument->issue_date;
+            $this->labour_document_registration_date = $this->employee->labourDocument->registration_date;
             $this->keep_existing_labour_document = true;
         } else {
             $this->resetLabourDocumentFields();
@@ -2273,6 +2275,7 @@ class EmployeeShow extends Component
     {
         $this->labour_document_file = null;
         $this->labour_document_issue_date = null;
+        $this->labour_document_registration_date = null;
         $this->keep_existing_labour_document = false;
     }
 
@@ -2283,6 +2286,7 @@ class EmployeeShow extends Component
     {
         $this->validate([
             'labour_document_issue_date' => 'required|date',
+            'labour_document_registration_date' => 'nullable|date',
             'labour_document_file' => $this->keep_existing_labour_document ? 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif' : 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
         ]);
 
@@ -2304,7 +2308,8 @@ class EmployeeShow extends Component
 
             $this->employee->setLabourDocument(
                 $filePath,
-                Carbon::parse($this->labour_document_issue_date)
+                Carbon::parse($this->labour_document_issue_date),
+                $this->labour_document_registration_date ? Carbon::parse($this->labour_document_registration_date) : null
             );
 
             $this->closeEditLabourDocumentModal();

@@ -2739,6 +2739,12 @@
                                             <span
                                                 class="text-sm font-medium">{{ $employee->labourDocument->issue_date }}</span>
                                         </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-sm text-slate-500 dark:text-slate-400">Registration
+                                                Date:</span>
+                                            <span
+                                                class="text-sm font-medium">{{ $employee->labourDocument->registration_date }}</span>
+                                        </div>
 
                                         <!-- Download Button -->
                                         <div class="mt-3">

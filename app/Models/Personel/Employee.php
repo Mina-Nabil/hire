@@ -2151,9 +2151,9 @@ class Employee extends Model
         // Get male employees with missing army service papers
         $missing = $docManager ? $baseQuery->clone()->where('gender', 'male')
             ->whereDoesntHave('armyServicePaper')
-            ->whereHas('info', function ($q) {
-                $q->whereIn('military_status', ['exempt', 'completed']);
-            })
+            // ->whereHas('info', function ($q) {
+            //     $q->whereIn('military_status', ['exempt', 'completed']);
+            // })
             ->count() : 0;
 
         // Get male employees with expired army service papers
@@ -2161,9 +2161,9 @@ class Employee extends Model
             ->whereHas('armyServicePaper', function ($q) use ($today) {
                 $q->whereNotNull('expiry_date')->where('expiry_date', '<=', $today);
             })
-            ->whereHas('info', function ($q) {
-                $q->whereIn('military_status', ['exempt', 'completed']);
-            })
+            // ->whereHas('info', function ($q) {
+            //     $q->whereIn('military_status', ['exempt', 'completed']);
+            // })
             ->count() : 0;
 
         // Get male employees with army service papers near expiry

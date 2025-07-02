@@ -51,6 +51,7 @@ class PayrollEmployee extends Model
         'net_amount',
         'status',
         'tax_amount',
+        'after_tax_salary',
     ];
     
     /**

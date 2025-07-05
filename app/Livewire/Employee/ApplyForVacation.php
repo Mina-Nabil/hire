@@ -130,11 +130,9 @@ class ApplyForVacation extends Component
         }
     }
 
-    public function updateHours($index, $hours)
+    public function updatedDays()
     {
-        $oldHours = $this->days[$index]['hours'] ?? 0;
-        $this->days[$index]['hours'] = $hours;
-        $this->totalHours = $this->totalHours - $oldHours + $hours;
+        $this->totalHours = collect($this->days)->sum('hours');
     }
 
     public function removeDay($index)

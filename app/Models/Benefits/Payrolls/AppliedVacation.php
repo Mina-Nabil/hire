@@ -67,6 +67,8 @@ class AppliedVacation extends Model
                 $this->vacationBenefit->update([
                     'current_balance' => $this->vacationBenefit->current_balance + $this->hours,
                 ]);
+                $this->new_balance = $this->vacationBenefit->current_balance;
+                $this->save();
             });
             AppLog::info('Vacation Rejected', "Employee: $this->employee->name, Vacation: $this->vacationBenefit->name", loggable: $this);
         } catch (Exception $e) {

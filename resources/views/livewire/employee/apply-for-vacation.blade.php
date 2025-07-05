@@ -80,8 +80,7 @@
                                                     <td class="table-td">
                                                         <input type="number" class="form-control py-2 w-20"
                                                             min="1" max="24"
-                                                            wire:model="days.{{ $index }}.hours"
-                                                            wire:change="updateHours({{ $index }}, $event.target.value)">
+                                                            wire:model.live="days.{{ $index }}.hours">
                                                         @error('days.' . $index . '.hours')
                                                             <span class="text-danger text-sm">{{ $message }}</span>
                                                         @enderror

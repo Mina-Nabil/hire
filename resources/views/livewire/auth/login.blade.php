@@ -1,6 +1,4 @@
 
-
-
     <div class="loginwrapper">
         <div class="lg-inner-column">
             <div class="right-column  relative">

@@ -24,6 +24,7 @@ use App\Models\Benefits\Configurations\WorkingDay;
 use App\Models\Benefits\Payrolls\BenefitPayment;
 use App\Models\Benefits\Payrolls\Payroll;
 use App\Models\Hierarchy\Position;
+use App\Models\Payrolls\PenaltyDay;
 use App\Models\Personel\Docs\ArmyServicePaper;
 use App\Models\Personel\Docs\BankAccount;
 use App\Models\Personel\Docs\BirthCertificate;
@@ -4056,7 +4057,10 @@ class Employee extends Model
 
         $benefitConfig = $this->benefitConfiguration;
         if (!$benefitConfig) {
-            return 0; // No benefit configuration
+            return [
+                'total_penalty_hours' => 0,
+                'penalty_days' => [],
+            ]; // No benefit configuration
         }
 
         $dailyWorkingHours = $benefitConfig->daily_working_hours ?? 8;
@@ -4073,6 +4077,14 @@ class Employee extends Model
             })
             ->toArray();
 
+        $approvedVacations = $this->appliedVacations()
+            ->where('status', AppliedVacation::STATUS_APPROVED)
+            ->whereHas('vacationDays', function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('vacation_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')]);
+            })
+            ->with('vacationDays')
+            ->get();
+
         // Get missed working hours (full days with no attendance) - already excludes public holidays
         $missedHours = $this->getMissedWorkingHours($startDate, $endDate, true);
 
@@ -4084,8 +4096,8 @@ class Employee extends Model
 
         $attendances = $attendanceQuery->get();
 
+        $totalVacationHours = 0;
         $totalPenaltyHours = $missedHours;
-
         // Process each attendance record to calculate penalty hours
         foreach ($attendances as $attendance) {
             // Skip penalty calculations for public holidays
@@ -4094,11 +4106,36 @@ class Employee extends Model
             }
 
             $penaltyHoursForDay = 0;
+            $vacationHoursForDay = 0;
 
-            // Skip if no start/end times
-            if (!$attendance->start_time || !$attendance->end_time) {
-                // If no times recorded, consider it as missing the full day
-                $penaltyHoursForDay = $dailyWorkingHours;
+            // Handle no start or end time
+            if ((!$attendance->start_time && $attendance->end_time) || ($attendance->start_time && !$attendance->end_time)) {
+                $vacationHours = $approvedVacations->clone()->where('vacationDays.vacation_date', $attendance->date)->sum('hours');
+                $penaltyHours = $this->benefitConfiguration->daily_working_hours - $vacationHours;
+                if ($penaltyHours > 0) {
+                    $penaltyDays[] = [
+                        'date' => $attendance->date,
+                        'hours' => $this->calculateLateArrivalPenalty($penaltyHours * 60),
+                        'type' => PenaltyDay::PENALTY_TYPE_MISSING_START_OR_END_TIME,
+                        'employee_id' => $this->id,
+                    ];
+                    $vacationHoursForDay += $vacationHours;
+                    $penaltyHoursForDay += $penaltyHours;
+                }
+            } elseif (!$attendance->start_time && !$attendance->end_time) {
+                $vacationHours = $approvedVacations->clone()->where('vacationDays.vacation_date', $attendance->date)->sum('hours');
+
+                $penaltyHours = $this->benefitConfiguration->daily_working_hours - $vacationHours;
+                if ($penaltyHours > 0) {
+                    $penaltyDays[] = [
+                        'date' => $attendance->date,
+                        'hours' => $this->calculateLateArrivalPenalty($penaltyHours * 60),
+                        'type' => PenaltyDay::PENALTY_TYPE_MISSING_START_AND_END_TIME,
+                        'employee_id' => $this->id,
+                    ];
+                    $vacationHoursForDay += $vacationHours;
+                    $penaltyHoursForDay += $penaltyHours;
+                }
             } else {
                 $attendanceStart = Carbon::parse($attendance->date . ' ' . $attendance->start_time);
                 $attendanceEnd = Carbon::parse($attendance->date . ' ' . $attendance->end_time);
@@ -4108,19 +4145,31 @@ class Employee extends Model
                     $attendanceEnd->addDay();
                 }
                 if ($this->benefitConfiguration->attendance_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_BUS && $this->benefitConfiguration->bus_id) {
-                    $penaltyHoursForDay = $this->calculatePenaltyAfterBusArrival(
+                   $this->generatePenaltyAfterBusArrival(
+                        $penaltyDays,
+                        $vacationHoursForDay,
+                        $penaltyHoursForDay,
+                        $approvedVacations->clone(),
                         $attendanceStart,
                         $attendanceEnd,
                         $workingDayEndMin
                     );
                 } elseif ($this->benefitConfiguration->attendance_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_IN_ONLY) {
-                    $penaltyHoursForDay = $this->calculatePenaltyAfterInOnly(
+                    $this->generatePenaltyAfterInOnly(
+                        $penaltyDays,
+                        $vacationHoursForDay,
+                        $penaltyHoursForDay,
+                        $approvedVacations->clone(),
                         $attendanceStart,
-                        $workingDayStartMax
+                        $workingDayStartMax,
                     );
                 } else {
                     // Calculate valid working hours within the allowed time range
-                    $validWorkingHours = $this->calculateValidWorkingHours(
+                    $this->generateDefaultPenaltyDays(
+                        $penaltyDays,
+                        $vacationHoursForDay,
+                        $penaltyHoursForDay,
+                        $approvedVacations->clone(),
                         $attendanceStart,
                         $attendanceEnd,
                         $attendance->date,
@@ -4129,24 +4178,29 @@ class Employee extends Model
                         $workingDayEndMin,
                         $workingDayEndMax
                     );
-                    // Calculate penalty hours for this day
-                    $penaltyHoursForDay = max(0, $dailyWorkingHours - $validWorkingHours);
                 }
-            }
 
-            if ($penaltyHoursForDay > 0) {
-                $attendance->penalized_hours = $penaltyHoursForDay;
-                $attendance->save();
+
+                if ($penaltyHoursForDay > 0) {
+                    $attendance->penalized_hours = $penaltyHoursForDay;
+                    $attendance->save();
+                }
+
+                if ($this->id == 1) {
+                    Log::info('penalty hours for day', ['penaltyHoursForDay' => $penaltyHoursForDay]);
+                }
+                $totalPenaltyHours += $penaltyHoursForDay;
+                $totalVacationHours += $vacationHoursForDay;
             }
-            if ($this->id == 1) {
-                Log::info('penalty hours for day', ['penaltyHoursForDay' => $penaltyHoursForDay]);
-            }
-            $totalPenaltyHours += $penaltyHoursForDay;
         }
         if ($this->id == 1) {
             Log::info('total penalty hours 2', ['totalPenaltyHours' => $totalPenaltyHours]);
         }
-        return $totalPenaltyHours;
+        return [
+            'total_penalty_hours' => $totalPenaltyHours,
+            'total_vacation_hours' => $totalVacationHours,
+            'penalty_days' => $penaltyDays,
+        ];
     }
 
     /**
@@ -4161,7 +4215,11 @@ class Employee extends Model
      * @param string|null $workingDayEndMax Latest allowed end time
      * @return float Valid working hours
      */
-    private function calculateValidWorkingHours(
+    private function generateDefaultPenaltyDays(
+        array &$penaltyDays,
+        &$vacationHoursForDay,
+        &$penaltyHoursForDay,
+        $approvedVacations,
         Carbon $attendanceStart,
         Carbon $attendanceEnd,
         string $date,
@@ -4169,10 +4227,35 @@ class Employee extends Model
         ?string $workingDayStartMax,
         ?string $workingDayEndMin,
         ?string $workingDayEndMax
-    ): float {
+    ) {
+        $penaltiesGenerated = 0;
+        $penaltyHours = 0;
+        $vacationHours = $approvedVacations->where('vacationDays.vacation_date', $attendanceStart->format('Y-m-d'))->sum('hours');
         // If no time constraints are set, use the actual hours worked
         if (!$workingDayStartMin || !$workingDayStartMax || !$workingDayEndMin || !$workingDayEndMax) {
-            return $attendanceStart->diffInHours($attendanceEnd);
+            $workingHours = $attendanceStart->diffInHours($attendanceEnd);
+            if ($workingHours < $this->benefitConfiguration->daily_working_hours) {
+                $penaltyHours = $this->benefitConfiguration->daily_working_hours - $workingHours;
+                if ($penaltyHours > $vacationHours) {
+                    $penaltyHours = ($penaltyHours - $vacationHours);
+                    $vacationHoursForDay += $vacationHours;
+                    $penaltyHoursForDay += $penaltyHours;
+                    $vacationHours = 0;
+                    $actualPenaltyHours = $this->calculateLateArrivalPenalty(($this->benefitConfiguration->daily_working_hours - $workingHours) * 60);
+                    if ($actualPenaltyHours) {
+                        $penaltyDays[] = [
+                            'date' => $date,
+                            'hours' => $actualPenaltyHours,
+                            'type' => PenaltyDay::PENALTY_TYPE_LATE_ARRIVAL,
+                            'employee_id' => $this->id,
+                        ];
+                    }
+                } else {
+                    $vacationHoursForDay += $penaltyHours;
+                    $penaltyHours = 0;
+                }
+            }
+            return;
         }
 
         // Parse the allowed time ranges
@@ -4192,101 +4275,267 @@ class Employee extends Model
             $attendanceEnd->addDay();
         }
 
-        // Determine the effective working period within allowed ranges
         $effectiveStart = $attendanceStart;
         $effectiveEnd = $attendanceEnd;
 
-        // Adjust start time if employee arrived too early or too late
-        if ($attendanceStart->lt($allowedStartMin)) {
-            // Arrived too early - start counting from allowed start min
-            $effectiveStart = $allowedStartMin;
-        } elseif ($attendanceStart->gt($allowedStartMax)) {
-            // Arrived too late - start counting from actual arrival (penalty will be applied)
-            $effectiveStart = $attendanceStart;
+
+        if ($attendanceStart->gt($allowedStartMax)) {
+            $startDiff = $attendanceStart->diffInHours($allowedStartMax, true);
+            $penaltyHours += $startDiff;
+            if ($penaltyHours > $vacationHours) {
+                // If employee has less vacation hours than penalty hours, calculate the penalty hours
+                $penaltyHours = ($penaltyHours - $vacationHours);
+                $vacationHoursForDay += $vacationHours;
+                $penaltyHoursForDay += $penaltyHours;
+                $vacationHours = 0;
+                $actualPenaltyHours = $this->calculateLateArrivalPenalty($penaltyHours * 60);
+                if ($actualPenaltyHours) {
+                    $penaltyDays[] = [
+                        'date' => $attendanceStart->format('Y-m-d'),
+                        'hours' => $actualPenaltyHours,
+                        'type' => PenaltyDay::PENALTY_TYPE_LATE_ARRIVAL,
+                        'employee_id' => $this->id,
+                    ];
+                    $penaltiesGenerated++;
+                }
+            } else {
+                // If employee has enough vacation hours, reduce the vacation hours
+                $vacationHours = $vacationHours - $penaltyHours;
+                $vacationHoursForDay += $vacationHours;
+                $penaltyHours = 0;
+            }
+        } else {
+            // If employee arrived early, start counting from allowed start min
+            $effectiveStart = $allowedStartMin->clone();
         }
 
         // Adjust end time if employee left too early or too late
         if ($attendanceEnd->lt($allowedEndMin)) {
-            // Left too early - end counting at actual departure (penalty will be applied)
-            $effectiveEnd = $attendanceEnd;
-        } elseif ($attendanceEnd->gt($allowedEndMax)) {
-            // Left too late - end counting at allowed end max (overtime not counted as penalty)
-            $effectiveEnd = $allowedEndMax;
+            $earlyDeparture = $allowedEndMin->diffInHours($attendanceEnd, true);
+            $penaltyHours += $earlyDeparture;
+            if ($penaltyHours > $vacationHours) {
+                $penaltyHours = ($penaltyHours - $vacationHours);
+                $vacationHoursForDay += $vacationHours;
+                $penaltyHoursForDay += $penaltyHours;
+                $vacationHours = 0;
+                $actualPenaltyHours = $this->calculateEarlyDeparturePenalty(($earlyDeparture - $vacationHours) * 60);
+                if ($actualPenaltyHours) {
+                    $penaltiesGenerated++;
+                    $penaltyDays[] = [
+                        'date' => $attendanceEnd->format('Y-m-d'),
+                        'hours' => $actualPenaltyHours,
+                        'type' => PenaltyDay::PENALTY_TYPE_EARLY_DEPARTURE,
+                        'employee_id' => $this->id,
+                    ];
+                }
+                $vacationHours = 0;
+            } else {
+                $vacationHours = $vacationHours - $penaltyHours;
+                $vacationHoursForDay += $vacationHours;
+                $penaltyHours = 0;
+            }
+        } else {
+            // If employee left late, start counting from allowed end min
+            $effectiveEnd = $allowedEndMax->clone();
         }
 
-        // Calculate valid hours, ensuring it's not negative
-        $validHours = max(0, $effectiveStart->diffInHours($effectiveEnd, true));
-        return $validHours;
-
-        // // Additional penalty for arriving late (after allowed start max)
-        // if ($attendanceStart->gt($allowedStartMax)) {
-        //     $lateHours = $attendanceStart->diffInHours($allowedStartMax, true);
-        //     $validHours += max(0, $validHours - $lateHours);
-        // }
-
-        // // Additional penalty for leaving early (before allowed end min)
-        // if ($attendanceEnd->lt($allowedEndMin)) {
-        //     $earlyHours = $allowedEndMin->diffInHours($attendanceEnd, true);
-        //     $validHours += max(0, $validHours - $earlyHours);
-        // }
-        // Log::info('valid hours 2', ['validHours' => $validHours]);
-
-        // return $validHours;
+        if ($penaltiesGenerated == 0) {
+            $effectiveWorkingHours = $effectiveStart->diffInHours($effectiveEnd, true);
+            $workingDiff = $this->benefitConfiguration->daily_working_hours - $effectiveWorkingHours - $vacationHours;
+            if ($workingDiff > 0) {
+                $penaltyHours += $workingDiff;
+                $vacationHoursForDay += $vacationHours;
+                $penaltyHoursForDay += $workingDiff;
+                $vacationHours = 0;
+                $actualPenaltyHours = $this->calculateLateArrivalPenalty($workingDiff * 60);
+                if ($actualPenaltyHours) {
+                    $penaltyDays[] = [
+                        'date' => $attendanceStart->format('Y-m-d'),
+                        'hours' => $actualPenaltyHours,
+                        'type' => PenaltyDay::PENALTY_TYPE_LATE_ARRIVAL,
+                        'employee_id' => $this->id,
+                    ];
+                    $penaltiesGenerated++;
+                }
+            }
+        }
     }
+
 
     /**
      * Calculate valid working hours within the allowed time range
      *
      * @param Carbon $attendanceStart Actual start time
      * @param Carbon $attendanceEnd Actual end time
-     * @param string $date Date of attendance
-     * @param string|null $workingDayStartMin Earliest allowed start time
-     * @param string|null $workingDayStartMax Latest allowed start time
+     * @param Collection $approvedVacations Approved vacations
      * @param string|null $workingDayEndMin Earliest allowed end time
-     * @param string|null $workingDayEndMax Latest allowed end time
-     * @return float Valid working hours
      */
-    private function calculatePenaltyAfterBusArrival(
+    private function generatePenaltyAfterBusArrival(
+        array &$penaltyDays,
+        &$vacationHoursForDay,
+        &$penaltyHoursForDay,
+        $approvedVacations,
         Carbon $attendanceStart,
         Carbon $attendanceEnd,
         ?string $workingDayEndMin,
-    ): float {
-
-        $penaltyDays = 0;
+    ) {
+        $penaltyHours = 0;
         $busArrival = BusArrival::where('date', $attendanceStart->format('Y-m-d'))->first();
         if (!$busArrival) {
             return 0;
         }
-        $allowedStartMax = Carbon::parse($busArrival->date . ' ' . $busArrival->time)->addMinutes(BusArrival::BUS_ARRIVAL_TIME_OFFSET);
-
-        // Calculating penalty for arriving late after bus arrival
-        if ($attendanceStart->gt($allowedStartMax)) {
-            $penaltyDays = $attendanceStart->diffInDays($allowedStartMax, true);
-        }
-
+        $allowedStartMax = Carbon::parse($busArrival->date . ' ' . $busArrival->time);
         $allowedEndMin = Carbon::parse($attendanceStart->format('Y-m-d') . ' ' . $workingDayEndMin);
 
+        $vacationHours = $approvedVacations->where('vacationDays.vacation_date', $attendanceStart->format('Y-m-d'))->sum('hours');
 
         // Leaving early penalty
         if ($attendanceEnd->lt($allowedEndMin)) {
-            $penaltyDays += $allowedEndMin->diffInDays($attendanceEnd, true);
+            $penaltyHours += $allowedEndMin->diffInHours($attendanceEnd, true);
+            if ($penaltyHours > $vacationHours) {
+                $penaltyHours = $penaltyHours - $vacationHours;
+                $penaltyHoursForDay += $penaltyHours;
+                $vacationHoursForDay += $vacationHours;
+                $vacationHours = 0;
+                $actualPenaltyHours = $this->calculateEarlyDeparturePenalty($attendanceEnd->diffInMinutes($allowedEndMin, true));
+                if ($actualPenaltyHours) {
+                    $penaltyDays[] = [
+                        'date' => $attendanceEnd->format('Y-m-d'),
+                        'hours' => $actualPenaltyHours,
+                        'type' => PenaltyDay::PENALTY_TYPE_EARLY_DEPARTURE,
+                        'employee_id' => $this->id,
+                    ];
+                }
+            } else {
+                $vacationHours = $vacationHours - $penaltyHours;
+                $penaltyHours = 0;
+            }
         }
 
-        return $penaltyDays;
+        // Calculating penalty for arriving late after bus arrival
+        if ($attendanceStart->gt($allowedStartMax)) {
+            $penaltyHours += $attendanceStart->diffInHours($allowedStartMax, true);
+            if ($penaltyHours > $vacationHours) {
+                $penaltyHours = ($penaltyHours - $vacationHours);
+                $vacationHoursForDay += $vacationHours;
+                $penaltyHoursForDay += $penaltyHours;
+                $vacationHours = 0;
+                $actualPenaltyHours = $this->calculateLateArrivalPenalty($attendanceStart->diffInMinutes($allowedStartMax, true));
+                if ($actualPenaltyHours) {
+                    $penaltyDays[] = [
+                        'date' => $attendanceStart->format('Y-m-d'),
+                        'hours' => $actualPenaltyHours,
+                        'type' => PenaltyDay::PENALTY_TYPE_LATE_ARRIVAL,
+                        'employee_id' => $this->id,
+                    ];
+                }
+            }
+        }
     }
 
-    private function calculatePenaltyAfterInOnly(
+    private function generatePenaltyAfterInOnly(
+        array &$penaltyDays,
+        &$vacationHoursForDay,
+        &$penaltyHoursForDay,
+        $approvedVacations,
         Carbon $attendanceStart,
         ?string $workingDayStartMax,
-    ): float {
+    ) {
         $penaltyHours = 0;
         $allowedStartMax = Carbon::parse($workingDayStartMax);
-
+        $vacationHours = $approvedVacations->where('vacationDays.vacation_date', $attendanceStart->format('Y-m-d'))->sum('hours');
         if ($attendanceStart->gt($allowedStartMax)) {
-            $penaltyHours = $attendanceStart->diffInDays($allowedStartMax, true);
+            $penaltyHours += $attendanceStart->diffInHours($allowedStartMax, true);
+            if ($penaltyHours > $vacationHours) {
+                $penaltyHours = ($penaltyHours - $vacationHours);
+                $vacationHoursForDay += $vacationHours;
+                $vacationHours = 0;
+                $actualPenaltyHours = $this->calculateLateArrivalPenalty($attendanceStart->diffInMinutes($allowedStartMax, true));
+                if ($actualPenaltyHours) {
+                    $penaltyHoursForDay += $penaltyHours;
+                    $penaltyDays[] = [
+                        'date' => $attendanceStart->format('Y-m-d'),
+                        'hours' => $actualPenaltyHours,
+                        'type' => PenaltyDay::PENALTY_TYPE_LATE_ARRIVAL,
+                        'employee_id' => $this->id,
+                    ];
+                }
+            }
+        }
+    }
+
+    /**
+     * Calculate penalty amount based on late arrival minutes
+     * Based on the company's late arrival penalty policy
+     *
+     * @param int $lateMinutes Number of minutes the employee was late
+     * @return float Penalty amount in minutes
+     */
+    public function calculateLateArrivalPenalty(int $lateMinutes): float
+    {
+
+        // Late arrival penalty policy:
+        // 1-15 minutes: 0 penalty
+        // 16-30 minutes: 120 penalty
+        // 31-45 minutes: 240 penalty
+        // 46-60 minutes: 360 penalty
+        // 61-420 minutes: 480 penalty
+
+        if ($lateMinutes <= 0) {
+            return 0; // No penalty for on-time or early arrival
         }
 
-        return $penaltyHours;
+        if ($lateMinutes <= 15) {
+            return 0; // Grace period - no penalty
+        }
+
+        if ($lateMinutes <= 30) {
+            return 120 / (60 * 24); // 2 hours penalty
+        }
+
+        if ($lateMinutes <= 45) {
+            return 240 / (60 * 24); // 4 hours penalty
+        }
+
+        if ($lateMinutes <= 60) {
+            return 360 / (60 * 24); // 6 hours penalty
+        }
+
+        if ($lateMinutes <= 420) { // Up to 7 hours
+            return 480 / (60 * 24); // 8 hours penalty (full day)
+        }
+
+        // For more than 7 hours late, treat as full day absence
+        return 480 / (60 * 24); // 8 hours penalty (full day)
+    }
+
+    /**
+     * Calculate penalty amount based on early departure minutes
+     * Based on the company's early departure penalty policy
+     *
+     * @param int $earlyMinutes Number of minutes the employee left early
+     * @return float Penalty amount in hours
+     */
+    public function calculateEarlyDeparturePenalty(int $earlyMinutes): float
+    {
+        // Early departure penalty policy:
+        // 1-30 minutes: 240 penalty (4 hours)
+        // 31-420 minutes: 480 penalty (8 hours - full day)
+
+        if ($earlyMinutes <= 0) {
+            return 0; // No penalty for staying until end time or overtime
+        }
+
+        if ($earlyMinutes <= 30) {
+            return 240 / (60 * 24); // 4 hours penalty
+        }
+
+        if ($earlyMinutes <= 420) { // Up to 7 hours
+            return 480 / (60 * 24); // 8 hours penalty (full day)
+        }
+
+        // For more than 7 hours early departure, treat as full day absence
+        return 480 / (60 * 24); // 8 hours penalty (full day)
     }
 
     /**
@@ -4692,7 +4941,10 @@ class Employee extends Model
         }
 
         // Get total penalty hours
-        $totalPenaltyHours = $this->getTotalPenaltyHours($startDate, $endDate);
+        $penaltyData = $this->getTotalPenaltyHours($startDate, $endDate);
+        $totalPenaltyHours = $penaltyData['total_penalty_hours'];
+        $totalVacationHours = $penaltyData['total_vacation_hours'];
+        $penaltyDays = $penaltyData['penalty_days'];
         if ($this->id == 1) {
             Log::info('total penalty hours', ['totalPenaltyHours' => $totalPenaltyHours]);
         }
@@ -4700,47 +4952,17 @@ class Employee extends Model
         if ($totalPenaltyHours <= 0) {
             return [
                 'total_penalty_hours' => 0,
-                'vacation_offset_hours' => 0,
+                'vacation_offset_hours' => $totalVacationHours,
                 'remaining_penalty_hours' => 0,
+                'direct_deduction_hours' => 0,
                 'direct_deduction_amount' => 0,
-                'used_approved_vacations' => [],
-                'available_vacation_benefits' => []
+                'available_vacation_benefits' => [],
+                'penalty_days' => $penaltyDays,
             ];
         }
 
         $remainingPenaltyHours = $totalPenaltyHours;
         $vacationOffsetHours = 0;
-        $usedApprovedVacations = [];
-
-        // Step 1: Check for existing approved applied vacations in the period
-        $approvedVacations = $this->appliedVacations()
-            ->where('status', AppliedVacation::STATUS_APPROVED)
-            ->whereHas('vacationDays', function ($query) use ($startDate, $endDate) {
-                $query->whereBetween('vacation_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')]);
-            })
-            ->with('vacationDays')
-            ->get();
-
-        foreach ($approvedVacations as $appliedVacation) {
-            if ($remainingPenaltyHours <= 0) break;
-
-            $vacationHoursInPeriod = $appliedVacation->vacationDays()
-                ->whereBetween('vacation_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
-                ->sum('hours');
-
-            $hoursToUse = min($remainingPenaltyHours, $vacationHoursInPeriod);
-
-            if ($hoursToUse > 0) {
-                $vacationOffsetHours += $hoursToUse;
-                $remainingPenaltyHours -= $hoursToUse;
-
-                $usedApprovedVacations[] = [
-                    'applied_vacation_id' => $appliedVacation->id,
-                    'vacation_benefit_name' => $appliedVacation->vacationBenefit->name ?? 'Unknown',
-                    'hours_used' => $hoursToUse
-                ];
-            }
-        }
 
         // Step 2: Get available vacation benefits for manual selection (if there are remaining penalty hours)
         $availableVacationBenefits = [];
@@ -4763,15 +4985,21 @@ class Employee extends Model
         }
 
         // Step 3: Calculate direct deduction for remaining penalty hours
-        $directDeductionAmount = $remainingPenaltyHours * $hourlyRate;
+        $directDeductionAmount = 0; //$remainingPenaltyHours * $hourlyRate;
+        $directDeductionHours = 0;
+        foreach ($penaltyDays as $penaltyDay) {
+            $directDeductionAmount += ($penaltyDay['hours'] * $hourlyRate);
+            $directDeductionHours += $penaltyDay['hours'];
+        }
 
         return [
             'total_penalty_hours' => $totalPenaltyHours,
             'vacation_offset_hours' => $vacationOffsetHours,
             'remaining_penalty_hours' => $remainingPenaltyHours,
+            'direct_deduction_hours' => $directDeductionHours,
             'direct_deduction_amount' => $directDeductionAmount,
-            'used_approved_vacations' => $usedApprovedVacations,
-            'available_vacation_benefits' => $availableVacationBenefits
+            'available_vacation_benefits' => $availableVacationBenefits,
+            'penalty_days' => $penaltyDays,
         ];
     }
 

@@ -338,14 +338,14 @@ class CreatePayroll extends Component
             $vacationOffsetHours = $penaltyData['vacation_offset_hours'];
             $remainingPenaltyHours = $penaltyData['remaining_penalty_hours'];
             $directDeductionAmount = $penaltyData['direct_deduction_amount'];
-            $usedApprovedVacations = $penaltyData['used_approved_vacations'];
+            // $usedApprovedVacations = $penaltyData['used_approved_vacations'];
             $availableVacationBenefits = $penaltyData['available_vacation_benefits'];
+            $totalPenaltyDays = $penaltyData['direct_deduction_hours'];
             if($employee->id == 1) {
                 Log::info('penalty data', ['penaltyData' => $penaltyData]);
             }
             // Log::info('penalty data', ['penaltyData' => $penaltyData]);
             // Convert total hours to days for display purposes
-            $totalPenaltyDays = $dailyWorkingHours > 0 ? ($totalPenaltyHours / $dailyWorkingHours) : 0;
 
             // The penalty amount is now only the direct deduction amount (after vacation offset)
             $penaltyAmount = $directDeductionAmount;
@@ -425,7 +425,7 @@ class CreatePayroll extends Component
             $departmentGroups[$departmentId]['totals']['employee_insurance'] += $employeeInsurance;
             $departmentGroups[$departmentId]['totals']['employer_insurance'] += $employerInsurance;
             $departmentGroups[$departmentId]['totals']['total_insurance'] += $totalInsurance;
-            $departmentGroups[$departmentId]['totals']['penalties_days'] += $totalPenaltyDays;
+            $departmentGroups[$departmentId]['totals']['penalties_hours'] += $totalPenaltyHours;
             $departmentGroups[$departmentId]['totals']['penalties_amount'] += $penaltyAmount;
             $departmentGroups[$departmentId]['totals']['extra_payments'] += $extraPayments;
             $departmentGroups[$departmentId]['totals']['overtime_hours'] += $overtimeHours;
@@ -438,7 +438,7 @@ class CreatePayroll extends Component
             $totals['employee_insurance'] += $employeeInsurance;
             $totals['employer_insurance'] += $employerInsurance;
             $totals['total_insurance'] += $totalInsurance;
-            $totals['penalties_days'] += $totalPenaltyDays;
+            $totals['penalties_hours'] += $totalPenaltyHours;
             $totals['penalties_amount'] += $penaltyAmount;
             $totals['extra_payments'] += $extraPayments;
             $totals['overtime_hours'] += $overtimeHours;
@@ -464,13 +464,13 @@ class CreatePayroll extends Component
                 'employee_medical' => $employeeMedical,
                 'total_medical' => $totalMedical,
                 'employee_deductions' => $employeeDeductions,
-                'penalties_days' => $totalPenaltyDays,
+                'penalties_hours' => $totalPenaltyHours,
                 'penalties_amount' => $penaltyAmount,
                 'total_penalty_hours' => $totalPenaltyHours,
                 'vacation_offset_hours' => $vacationOffsetHours,
                 'remaining_penalty_hours' => $remainingPenaltyHours,
                 'direct_deduction_amount' => $directDeductionAmount,
-                'used_approved_vacations' => $usedApprovedVacations,
+                // 'used_approved_vacations' => $usedApprovedVacations,
                 'available_vacation_benefits' => $availableVacationBenefits,
                 'net_income' => $netIncome - $penaltyAmount,
                 'net_after_penalty' => $netAfterPenalty,
@@ -543,7 +543,6 @@ class CreatePayroll extends Component
                                     }
 
                                     // Calculate when normal working hours should end
-                                    Log::info('dailyWorkingHours', ['dailyWorkingHours' => $dailyWorkingHours]);
                                     $normalWorkingEnd = $attendanceStart->copy()->addHours((float)$dailyWorkingHours);
 
                                     // Overtime starts when normal working hours end
@@ -635,7 +634,7 @@ class CreatePayroll extends Component
                             'penalties_amount' => $employeeData['penalties_amount'],
                             'total_penalty_hours' => $employeeData['total_penalty_hours'] ?? 0,
                             'vacation_offset_hours' => $employeeData['vacation_offset_hours'] ?? 0,
-                            'direct_deduction_hours' => $employeeData['remaining_penalty_hours'] ?? 0,
+                            'direct_deduction_hours' => $employeeData['direct_deduction_hours'] ?? 0,
                             'direct_deduction_amount' => $employeeData['direct_deduction_amount'] ?? 0,
                             'overtime_hours' => $employeeData['overtime_hours'] ?? 0,
                             'overtime_amount' => $employeeData['overtime_amount'] ?? 0,

@@ -48,6 +48,7 @@ class PayrollShow extends Component
     public $employeeVacationBenefits = [];
     public $employeeAppliedVacations = [];
     public $employeeMissingDays = [];
+    public $employeePenaltyDays = [];
     
     // Vacation application for penalty offset modal properties
     public $showVacationApplicationModal = false;
@@ -141,6 +142,11 @@ class PayrollShow extends Component
             ->betweenDates($this->payroll->start_date, $this->payroll->end_date)
             ->orderBy('date')
             ->get();
+
+        $this->employeePenaltyDays = \App\Models\Payrolls\PenaltyDay::where('employee_id', $this->selectedEmployeeId)
+            ->where('payroll_id', $this->payroll->id)
+            ->orderBy('date')
+            ->get();
         
         $this->showEmployeeDetailsModal = true;
     }
@@ -187,8 +193,10 @@ class PayrollShow extends Component
             'vacation_offset_hours' => $penaltyCalculation['vacation_offset_hours'],
             'remaining_penalty_hours' => $penaltyCalculation['remaining_penalty_hours'],
             'direct_deduction_amount' => $penaltyCalculation['direct_deduction_amount'],
-            'used_approved_vacations' => $penaltyCalculation['used_approved_vacations'],
-            'available_vacation_benefits' => $penaltyCalculation['available_vacation_benefits']
+            'direct_deduction_hours' => $penaltyCalculation['direct_deduction_hours'],
+            // 'used_approved_vacations' => $penaltyCalculation['used_approved_vacations'],
+            'available_vacation_benefits' => $penaltyCalculation['available_vacation_benefits'],
+            'penalty_days' => $penaltyCalculation['penalty_days']
         ];
         
         // Store available vacation benefits for potential application

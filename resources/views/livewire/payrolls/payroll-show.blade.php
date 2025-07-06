@@ -510,6 +510,36 @@
                                 </tbody>
                             </table>
                         </div>
+                        <!-- Penalty Days Table -->
+                        <div class="overflow-x-auto mt-4">
+                            <table class="min-w-full divide-y divide-slate-100 dark:divide-slate-700">
+                                <thead>
+                                    <tr>
+                                        <th class="table-th">Penalties</th>
+                                        <th class="table-th">Type</th>
+                                        <th class="table-th">Hours</th>
+                                        <th class="table-th">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody
+                                    class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
+                                    @forelse($employeePenaltyDays as $penaltyDay)
+                                        <tr>
+                                            <td class="table-td">
+                                                {{ \Carbon\Carbon::parse($penaltyDay->date)->format('d M Y') }}
+                                            </td>
+                                            <td class="table-td">{{ ucfirst(str_replace('_', ' ', $penaltyDay->type)) }}</td>
+                                            <td class="table-td">{{ $penaltyDay->hours }}</td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="2" class="table-td text-center py-4">No missing days
+                                                found</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
                     <!-- Benefit Payments Tab -->

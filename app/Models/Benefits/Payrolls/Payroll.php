@@ -5,6 +5,7 @@ namespace App\Models\Benefits\Payrolls;
 use App\Exceptions\AppException;
 use App\Models\Attendance\Attendance;
 use App\Models\Attendance\Overtime;
+use App\Models\Payrolls\PenaltyDay;
 use App\Models\Personel\Employee;
 use App\Models\Users\AppLog;
 use App\Models\Users\User;
@@ -27,6 +28,7 @@ class Payroll extends Model
         self::STATUS_PENDING,
         self::STATUS_APPROVED,
     ];
+
 
     protected $table = 'payrolls';
     protected $fillable = [
@@ -120,6 +122,11 @@ class Payroll extends Model
     public function overtimes()
     {
         return $this->hasMany(\App\Models\Attendance\Overtime::class);
+    }
+
+    public function penaltyDays()
+    {
+        return $this->hasMany(PenaltyDay::class);
     }
 
     /**
@@ -299,6 +306,11 @@ class Payroll extends Model
                     'tax_amount' => $taxAmount,
                     'after_tax_salary' => $netAmountAfterTax,
                 ]);
+
+                //create penalty days
+                if (isset($employeeData['penalty_days']) && is_array($employeeData['penalty_days'])) {
+                    $payroll->penaltyDays()->createMany($employeeData['penalty_days']);
+                }
 
                 // Create benefit payments for this employee using only base benefits data
                 if (isset($employeeData['benefits'])) {

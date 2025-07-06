@@ -9,6 +9,7 @@
                 <th class="table-th">Social Insurance Salary</th>
                 <th class="table-th">Other Amount</th>
                 <th class="table-th">Absence</th>
+                <th class="table-th">Penalty</th>
                 <th class="table-th">Extra Payments</th>
                 <th class="table-th">Overtime</th>
                 <th class="table-th">Adjustment</th>
@@ -97,6 +98,11 @@
                             @else
                                 <span class="text-xs text-success-500">No penalties</span>
                             @endif
+                        </div>
+                    </td>
+                    <td class="table-td">
+                        <div class="flex flex-col">
+                            <span class="text-xs text-danger-500">{{ number_format($payrollEmployee->penalties_amount ?? 0, 1) }} EGP</span>
                         </div>
                     </td>
                     <td class="table-td">{{ number_format($payrollEmployee->extra_payments, 2) }}</td>
@@ -197,7 +203,7 @@
                 </td>
                 <td class="table-td border-t-2 border-slate-200 dark:border-slate-600">
                     <div class="flex flex-col">
-                        <span class="text-sm font-bold">{{ number_format($totals['penalties_days'], 2) }} days</span>
+                        <span class="text-sm font-bold">{{ number_format($totals['total_penalty_hours'], 2) }} hours</span>
                         <span
                             class="text-xs text-danger-500 font-bold">-{{ number_format($totals['penalties_amount'], 2) }}
                             EGP</span>

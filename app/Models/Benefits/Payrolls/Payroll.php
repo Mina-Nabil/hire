@@ -308,8 +308,8 @@ class Payroll extends Model
                 ]);
 
                 //create penalty days
-                if (isset($employeeData['penalty_days']) && is_array($employeeData['penalty_days'])) {
-                    $payroll->penaltyDays()->createMany($employeeData['penalty_days']);
+                if (isset($employeeData['penalties_days']) && is_array($employeeData['penalties_days'])) {
+                    $payroll->penaltyDays()->createMany($employeeData['penalties_days']);
                 }
 
                 // Create benefit payments for this employee using only base benefits data

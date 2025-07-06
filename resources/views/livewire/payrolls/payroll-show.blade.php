@@ -273,12 +273,7 @@
                                                 class="font-semibold">{{ number_format($selectedPayrollEmployee->new_vacation_hours, 1) }}h</span>
                                         </div>
                                     @endif
-                                    @if (($selectedPayrollEmployee->direct_deduction_hours ?? 0) > 0)
-                                        <div class="flex justify-between text-xs text-danger-600">
-                                            <span>Deduction:</span>
-                                            <span
-                                                class="font-semibold">{{ number_format($selectedPayrollEmployee->direct_deduction_hours, 1) }}h</span>
-                                        </div>
+                                    @if (($selectedPayrollEmployee->penalties_amount ?? 0) > 0)
                                         <div class="flex justify-between text-xs text-danger-600 border-t pt-1">
                                             <span>Amount Deducted:</span>
                                             <span
@@ -450,7 +445,7 @@
                                                     class="
                                             @if ($attendance->penalized_hours > 0) text-danger-500 @else text-success-500 @endif
                                             ">
-                                                    {{ $attendance->hours ? $attendance->hours . 'h' : 'N/A' }}
+                                                    {{ $attendance->hours ?  sprintf('%02d:%02d', (int) $attendance->hours, fmod($attendance->hours, 1) * 60)  . 'h' : 'N/A' }}
                                                     @if ($attendance->penalized_hours > 0)
                                                         <span>
                                                             -
@@ -518,7 +513,6 @@
                                         <th class="table-th">Penalties</th>
                                         <th class="table-th">Type</th>
                                         <th class="table-th">Hours</th>
-                                        <th class="table-th">Amount</th>
                                     </tr>
                                 </thead>
                                 <tbody
@@ -533,7 +527,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="2" class="table-td text-center py-4">No missing days
+                                            <td colspan="2" class="table-td text-center py-4">No penalty hours
                                                 found</td>
                                         </tr>
                                     @endforelse

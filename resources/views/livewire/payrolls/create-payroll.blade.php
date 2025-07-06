@@ -69,7 +69,7 @@
                                     class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center">
                                 </th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center th-highlight-yellow"
-                                >Net</th>
+                                colspan="3">Penalty</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center th-highlight-red"
                                     colspan="2">Extra Payments</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700 text-center th-highlight-green"
@@ -100,10 +100,10 @@
                                     Days</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
                                     Amount</th>
-                                {{-- <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Net
+                                <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Net
                                     After Penalty</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
-                                    Amount</th> --}}
+                                    Amount</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">Net
                                     After Deductions</th>
                                 <th class="table-th border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
@@ -168,12 +168,12 @@
                                             <td
                                                 class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
                                                 {{ number_format($employee['employee_deductions'], 2) }}</td>
-                                            {{-- <td
-                                                class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
-                                                {{ number_format($employee['penalties_days'], 2) }}</td>
                                             <td
                                                 class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
-                                                {{ number_format($employee['penalties_amount'], 2) }}</td> --}}
+                                                {{ number_format($employee['penalties_hours'], 2) }}</td>
+                                            <td
+                                                class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
+                                                {{ number_format($employee['penalties_amount'], 2) }}</td>
                                             <td
                                                 class="table-td border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
                                                 {{ number_format($employee['net_after_penalty'], 2) }}</td>

@@ -33,6 +33,7 @@ use App\Models\Hierarchy\Department;
 use App\Models\Hierarchy\Location;
 use App\Models\Hierarchy\OrganizationalChart;
 use App\Models\Hierarchy\Position;
+use App\Models\Payrolls\PenaltyDay;
 use App\Models\Personel\Docs\BankAccount;
 use App\Models\Personel\Docs\DriverLicense;
 use App\Models\Personel\Docs\EmployeeContract;
@@ -155,6 +156,7 @@ class AppServiceProvider extends ServiceProvider
             MissingDay::MORPH_NAME => MissingDay::class,
             Bus::MORPH_NAME => Bus::class,
             BusArrival::MORPH_NAME => BusArrival::class,
+            PenaltyDay::MORPH_NAME => PenaltyDay::class,
         ]);
     }
 }

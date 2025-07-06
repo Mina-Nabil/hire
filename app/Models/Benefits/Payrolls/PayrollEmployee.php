@@ -30,7 +30,7 @@ class PayrollEmployee extends Model
         'employee_medical',
         'total_medical',
         'employee_deductions',
-        'penalties_days',
+        // 'penalties_days',
         'penalties_amount',
         'total_penalty_hours',
         'vacation_offset_hours',

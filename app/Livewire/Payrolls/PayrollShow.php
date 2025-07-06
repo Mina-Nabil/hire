@@ -476,6 +476,7 @@ class PayrollShow extends Component
                 'other_amount' => $totalsQuery->sum('other_amount'),
                 'penalties_days' => $totalsQuery->sum('penalties_days'),
                 'penalties_amount' => $totalsQuery->sum('penalties_amount'),
+                'total_penalty_hours' => $totalsQuery->sum('total_penalty_hours'),
                 'extra_payments' => $totalsQuery->sum('extra_payments'),
                 'overtime_hours' => $totalsQuery->sum('overtime_hours'),
                 'overtime_amount' => $totalsQuery->sum('overtime_amount'),

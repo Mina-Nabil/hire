@@ -264,6 +264,7 @@ class CreatePayroll extends Component
             'penalties_days' => 0,
             'penalties_amount' => 0,
             'extra_payments' => 0,
+            'penalties_hours' => 0,
             'overtime_hours' => 0,
             'overtime_amount' => 0,
             'adj_amount' => 0,
@@ -290,6 +291,7 @@ class CreatePayroll extends Component
                         'extra_payments' => 0,
                         'overtime_hours' => 0,
                         'overtime_amount' => 0,
+                        'penalties_hours' => 0,
                         'adj_amount' => 0,
                     ]
                 ];
@@ -340,7 +342,9 @@ class CreatePayroll extends Component
             $directDeductionAmount = $penaltyData['direct_deduction_amount'];
             // $usedApprovedVacations = $penaltyData['used_approved_vacations'];
             $availableVacationBenefits = $penaltyData['available_vacation_benefits'];
-            $totalPenaltyDays = $penaltyData['direct_deduction_hours'];
+            $penaltyAmount = $penaltyData['direct_deduction_amount'];
+
+
             if($employee->id == 1) {
                 Log::info('penalty data', ['penaltyData' => $penaltyData]);
             }
@@ -348,7 +352,6 @@ class CreatePayroll extends Component
             // Convert total hours to days for display purposes
 
             // The penalty amount is now only the direct deduction amount (after vacation offset)
-            $penaltyAmount = $directDeductionAmount;
 
             $netAfterPenalty = $netIncome - $penaltyAmount;
 
@@ -425,7 +428,7 @@ class CreatePayroll extends Component
             $departmentGroups[$departmentId]['totals']['employee_insurance'] += $employeeInsurance;
             $departmentGroups[$departmentId]['totals']['employer_insurance'] += $employerInsurance;
             $departmentGroups[$departmentId]['totals']['total_insurance'] += $totalInsurance;
-            $departmentGroups[$departmentId]['totals']['penalties_hours'] += $totalPenaltyHours;
+            $departmentGroups[$departmentId]['totals']['penalties_days'] += $remainingPenaltyHours;
             $departmentGroups[$departmentId]['totals']['penalties_amount'] += $penaltyAmount;
             $departmentGroups[$departmentId]['totals']['extra_payments'] += $extraPayments;
             $departmentGroups[$departmentId]['totals']['overtime_hours'] += $overtimeHours;
@@ -439,6 +442,7 @@ class CreatePayroll extends Component
             $totals['employer_insurance'] += $employerInsurance;
             $totals['total_insurance'] += $totalInsurance;
             $totals['penalties_hours'] += $totalPenaltyHours;
+            $totals['penalties_days'] += $remainingPenaltyHours;
             $totals['penalties_amount'] += $penaltyAmount;
             $totals['extra_payments'] += $extraPayments;
             $totals['overtime_hours'] += $overtimeHours;
@@ -466,6 +470,7 @@ class CreatePayroll extends Component
                 'employee_deductions' => $employeeDeductions,
                 'penalties_hours' => $totalPenaltyHours,
                 'penalties_amount' => $penaltyAmount,
+                'penalties_days' => $penaltyData['penalty_days'],
                 'total_penalty_hours' => $totalPenaltyHours,
                 'vacation_offset_hours' => $vacationOffsetHours,
                 'remaining_penalty_hours' => $remainingPenaltyHours,
@@ -671,6 +676,7 @@ class CreatePayroll extends Component
                 $this->alertError('Failed to create payroll. Please try again.');
             }
         } catch (\Exception $e) {
+            report($e);
             $this->alertError('Failed to create payroll: ' . $e->getMessage());
             AppLog::error('Payroll creation error: ' . $e->getMessage());
         }

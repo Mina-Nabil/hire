@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignIdFor(Payroll::class)->constrained()->cascadeOnDelete();
             $table->date('date');
             $table->enum('type', PenaltyDay::PENALTY_TYPE_LIST);
-            $table->float('hours');
+            $table->decimal('hours', 8, 2);
             $table->timestamps();
         });
     }

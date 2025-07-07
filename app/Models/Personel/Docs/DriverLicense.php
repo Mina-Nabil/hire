@@ -12,12 +12,21 @@ class DriverLicense extends Model
     const MORPH_NAME = 'driver_license';
     const DOC_TYPE = 'driverLicense';
 
+    // Type enum constants
+    const TYPE_PROFESSIONAL_LEVEL_1 = 'Professional Level 1';
+    const TYPE_PROFESSIONAL_LEVEL_2 = 'Professional Level 2';
+    const TYPE_PROFESSIONAL_LEVEL_3 = 'Professional Level 3';
+    const TYPE_PRIVATE = 'Private';
+    const TYPE_AGRICULTURE_EQUIPMENT = 'Agriculture Equipment';
+
     protected $fillable = [
         'employee_id',
         'created_by',
         'file_path',
         'issue_date',
         'expiry_date',
+        'type',
+        'note',
     ];
 
     protected $casts = [

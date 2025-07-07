@@ -16,17 +16,25 @@ class LabourDocument extends Model
     const MORPH_NAME = 'labour_document';
     const DOC_TYPE = 'labourDocument';
 
+    // Type enum constants
+    const TYPE_AVAILABLE = 'Available';
+    const TYPE_NOT_AVAILABLE = 'Not Available';
+    const TYPE_REGISTERED = 'Registered';
+
     protected $fillable = [
         'employee_id',
         'created_by',
         'file_path',
         'issue_date',
         'registration_date',
+        'expiry_date',
+        'type',
     ];
 
     protected $casts = [
         'issue_date' => 'date',
         'registration_date' => 'datetime',
+        'expiry_date' => 'datetime',
     ];
 
     /**
@@ -35,9 +43,11 @@ class LabourDocument extends Model
      * @param string $file_path
      * @param Carbon $issue_date
      * @param Carbon|null $registration_date
+     * @param Carbon|null $expiry_date
+     * @param string|null $type
      * @return bool
      */
-    public function updateRecord($file_path, Carbon $issue_date, ?Carbon $registration_date = null)
+    public function updateRecord($file_path, Carbon $issue_date, ?Carbon $registration_date = null, ?Carbon $expiry_date = null, ?string $type = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -50,6 +60,8 @@ class LabourDocument extends Model
                 'file_path' => $file_path,
                 'issue_date' => $issue_date,
                 'registration_date' => $registration_date,
+                'expiry_date' => $expiry_date,
+                'type' => $type,
                 'created_by' => Auth::id(), // Track who updated it
             ]);
             AppLog::info('Labour Document Updated', 'Labour document updated for employee: ' . $this->employee->name, loggable: $this);

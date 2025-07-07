@@ -252,7 +252,7 @@
                             <li wire:click="changeSection('employee_s1_doc')"
                                 class="block py-[8px] p-6  {{ $section == 'employee_s1_doc' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                                 <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                    {{ $this->getDocumentName('employeeS1Doc', 'Employee S1 Doc') }}
+                                    {{ $this->getDocumentName('employeeS1Doc', 'Employee S1 Document') }}
                                     <span>
 
                                         @if ($employee->checkS1DocStatus()['status'] === 'valid')
@@ -288,7 +288,7 @@
                             <li wire:click="changeSection('employee_s2_doc')"
                                 class="block py-[8px] p-6  {{ $section == 'employee_s2_doc' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                                 <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                    {{ $this->getDocumentName('employeeS2Doc', 'Employee S2 Doc') }}
+                                    {{ $this->getDocumentName('employeeS2Doc', 'Employee S2 Document') }}
                                     <span>
                                         @if ($employee->checkS2DocsStatus()['status'] === 'valid')
                                             <span
@@ -323,7 +323,7 @@
                             <li wire:click="changeSection('employee_s6_doc')"
                                 class="block py-[8px] p-6  {{ $section == 'employee_s6_doc' ? 'bg-slate-900 text-white dark:bg-slate-700' : 'hover:bg-slate-200 dark:hover:bg-slate-700 dark:text-white' }}">
                                 <div class="flex justify-between space-x-2 rtl:space-x-reverse">
-                                    {{ $this->getDocumentName('employeeS6Doc', 'Employee S6 Doc') }}
+                                    {{ $this->getDocumentName('employeeS6Doc', 'Employee S6 Document') }}
                                     <span>
                                         @if ($employee->checkS6DocsStatus()['status'] === 'valid')
                                             <span
@@ -1298,6 +1298,22 @@
                                                 Date</label>
                                             <div class="text-base text-slate-900 dark:text-white">
                                                 {{ $employee->driverLicense->expiry_date }}
+                                            </div>
+                                        </div>
+                                    @endif
+                                    @if ($employee->driverLicense->type)
+                                        <div class="mb-5 text-wrap">
+                                            <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Type</label>
+                                            <div class="text-base text-slate-900 dark:text-white">
+                                                {{ $employee->driverLicense->type }}
+                                            </div>
+                                        </div>
+                                    @endif
+                                    @if ($employee->driverLicense->note)
+                                        <div class="mb-5 text-wrap">
+                                            <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Note</label>
+                                            <div class="text-base text-slate-900 dark:text-white">
+                                                {{ $employee->driverLicense->note }}
                                             </div>
                                         </div>
                                     @endif
@@ -2771,6 +2787,19 @@
                                             <span
                                                 class="text-sm font-medium">{{ $employee->labourDocument->registration_date }}</span>
                                         </div>
+                                        @if ($employee->labourDocument->expiry_date)
+                                                                                    <div class="flex justify-between">
+                                            <span class="text-sm text-slate-500 dark:text-slate-400">Expiry
+                                                Date:</span>
+                                            <span
+                                                class="text-sm font-medium">{{ $employee->labourDocument->expiry_date }}</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-sm text-slate-500 dark:text-slate-400">Type:</span>
+                                            <span
+                                                class="text-sm font-medium">{{ $employee->labourDocument->type }}</span>
+                                        </div>
+                                        @endif
 
                                         <!-- Download Button -->
                                         <div class="mt-3">
@@ -3292,6 +3321,36 @@
                                         class="form-control @error('driver_license_expiry_date') !border-danger-500 @enderror"
                                         wire:model="driver_license_expiry_date">
                                     @error('driver_license_expiry_date')
+                                        <span
+                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+                                <div class="from-group">
+                                    <label for="driver_license_type" class="form-label">Type</label>
+                                    <select id="driver_license_type"
+                                        class="form-control @error('driver_license_type') !border-danger-500 @enderror"
+                                        wire:model="driver_license_type">
+                                        <option value="">Select Type</option>
+                                        <option value="Professional Level 1">Professional Level 1</option>
+                                        <option value="Professional Level 2">Professional Level 2</option>
+                                        <option value="Professional Level 3">Professional Level 3</option>
+                                        <option value="Private">Private</option>
+                                        <option value="Agriculture Equipment">Agriculture Equipment</option>
+                                    </select>
+                                    @error('driver_license_type')
+                                        <span
+                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+                                <div class="from-group">
+                                    <label for="driver_license_note" class="form-label">Note</label>
+                                    <textarea id="driver_license_note"
+                                        class="form-control @error('driver_license_note') !border-danger-500 @enderror"
+                                        wire:model="driver_license_note" rows="3"
+                                        placeholder="Add any additional notes about the driver license..."></textarea>
+                                    @error('driver_license_note')
                                         <span
                                             class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
                                     @enderror
@@ -6909,6 +6968,34 @@
                                                 id="labour_document_registration_date"
                                                 wire:model="labour_document_registration_date">
                                             @error('labour_document_registration_date')
+                                                <span class="text-danger-500 text-sm">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                        <div class="col-span-12">
+                                            <label for="labour_document_expiry_date"
+                                                class="form-label">Expiry
+                                                Date</label>
+                                            <input type="date"
+                                                class="form-control @error('labour_document_expiry_date') !border-danger-500 @enderror"
+                                                id="labour_document_expiry_date"
+                                                wire:model="labour_document_expiry_date">
+                                            @error('labour_document_expiry_date')
+                                                <span class="text-danger-500 text-sm">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                        <div class="col-span-12">
+                                            <label for="labour_document_type"
+                                                class="form-label">Type</label>
+                                            <select
+                                                class="form-control @error('labour_document_type') !border-danger-500 @enderror"
+                                                id="labour_document_type"
+                                                wire:model="labour_document_type">
+                                                <option value="">Select Type</option>
+                                                <option value="Available">Available</option>
+                                                <option value="Not Available">Not Available</option>
+                                                <option value="Registered">Registered</option>
+                                            </select>
+                                            @error('labour_document_type')
                                                 <span class="text-danger-500 text-sm">{{ $message }}</span>
                                             @enderror
                                         </div>

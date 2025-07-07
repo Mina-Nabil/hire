@@ -161,6 +161,8 @@ class EmployeeShow extends Component
     public $driver_license_file;
     public $driver_license_issue_date;
     public $driver_license_expiry_date;
+    public $driver_license_type;
+    public $driver_license_note;
 
     // Police Record Properties
     public $editPoliceRecordModal = false;
@@ -233,6 +235,8 @@ class EmployeeShow extends Component
     public $labour_document_file;
     public $labour_document_issue_date;
     public $labour_document_registration_date;
+    public $labour_document_expiry_date;
+    public $labour_document_type;
     public $keep_existing_labour_document = false;
 
     // College Certificate Properties
@@ -1197,6 +1201,8 @@ class EmployeeShow extends Component
         if ($this->employee->driverLicense) {
             $this->driver_license_issue_date = $this->employee->driverLicense->issue_date;
             $this->driver_license_expiry_date = $this->employee->driverLicense->expiry_date;
+            $this->driver_license_type = $this->employee->driverLicense->type;
+            $this->driver_license_note = $this->employee->driverLicense->note;
         }
     }
 
@@ -1212,7 +1218,9 @@ class EmployeeShow extends Component
             'keep_existing_driver_license',
             'driver_license_file',
             'driver_license_issue_date',
-            'driver_license_expiry_date'
+            'driver_license_expiry_date',
+            'driver_license_type',
+            'driver_license_note'
         ]);
     }
 
@@ -1221,6 +1229,8 @@ class EmployeeShow extends Component
         $validationRules = [
             'driver_license_issue_date' => 'required|date',
             'driver_license_expiry_date' => 'required|date',
+            'driver_license_type' => 'nullable|in:Professional Level 1,Professional Level 2,Professional Level 3,Private,Agriculture Equipment',
+            'driver_license_note' => 'nullable|string|max:1000',
         ];
 
         if (!$this->keep_existing_driver_license) {
@@ -1237,7 +1247,9 @@ class EmployeeShow extends Component
             $res = $this->employee->setDriverLicense(
                 $path ?? ($this->employee->driverLicense?->file_path ?? null),
                 Carbon::parse($this->driver_license_issue_date),
-                Carbon::parse($this->driver_license_expiry_date)
+                Carbon::parse($this->driver_license_expiry_date),
+                $this->driver_license_type,
+                $this->driver_license_note
             );
 
             if ($res) {
@@ -2262,6 +2274,8 @@ class EmployeeShow extends Component
         if ($this->employee->labourDocument) {
             $this->labour_document_issue_date = $this->employee->labourDocument->issue_date;
             $this->labour_document_registration_date = $this->employee->labourDocument->registration_date;
+            $this->labour_document_expiry_date = $this->employee->labourDocument->expiry_date;
+            $this->labour_document_type = $this->employee->labourDocument->type;
             $this->keep_existing_labour_document = true;
         } else {
             $this->resetLabourDocumentFields();
@@ -2285,6 +2299,8 @@ class EmployeeShow extends Component
         $this->labour_document_file = null;
         $this->labour_document_issue_date = null;
         $this->labour_document_registration_date = null;
+        $this->labour_document_expiry_date = null;
+        $this->labour_document_type = null;
         $this->keep_existing_labour_document = false;
     }
 
@@ -2296,6 +2312,8 @@ class EmployeeShow extends Component
         $this->validate([
             'labour_document_issue_date' => 'required|date',
             'labour_document_registration_date' => 'nullable|date',
+            'labour_document_expiry_date' => 'nullable|date|after:labour_document_issue_date',
+            'labour_document_type' => 'nullable|in:Available,Not Available,Registered',
             'labour_document_file' => $this->keep_existing_labour_document ? 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif' : 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
         ]);
 
@@ -2318,7 +2336,9 @@ class EmployeeShow extends Component
             $this->employee->setLabourDocument(
                 $filePath,
                 Carbon::parse($this->labour_document_issue_date),
-                $this->labour_document_registration_date ? Carbon::parse($this->labour_document_registration_date) : null
+                $this->labour_document_registration_date ? Carbon::parse($this->labour_document_registration_date) : null,
+                $this->labour_document_expiry_date ? Carbon::parse($this->labour_document_expiry_date) : null,
+                $this->labour_document_type
             );
 
             $this->closeEditLabourDocumentModal();

@@ -139,6 +139,13 @@ class DocManagerSeeder extends Seeder
                 'description' => 'Social security or insurance documents',
                 'is_required' => true,
                 'is_active' => true
+            ],
+            [
+                'doc_type' => 'hrLetter',
+                'name' => 'HR Letter',
+                'description' => 'Human Resources letter or related documentation',
+                'is_required' => true,
+                'is_active' => true
             ]
         ];
 

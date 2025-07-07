@@ -714,7 +714,7 @@ class Employee extends Model
         }
     }
 
-    public function setDriverLicense($file_path, Carbon $issue_date, Carbon $expiry_date)
+    public function setDriverLicense($file_path, Carbon $issue_date, Carbon $expiry_date, ?string $type = null, ?string $note = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -732,6 +732,8 @@ class Employee extends Model
                     'file_path' => $file_path,
                     'issue_date' => $issue_date,
                     'expiry_date' => $expiry_date,
+                    'type' => $type,
+                    'note' => $note,
                 ],
             );
             AppLog::info('Driver License Set', 'Driver license set for employee: ' . $this->name, loggable: $this);
@@ -1149,7 +1151,7 @@ class Employee extends Model
      * @return bool
      * @throws AppException
      */
-    public function setLabourDocument($file_path, Carbon $issue_date, ?Carbon $registration_date = null)
+    public function setLabourDocument($file_path, Carbon $issue_date, ?Carbon $registration_date = null, ?Carbon $expiry_date = null, ?string $type = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -1165,6 +1167,8 @@ class Employee extends Model
                     'file_path' => $file_path,
                     'issue_date' => $issue_date,
                     'registration_date' => $registration_date,
+                    'expiry_date' => $expiry_date,
+                    'type' => $type,
                 ]
             );
             AppLog::info('Labour Document Set', 'Labour document set for employee: ' . $this->name, loggable: $this);

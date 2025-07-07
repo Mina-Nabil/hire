@@ -833,14 +833,6 @@
                                     </div>
                                 </div>
 
-                                <div class="mb-5 text-wrap">
-                                    <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Release
-                                        Date</label>
-                                    <div class="text-base text-slate-900 dark:text-white font-bold">
-                                        {{ $employee->release_date?->format('d/m/Y') }}
-                                    </div>
-                                </div>
-
 
                                 <div class="mb-5 text-wrap">
                                     <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Absent
@@ -889,6 +881,14 @@
                                         Date</label>
                                     <div class="text-base text-slate-900 dark:text-white font-bold">
                                         {{ $employee->employment_date?->format('d/m/Y') }}</div>
+                                </div>
+
+                                <div class="mb-5 text-wrap">
+                                    <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Release
+                                        Date</label>
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
+                                        {{ $employee->release_date?->format('d/m/Y') }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -3480,7 +3480,7 @@
 
                                     <div class="col-span-12 xl:col-span-6">
                                         <label for="release_note" class="form-label">Release Note</label>
-                                        <textarea id="release_note"
+                                        <textarea id="release_note"id="release_note"
                                             class="form-control @error('release_note') !border-danger-500 @enderror"
                                             wire:model="release_note" rows="3"></textarea>
                                         @error('release_note')

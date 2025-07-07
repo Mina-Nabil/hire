@@ -1426,8 +1426,9 @@ class Employee extends Model
 
 
     //scopes
-    public function scopeCurrent($query, $start_date = null)
+    public function scopeCurrent($query, ?Carbon $start_date = null)
     {
+        $start_date = $start_date ? $start_date->format('Y-m-d') : now()->format('Y-m-d');
         return $query->where(function ($q) use ($start_date) {
             $q->whereNull('termination_date')->orWhere('termination_date', '>=', $start_date);
         })->where(function ($q) use ($start_date) {
@@ -1436,7 +1437,7 @@ class Employee extends Model
             $q->whereNull('absent_date')->orWhere('absent_date', '>=', $start_date);
         });
     }
-    
+
     public function scopeStatusActive($query)
     {
         return $query->where('status', self::STATUS_ACTIVE);

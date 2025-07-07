@@ -140,6 +140,9 @@ class EmployeeDashboard extends Component
 
     public function render()
     {
-        return view('livewire.employee.employee-dashboard');
+        $totalLeft = Employee::left()->count();
+        return view('livewire.employee.employee-dashboard', [
+            'totalLeft' => $totalLeft
+        ]);
     }
 }

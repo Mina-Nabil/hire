@@ -17,6 +17,7 @@
                             <th class="px-4 py-3 text-center text-sm font-semibold text-white">Expired</th>
                             <th class="px-4 py-3 text-center text-sm font-semibold text-white">Missing</th>
                             <th class="px-4 py-3 text-center text-sm font-semibold text-white">Additional Info</th>
+                            <th class="px-4 py-3 text-center text-sm font-semibold text-white">Left</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
@@ -53,6 +54,7 @@
                                 @endif
                             </td>
                             <td class="px-4 py-3 text-sm text-center">-</td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $totalLeft }}</td>
                         </tr>
 
                         <!-- Birth Certificate -->
@@ -92,6 +94,7 @@
                                 Verified: {{ $birthCertificateStats['by_type']['verified_copy'] }} | 
                                 Copy: {{ $birthCertificateStats['by_type']['copy'] }}
                             </td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $totalLeft }}</td>
                         </tr>
 
                         <!-- Army Service Paper -->
@@ -130,6 +133,7 @@
                                 Males: {{ $armyServicePaperStats['males'] }} | 
                                 Females: {{ $armyServicePaperStats['females'] }}
                             </td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $totalLeft }}</td>
                         </tr>
 
                         <!-- Employment Contract -->
@@ -165,6 +169,7 @@
                                 @endif
                             </td>
                             <td class="px-4 py-3 text-sm text-center">-</td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $totalLeft }}</td>
                         </tr>
 
                         <!-- Driver License -->
@@ -203,6 +208,7 @@
                                 Required: {{ $driverLicenseStats['required'] }} | 
                                 Not Required: {{ $driverLicenseStats['not_required'] }}
                             </td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $totalLeft }}</td>
                         </tr>
 
                         <!-- Police Record -->
@@ -238,10 +244,11 @@
                                 @endif
                             </td>
                             <td class="px-4 py-3 text-sm text-center">-</td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $totalLeft }}</td>
                         </tr>
 
                         <!-- HR Letter -->
-                        {{-- <tr class="hover:bg-gray-50">
+                        <tr class="hover:bg-gray-50">
                             <td class="px-4 py-3 text-sm font-medium text-gray-900">HR Letter</td>
                             <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $hrLetterStats['total'] }}</td>
                             <td class="px-4 py-3 text-sm text-center text-success-600 font-semibold">{{ $hrLetterStats['valid'] }}</td>
@@ -273,7 +280,8 @@
                                 @endif
                             </td>
                             <td class="px-4 py-3 text-sm text-center">-</td>
-                        </tr> --}}
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $totalLeft }}</td>
+                        </tr>
 
                         <!-- S1 Document -->
                         <tr class="hover:bg-gray-50">
@@ -308,6 +316,7 @@
                                 @endif
                             </td>
                             <td class="px-4 py-3 text-sm text-center">-</td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $totalLeft }}</td>
                         </tr>
 
                         <!-- S2 Document -->
@@ -343,6 +352,7 @@
                                 @endif
                             </td>
                             <td class="px-4 py-3 text-sm text-center">-</td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $totalLeft }}</td>
                         </tr>
 
                         <!-- S6 Document -->
@@ -419,6 +429,7 @@
                                 Covered: {{ $medicalRecordStats['by_status']['Covered'] }} | 
                                 External: {{ $medicalRecordStats['by_status']['External Cover'] }}
                             </td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $totalLeft }}</td>
                         </tr>
 
                         <!-- External Medical Record -->
@@ -454,6 +465,7 @@
                                 @endif
                             </td>
                             <td class="px-4 py-3 text-sm text-center">-</td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $totalLeft }}</td>
                         </tr>
 
                         <!-- Practice Card -->
@@ -489,6 +501,7 @@
                                 @endif
                             </td>
                             <td class="px-4 py-3 text-sm text-center">-</td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $totalLeft }}</td>
                         </tr>
 
                         <!-- Skills Qualification -->
@@ -524,6 +537,7 @@
                                 @endif
                             </td>
                             <td class="px-4 py-3 text-sm text-center">-</td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $totalLeft }}</td>
                         </tr>
 
                         <!-- Syndicate Card -->
@@ -594,6 +608,7 @@
                                 @endif
                             </td>
                             <td class="px-4 py-3 text-sm text-center">-</td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-900">{{ $totalLeft }}</td>
                         </tr>
                     </tbody>
                 </table>

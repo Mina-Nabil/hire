@@ -45,6 +45,7 @@ class EmployeeConfiguration extends Component
     public $termination_date;
     public $release_date;
     public $absent_date;
+    public $release_note;
 
     public $benefitIncrementTypes = BaseBenefit::TYPE_LIST;
     public $vacationBenefitTypes = VacationDetail::TYPE_LIST;
@@ -661,6 +662,7 @@ class EmployeeConfiguration extends Component
             'release_date' => 'nullable|date',
             'absent_date' => 'nullable|date',
             'mother_name' => 'nullable|string|max:255',
+            'release_note' => 'nullable|string|max:255',
         ]);
 
         $res = $this->employee->updateBaseInfo(
@@ -677,7 +679,8 @@ class EmployeeConfiguration extends Component
             $this->mother_name,
             $this->termination_date ? Carbon::parse($this->termination_date) : null,
             $this->release_date ? Carbon::parse($this->release_date) : null,
-            $this->absent_date ? Carbon::parse($this->absent_date) : null
+            $this->absent_date ? Carbon::parse($this->absent_date) : null,
+            $this->release_note
         );
 
         if ($res) {

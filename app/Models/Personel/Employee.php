@@ -110,6 +110,7 @@ class Employee extends Model
         'absent_date',
         'mother_name',
         'status',
+        'release_note',
     ];
 
     protected $casts = [
@@ -1332,7 +1333,7 @@ class Employee extends Model
      * @return Employee
      * @throws AppException
      */
-    public function updateBaseInfo(string $name, string $name_ar, string $email, string $phone, string $address, string $nationality, string $gender, $birth_date, $employment_date, string $id_number, ?string $mother_name = null, ?Carbon $termination_date = null, ?Carbon $release_date = null, ?Carbon $absent_date = null)
+    public function updateBaseInfo(string $name, string $name_ar, string $email, string $phone, string $address, string $nationality, string $gender, $birth_date, $employment_date, string $id_number, ?string $mother_name = null, ?Carbon $termination_date = null, ?Carbon $release_date = null, ?Carbon $absent_date = null, ?string $release_note = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -1356,6 +1357,7 @@ class Employee extends Model
                 'termination_date' => $termination_date,
                 'release_date' => $release_date,
                 'absent_date' => $absent_date,
+                'release_note' => $release_note,
             ]);
             AppLog::info('Employee Base Info Updated', 'Employee base info updated for employee: ' . $this->name, loggable: $this);
             return $this->fresh();
@@ -1429,7 +1431,8 @@ class Employee extends Model
     public function scopeCurrent($query, $start_date = null)
     {
         $start_date = $start_date ?? now()->format('Y-m-d');
-        return $query->where(function ($q) use ($start_date) {
+        return $query->statusActive()
+        ->where(function ($q) use ($start_date) {
             $q->whereNull('termination_date')->orWhere('termination_date', '>=', $start_date);
         })->where(function ($q) use ($start_date) {
             $q->whereNull('release_date')->orWhere('release_date', '>=', $start_date);

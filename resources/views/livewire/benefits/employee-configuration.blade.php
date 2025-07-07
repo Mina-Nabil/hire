@@ -1741,6 +1741,21 @@
                                         @enderror
                                     </div>
 
+                                    <div class="col-span-12 xl:col-span-6">
+                                        <label for="release_note" class="form-label">Release Note</label>
+                                        <textarea
+                                            class="form-control @error('release_note') !border-danger-500 @enderror"
+                                            wire:model="release_note" rows="3"></textarea>
+                                        @error('release_note')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                     
+                                    </div>
+
+
+
+
+
 
                                 </div>
                             </div>

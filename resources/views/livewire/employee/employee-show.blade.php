@@ -833,6 +833,32 @@
                                     </div>
                                 </div>
 
+                                <div class="mb-5 text-wrap">
+                                    <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Release
+                                        Date</label>
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
+                                        {{ $employee->release_date?->format('d/m/Y') }}
+                                    </div>
+                                </div>
+
+
+                                <div class="mb-5 text-wrap">
+                                    <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Absent
+                                        Date</label>
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
+                                        {{ $employee->absent_date?->format('d/m/Y') }}
+                                    </div>
+                                </div>
+
+
+                                <div class="mb-5 text-wrap">
+                                    <label class="text-xs text-slate-500 dark:text-slate-400 m-0">Release
+                                        Note</label>
+                                    <div class="text-base text-slate-900 dark:text-white font-bold">
+                                        {{ $employee->release_note }}
+                                    </div>
+                                </div>
+
 
                             </div>
                             <div class="xl:col-span-6 lg:col-span-6 md:col-span-6 col-span-12">
@@ -3428,6 +3454,36 @@
                                             class="form-control @error('termination_date') !border-danger-500 @enderror"
                                             wire:model="termination_date">
                                         @error('termination_date')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+
+                                    <div class="col-span-12 xl:col-span-6">
+                                        <label for="release_date" class="form-label">Release Date</label>
+                                        <input type="date"
+                                            class="form-control @error('release_date') !border-danger-500 @enderror"
+                                            wire:model="release_date">
+                                        @error('release_date')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+
+                                    <div class="col-span-12 xl:col-span-6">
+                                        <label for="absent_date" class="form-label">Absent Date</label>
+                                        <input type="date"
+                                            class="form-control @error('absent_date') !border-danger-500 @enderror"
+                                            wire:model="absent_date">
+                                        @error('absent_date')
+                                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+
+                                    <div class="col-span-12 xl:col-span-6">
+                                        <label for="release_note" class="form-label">Release Note</label>
+                                        <textarea id="release_note"
+                                            class="form-control @error('release_note') !border-danger-500 @enderror"
+                                            wire:model="release_note" rows="3"></textarea>
+                                        @error('release_note')
                                             <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
                                         @enderror
                                     </div>

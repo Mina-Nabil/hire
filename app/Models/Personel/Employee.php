@@ -1429,15 +1429,14 @@ class Employee extends Model
     public function scopeCurrent($query, $start_date = null)
     {
         return $query->where(function ($q) use ($start_date) {
-            $q->whereNull('termination_date');
-            $start_date = $start_date ?? now()->format('Y-m-d');
-            $q->orWhere(function ($q) use ($start_date) {
-                $q->where('termination_date', '>=', $start_date)
-                    ->orWhere('release_date', '>=', $start_date)
-                    ->orWhere('absent_date', '>=', $start_date);
-            });
+            $q->whereNull('termination_date')->orWhere('termination_date', '>=', $start_date);
+        })->where(function ($q) use ($start_date) {
+            $q->whereNull('release_date')->orWhere('release_date', '>=', $start_date);
+        })->where(function ($q) use ($start_date) {
+            $q->whereNull('absent_date')->orWhere('absent_date', '>=', $start_date);
         });
     }
+    
     public function scopeStatusActive($query)
     {
         return $query->where('status', self::STATUS_ACTIVE);

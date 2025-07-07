@@ -2835,8 +2835,9 @@
                             </div>
 
 
-                                <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
-                                <h5 class="card-title text-slate-900 dark:text-white">Type: {{ $employee->collegeCertificate->type }}</h5>
+                            <div class="card-header bg-slate-50 dark:bg-slate-700 p-3 flex justify-between">
+                                <h5 class="card-title text-slate-900 dark:text-white">Type:
+                                    {{ $employee->collegeCertificate->type }}</h5>
                             </div>
 
                             <div class="card-body p-4">
@@ -3481,8 +3482,8 @@
                                     <div class="col-span-12 xl:col-span-6">
                                         <label for="release_note" class="form-label">Release Note</label>
                                         <textarea id="release_note"id="release_note"
-                                            class="form-control @error('release_note') !border-danger-500 @enderror"
-                                            wire:model="release_note" rows="3"></textarea>
+                                            class="form-control @error('release_note') !border-danger-500 @enderror" wire:model="release_note"
+                                            rows="3"></textarea>
                                         @error('release_note')
                                             <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
                                         @enderror
@@ -6900,7 +6901,8 @@
                                             @enderror
                                         </div>
                                         <div class="col-span-12">
-                                            <label for="labour_document_registration_date" class="form-label">Registration
+                                            <label for="labour_document_registration_date"
+                                                class="form-label">Registration
                                                 Date</label>
                                             <input type="date"
                                                 class="form-control @error('labour_document_registration_date') !border-danger-500 @enderror"
@@ -7088,7 +7090,8 @@
                                                 wire:model="college_certificate_type">
                                                 <option value="">Select Type</option>
                                                 @foreach ($college_certificate_types as $type)
-                                                    <option value="{{ $type }}">{{ $type }}</option>
+                                                    <option value="{{ $type }}">{{ $type }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                             @error('college_certificate_type')
@@ -7361,7 +7364,9 @@
                                                 class="border-2 border-dashed border-slate-200 rounded-md p-4 text-center">
                                                 @if ($other_document_file)
                                                     @foreach ($other_document_file as $key => $file)
-                                                    @if(!$file) @continue @endif
+                                                        @if (!$file)
+                                                            @continue
+                                                        @endif
                                                         <div class="flex items-center justify-center mb-3">
                                                             @if (in_array($file->getClientOriginalExtension(), ['pdf']))
                                                                 <iconify-icon icon="mingcute:file-pdf-fill"

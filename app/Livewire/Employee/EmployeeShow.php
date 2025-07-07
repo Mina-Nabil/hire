@@ -252,6 +252,8 @@ class EmployeeShow extends Component
     public $social_print_file;
     public $social_print_issue_date;
     public $keep_existing_social_print = false;
+    public $social_print_type;
+    public $social_print_types;
 
     // Other Document Properties
     public $editOtherDocumentModal = false;
@@ -303,6 +305,7 @@ class EmployeeShow extends Component
         $this->employeeS6DocLeavingReasons = EmployeeS6Doc::LEAVING_REASONS;
         $this->statuses = Employee::STATUS_LIST;
         $this->college_certificate_types = CollegeCertificate::TYPES;
+        $this->social_print_types = \App\Models\Personel\Docs\SocialPrint::TYPES;
     }
 
     public function openEditIdCardModal()
@@ -2507,6 +2510,7 @@ class EmployeeShow extends Component
 
         if ($this->employee->socialPrint) {
             $this->social_print_issue_date = $this->employee->socialPrint->issue_date;
+            $this->social_print_type = $this->employee->socialPrint->type;
             $this->keep_existing_social_print = true;
         } else {
             $this->resetSocialPrintFields();
@@ -2529,6 +2533,7 @@ class EmployeeShow extends Component
     {
         $this->social_print_file = null;
         $this->social_print_issue_date = null;
+        $this->social_print_type = null;
         $this->keep_existing_social_print = false;
     }
 
@@ -2539,6 +2544,7 @@ class EmployeeShow extends Component
     {
         $this->validate([
             'social_print_issue_date' => 'required|date',
+            'social_print_type' => 'nullable|string|in:' . implode(',', \App\Models\Personel\Docs\SocialPrint::TYPES),
             'social_print_file' => $this->keep_existing_social_print ? 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif' : 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,bmp,gif',
         ]);
 
@@ -2560,7 +2566,8 @@ class EmployeeShow extends Component
 
             $this->employee->setSocialPrint(
                 $filePath,
-                Carbon::parse($this->social_print_issue_date)
+                Carbon::parse($this->social_print_issue_date),
+                $this->social_print_type
             );
 
             $this->closeEditSocialPrintModal();

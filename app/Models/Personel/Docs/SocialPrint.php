@@ -16,11 +16,23 @@ class SocialPrint extends Model
     const MORPH_NAME = 'social_print';
     const DOC_TYPE = 'socialPrint';
 
+    // Type constants
+    const TYPE_AVAILABLE_EXAMINED = 'Available & Examined';
+    const TYPE_AVAILABLE_NOT_EXAMINED = 'Available & Not Examined';
+    const TYPE_NOT_AVAILABLE = 'Not Available';
+
+    const TYPES = [
+        self::TYPE_AVAILABLE_EXAMINED,
+        self::TYPE_AVAILABLE_NOT_EXAMINED,
+        self::TYPE_NOT_AVAILABLE,
+    ];
+
     protected $fillable = [
         'employee_id',
         'created_by',
         'file_path',
         'issue_date',
+        'type',
     ];
 
     protected $casts = [
@@ -32,9 +44,10 @@ class SocialPrint extends Model
      * 
      * @param string $file_path
      * @param Carbon $issue_date
+     * @param string $type
      * @return bool
      */
-    public function updateRecord($file_path, Carbon $issue_date)
+    public function updateRecord($file_path, Carbon $issue_date, $type = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -46,6 +59,7 @@ class SocialPrint extends Model
             $this->update([
                 'file_path' => $file_path,
                 'issue_date' => $issue_date,
+                'type' => $type,
                 'created_by' => Auth::id(), // Track who updated it
             ]);
             AppLog::info('Social Print Updated', 'Social print updated for employee: ' . $this->employee->name, loggable: $this);

@@ -2988,6 +2988,12 @@
                                             <span
                                                 class="text-sm font-medium">{{ $employee->socialPrint->issue_date }}</span>
                                         </div>
+                                        @if($employee->socialPrint->type)
+                                        <div class="flex justify-between">
+                                            <span class="text-sm text-slate-500 dark:text-slate-400">Type:</span>
+                                            <span class="text-sm font-medium">{{ $employee->socialPrint->type }}</span>
+                                        </div>
+                                        @endif
 
                                         <!-- Download Button -->
                                         <div class="mt-3">
@@ -7349,6 +7355,21 @@
                                                 class="form-control @error('social_print_issue_date') !border-danger-500 @enderror"
                                                 id="social_print_issue_date" wire:model="social_print_issue_date">
                                             @error('social_print_issue_date')
+                                                <span class="text-danger-500 text-sm">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
+                                        <div class="col-span-12">
+                                            <label for="social_print_type" class="form-label">Type</label>
+                                            <select
+                                                class="form-control @error('social_print_type') !border-danger-500 @enderror"
+                                                id="social_print_type" wire:model="social_print_type">
+                                                <option value="">Select Type (Optional)</option>
+                                                @foreach($social_print_types as $type)
+                                                    <option value="{{ $type }}">{{ $type }}</option>
+                                                @endforeach
+                                            </select>
+                                            @error('social_print_type')
                                                 <span class="text-danger-500 text-sm">{{ $message }}</span>
                                             @enderror
                                         </div>

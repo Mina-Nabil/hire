@@ -1220,10 +1220,11 @@ class Employee extends Model
      *
      * @param string $file_path
      * @param Carbon $issue_date
+     * @param string|null $type
      * @return bool
      * @throws AppException
      */
-    public function setSocialPrint($file_path, Carbon $issue_date)
+    public function setSocialPrint($file_path, Carbon $issue_date, ?string $type = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -1238,6 +1239,7 @@ class Employee extends Model
                     'created_by' => $loggedInUser->id,
                     'file_path' => $file_path,
                     'issue_date' => $issue_date,
+                    'type' => $type,
                 ]
             );
             AppLog::info('Social Print Set', 'Social print set for employee: ' . $this->name, loggable: $this);

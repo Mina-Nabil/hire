@@ -47,7 +47,7 @@ class ApplyPackageModal extends Component
                 ->bySalaryGrade($this->selectedPackageId)->get()->mapWithKeys(function ($benefit) {
                     $tmpPackageDetail = PackageDetail::find($benefit->package_detail_id);
                     return [
-                        $benefit->package_detail_id => [
+                        (string)$benefit->package_detail_id => [
                             'package_detail_id' => $benefit->package_detail_id,
                             'name' => $benefit->name,
                             'amount' => $benefit->amount,
@@ -64,7 +64,7 @@ class ApplyPackageModal extends Component
 
             $defaultPackageDetails = PackageDetail::bySalaryGrade($this->selectedPackageId)->get()->mapWithKeys(function ($detail) {
                 return [
-                    $detail->id => [
+                    (string)$detail->id => [
                         'package_detail_id' => $detail->id,
                         'name' => $detail->name,
                         'type' => $detail->type,
@@ -85,7 +85,7 @@ class ApplyPackageModal extends Component
             $this->selectedPackageId = $this->selectedEmployee->position->salary_grade_id;
 
             $this->packageDetails = PackageDetail::bySalaryGrade($this->selectedPackageId)->get()->mapWithKeys(function ($detail) {
-                return [$detail->id => [
+                return [(string)$detail->id => [
                     'package_detail_id' => $detail->id,
                     'name' => $detail->name,
                     'type' => $detail->type,

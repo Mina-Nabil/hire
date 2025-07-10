@@ -46,24 +46,41 @@ class ApplyPackageModal extends Component
             $this->grossSalary = $this->selectedEmployee->benefitConfiguration->gross_salary;
             $this->insuranceAmount = $this->selectedEmployee->benefitConfiguration->insurance_amount;
 
-            $this->packageDetails = $this->selectedEmployee->baseBenefits()
-            ->bySalaryGrade($this->selectedPackageId)->get()->map(function ($benefit) {
-                $tmpPackageDetail = PackageDetail::find($benefit->package_detail_id);
+            $savedPackageDetails = $this->selectedEmployee->baseBenefits()
+                ->bySalaryGrade($this->selectedPackageId)->get()->map(function ($benefit) {
+                    $tmpPackageDetail = PackageDetail::find($benefit->package_detail_id);
+                    return [
+                        $benefit->package_detail_id => [
+                            'package_detail_id' => $benefit->package_detail_id,
+                            'name' => $benefit->name,
+                            'amount' => $benefit->amount,
+                            'type' => $benefit->type,
+                            'receiver' => $benefit->receiver,
+                            'is_hidden' => $benefit->is_hidden,
+                            'start_date' => $benefit->start_date,
+                            'end_date' => $benefit->end_date,
+                            'amount_min' => $tmpPackageDetail->amount_min,
+                            'amount_max' => $tmpPackageDetail->amount_max,
+                        ]
+                    ];
+                })->toArray();
+
+            $defaultPackageDetails = PackageDetail::bySalaryGrade($this->selectedPackageId)->get()->map(function ($detail) {
                 return [
-                    'package_detail_id' => $benefit->package_detail_id,
-                    'name' => $benefit->name,
-                    'amount' => $benefit->amount,
-                    'type' => $benefit->type,
-                    'receiver' => $benefit->receiver,
-                    'is_hidden' => $benefit->is_hidden,
-                    'start_date' => $benefit->start_date,
-                    'end_date' => $benefit->end_date,
-
-
-                    'amount_min' => $tmpPackageDetail->amount_min,
-                    'amount_max' => $tmpPackageDetail->amount_max,
+                    $detail->id => [
+                        'package_detail_id' => $detail->id,
+                        'name' => $detail->name,
+                        'type' => $detail->type,
+                        'receiver' => $detail->receiver,
+                        'is_hidden' => $detail->is_hidden,
+                        'start_date' => $detail->start_date,
+                        'end_date' => $detail->end_date,
+                        'amount_min' => $detail->amount_min,
+                        'amount_max' => $detail->amount_max,
+                    ]
                 ];
             })->toArray();
+            $this->packageDetails = array_merge($defaultPackageDetails, $savedPackageDetails);
 
             $this->managersList = $this->selectedEmployee->position?->potentialManagers;
         } else if ($this->selectedEmployee->position?->salaryGrade) {
@@ -105,8 +122,6 @@ class ApplyPackageModal extends Component
         }
 
         $this->showApplyPackageModal = true;
-
-
     }
 
     public function closeApplyPackageModal()
@@ -149,7 +164,6 @@ class ApplyPackageModal extends Component
                 'is_hidden' => $detail->is_hidden
             ];
         })->toArray();
-
     }
 
     public function applyPackage()

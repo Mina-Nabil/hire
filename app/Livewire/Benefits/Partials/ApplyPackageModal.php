@@ -113,11 +113,11 @@ class ApplyPackageModal extends Component
 
 
         if (count($this->packageDetails)) {
-            if ($this->packageDetails[0]['start_date']) {
+            if ($this->packageDetails[array_key_first($this->packageDetails)]['start_date']) {
                 $this->packageStartDate = Carbon::parse($this->packageDetails[0]['start_date'])->format('Y-m-d');
             }
-            if ($this->packageDetails[0]['end_date']) {
-                $this->packageEndDate = Carbon::parse($this->packageDetails[0]['end_date'])->format('Y-m-d');
+            if ($this->packageDetails[array_key_first($this->packageDetails)]['end_date']) {
+                $this->packageEndDate = Carbon::parse($this->packageDetails[array_key_first($this->packageDetails)]['end_date'])->format('Y-m-d');
             }
         }
 

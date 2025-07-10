@@ -65,7 +65,7 @@ class ApplyPackageModal extends Component
                     ];
                 })->toArray();
 
-            $defaultPackageDetails = PackageDetail::bySalaryGrade($this->selectedPackageId)->get()->map(function ($detail) {
+            $defaultPackageDetails = PackageDetail::bySalaryGrade($this->selectedPackageId)->get()->mapWithKeys(function ($detail) {
                 return [
                     $detail->id => [
                         'package_detail_id' => $detail->id,
@@ -87,8 +87,8 @@ class ApplyPackageModal extends Component
             $this->selectedPackage = $this->selectedEmployee->position->salaryGrade;
             $this->selectedPackageId = $this->selectedEmployee->position->salary_grade_id;
 
-            $this->packageDetails = PackageDetail::bySalaryGrade($this->selectedPackageId)->get()->map(function ($detail) {
-                return [
+            $this->packageDetails = PackageDetail::bySalaryGrade($this->selectedPackageId)->get()->mapWithKeys(function ($detail) {
+                return [$detail->id => [
                     'package_detail_id' => $detail->id,
                     'name' => $detail->name,
                     'type' => $detail->type,
@@ -98,7 +98,7 @@ class ApplyPackageModal extends Component
                     'end_date' => $detail->end_date,
                     'amount_min' => $detail->amount_min,
                     'amount_max' => $detail->amount_max,
-                ];
+                ]];
             })->toArray();
 
             $this->managersList = $this->selectedEmployee->position?->potentialManagers;

@@ -785,14 +785,14 @@
                                 </ul>
                             </div>
 
-                            @can('setDocs', [$employee, 'idCard'])
-                                @if (!$employee->idCard)
+                            @can('delete', $employee)
+
                                     <button type="button" class="text-slate-900 dark:text-white"
                                         wire:click="openEditBaseInfoModal">
                                         <iconify-icon icon="mingcute:edit-line" width="25"
                                             height="25"></iconify-icon>
                                     </button>
-                                @endif
+
                             @endcan
                         </div>
                     </div>

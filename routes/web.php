@@ -82,6 +82,7 @@ Route::group(['middleware' => ['auth', 'type:admin|hr']], function () {
     Route::get('/benefits/vacation-packages', VacationPackageIndex::class)->name('benefits.vacation-packages');
     Route::get('/benefits/configurations', ConfigurationIndex::class)->name('benefits.configurations');
     Route::get('/benefits/employee/{employee}', EmployeeConfiguration::class)->name('employee.configuration');
+    Route::get('/benefits/bulk-benefits', App\Livewire\Benefits\BulkBenefitsIndex::class)->name('benefits.bulk-benefits');
 
     Route::get('/hierarchy/tree', [OrganizationController::class, 'index'])->name('hierarchy.tree');
     Route::get('/hierarchy/positions', PositionIndex::class)->name('hierarchy.positions');

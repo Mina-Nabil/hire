@@ -125,7 +125,7 @@
                                                             <select name="users_array[{{ $index }}][user_id]" id="userId_{{ $index }}" class="form-control w-full mt-2 @error('users_array.' . $index . '.user_id') !border-danger-500 @enderror" wire:model.defer="users_array.{{ $index }}.user_id">
                                                                 <option>Select user...</option>
                                                                 @foreach ($USERS as $USER)
-                                                                    <option value="{{ $USER->id }}">{{ ucwords($USER->first_name) }} {{ ucwords($USER->last_name) }}</option>
+                                                                    <option value="{{ $USER->id }}">{{ ucwords($USER->username) }}</option>
                                                                 @endforeach
                                                             </select>
                                                         </div>

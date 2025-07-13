@@ -319,11 +319,11 @@ class Applicant extends Model
      * @param string $cvUrl
      * @return Applicant
      */
-    public function updateCv(string $cvUrl): bool
+    public function updateCv(string $cvUrl, $skipValidation = false): bool
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('update', $this)) {
+        if (!$skipValidation && !$loggedInUser->can('update', $this)) {
             throw new AppException(__('misc.not_authorized'));
         }
 
@@ -348,11 +348,11 @@ class Applicant extends Model
      * @param array $educations Array of education data
      * @return Applicant
      */
-    public function setEducations(array $educations): Applicant
+    public function setEducations(array $educations, $skipValidation = false): Applicant
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('update', $this)) {
+        if (!$skipValidation && !$loggedInUser->can('update', $this)) {
             throw new AppException(__('misc.not_authorized'));
         }
 
@@ -383,11 +383,11 @@ class Applicant extends Model
      * @param array $trainings Array of training data
      * @return Applicant
      */
-    public function setTrainings(array $trainings): Applicant
+    public function setTrainings(array $trainings, $skipValidation = false): Applicant
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('update', $this)) {
+        if (!$skipValidation && !$loggedInUser->can('update', $this)) {
             throw new AppException(__('misc.not_authorized'));
         }
 
@@ -418,11 +418,11 @@ class Applicant extends Model
      * @param array $experiences Array of experience data
      * @return Applicant
      */
-    public function setExperiences(array $experiences): Applicant
+    public function setExperiences(array $experiences, $skipValidation = false): Applicant
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('update', $this)) {
+        if (!$skipValidation && !$loggedInUser->can('update', $this)) {
             throw new AppException(__('misc.not_authorized'));
         }
 
@@ -453,11 +453,11 @@ class Applicant extends Model
      * @param array $languages Array of language data
      * @return Applicant
      */
-    public function setLanguages(array $languages): Applicant
+    public function setLanguages(array $languages, $skipValidation = false): Applicant
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('update', $this)) {
+        if (!$skipValidation && !$loggedInUser->can('update', $this)) {
             throw new AppException(__('misc.not_authorized'));
         }
 
@@ -488,11 +488,11 @@ class Applicant extends Model
      * @param array $references Array of reference data
      * @return Applicant
      */
-    public function setReferences(array $references): Applicant
+    public function setReferences(array $references, $skipValidation = false): Applicant
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('update', $this)) {
+        if (!$skipValidation && !$loggedInUser->can('update', $this)) {
             throw new AppException(__('misc.not_authorized'));
         }
 
@@ -523,11 +523,11 @@ class Applicant extends Model
      * @param array $skills Array of skill data
      * @return Applicant
      */
-    public function setSkills(array $skills): Applicant
+    public function setSkills(array $skills, $skipValidation = false): Applicant
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('update', $this)) {
+        if (!$skipValidation && !$loggedInUser->can('update', $this)) {
             throw new AppException(__('misc.not_authorized'));
         }
 
@@ -559,11 +559,11 @@ class Applicant extends Model
      * @param string|null $healthIssues
      * @return ApplicantHealth
      */
-    public function setHealth(bool $hasHealthIssues, ?string $healthIssues = null): ApplicantHealth
+    public function setHealth(bool $hasHealthIssues, ?string $healthIssues = null, $skipValidation = false): ApplicantHealth
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('update', $this)) {
+        if (!$skipValidation && !$loggedInUser->can('update', $this)) {
             throw new AppException(__('misc.not_authorized'));
         }
 
@@ -592,11 +592,11 @@ class Applicant extends Model
      * @param string $imageUrl
      * @return bool
      */
-    public function setImage(string $imageUrl): bool
+    public function setImage(string $imageUrl, $skipValidation = false): bool
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('update', $this)) {
+        if (!$skipValidation && !$loggedInUser->can('update', $this)) {
             throw new AppException(__('misc.not_authorized'));
         }
 
@@ -617,11 +617,11 @@ class Applicant extends Model
      * @param string $signatureUrl
      * @return bool
      */
-    public function setSignature(string $signatureUrl): bool
+    public function setSignature(string $signatureUrl, $skipValidation = false): bool
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('update', $this)) {
+        if (!$skipValidation && !$loggedInUser->can('update', $this)) {
             throw new AppException(__('misc.not_authorized'));
         }
 
@@ -816,8 +816,14 @@ class Applicant extends Model
      * @param string $idCardUrl
      * @return bool
      */
-    public function setIdCard(string $idCardUrl): bool
+    public function setIdCard(string $idCardUrl, $skipValidation = false): bool
     {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$skipValidation && !$loggedInUser->can('update', $this)) {
+            throw new AppException(__('misc.not_authorized'));
+        }
+
         try {
             if ($this->id_card_url) {
                 Storage::disk('s3')->delete($this->id_card_url);
@@ -838,8 +844,14 @@ class Applicant extends Model
      * @param string $birthCertificateUrl
      * @return bool
      */
-    public function setBirthCertificate(string $birthCertificateUrl): bool
+    public function setBirthCertificate(string $birthCertificateUrl, $skipValidation = false): bool
     {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$skipValidation && !$loggedInUser->can('update', $this)) {
+            throw new AppException(__('misc.not_authorized'));
+        }
+
         try {
             if ($this->birth_certificate_url) {
                 Storage::disk('s3')->delete($this->birth_certificate_url);
@@ -860,8 +872,14 @@ class Applicant extends Model
      * @param string $collegeCertificateUrl
      * @return bool
      */
-    public function setCollegeCertificate(string $collegeCertificateUrl): bool
+    public function setCollegeCertificate(string $collegeCertificateUrl, $skipValidation = false): bool
     {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$skipValidation && !$loggedInUser->can('update', $this)) {
+            throw new AppException(__('misc.not_authorized'));
+        }
+
         try {
             if ($this->college_certificate_url) {
                 Storage::disk('s3')->delete($this->college_certificate_url);
@@ -882,8 +900,14 @@ class Applicant extends Model
      * @param string $armyCertificateUrl
      * @return bool
      */
-    public function setArmyCertificate(string $armyCertificateUrl): bool
+    public function setArmyCertificate(string $armyCertificateUrl, $skipValidation = false): bool
     {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$skipValidation && !$loggedInUser->can('update', $this)) {
+            throw new AppException(__('misc.not_authorized'));
+        }
+
         try {
             if ($this->army_certificate_url) {
                 Storage::disk('s3')->delete($this->army_certificate_url);

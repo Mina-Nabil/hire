@@ -607,32 +607,32 @@ class ApplicantsCreate extends Component
                 // 2. Handle file uploads
                 if ($this->profileImage) {
                     $imagePath = $this->profileImage->store(Applicant::IMAGE_PATH, 's3');
-                    $applicant->setImage($imagePath);
+                    $applicant->setImage($imagePath, true);
                 }
 
                 if ($this->cv) {
                     $cvPath = $this->cv->store(Applicant::CV_PATH, 's3');
-                    $applicant->updateCv($cvPath);
+                    $applicant->updateCv($cvPath, true);
                 }
 
                 if ($this->idCard) {
                     $idCardPath = $this->idCard->store(Applicant::ID_CARD_PATH, 's3');
-                    $applicant->setIdCard($idCardPath);
+                    $applicant->setIdCard($idCardPath, true);
                 }
 
                 if ($this->birthCertificate) {
                     $birthCertificatePath = $this->birthCertificate->store(Applicant::BIRTH_CERTIFICATE_PATH, 's3');
-                    $applicant->setBirthCertificate($birthCertificatePath);
+                    $applicant->setBirthCertificate($birthCertificatePath, true);
                 }
 
                 if ($this->collegeCertificate) {
                     $collegeCertificatePath = $this->collegeCertificate->store(Applicant::COLLEGE_CERTIFICATE_PATH, 's3');
-                    $applicant->setCollegeCertificate($collegeCertificatePath);
+                    $applicant->setCollegeCertificate($collegeCertificatePath, true);
                 }
 
                 if ($this->armyCertificate) {
                     $armyCertificatePath = $this->armyCertificate->store(Applicant::ARMY_CERTIFICATE_PATH, 's3');
-                    $applicant->setArmyCertificate($armyCertificatePath);
+                    $applicant->setArmyCertificate($armyCertificatePath, true);
                 }
 
                 // 3. Set educations
@@ -640,7 +640,7 @@ class ApplicantsCreate extends Component
                     return !empty($education['school_name']);
                 });
                 if (!empty($validEducations)) {
-                    $applicant->setEducations($validEducations);
+                    $applicant->setEducations($validEducations, true);
                 }
 
                 // 4. Set trainings
@@ -648,7 +648,7 @@ class ApplicantsCreate extends Component
                     return !empty($training['name']);
                 });
                 if (!empty($validTrainings)) {
-                    $applicant->setTrainings($validTrainings);
+                    $applicant->setTrainings($validTrainings, true);
                 }
 
                 // 5. Set experiences
@@ -656,7 +656,7 @@ class ApplicantsCreate extends Component
                     return !empty($experience['company_name']);
                 });
                 if (!empty($validExperiences)) {
-                    $applicant->setExperiences($validExperiences);
+                    $applicant->setExperiences($validExperiences, true);
                 }
 
                 // 6. Set languages
@@ -664,7 +664,7 @@ class ApplicantsCreate extends Component
                     return !empty($language['language']);
                 });
                 if (!empty($validLanguages)) {
-                    $applicant->setLanguages($validLanguages);
+                    $applicant->setLanguages($validLanguages, true);
                 }
 
                 // 7. Set references
@@ -672,7 +672,7 @@ class ApplicantsCreate extends Component
                     return !empty($reference['name']);
                 });
                 if (!empty($validReferences)) {
-                    $applicant->setReferences($validReferences);
+                    $applicant->setReferences($validReferences, true);
                 }
 
                 // 8. Set skills
@@ -680,11 +680,11 @@ class ApplicantsCreate extends Component
                     return !empty($skill['skill']);
                 });
                 if (!empty($validSkills)) {
-                    $applicant->setSkills($validSkills);
+                    $applicant->setSkills($validSkills, true);
                 }
 
                 // 9. Set health
-                $applicant->setHealth($this->hasHealthIssues, $this->hasHealthIssues ? $this->healthIssues : null);
+                $applicant->setHealth($this->hasHealthIssues, $this->hasHealthIssues ? $this->healthIssues : null, true);
 
                 // 10. Create application
                 $application = Application::createApplication(

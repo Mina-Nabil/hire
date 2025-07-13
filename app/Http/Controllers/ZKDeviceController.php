@@ -293,7 +293,7 @@ class ZKDeviceController extends Controller
             'SN' => $serialNumber,
             'user_agent' => $request->userAgent()
         ]);
-        return response('OK', 200);
+        return response('NO', 200);
         try {
             // Check if this is a command response from the device (has body with ID= and Return=)
             if (!empty($requestBody) && (strpos($requestBody, 'ID=') !== false && strpos($requestBody, 'Return=') !== false)) {

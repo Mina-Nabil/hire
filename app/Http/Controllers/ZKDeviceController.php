@@ -264,7 +264,10 @@ class ZKDeviceController extends Controller
                 'employee_name' => $employee->name,
                 'device_id' => $employee->info->device_id ?? 'null'
             ]);
-
+            $punch_time = Carbon::parse($timestamp);
+            if(env('BASMA_TIME_ADJUSTMENT')){
+                $punch_time = $punch_time->addHours(env('BASMA_TIME_ADJUSTMENT'));
+            }
             $punches_to_insert[] = [
                 'employee_id' => $employee->id,
                 'punch_time' => Carbon::parse($timestamp),

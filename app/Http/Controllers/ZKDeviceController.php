@@ -195,10 +195,19 @@ class ZKDeviceController extends Controller
                 'employee_name' => $employee->name,
                 'device_id' => $employee->info->device_id ?? 'null'
             ]);
+            $punch_time = Carbon::parse($timestamp);
+            if(env('BASMA_TIMEZONE')){
+                Log::info("[ZKTeco] BASMA_TIMEZONE: " . env('BASMA_TIMEZONE'));
+                Log::info("[ZKTeco] Current time: " . $timestamp);
+                $punch_time = $punch_time->setTimezone(env('BASMA_TIMEZONE'));
+                Log::info("[ZKTeco] Converted time: " . $punch_time);
+                $punch_time->shiftTimezone('Africa/Cairo');
+                Log::info("[ZKTeco] Shifted time: " . $punch_time);
+            }
 
             $punches_to_insert[] = [
                 'employee_id' => $employee->id,
-                'punch_time' => Carbon::parse($timestamp),
+                'punch_time' => $punch_time,
                 'punch_state' => $punch_state,
                 'verify_mode' => $verify_mode,
                 'work_code' => $work_code,
@@ -275,7 +284,7 @@ class ZKDeviceController extends Controller
             }
             $punches_to_insert[] = [
                 'employee_id' => $employee->id,
-                'punch_time' => Carbon::parse($timestamp),
+                'punch_time' => $punch_time,
                 'punch_state' => $punch_state,
                 'verify_mode' => $verify_mode,
                 'work_code' => $work_code,

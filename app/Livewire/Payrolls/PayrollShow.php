@@ -403,7 +403,7 @@ class PayrollShow extends Component
         $payrollEmployee = \App\Models\Benefits\Payrolls\PayrollEmployee::findOrFail($this->editingPayrollEmployeeId);
         
         // Store the old net amount for comparison
-        $oldNetAmount = $payrollEmployee->net_after_deductions;
+        $oldNetAmount = $payrollEmployee->paid;
         $oldAdjAmount = $payrollEmployee->adj_amount;
         
         // Update adjustment fields
@@ -414,13 +414,15 @@ class PayrollShow extends Component
         $newNetAmount = $payrollEmployee->net_after_penalty + $payrollEmployee->extra_payments + $payrollEmployee->overtime_amount + $this->adjustmentAmount;
         $payrollEmployee->net_after_deductions = $newNetAmount;
         $payrollEmployee->paid = $newNetAmount; // Update paid amount as well
+        $payrollEmployee->tax_amount = Payroll::calculateTaxAmount($newNetAmount);
+        $payrollEmployee->after_tax_salary = $newNetAmount - $payrollEmployee->tax_amount;
         
         $payrollEmployee->save();
         
         // Update payroll total if needed
-        $adjustmentDifference = $this->adjustmentAmount - $oldAdjAmount;
-        if ($adjustmentDifference != 0) {
-            $this->payroll->total_paid += $adjustmentDifference;
+        $paidDifference = $payrollEmployee->paid - $oldNetAmount;
+        if ($paidDifference != 0) {
+            $this->payroll->total_paid += $paidDifference;
             $this->payroll->save();
         }
         

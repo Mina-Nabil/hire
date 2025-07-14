@@ -112,7 +112,7 @@ class BulkBenefitsIndex extends Component
         ];
 
         // Load existing configuration if available
-        if ($employee->benefitConfiguration && $employee->benefitConfiguration->salaryGrade) {
+        if ($employee->benefitConfiguration && $employee->benefitConfiguration->salaryGrade && $employee->position->salaryGrade->id == $employee->benefitConfiguration->salaryGrade->id) {
             $employeeData['selectedPackageId'] = $employee->benefitConfiguration->salaryGrade->id;
             $employeeData['selectedPackage'] = $employee->benefitConfiguration->salaryGrade;
             $employeeData['grossSalary'] = $employee->benefitConfiguration->gross_salary;

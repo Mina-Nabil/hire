@@ -139,7 +139,7 @@ class Attendance extends Model
             $employeeName = trim($sheet->getCell('A' . $row)->getValueString());
             if (!$employeeName) continue;
 
-            if (!$sheet->getCell('B' . $row)->getValue()) continue; //if the start time is empty, skip the row
+            if (!$sheet->getCell('B' . $row)->getValue() || !$sheet->getCell('C' . $row)->getValue()) continue; //if the start time is empty, skip the row
 
             $attendanceDay = new Carbon(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($sheet->getCell('B' . $row)->getValue()));
             $attendanceStartDate = new Carbon(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($sheet->getCell('C' . $row)->getValue()));

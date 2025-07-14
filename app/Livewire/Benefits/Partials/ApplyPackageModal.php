@@ -37,7 +37,7 @@ class ApplyPackageModal extends Component
         $this->closeApplyPackageModal();
         $this->selectedEmployee = Employee::with('position.salaryGrade')->findOrFail($employeeId);
 
-        if ($this->selectedEmployee->benefitConfiguration?->salaryGrade) {
+        if ($this->selectedEmployee->benefitConfiguration?->salaryGrade && $this->selectedEmployee->position->salaryGrade->id == $this->selectedEmployee->benefitConfiguration->salaryGrade->id) {
             $this->selectedPackage = $this->selectedEmployee->benefitConfiguration->salaryGrade;
             $this->selectedPackageId = $this->selectedEmployee->benefitConfiguration->salaryGrade->id;
             $this->grossSalary = $this->selectedEmployee->benefitConfiguration->gross_salary;

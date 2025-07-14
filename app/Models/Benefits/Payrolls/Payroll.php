@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -394,11 +395,13 @@ class Payroll extends Model
 
     public static function calculateTaxAmount($netAfterDeductions) : float
     {
+        Log::info("Calculating tax amount for netAfterDeductions: " . $netAfterDeductions);
         // Calculate annual taxable income: (12 * monthly_net_salary) - yearly_allowance
         $annualTaxableIncome = (12 * $netAfterDeductions) - self::TAX_YEARLY_ALLOWANCE;
         
         // If taxable income is 0 or negative, no tax
         if ($annualTaxableIncome <= 0) {
+            Log::info("Taxable income is 0 or negative, returning 0");
             return 0;
         }
         
@@ -440,8 +443,9 @@ class Payroll extends Model
             $tax = ($annualTaxableIncome - self::TAX_BRACKET_10) * 0.275 + 300000;
         }
 
-        
+        Log::info("Calculated tax amount: " . $tax / 12);
         // Return the monthly tax amount (divide annual tax by 12)
+
         return $tax / 12;
     }
 

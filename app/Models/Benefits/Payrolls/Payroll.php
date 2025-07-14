@@ -395,7 +395,7 @@ class Payroll extends Model
     public static function calculateTaxAmount($netAfterDeductions) : float
     {
         // Calculate annual taxable income: (12 * monthly_net_salary) - yearly_allowance
-        $annualTaxableIncome = (12 * $netAfterDeductions) - self::TAX_YEARLY_ALLOWANCE;
+        $annualTaxableIncome = (12 * $netAfterDeductions);
         
         // If taxable income is 0 or negative, no tax
         if ($annualTaxableIncome <= 0) {

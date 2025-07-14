@@ -208,7 +208,8 @@ class ZKDeviceController extends Controller
             if(env('BASMA_TIMEZONE')){
                 Log::info("[ZKTeco] BASMA_TIMEZONE: " . env('BASMA_TIMEZONE'));
                 Log::info("[ZKTeco] Current time: " . $timestamp);
-                $punch_time = $punch_time->addHours(env('BASMA_TIMEZONE'));
+                $timeDiff = (float) env('BASMA_TIMEZONE');
+                $punch_time = $punch_time->addHours($timeDiff);
                 Log::info("[ZKTeco] Converted time: " . $punch_time->format('Y-m-d H:i:s T'));
             }
 
@@ -284,7 +285,8 @@ class ZKDeviceController extends Controller
             if(env('BASMA_TIMEZONE')){
                 Log::info("[ZKTeco] BASMA_TIMEZONE: " . env('BASMA_TIMEZONE'));
                 Log::info("[ZKTeco] Current time: " . $punch_time->format('Y-m-d H:i:s T'));
-                $punch_time = $punch_time->addHours(env('BASMA_TIMEZONE'));
+                $timeDiff = (float) env('BASMA_TIMEZONE');
+                $punch_time = $punch_time->addHours($timeDiff);
                 Log::info("[ZKTeco] Converted time: " . $punch_time->format('Y-m-d H:i:s T'));
             }
             $punches_to_insert[] = [

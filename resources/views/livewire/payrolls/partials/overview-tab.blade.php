@@ -206,6 +206,9 @@
                     </div>
                 </td>
                 <td class="table-td border-t-2 border-slate-200 dark:border-slate-600">
+                    <div class="text-sm">-</div>
+                </td>
+                <td class="table-td border-t-2 border-slate-200 dark:border-slate-600">
                     <div class="flex flex-col">
                         <span class="text-sm font-bold">{{ number_format($totals['total_penalty_hours'], 2) }} hours</span>
                         <span

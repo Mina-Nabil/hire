@@ -104,8 +104,8 @@ class ZKDeviceController extends Controller
 
     /**
      * Process the new OPLOG format
-     * Format: "OPLOG 3\t0\t2025-06-23 16:42:03\t53\t0\t0\t0\t"
-     * Parts: [OPLOG, device_id, ?, timestamp, ?, ?, ?, ?]
+     * Format: "OPLOG 3\t0\t2025-07-14 19:16:35\t53\t0\t0\t0"
+     * Parts: [OPLOG device_id, ?, timestamp, user_id, punch_state, verify_mode, work_code]
      */
     private function processOplogFormat($body)
     {
@@ -121,19 +121,28 @@ class ZKDeviceController extends Controller
                 continue;
             }
 
-            // Skip if it's not an OPLOG entry
-            if ($parts[0] !== 'OPLOG') {
+            // Check if the first part starts with "OPLOG"
+            if (!str_starts_with($parts[0], 'OPLOG')) {
                 continue;
             }
 
-            $device_id = $parts[1];
-            $timestamp = $parts[3]; // timestamp is at index 3
+            // Extract device_id from "OPLOG device_id" format
+            $oplogParts = explode(' ', $parts[0], 2);
+            if (count($oplogParts) < 2) {
+                Log::warning("[ZKTeco] Invalid OPLOG header format: {$parts[0]}");
+                continue;
+            }
+            
+            $device_id_from_oplog = $oplogParts[1]; // device_id from OPLOG header
+            $timestamp = $parts[2]; // timestamp is at index 2
+            $user_id = $parts[3]; // user_id is at index 3
             $punch_state = $parts[4] ?? null;
             $verify_mode = $parts[5] ?? null;
             $work_code = $parts[6] ?? null;
 
             Log::info("[ZKTeco] Processing OPLOG entry", [
-                'device_id' => $device_id,
+                'device_id_from_oplog' => $device_id_from_oplog,
+                'user_id' => $user_id,
                 'timestamp' => $timestamp,
                 'punch_state' => $punch_state,
                 'verify_mode' => $verify_mode,
@@ -141,17 +150,17 @@ class ZKDeviceController extends Controller
                 'raw_log' => $log
             ]);
 
-            // First try to find employee by device_id in employee_info with better debugging
-            $employee = Employee::whereHas('info', function ($query) use ($device_id) {
-                $query->where('device_id', $device_id);
+            // First try to find employee by device_id (user_id) in employee_info with better debugging
+            $employee = Employee::whereHas('info', function ($query) use ($user_id) {
+                $query->where('device_id', $user_id);
             })->with('info')->first();
 
             // If not found, try a direct database lookup to debug the relationship issue
             if (!$employee) {
-                Log::info("[ZKTeco] Employee not found by device_id {$device_id} using relationship, trying direct lookup");
+                Log::info("[ZKTeco] Employee not found by device_id {$user_id} using relationship, trying direct lookup");
 
                 // Direct lookup in employee_info table
-                $employeeInfo = DB::table('employee_info')->where('device_id', $device_id)->first();
+                $employeeInfo = DB::table('employee_info')->where('device_id', $user_id)->first();
                 if ($employeeInfo) {
                     Log::info("[ZKTeco] Found employee_info record directly", [
                         'employee_id' => $employeeInfo->employee_id,
@@ -166,21 +175,21 @@ class ZKDeviceController extends Controller
 
             // If still not found, try to find by employee_code as fallback
             if (!$employee) {
-                Log::info("[ZKTeco] Employee not found by device_id {$device_id}, trying employee_code");
-                $employee = Employee::whereHas('info', function ($query) use ($device_id) {
-                    $query->where('employee_code', $device_id);
+                Log::info("[ZKTeco] Employee not found by device_id {$user_id}, trying employee_code");
+                $employee = Employee::whereHas('info', function ($query) use ($user_id) {
+                    $query->where('employee_code', $user_id);
                 })->first();
             }
 
             // If still not found, try to find by employee ID as fallback (device might be sending user IDs)
             if (!$employee) {
-                Log::info("[ZKTeco] Employee not found by employee_code {$device_id}, trying employee ID");
-                $employee = Employee::find($device_id);
+                Log::info("[ZKTeco] Employee not found by employee_code {$user_id}, trying employee ID");
+                $employee = Employee::find($user_id);
             }
 
             // If still not found, log all available device_ids for debugging
             if (!$employee) {
-                Log::warning("[ZKTeco] Employee with device_id {$device_id} not found. Available device_ids:");
+                Log::warning("[ZKTeco] Employee with device_id {$user_id} not found. Available device_ids:");
                 $allEmployees = Employee::with('info')->get();
                 foreach ($allEmployees as $emp) {
                     if ($emp->info && $emp->info->device_id) {

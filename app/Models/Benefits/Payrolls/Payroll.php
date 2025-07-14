@@ -416,31 +416,31 @@ class Payroll extends Model
             $tax = ($annualTaxableIncome - self::TAX_BRACKET_1) * 0.10;
         } elseif ($annualTaxableIncome <= self::TAX_BRACKET_3) {
             // 15% on amount above 45,000 up to 60,000, plus previous bracket tax
-            $tax = ($annualTaxableIncome - self::TAX_BRACKET_2) * 0.15 + 1500;
+            $tax = ($annualTaxableIncome - self::TAX_BRACKET_2) * 0.15 + (1500*12);
         } elseif ($annualTaxableIncome <= self::TAX_BRACKET_4) {
             // 20% on amount above 60,000 up to 200,000, plus previous brackets tax
-            $tax = ($annualTaxableIncome - self::TAX_BRACKET_3) * 0.20 + 1500 + 2250;
+            $tax = ($annualTaxableIncome - self::TAX_BRACKET_3) * 0.20 + 1500*12 + 2250*12;
         } elseif ($annualTaxableIncome <= self::TAX_BRACKET_5) {
             // 22.5% on amount above 200,000 up to 400,000, plus previous brackets tax
-            $tax = ($annualTaxableIncome - self::TAX_BRACKET_4) * 0.225 + 1500 + 2250 + 28000;
+            $tax = ($annualTaxableIncome - self::TAX_BRACKET_4) * 0.225 + 1500*12 + 2250*12 + 28000*12;
         } elseif ($annualTaxableIncome <= self::TAX_BRACKET_6) {
             // 25% on amount above 400,000 up to 600,000, plus previous brackets tax
-            $tax = ($annualTaxableIncome - self::TAX_BRACKET_5) * 0.25 + 1500 + 2250 + 28000 + 45000;
+            $tax = ($annualTaxableIncome - self::TAX_BRACKET_5) * 0.25 + 1500*12 + 2250*12 + 28000*12 + 45000*12;
         } elseif ($annualTaxableIncome <= self::TAX_BRACKET_7) {
             // 25% on amount above 400,000 up to 700,000, plus adjusted previous brackets tax
-            $tax = ($annualTaxableIncome - self::TAX_BRACKET_5) * 0.25 + 4500 + 2250 + 28000 + 45000;
+            $tax = ($annualTaxableIncome - self::TAX_BRACKET_5) * 0.25 + 4500*12 + 2250*12 + 28000*12 + 45000*12;
         } elseif ($annualTaxableIncome <= self::TAX_BRACKET_8) {
             // 25% on amount above 400,000 up to 800,000, plus adjusted previous brackets tax
-            $tax = ($annualTaxableIncome - self::TAX_BRACKET_5) * 0.25 + 9000 + 28000 + 45000;
+            $tax = ($annualTaxableIncome - self::TAX_BRACKET_5) * 0.25 + 9000*12 + 28000*12 + 45000*12;
         } elseif ($annualTaxableIncome <= self::TAX_BRACKET_9) {
             // 25% on amount above 400,000 up to 900,000, plus adjusted previous brackets tax
-            $tax = ($annualTaxableIncome - self::TAX_BRACKET_5) * 0.25 + 40000 + 45000;
+            $tax = ($annualTaxableIncome - self::TAX_BRACKET_5) * 0.25 + 40000*12 + 45000*12;
         } elseif ($annualTaxableIncome <= self::TAX_BRACKET_10) {
             // 25% on amount above 400,000 up to 1,200,000, plus adjusted previous brackets tax
-            $tax = ($annualTaxableIncome - self::TAX_BRACKET_5) * 0.25 + 90000;
+            $tax = ($annualTaxableIncome - self::TAX_BRACKET_5) * 0.25 + 90000*12;
         } else {
             // 27.5% on amount above 1,200,000, plus previous brackets tax
-            $tax = ($annualTaxableIncome - self::TAX_BRACKET_10) * 0.275 + 300000;
+            $tax = ($annualTaxableIncome - self::TAX_BRACKET_10) * 0.275 + 300000*12;
         }
 
         Log::info("Calculated tax amount: " . $tax / 12);

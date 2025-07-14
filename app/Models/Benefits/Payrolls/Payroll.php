@@ -405,41 +405,34 @@ class Payroll extends Model
         $tax = 0;
         
         // Progressive tax calculation based on the Excel formula
-        if ($annualTaxableIncome <= self::TAX_BRACKET_1) {
-            // 0% tax up to 30,000
+        // IF(C17≤60000,0,IF(C17≤75000,(C17×10%)−6000,IF(C17≤90000,(C17×15%)−9750,IF(C17≤220000,(C17×20%)−14250,IF(C17≤420000,(C17×22.5%)−19750,IF(C17≤620000,(C17×25%)−30250,IF(C17≤720000,(C17×25%)−26250,IF(C17≤820000,(C17×25%)−23500,IF(C17≤920000,(C17×25%)−20000,IF(C17≤1220000,(C17×25%)−15000,(C17×27.5%)−35500))))))))))
+        
+        if ($annualTaxableIncome <= 60000) {
             $tax = 0;
-        } elseif ($annualTaxableIncome <= self::TAX_BRACKET_2) {
-            // 10% on amount above 30,000 up to 45,000
-            $tax = ($annualTaxableIncome - self::TAX_BRACKET_1) * 0.10;
-        } elseif ($annualTaxableIncome <= self::TAX_BRACKET_3) {
-            // 15% on amount above 45,000 up to 60,000, plus previous bracket tax
-            $tax = ($annualTaxableIncome - self::TAX_BRACKET_2) * 0.15 + 1500;
-        } elseif ($annualTaxableIncome <= self::TAX_BRACKET_4) {
-            // 20% on amount above 60,000 up to 200,000, plus previous brackets tax
-            $tax = ($annualTaxableIncome - self::TAX_BRACKET_3) * 0.20 + 1500 + 2250;
-        } elseif ($annualTaxableIncome <= self::TAX_BRACKET_5) {
-            // 22.5% on amount above 200,000 up to 400,000, plus previous brackets tax
-            $tax = ($annualTaxableIncome - self::TAX_BRACKET_4) * 0.225 + 1500 + 2250 + 28000;
-        } elseif ($annualTaxableIncome <= self::TAX_BRACKET_6) {
-            // 25% on amount above 400,000 up to 600,000, plus previous brackets tax
-            $tax = ($annualTaxableIncome - self::TAX_BRACKET_5) * 0.25 + 1500 + 2250 + 28000 + 45000;
-        } elseif ($annualTaxableIncome <= self::TAX_BRACKET_7) {
-            // 25% on amount above 400,000 up to 700,000, plus adjusted previous brackets tax
-            $tax = ($annualTaxableIncome - self::TAX_BRACKET_5) * 0.25 + 4500 + 2250 + 28000 + 45000;
-        } elseif ($annualTaxableIncome <= self::TAX_BRACKET_8) {
-            // 25% on amount above 400,000 up to 800,000, plus adjusted previous brackets tax
-            $tax = ($annualTaxableIncome - self::TAX_BRACKET_5) * 0.25 + 9000 + 28000 + 45000;
-        } elseif ($annualTaxableIncome <= self::TAX_BRACKET_9) {
-            // 25% on amount above 400,000 up to 900,000, plus adjusted previous brackets tax
-            $tax = ($annualTaxableIncome - self::TAX_BRACKET_5) * 0.25 + 40000 + 45000;
-        } elseif ($annualTaxableIncome <= self::TAX_BRACKET_10) {
-            // 25% on amount above 400,000 up to 1,200,000, plus adjusted previous brackets tax
-            $tax = ($annualTaxableIncome - self::TAX_BRACKET_5) * 0.25 + 90000;
+        } elseif ($annualTaxableIncome <= 75000) {
+            $tax = ($annualTaxableIncome * 0.10) - 6000;
+        } elseif ($annualTaxableIncome <= 90000) {
+            $tax = ($annualTaxableIncome * 0.15) - 9750;
+        } elseif ($annualTaxableIncome <= 220000) {
+            $tax = ($annualTaxableIncome * 0.20) - 14250;
+        } elseif ($annualTaxableIncome <= 420000) {
+            $tax = ($annualTaxableIncome * 0.225) - 19750;
+        } elseif ($annualTaxableIncome <= 620000) {
+            $tax = ($annualTaxableIncome * 0.25) - 30250;
+        } elseif ($annualTaxableIncome <= 720000) {
+            $tax = ($annualTaxableIncome * 0.25) - 26250;
+        } elseif ($annualTaxableIncome <= 820000) {
+            $tax = ($annualTaxableIncome * 0.25) - 23500;
+        } elseif ($annualTaxableIncome <= 920000) {
+            $tax = ($annualTaxableIncome * 0.25) - 20000;
+        } elseif ($annualTaxableIncome <= 1220000) {
+            $tax = ($annualTaxableIncome * 0.25) - 15000;
         } else {
-            // 27.5% on amount above 1,200,000, plus previous brackets tax
-            $tax = ($annualTaxableIncome - self::TAX_BRACKET_10) * 0.275 + 300000;
+            $tax = ($annualTaxableIncome * 0.275) - 35500;
         }
 
+        // Ensure tax is never negative
+        $tax = max(0, $tax);
         
         // Return the monthly tax amount (divide annual tax by 12)
         return $tax / 12;

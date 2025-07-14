@@ -200,7 +200,7 @@ class ZKDeviceController extends Controller
                 Log::info("[ZKTeco] BASMA_TIMEZONE: " . env('BASMA_TIMEZONE'));
                 Log::info("[ZKTeco] Current time: " . $timestamp);
                 $punch_time = $punch_time->addHours(env('BASMA_TIMEZONE'));
-                Log::info("[ZKTeco] Converted time: " . $punch_time);
+                Log::info("[ZKTeco] Converted time: " . $punch_time->format('Y-m-d H:i:s T'));
             }
 
             $punches_to_insert[] = [

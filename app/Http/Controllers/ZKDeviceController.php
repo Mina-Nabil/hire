@@ -199,10 +199,8 @@ class ZKDeviceController extends Controller
             if(env('BASMA_TIMEZONE')){
                 Log::info("[ZKTeco] BASMA_TIMEZONE: " . env('BASMA_TIMEZONE'));
                 Log::info("[ZKTeco] Current time: " . $timestamp);
-                $punch_time = $punch_time->setTimezone(env('BASMA_TIMEZONE'));
+                $punch_time = $punch_time->addHours(env('BASMA_TIMEZONE'));
                 Log::info("[ZKTeco] Converted time: " . $punch_time);
-                $punch_time->shiftTimezone('Africa/Cairo');
-                Log::info("[ZKTeco] Shifted time: " . $punch_time);
             }
 
             $punches_to_insert[] = [
@@ -277,10 +275,8 @@ class ZKDeviceController extends Controller
             if(env('BASMA_TIMEZONE')){
                 Log::info("[ZKTeco] BASMA_TIMEZONE: " . env('BASMA_TIMEZONE'));
                 Log::info("[ZKTeco] Current time: " . $punch_time->format('Y-m-d H:i:s T'));
-                $punch_time = $punch_time->setTimezone(env('BASMA_TIMEZONE'));
+                $punch_time = $punch_time->addHours(env('BASMA_TIMEZONE'));
                 Log::info("[ZKTeco] Converted time: " . $punch_time->format('Y-m-d H:i:s T'));
-                $punch_time->shiftTimezone('Africa/Cairo');
-                Log::info("[ZKTeco] Shifted time: " . $punch_time->format('Y-m-d H:i:s T'));
             }
             $punches_to_insert[] = [
                 'employee_id' => $employee->id,

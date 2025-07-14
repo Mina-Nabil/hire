@@ -13,7 +13,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -70,7 +69,7 @@ class Payroll extends Model
     const TAX_BRACKET_10 = 1200000; // 25% from 900,001 to 1,200,000
     // 27.5% above 1,200,000
     
-    const TAX_YEARLY_ALLOWANCE = 60000;
+    const TAX_YEARLY_ALLOWANCE = 15000;
 
     /**
      * Get the employee records for this payroll
@@ -395,13 +394,11 @@ class Payroll extends Model
 
     public static function calculateTaxAmount($netAfterDeductions) : float
     {
-        Log::info("Calculating tax amount for netAfterDeductions: " . $netAfterDeductions);
         // Calculate annual taxable income: (12 * monthly_net_salary) - yearly_allowance
-        $annualTaxableIncome = (12 * $netAfterDeductions);
+        $annualTaxableIncome = (12 * $netAfterDeductions) - self::TAX_YEARLY_ALLOWANCE;
         
         // If taxable income is 0 or negative, no tax
-        if ($annualTaxableIncome - self::TAX_YEARLY_ALLOWANCE <= 0) {
-            Log::info("Taxable income is 0 or negative, returning 0");
+        if ($annualTaxableIncome <= 0) {
             return 0;
         }
         
@@ -443,9 +440,8 @@ class Payroll extends Model
             $tax = ($annualTaxableIncome - self::TAX_BRACKET_10) * 0.275 + 300000;
         }
 
-        Log::info("Calculated tax amount: " . $tax / 12);
+        
         // Return the monthly tax amount (divide annual tax by 12)
-
         return $tax / 12;
     }
 

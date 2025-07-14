@@ -53,7 +53,6 @@
                     </td>
                     <td class="table-td">{{ number_format($payrollEmployee->gross_salary, 2) }}</td>
                     <td class="table-td">{{ number_format($payrollEmployee->insurance_amount, 2) }}</td>
-                    <td class="table-td">{{ number_format($payrollEmployee->employee_insurance, 2) }}</td>
                     <td class="table-td">{{ number_format($payrollEmployee->other_amount, 2) }}</td>
                     <td class="table-td">
                         <div class="flex flex-col space-y-1">
@@ -126,6 +125,7 @@
                             @endif
                         </div>
                     </td>
+                    <td class="table-td">{{ number_format($payrollEmployee->employee_insurance, 2) }}</td>
                     <td class="table-td font-semibold">
                         {{ number_format($payrollEmployee->net_after_deductions, 2) }}</td>
                     <td class="table-td">{{ number_format($payrollEmployee->tax_amount, 2) }}</td>

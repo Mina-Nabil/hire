@@ -4063,12 +4063,6 @@ class Employee extends Model
      */
     public function getTotalPenaltyHours($startDate, $endDate)
     {
-        return [
-            'total_penalty_hours' => 0,
-            'total_vacation_hours' => 0,
-            'penalty_days' => [],
-        ]; // No benefit configuration
-
         $startDate = $startDate instanceof Carbon ? $startDate : Carbon::parse($startDate);
         $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
         $penaltyDays = [];

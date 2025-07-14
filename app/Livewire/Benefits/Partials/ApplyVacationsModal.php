@@ -77,6 +77,8 @@ class ApplyVacationsModal extends Component
             }
         }
 
+        $this->updatedSelectedPackageId();
+
         $this->showApplyVacationsModal = true;
     }
 

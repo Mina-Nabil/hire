@@ -242,6 +242,11 @@
                     </div>
                 </td>
                 <td class="table-td border-t-2 border-slate-200 dark:border-slate-600">
+                    <div class="text-sm font-bold">
+                        {{ number_format($totals['employee_insurance'], 2) }}
+                    </div>
+                </td>
+                <td class="table-td border-t-2 border-slate-200 dark:border-slate-600">
                     <div class="text-sm font-bold text-primary-600 dark:text-primary-400">
                         {{ number_format($totals['net_after_deductions'], 2) }}
                     </div>
@@ -256,7 +261,6 @@
                         {{ number_format($totals['after_tax_salary'], 2) }}
                     </div>
                 </td>
-              
                 <td class="table-td border-t-2 border-slate-200 dark:border-slate-600">
                     <div class="text-sm font-bold">
                         {{ number_format($totals['employer_insurance'], 2) }}

@@ -69,7 +69,7 @@ class Payroll extends Model
     const TAX_BRACKET_10 = 1200000; // 25% from 900,001 to 1,200,000
     // 27.5% above 1,200,000
     
-    const TAX_YEARLY_ALLOWANCE = 15000;
+    const TAX_YEARLY_ALLOWANCE = 60000;
 
     /**
      * Get the employee records for this payroll

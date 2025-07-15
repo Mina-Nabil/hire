@@ -19,7 +19,7 @@ class BulkBenefitsIndex extends Component
 
     public $employeesData = [];
     public $packages = [];
-    public $perPage = 10;
+    public $perPage = 5;
     public $search = '';
     public $selectedDepartment = '';
     public $departments = [];

@@ -897,7 +897,7 @@ class ApplicantShow extends Component
                     'degree' => $education->degree,
                     'field_of_study' => $education->field_of_study,
                     'start_date' => $education->start_date->format('Y-m-d'),
-                    'end_date' => $education->end_date->format('Y-m-d'),
+                    'end_date' => $education->end_date?->format('Y-m-d'),
                 ];
             }
         }
@@ -927,7 +927,7 @@ class ApplicantShow extends Component
                     'sponsor' => $training->sponsor,
                     'duration' => $training->duration,
                     'start_date' => $training->start_date->format('Y-m-d'),
-                    'end_date' => $training->end_date->format('Y-m-d'),
+                    'end_date' => $training->end_date?->format('Y-m-d'),
                 ];
             }
         }
@@ -959,7 +959,7 @@ class ApplicantShow extends Component
                     'company_name' => $experience->company_name,
                     'position' => $experience->position,
                     'start_date' => $experience->start_date->format('Y-m-d'),
-                    'end_date' => $experience->end_date->format('Y-m-d'),
+                    'end_date' => $experience->end_date?->format('Y-m-d'),
                     'salary' => $experience->salary,
                     'reason_for_leaving' => $experience->reason_for_leaving,
                 ];

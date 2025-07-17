@@ -42,6 +42,11 @@ class EmployeePolicy
         return $user->is_admin || $user->is_hr || $user->id === $employee->user_id || $user->employee_id === $employee->manager_id;
     }
 
+    public function applyForVacationLate(User $user, Employee $employee): bool
+    {
+        return $user->is_admin || $user->is_hr || $user->id === $employee->user_id || $user->employee_id === $employee->manager_id;
+    }
+
     public function approveVacation(User $user, Employee $employee, AppliedVacation $appliedVacation): bool
     {
         return $user->is_admin || $user->is_hr || ($user->employee_id === $employee->manager_id && $appliedVacation->status === AppliedVacation::STATUS_PENDING);

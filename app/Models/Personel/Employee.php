@@ -559,7 +559,7 @@ class Employee extends Model
         $applyDeadline = $vacationBenefit->apply_deadline;
         $deadlineDate = Carbon::now()->addDays($applyDeadline)->setTime(23, 59, 59);
 
-        if (!$loggedInUser->can('applyLateForAny', AppliedVacation::class)) {
+        if (!$loggedInUser->can('applyLateForAny', AppliedVacation::class) && !$loggedInUser->can('applyForVacationLate', $this)) {
             foreach ($days as $day) {
                 $dayDate = Carbon::parse($day['vacation_date']);
                 if ($dayDate->isBefore($deadlineDate)) {

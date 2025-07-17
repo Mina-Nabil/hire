@@ -229,7 +229,7 @@ class Application extends Model
 
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('create', Interview::class, $this)) {
+        if (!$loggedInUser->can('create', [Interview::class, $this])) {
             throw new AppException(__('misc.not_authorized'));
         }
 

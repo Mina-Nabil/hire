@@ -21,7 +21,9 @@ class ApplicantPolicy
      */
     public function view(User $user, Applicant $applicant): bool
     {
-        return $user->is_admin || $user->is_hr;
+        return $user->is_admin || $user->is_hr || (
+            $applicant->vacancies()->where('user_id', $user->id)->exists()
+        );
     }
 
     /**

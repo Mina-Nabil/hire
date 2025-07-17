@@ -174,6 +174,14 @@ class Applicant extends Model
     }
 
     /**
+     * Get all applications for this applicant
+     */
+    public function vacancies(): HasManyThrough
+    {
+        return $this->hasManyThrough(Vacancy::class, Application::class);
+    }
+
+    /**
      * Get all education records for this applicant
      */
     public function educations(): HasMany

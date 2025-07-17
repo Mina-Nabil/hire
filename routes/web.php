@@ -54,7 +54,7 @@ Route::group(['middleware' => ['auth', 'type:employee|hr|admin']], function () {
     Route::get('/attendance', App\Livewire\Attendance\ShowAttendance::class)->name('attendance.index');
     Route::get('/recruitment/vacancies/{id}', VacancyShow::class)->name('recruitment.vacancies.show');
     Route::get('/recruitment/vacancies', VacancyIndex::class)->name('recruitment.vacancies');
-
+    Route::get('/recruitment/applicants/{applicant}', ApplicantShow::class)->name('recruitment.applicants.show');
     Route::get('/calendar', Calendar::class)->name('calendar');
 
     Route::get('/logout', function () {
@@ -90,7 +90,7 @@ Route::group(['middleware' => ['auth', 'type:admin|hr']], function () {
 
     Route::get('/recruitment/applicants', ApplicantsIndex::class)->name('recruitment.applicants');
     Route::get('/recruitment/applicants/create', ApplicantsCreate::class)->name('applicants.create');
-    Route::get('/recruitment/applicants/{applicant}', ApplicantShow::class)->name('recruitment.applicants.show');
+
     Route::get('/recruitment/base-questions', BaseQuestionsIndex::class)->name('recruitment.base-questions');
     Route::get('/recruitment/applicants/success', ApplicantSuccess::class)->name('applicants.success');
 

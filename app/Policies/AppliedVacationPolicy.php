@@ -17,7 +17,7 @@ class AppliedVacationPolicy
 
     public function apply(User $user, ?Employee $employee = null): bool
     {
-        return $user->is_admin || $user->is_hr || $user->employee_id === $employee->id;
+        return $user->is_admin || $user->is_hr || $user->employee_id === $employee->id || $user->employee_id === $employee->manager_id;
     }
     
     public function applyForAny(User $user): bool

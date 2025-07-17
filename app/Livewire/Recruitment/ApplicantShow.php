@@ -1333,7 +1333,12 @@ class ApplicantShow extends Component
 
     public function render()
     {
-        return view('livewire.recruitment.applicant-show');
+        $loggedInUser = Auth::user();
+        $layout = 'components.layouts.app';
+        if ($loggedInUser->is_employee) {
+            $layout = 'components.layouts.employee';
+        } 
+        return view('livewire.recruitment.applicant-show')->layout($layout);
     }
 
     // Interview Management - Set Interviewers

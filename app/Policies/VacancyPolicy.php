@@ -40,6 +40,16 @@ class VacancyPolicy
         return $user->is_admin || $user->is_hr;
     }
 
+    public function createInterview(User $user, Vacancy $vacancy): bool
+    {
+        return $user->is_admin || $user->is_hr || $user->id === $vacancy->assigned_to || $user->id === $vacancy->hiring_manager_id || $user->id === $vacancy->hr_manager_id;
+    }
+
+    public function createOffer(User $user, Vacancy $vacancy): bool
+    {
+        return $user->is_admin || $user->is_hr || $user->id === $vacancy->assigned_to || $user->id === $vacancy->hiring_manager_id || $user->id === $vacancy->hr_manager_id;
+    }
+
     /**
      * Determine whether the user can delete the model.
      */

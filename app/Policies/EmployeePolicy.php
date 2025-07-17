@@ -39,7 +39,7 @@ class EmployeePolicy
 
     public function applyForVacation(User $user, Employee $employee): bool
     {
-        return $user->is_admin || $user->is_hr || $user->id === $employee->user_id;
+        return $user->is_admin || $user->is_hr || $user->id === $employee->user_id || $user->id === $employee->manager_id;
     }
 
     public function approveVacation(User $user, Employee $employee, AppliedVacation $appliedVacation): bool

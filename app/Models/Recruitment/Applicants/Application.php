@@ -229,7 +229,7 @@ class Application extends Model
 
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('create', Interview::class)) {
+        if (!$loggedInUser->can('create', Interview::class, $this)) {
             throw new AppException(__('misc.not_authorized'));
         }
 
@@ -352,7 +352,7 @@ class Application extends Model
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
-        if (!$loggedInUser->can('create', JobOffer::class)) {
+        if (!$loggedInUser->can('create', JobOffer::class, $this)) {
             throw new AppException(__('misc.not_authorized'));
         }
 

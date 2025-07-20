@@ -133,6 +133,12 @@ class ApplyForVacation extends Component
 
     public function updatedDays()
     {
+        foreach ($this->days as $day) {
+            if ($day['hours'] < 1 || $day['hours'] > 24) {
+                // $this->alertError("Make sure you set valid hours");
+                return;
+            }
+        }
         try {
             $this->totalHours = collect($this->days)->sum('hours');
         } catch (Exception $e) {

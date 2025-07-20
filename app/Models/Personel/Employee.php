@@ -565,9 +565,17 @@ class Employee extends Model
                 if ($dayDate->isBefore($deadlineDate)) {
                     throw new AppException('You cannot apply for vacation after the apply deadline');
                 }
-                if ($this->appliedVacations()->whereNot('status', AppliedVacation::STATUS_REJECTED)->where('vacation_date', $dayDate)->exists()) {
-                    throw new AppException('You have already applied for vacation on this date');
-                }
+            }
+        }
+
+        foreach ($days as $day) {
+            $dayDate = Carbon::parse($day['vacation_date']);
+            if ($this->appliedVacations()->where('vacation_benefit_id', $vacationBenefit->id)
+                ->whereNot('status', AppliedVacation::STATUS_REJECTED)->whereHas('vacationDays', function ($query) use ($dayDate) {
+                    $query->where('vacation_date', $dayDate);
+                })->exists()
+            ) {
+                throw new AppException('You have already applied for vacation on this date');
             }
         }
 

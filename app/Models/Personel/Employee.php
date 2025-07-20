@@ -565,6 +565,9 @@ class Employee extends Model
                 if ($dayDate->isBefore($deadlineDate)) {
                     throw new AppException('You cannot apply for vacation after the apply deadline');
                 }
+                if ($this->appliedVacations()->whereNot('status', AppliedVacation::STATUS_REJECTED)->where('vacation_date', $dayDate)->exists()) {
+                    throw new AppException('You have already applied for vacation on this date');
+                }
             }
         }
 

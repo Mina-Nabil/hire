@@ -90,7 +90,7 @@ class ShowAppliedVacation extends Component
 
     public function render()
     {
-        $query = AppliedVacation::query()
+        $query = AppliedVacation::userData()
             ->with(['employee', 'vacationBenefit', 'payroll'])
             ->when($this->search, function ($query) {
                 $query->whereHas('employee', function ($q) {

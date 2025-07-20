@@ -78,7 +78,21 @@ class AppliedVacation extends Model
         }
     }
 
-
+    ///scopes
+    public function scopeUserData($query)
+    {
+        $loggedInUser = Auth::user();
+        if ($loggedInUser->is_admin || $loggedInUser->is_hr) {
+            return $query;
+        }
+        $query->where(function ($q) use ($loggedInUser) {
+            $q->where('employee_id', $loggedInUser->employee_id)
+                ->orWhereHas('employee.benefitConfiguration', function ($q) use ($loggedInUser) {
+                    $q->where('manager_id', $loggedInUser->employee_id);
+                });
+        });
+        return $query;
+    }
 
     ///relations
     public function employee()

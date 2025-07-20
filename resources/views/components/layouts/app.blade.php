@@ -89,7 +89,7 @@
                             </span>
                         </a>
                     </li>
-
+                    @if(env('HIDE_TIBIAN', false) && Auth::id() == 22)
                     <li class="">
                         <a href="javascript:void(0)" class="navItem">
                             <span class="flex items-center">
@@ -234,7 +234,7 @@
 
                         </ul>
                     </li>
-
+                    @endif
 
                     <li class="">
                         <a href="javascript:void(0)" class="navItem">
@@ -339,7 +339,7 @@
 
                         </ul>
                     </li>
-
+                    @if(env('HIDE_TIBIAN', false) && Auth::id() == 22)
                     <li class="">
                         <a href="javascript:void(0)" class="navItem">
                             <span class="flex items-center">
@@ -412,7 +412,7 @@
                             @endcan
                         </ul>
                     </li>
-
+                    @endif
 
                 </ul>
             </div>

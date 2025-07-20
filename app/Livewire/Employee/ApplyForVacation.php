@@ -7,6 +7,7 @@ use App\Models\Personel\Employee;
 use App\Models\Benefits\Vacations\VacationBenefit;
 use App\Traits\AlertFrontEnd;
 use Carbon\Carbon;
+use Exception;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -132,7 +133,11 @@ class ApplyForVacation extends Component
 
     public function updatedDays()
     {
-        $this->totalHours = collect($this->days)->sum('hours');
+        try {
+            $this->totalHours = collect($this->days)->sum('hours');
+        } catch (Exception $e) {
+            $this->alertError("Make sure you set valid hours");
+        }
     }
 
     public function removeDay($index)

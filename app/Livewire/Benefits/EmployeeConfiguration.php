@@ -663,6 +663,7 @@ class EmployeeConfiguration extends Component
             'absent_date' => 'nullable|date',
             'mother_name' => 'nullable|string|max:255',
             'release_note' => 'nullable|string|max:255',
+            'id_number' => 'required|string|max:255',
         ]);
 
         $res = $this->employee->updateBaseInfo(
@@ -675,7 +676,7 @@ class EmployeeConfiguration extends Component
             $this->gender,
             $this->birth_date,
             $this->employment_date,
-            $this->employee->id_number,
+            $this->id_number,
             $this->mother_name,
             $this->termination_date ? Carbon::parse($this->termination_date) : null,
             $this->release_date ? Carbon::parse($this->release_date) : null,

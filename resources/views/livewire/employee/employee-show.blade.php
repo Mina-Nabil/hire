@@ -3460,8 +3460,8 @@
                                         <label for="id_number" class="form-label">ID Number</label>
                                         <input type="text"
                                             class="form-control @error('id_number') !border-danger-500 @enderror"
-                                            wire:model="id_number">
-                                        @error('id_number')
+                                            wire:model="employee_id_number">
+                                        @error('employee_id_number')
                                             <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
                                         @enderror
                                     </div>

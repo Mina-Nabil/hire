@@ -81,6 +81,7 @@ class EmployeeShow extends Component
     public $release_date;
     public $absent_date;
     public $release_note;
+    public $employee_id_number;
 
     // Employee Info Edit Modal
     public $editEmployeeInfoModal = false;
@@ -415,6 +416,7 @@ class EmployeeShow extends Component
         $this->birth_date = $this->employee->birth_date ? Carbon::parse($this->employee->birth_date)->format('Y-m-d') : null;
         $this->employment_date = $this->employee->employment_date ? Carbon::parse($this->employee->employment_date)->format('Y-m-d') : null;
         $this->termination_date = $this->employee->termination_date ? Carbon::parse($this->employee->termination_date)->format('Y-m-d') : null;
+        $this->employee_id_number = $this->employee->id_number;
         $this->editBaseInfoModal = true;
     }
 
@@ -440,7 +442,7 @@ class EmployeeShow extends Component
             'release_date' => 'nullable|date',
             'absent_date' => 'nullable|date',
             'release_note' => 'nullable|string|max:255',
-            'id_number' => 'required|string|max:255',
+            'employee_id_number' => 'required|string|max:255',
         ]);
 
 
@@ -454,7 +456,7 @@ class EmployeeShow extends Component
             $this->gender,
             $this->birth_date,
             $this->employment_date,
-            $this->employee->id_number,
+            $this->employee_id_number,
             $this->mother_name,
             $this->termination_date ? Carbon::parse($this->termination_date) : null,
             $this->release_date ? Carbon::parse($this->release_date) : null,

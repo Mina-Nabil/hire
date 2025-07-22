@@ -101,7 +101,7 @@
                             @can('viewAny', App\Models\Payroll\Payroll::class)
                                 <li>
                                     <a class="{{ request()->routeIs('payrolls.index') ? 'active' : '' }}"
-                                        href="{{ url('/payrolls') }}">Payrolls</a>
+                                        href="{{ url('/payrolls') }}">Closing History</a>
                                 </li>
                             @endcan
                             @can('viewAny', App\Models\Payroll\Payroll::class)

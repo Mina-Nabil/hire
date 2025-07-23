@@ -45,6 +45,8 @@ class Payroll extends Model
         'total_employee_medical',
         'total_penalties_amount',
         'total_overtime_amount',
+        'total_employee_base_benefits',
+        'total_other_base_benefits',
         'status',
     ];
 

@@ -42,6 +42,7 @@ class Attendance extends Model
     protected static function booted()
     {
         static::addGlobalScope('managerAccessibleAttendance', function ($builder) {
+            $builder->orderBy('date', 'desc');
             $user = Auth::user();
 
             // If no user is logged in or if they are admin, don't restrict

@@ -238,7 +238,7 @@ class MissingDocReport extends Component
         }
         
         $employees = $query->with(['idCard', 'birthCertificate', 'contracts', 'armyServicePaper', 'driverLicense', 'policeRecords', 'hrLetters', 'employeeS1Doc', 'employeeS2Doc', 'employeeS6Doc', 'medicalRecord', 'externalMedicalRecord', 'practiceCard', 'skillsQualifications', 'syndicateCard', 'info'])
-        ->cursorPaginate(10);
+        ->get();
             
         // Pre-calculate missing, expired, and near expiry document counts for each employee
         foreach ($employees as $key => $employee) {

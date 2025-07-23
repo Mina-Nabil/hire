@@ -149,9 +149,9 @@
                     </div>
                 </div>
             </div>
-            <div class="mt-6">
+            {{-- <div class="mt-6">
                 {{ $employees->links('vendor.livewire.simple-bootstrap') }}
-            </div>
+            </div> --}}
         </div>
     </div>
 

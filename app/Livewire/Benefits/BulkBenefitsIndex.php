@@ -268,7 +268,7 @@ class BulkBenefitsIndex extends Component
 
         $employeeData = $this->employeesData[$employeeId];
         $employee = $employeeData['employee'];
-        $selectedPackage = $employeeData['selectedPackage'];
+        $selectedPackage = SalaryGrade::find($employeeData['selectedPackageId']);
 
         // Individual validation for this employee
         $rules = [

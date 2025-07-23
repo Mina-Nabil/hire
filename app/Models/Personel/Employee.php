@@ -217,6 +217,11 @@ class Employee extends Model
                         'end_date' => $start_date->subDay()->format('Y-m-d'),
                     ]);
                 }
+                if ($this->position && $this->position->salary_grade_id != $salaryGrade->id) {
+                    $this->position()->update([
+                        'salary_grade_id' => $salaryGrade->id,
+                    ]);
+                }
                 $this->baseBenefits()->createMany($package_details);
                 $this->benefitConfiguration()->updateOrCreate([
                     'employee_id' => $this->id,

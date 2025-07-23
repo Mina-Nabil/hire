@@ -43,7 +43,7 @@
                     <!-- Package Selection -->
                     <div class="mb-6">
                         <x-select title="Select Package" wire:model="selectedPackageId" wire:change="loadPackageDetails"
-                            errorMessage="{{ $errors->first('selectedPackageId') }}" disabled>
+                            errorMessage="{{ $errors->first('selectedPackageId') }}">
                             <option value="">-- Package is selected from position automatically, make sure
                                 position has a salary grade and the employee is selected --</option>
                             @foreach ($packages as $package)

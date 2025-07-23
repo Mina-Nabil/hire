@@ -119,7 +119,7 @@
                                         <select wire:model.live="employeesData.{{ $employee->id }}.selectedPackageId"
                                             style="min-width: 120px;"
                                             wire:change="loadPackageDetails({{ $employee->id }})"
-                                            class="form-control text-xs py-1 px-2 h-8 w-full" readonly>
+                                            class="form-control text-xs py-1 px-2 w-full" >
                                             <option value="">Select Package</option>
                                             @foreach ($packages as $package)
                                                 <option value="{{ $package->id }}">{{ $package->name }}</option>

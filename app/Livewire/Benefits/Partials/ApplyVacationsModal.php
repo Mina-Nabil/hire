@@ -136,7 +136,9 @@ class ApplyVacationsModal extends Component
     {
         $value = $this->vacationBenefits[$key]['inc_rate'];
         $currentBalance = $this->vacationBenefits[$key]['original_current_balance'] ?? 0;
+        $startOfThisYear = Carbon::now()->startOfYear();
         $startDate = Carbon::parse($this->vacationBenefits[$key]['start_date'] ?? $this->packageStartDate);
+        $startDate = $startDate->isBefore($startOfThisYear) ? $startOfThisYear : $startDate;
         switch ($this->vacationBenefits[$key]['type']) {
             case VacationDetail::TYPE_YEARLY:
                 $endOfYear = $startDate->clone()->endOfYear();

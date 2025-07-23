@@ -1553,7 +1553,9 @@ class Employee extends Model
                 // 17. Passport
                 ->when($docManagers->contains('doc_type', 'collegeCertificate'), fn($q) => $q->orWhereDoesntHave('collegeCertificate'))
                 // 18. Labour Document
-                ->when($docManagers->contains('doc_type', 'labourDocument'), fn($q) => $q->orWhereDoesntHave('labourDocument'));
+                ->when($docManagers->contains('doc_type', 'labourDocument'), fn($q) => $q->orWhereDoesntHave('labourDocument'))
+                // 19. Skills Qualification
+                ->when($docManagers->contains('doc_type', 'skillsQualification'), fn($q) => $q->orWhereDoesntHave('skillsQualifications'));
         });
     }
 
@@ -1619,6 +1621,10 @@ class Employee extends Model
                 }))
                 // 15. Work Declaration expired
                 ->when($docManagers->contains('doc_type', 'workDeclaration'), fn($q) => $q->orWhereHas('workDeclarations', function ($q) use ($today) {
+                    $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
+                }))
+                // 16. Skills Qualification expired
+                ->when($docManagers->contains('doc_type', 'skillsQualification'), fn($q) => $q->orWhereHas('skillsQualifications', function ($q) use ($today) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '<', $today);
                 }));
         });
@@ -1689,6 +1695,10 @@ class Employee extends Model
                 }))
                 // 15. Work Declaration near expiry
                 ->when($docManagers->contains('doc_type', 'workDeclaration'), fn($q) => $q->orWhereHas('workDeclarations', function ($q) use ($today, $nearExpiryDate) {
+                    $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
+                }))
+                // 16. Skills Qualification near expiry
+                ->when($docManagers->contains('doc_type', 'skillsQualification'), fn($q) => $q->orWhereHas('skillsQualifications', function ($q) use ($today, $nearExpiryDate) {
                     $q->whereNotNull('expiry_date')->where('expiry_date', '>', $today)->where('expiry_date', '<=', $nearExpiryDate);
                 }));
         });

@@ -67,8 +67,11 @@ class Attendance extends Model
             $userEmployee = Employee::where('user_id', $user->id)->first();
             if ($userEmployee && $userEmployee->is_manager) {
                 // Get attendance records of employees who have this manager as their manager
-                $builder->whereHas('employee.benefitConfiguration', function ($query) use ($userEmployee) {
-                    $query->where('manager_id', $userEmployee->id);
+                $builder->where(function ($q) {
+                    $q->where('employee_id', $userEmployee->id)
+                        ->orwhereHas('employee.benefitConfiguration', function ($query) use ($userEmployee) {
+                            $query->where('manager_id', $userEmployee->id);
+                        });
                 });
             } else {
                 // Regular employee can only see their own attendance

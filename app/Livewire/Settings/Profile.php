@@ -95,10 +95,10 @@ class Profile extends Component
             if (!$user) {
                 throw new AppException('User not found');
             }
-            
+
             // Use the changePassword method from the User model
             $user->changePassword($this->newPassword);
-            
+
             $this->closeChangePasswordModal();
             $this->alertSuccess('Password changed successfully');
         } catch (AppException $e) {
@@ -115,7 +115,7 @@ class Profile extends Component
             // Get the database model for the user
             /** @var User $user */
             $user = Auth::user();
-            
+
             // Handle image upload if needed
             $imageUrl = null;
             if ($this->userImage && !is_string($this->userImage)) {
@@ -124,15 +124,15 @@ class Profile extends Component
             } else {
                 $imageUrl = $this->user->image_url;
             }
-            
+
             // Use the editInfo method from the User model
             $user->editInfo(
                 $this->name,
-                $this->username, 
+                $this->username,
                 $this->user->type, // Use existing type 
                 $imageUrl
             );
-            
+
             $this->changes = false;
             $this->alertSuccess('Profile updated successfully');
         } catch (AppException $e) {
@@ -145,6 +145,13 @@ class Profile extends Component
 
     public function render()
     {
-        return view('livewire.settings.profile');
+
+        $loggedInUser = Auth::user();
+        if ($loggedInUser->is_admin || $loggedInUser->is_hr) {
+            $layout = 'components.layouts.app';
+        } else {
+            $layout = 'components.layouts.employee';
+        }
+        return view('livewire.settings.profile')->layout($layout);
     }
 }

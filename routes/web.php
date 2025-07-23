@@ -56,6 +56,7 @@ Route::group(['middleware' => ['auth', 'type:employee|hr|admin']], function () {
     Route::get('/recruitment/vacancies', VacancyIndex::class)->name('recruitment.vacancies');
     Route::get('/recruitment/applicants/{applicant}', ApplicantShow::class)->name('recruitment.applicants.show');
     Route::get('/calendar', Calendar::class)->name('calendar');
+    Route::get('/profile', Profile::class);
 
     Route::get('/logout', function () {
         Auth::logout();
@@ -83,6 +84,8 @@ Route::group(['middleware' => ['auth', 'type:admin|hr']], function () {
     Route::get('/benefits/configurations', ConfigurationIndex::class)->name('benefits.configurations');
     Route::get('/benefits/employee/{employee}', EmployeeConfiguration::class)->name('employee.configuration');
     Route::get('/benefits/bulk-benefits', App\Livewire\Benefits\BulkBenefitsIndex::class)->name('benefits.bulk-benefits');
+    Route::get('/benefits/bulk-attendance', App\Livewire\Benefits\BulkAttendanceIndex::class)->name('benefits.bulk-attendance');
+    Route::get('/benefits/bulk-vacation', App\Livewire\Benefits\BulkVacationIndex::class)->name('benefits.bulk-vacation');
 
     Route::get('/hierarchy/tree', [OrganizationController::class, 'index'])->name('hierarchy.tree');
     Route::get('/hierarchy/positions', PositionIndex::class)->name('hierarchy.positions');
@@ -112,7 +115,6 @@ Route::group(['middleware' => ['auth', 'type:admin|hr']], function () {
     Route::get('/settings/users', UsersIndex::class)->name('settings.users');
     Route::get('/settings/areas', AreasIndex::class)->name('settings.areas');
     Route::get('/settings/channels', ChannelIndex::class)->name('settings.channels');
-    Route::get('/profile', Profile::class);
 
     Route::get('/app-logs', AppLogIndex::class);
 

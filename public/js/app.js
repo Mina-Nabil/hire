@@ -1007,7 +1007,7 @@ setTimeout(function () {
 }, 3000);
 
 window.addEventListener("toastalert", (event) => {
-    console.log(event);
+
     var x = document.getElementById("simpleToast");
 
     // The correct data is inside event.detail.detail
@@ -1035,7 +1035,7 @@ window.addEventListener("toastalert", (event) => {
 
     setTimeout(function () {
         x.className = x.className.replace("show", "");
-    }, 3000);
+    }, 10000);
 });
 
 document.addEventListener("livewire:load", function () {

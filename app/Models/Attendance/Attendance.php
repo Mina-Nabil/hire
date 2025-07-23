@@ -5,6 +5,7 @@ namespace App\Models\Attendance;
 use App\Exceptions\AppException;
 use App\Models\Attendance\PublicHoliday;
 use App\Models\Benefits\Configurations\BenefitConfiguration;
+use App\Models\Benefits\Payrolls\AppliedVacation;
 use App\Models\Benefits\Vacations\VacationBenefit;
 use App\Models\Benefits\Vacations\GainedVacation;
 use App\Models\Personel\Employee;
@@ -477,6 +478,16 @@ class Attendance extends Model
         // First check if it's a public holiday - no one works on public holidays
         $isPublicHoliday = PublicHoliday::where('date', $date->format('Y-m-d'))->exists();
         if ($isPublicHoliday) {
+            return false;
+        }
+
+        $isAppliedVacation = AppliedVacation::where('employee_id', $employee->id)
+            ->where('status', AppliedVacation::STATUS_APPROVED)
+            ->whereHas('vacationDays', function ($query) use ($date) {
+                $query->where('date', $date->format('Y-m-d'));
+            })
+            ->exists();
+        if ($isAppliedVacation) {
             return false;
         }
 

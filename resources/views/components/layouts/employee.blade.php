@@ -416,7 +416,7 @@
 
             setTimeout(function() {
                 x.className = x.className.replace("show", "");
-            }, 3000);
+            }, 10000);
         }
 
         // Fix for Livewire v3 dispatched events

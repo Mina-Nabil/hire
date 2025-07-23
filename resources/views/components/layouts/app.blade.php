@@ -216,6 +216,14 @@
                                     <a class="{{ request()->routeIs('benefits.bulk-benefits') ? 'active' : '' }}"
                                         href="{{ url('/benefits/bulk-benefits') }}">Bulk Benefits</a>
                                 </li>
+                                <li>
+                                    <a class="{{ request()->routeIs('benefits.bulk-attendance') ? 'active' : '' }}"
+                                        href="{{ url('/benefits/bulk-attendance') }}">Bulk Attendance</a>
+                                </li>
+                                <li>
+                                    <a class="{{ request()->routeIs('benefits.bulk-vacation') ? 'active' : '' }}"
+                                        href="{{ url('/benefits/bulk-vacation') }}">Bulk Vacation</a>
+                                </li>
                             @endcan
                             @can('viewAny', App\Models\Benefits\Configurations\SalaryGrade::class)
                                 <li>
@@ -650,7 +658,7 @@
 
             setTimeout(function() {
                 x.className = x.className.replace("show", "");
-            }, 3000);
+            }, 10000);
         }
 
         // Fix for Livewire v3 dispatched events

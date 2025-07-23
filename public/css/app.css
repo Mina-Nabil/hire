@@ -8967,7 +8967,7 @@ ToolTip And PopOver
     font-size: 0.875rem;
     line-height: 1.25rem;
     font-weight: 400;
-    transition: opacity 3s ease-in-out; /* Transition the opacity property over 3 seconds */
+    transition: opacity 10s ease-in-out; /* Transition the opacity property over 3 seconds */
 }
 
 .hide {
@@ -17368,8 +17368,8 @@ ul.custom-list ul {
     visibility: visible; /* Show the SIMPLE-TOAST */
     /* Add animation: Take 0.5 seconds to fade in and out the SIMPLE-TOAST.
     However, delay the fade out process for 2.5 seconds */
-    -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
-    animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    -webkit-animation: fadein 0.5s, fadeout 0.5s 9.5s;
+    animation: fadein 0.5s, fadeout 0.5s 9.5s;
 }
 
 /* Animations to fade the SIMPLE-TOAST in and out */

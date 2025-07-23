@@ -59,7 +59,7 @@ class BulkBenefitsIndex extends Component
                 $query->whereNull('end_date');
             }
         ])
-        ->where('status', Employee::STATUS_ACTIVE);
+        ->current();
 
         if ($this->search) {
             $query->where(function ($q) {

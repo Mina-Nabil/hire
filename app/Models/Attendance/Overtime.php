@@ -79,4 +79,53 @@ class Overtime extends Model
     {
         return $this->belongsTo(Payroll::class);
     }
+
+    protected static function booted()
+    {
+        static::addGlobalScope('managerAccessibleOvertime', function ($builder) {
+            $builder->orderBy('date', 'desc');
+            $user = Auth::user();
+
+            // If no user is logged in or if they are admin, don't restrict
+            if (!$user || $user->is_admin) {
+                return;
+            }
+
+            // If user is HR, restrict to employees in their assigned locations
+            if ($user->is_hr) {
+                // Get the HR user's assigned location IDs
+                $locationIds = $user->assignedLocations()->pluck('locations.id')->toArray();
+
+                // Only apply filter if the user has assigned locations
+                if (!empty($locationIds)) {
+                    $builder->whereHas('employee.position', function ($query) use ($locationIds) {
+                        $query->whereIn('location_id', $locationIds);
+                    });
+                }
+                return;
+            }
+
+            // If user is a manager (has employees reporting to them)
+            $userEmployee = Employee::where('user_id', $user->id)->first();
+            if ($userEmployee && $userEmployee->is_manager) {
+                // Get attendance records of employees who have this manager as their manager
+                $builder->where(function ($q) use ($userEmployee) {
+                    $q->where('employee_id', $userEmployee->id)
+                        ->orwhereHas('employee.benefitConfiguration', function ($query) use ($userEmployee) {
+                            $query->where('manager_id', $userEmployee->id);
+                        });
+                });
+            } else {
+                // Regular employee can only see their own attendance
+                $builder->where(function ($query) use ($user, $userEmployee) {
+                    if ($userEmployee) {
+                        $query->where('employee_id', $userEmployee->id);
+                    } else {
+                        // Force no results if the user doesn't have an employee record
+                        $query->where('employee_id', -1);
+                    }
+                });
+            }
+        });
+    }
 }

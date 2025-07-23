@@ -63,8 +63,7 @@ class BulkBenefitsIndex extends Component
 
         if ($this->search) {
             $query->where(function ($q) {
-                $q->where('name', 'like', '%' . $this->search . '%')
-                  ->orWhere('employee_id', 'like', '%' . $this->search . '%');
+                $q->where('name', 'like', '%' . $this->search . '%');
             });
         }
 
@@ -218,6 +217,7 @@ class BulkBenefitsIndex extends Component
         }
 
         $this->employeesData[$employeeId]['selectedPackage'] = $package;
+        $this->employeesData[$employeeId]['packageStartDate'] = Carbon::parse($package->start_date)->format('Y-m-d');
         $this->employeesData[$employeeId]['packageDetails'] = $package->packageDetails->mapWithKeys(function ($detail) {
             return [
                 $detail->name => [
@@ -236,7 +236,7 @@ class BulkBenefitsIndex extends Component
         })->toArray();
 
         // Initialize package start and end dates from package details (same as ApplyPackageModal.php)
-        if (count($this->employeesData[$employeeId]['packageDetails'])) {
+        if (!$this->employeesData[$employeeId]['packageStartDate'] && count($this->employeesData[$employeeId]['packageDetails'])) {
             $firstDetail = reset($this->employeesData[$employeeId]['packageDetails']);
             if (isset($firstDetail['start_date'])) {
                 $this->employeesData[$employeeId]['packageStartDate'] = Carbon::parse($firstDetail['start_date'])->format('Y-m-d');
@@ -323,6 +323,7 @@ class BulkBenefitsIndex extends Component
             // Apply benefits package
             $employee->applyBenefitsPackage(
                 $selectedPackage,
+                Carbon::parse($employeeData['packageStartDate']),
                 array_values($packageDetails),
                 $employeeData['grossSalary'],
                 $employeeData['insuranceAmount'],

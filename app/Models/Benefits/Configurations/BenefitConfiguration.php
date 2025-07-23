@@ -28,6 +28,7 @@ class BenefitConfiguration extends Model
     protected $fillable = [
         'employee_id',
         'salary_grade_id',
+        'start_date',
         'manager_id',
         'vacation_package_id',
         'gross_salary',

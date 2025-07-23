@@ -42,6 +42,7 @@ class ApplyPackageModal extends Component
             $this->selectedPackageId = $this->selectedEmployee->benefitConfiguration->salaryGrade->id;
             $this->grossSalary = $this->selectedEmployee->benefitConfiguration->gross_salary;
             $this->insuranceAmount = $this->selectedEmployee->benefitConfiguration->insurance_amount;
+            $this->packageStartDate = Carbon::parse($this->selectedEmployee->benefitConfiguration->start_date)->format('Y-m-d');
 
             $savedPackageDetails = $this->selectedEmployee->baseBenefits()
                 ->bySalaryGrade($this->selectedPackageId)->get()->mapWithKeys(function ($benefit) {
@@ -109,7 +110,7 @@ class ApplyPackageModal extends Component
 
 
 
-        if (count($this->packageDetails)) {
+        if (!$this->packageStartDate && count($this->packageDetails)) {
             if (isset($this->packageDetails[array_key_first($this->packageDetails)]['start_date'])) {
                 $this->packageStartDate = Carbon::parse($this->packageDetails[array_key_first($this->packageDetails)]['start_date'])->format('Y-m-d');
             }
@@ -198,6 +199,7 @@ class ApplyPackageModal extends Component
 
             $this->selectedEmployee->applyBenefitsPackage(
                 $this->selectedPackage,
+                Carbon::parse($this->packageStartDate),
                 $this->packageDetails,
                 $this->grossSalary,
                 $this->insuranceAmount,

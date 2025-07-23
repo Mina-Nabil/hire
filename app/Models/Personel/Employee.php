@@ -185,7 +185,7 @@ class Employee extends Model
      * @param bool $delete_old_conf delete old configuration if true and end old configuration if false
      * @return void
      */
-    public function applyBenefitsPackage(SalaryGrade $salaryGrade, $package_details, $grossSalary, $insuranceAmount, $manager_id = null, bool $delete_old_conf = true)
+    public function applyBenefitsPackage(SalaryGrade $salaryGrade, Carbon $start_date, $package_details, $grossSalary, $insuranceAmount, $manager_id = null, bool $delete_old_conf = true)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -208,7 +208,7 @@ class Employee extends Model
         }
 
         try {
-            DB::transaction(function () use ($package_details, $salaryGrade, $grossSalary, $manager_id, $delete_old_conf, $insuranceAmount) {
+            DB::transaction(function () use ($package_details, $salaryGrade, $grossSalary, $manager_id, $delete_old_conf, $insuranceAmount, $start_date) {
                 if ($delete_old_conf) {
                     $this->baseBenefits()->delete();
                 } else {
@@ -226,6 +226,7 @@ class Employee extends Model
                     'gross_salary' => $grossSalary,
                     'insurance_amount' => $insuranceAmount,
                     'manager_id' => $manager_id,
+                    'start_date' => $start_date->format('Y-m-d'),
                 ]);
                 AppLog::info('Benefits Package Applied', 'Benefits package applied for employee: ' . $this->name, loggable: $this);
             });

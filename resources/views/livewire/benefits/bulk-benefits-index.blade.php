@@ -14,7 +14,7 @@
                     <iconify-icon wire:loading wire:target="search" class="loading-icon text-lg mr-2"
                         icon="line-md:loading-twotone-loop"></iconify-icon>
                     <input type="text" class="form-control !pl-9 mr-1 basis-1/4 w-full"
-                        placeholder="Search by name or ID" wire:model.live.debounce.400ms="search">
+                        placeholder="Search by name" wire:model.live.debounce.400ms="search">
                 </div>
 
                 <div class="flex items-center space-x-3">

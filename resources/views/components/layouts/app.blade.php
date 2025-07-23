@@ -339,7 +339,7 @@
 
                         </ul>
                     </li>
-                    @if(!env('HIDE_TIBIAN', false) && Auth::id() == 22)
+                    @if(Auth::id() !== 22 || !env('HIDE_TIBIAN', false))
                     <li class="">
                         <a href="javascript:void(0)" class="navItem">
                             <span class="flex items-center">

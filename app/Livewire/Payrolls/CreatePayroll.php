@@ -321,7 +321,7 @@ class CreatePayroll extends Component
             $otherAmount = $grossSalary - $insuranceAmount - $employeeInsurance ?? 0;
             $employeeMedical = $employee->activeMedicalBenefits(Carbon::parse($this->startDate), Carbon::parse($this->endDate))->sum('amount');
             $totalMedical = $employeeMedical;
-            $employeeDeductions = $employeeInsurance + $employeeMedical;
+            $employeeDeductions = $employeeInsurance;
             $netIncome = $otherAmount + $insuranceAmount;
             $dayPrice = $netIncome / 30;
             $employeeBaseBenefits = $employee->getEmployeeBaseBenefitsCalculation(Carbon::parse($this->startDate), Carbon::parse($this->endDate));

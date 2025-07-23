@@ -92,6 +92,14 @@
                     <h5 class="text-sm font-medium text-slate-500 dark:text-slate-300 mb-1">Tax Amount</h5>
                     <div class="text-base font-semibold">{{ number_format($payroll->total_tax_amount, 2) }}</div>
                 </div>
+                <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-4">
+                    <h5 class="text-sm font-medium text-slate-500 dark:text-slate-300 mb-1">Total Employee Benefits Amount</h5>
+                    <div class="text-base font-semibold">{{ number_format($payroll->total_employee_base_benefits, 2) }}</div>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-4">
+                    <h5 class="text-sm font-medium text-slate-500 dark:text-slate-300 mb-1">Total Other Benefits Amount</h5>
+                    <div class="text-base font-semibold">{{ number_format($payroll->total_other_base_benefits, 2) }}</div>
+                </div>
 
                 <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-4">
                     <h5 class="text-sm font-medium text-slate-500 dark:text-slate-300 mb-1">Status</h5>
@@ -355,10 +363,20 @@
                             <div class="text-lg font-semibold text-secondary-600 dark:text-secondary-400">
                                 {{ number_format($selectedPayrollEmployee->tax_amount, 2) }}</div>
                         </div>
-                        <div class="bg-primary-50 dark:bg-primary-900/20 rounded-md p-3 md:col-span-6">
+                        <div class="bg-primary-50 dark:bg-primary-900/20 rounded-md p-3 md:col-span-2">
                             <h5 class="text-xs font-medium text-primary-500 dark:text-primary-400 mb-1">Net Amount</h5>
                             <div class="text-lg font-semibold text-primary-600 dark:text-primary-400">
                                 {{ number_format($selectedPayrollEmployee->after_tax_salary, 2) }}</div>
+                        </div>
+                        <div class="bg-primary-50 dark:bg-primary-900/20 rounded-md p-3 md:col-span-2">
+                            <h5 class="text-xs font-medium text-primary-500 dark:text-primary-400 mb-1">Employee Benefits Amount</h5>
+                            <div class="text-lg font-semibold text-primary-600 dark:text-primary-400">
+                                {{ number_format($selectedPayrollEmployee->employee_base_benefits, 2) }}</div>
+                        </div>
+                        <div class="bg-primary-50 dark:bg-primary-900/20 rounded-md p-3 md:col-span-2">
+                            <h5 class="text-xs font-medium text-primary-500 dark:text-primary-400 mb-1">Other Benefits Amount</h5>
+                            <div class="text-lg font-semibold text-primary-600 dark:text-primary-400">
+                                {{ number_format($selectedPayrollEmployee->other_base_benefits, 2) }}</div>
                         </div>
                     </div>
                 </div>

@@ -567,6 +567,80 @@ class EmployeeConfiguration extends Component
         }
     }
 
+    // --------- Loan Delete Function ---------
+    public function deleteLoan($loanId)
+    {
+        try {
+            $loan = Loan::findOrFail($loanId);
+            $loan->deleteLoan($this->employee);
+            $this->alertSuccess('Loan deleted successfully.');
+        } catch (AppException $e) {
+            $this->alertError($e->getMessage());
+        } catch (Exception $e) {
+            report($e);
+            $this->alertError('Error deleting loan. Please try again.');
+        }
+    }
+
+    // --------- Purchase Delete Function ---------
+    public function deletePurchase($purchaseId)
+    {
+        try {
+            $purchase = Purchase::findOrFail($purchaseId);
+            $purchase->deletePurchase($this->employee);
+            $this->alertSuccess('Purchase deleted successfully.');
+        } catch (AppException $e) {
+            $this->alertError($e->getMessage());
+        } catch (Exception $e) {
+            report($e);
+            $this->alertError('Error deleting purchase. Please try again.');
+        }
+    }
+
+    // --------- Extra Payment Edit Functions ---------
+    public $showEditExtraPaymentModal = false;
+    public $editingExtraPayment = null;
+    public $editExtraPaymentDueDate = '';
+
+    public function editExtraPayment($extraPaymentId)
+    {
+        try {
+            $this->editingExtraPayment = ExtraPayment::findOrFail($extraPaymentId);
+            $this->editExtraPaymentDueDate = $this->editingExtraPayment->due_date->format('Y-m-d');
+            $this->showEditExtraPaymentModal = true;
+        } catch (Exception $e) {
+            $this->alertError('Error loading extra payment. Please try again.');
+        }
+    }
+
+    public function closeEditExtraPaymentModal()
+    {
+        $this->showEditExtraPaymentModal = false;
+        $this->editingExtraPayment = null;
+        $this->editExtraPaymentDueDate = '';
+    }
+
+    public function saveExtraPaymentEdit()
+    {
+        $this->validate([
+            'editExtraPaymentDueDate' => 'required|date',
+        ], [
+            'editExtraPaymentDueDate.required' => 'The due date is required.',
+            'editExtraPaymentDueDate.date' => 'The due date must be a valid date.',
+        ]);
+
+        try {
+            $this->editingExtraPayment->editExtraPayment($this->editExtraPaymentDueDate);
+            $this->closeEditExtraPaymentModal();
+            $this->alertSuccess('Extra payment due date updated successfully.');
+        } catch (AppException $e) {
+            $this->alertError($e->getMessage());
+        } catch (Exception $e) {
+            report($e);
+            $this->alertError('Error updating extra payment. Please try again.');
+        }
+    }
+
 
     ///payroll detials modal
     // Modal properties

@@ -465,6 +465,7 @@
                                                         <th scope="col" class="table-th">For</th>
                                                         <th scope="col" class="table-th">Status</th>
                                                         <th scope="col" class="table-th">Description</th>
+                                                        <th scope="col" class="table-th">Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody
@@ -493,6 +494,18 @@
                                                                 @endif
                                                             </td>
                                                             <td class="table-td">{{ $payment->desc ?? '-' }}</td>
+                                                            <td class="table-td">
+                                                                @can('editExtraPayment', $employee)
+                                                                    @if ($payment->status !== 'paid' && is_null($payment->payroll_id))
+                                                                        <button 
+                                                                            wire:click="editExtraPayment({{ $payment->id }})"
+                                                                            class="btn btn-sm btn-primary"
+                                                                            title="Edit Due Date">
+                                                                            <iconify-icon icon="mdi:edit"></iconify-icon>
+                                                                        </button>
+                                                                    @endif
+                                                                @endcan
+                                                            </td>
                                                         </tr>
                                                     @endforeach
                                                 </tbody>
@@ -765,6 +778,7 @@
                                                         <th scope="col" class="table-th">Date</th>
                                                         <th scope="col" class="table-th">Amount</th>
                                                         <th scope="col" class="table-th">Description</th>
+                                                        <th scope="col" class="table-th">Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody
@@ -775,6 +789,17 @@
                                                                 {{ $loan->created_at->format('d/m/Y') }}</td>
                                                             <td class="table-td">{{ $loan->amount }}</td>
                                                             <td class="table-td">{{ $loan->desc ?? '-' }}</td>
+                                                            <td class="table-td">
+                                                                @can('deleteLoan', $employee)
+                                                                    <button 
+                                                                        wire:click="deleteLoan({{ $loan->id }})"
+                                                                        wire:confirm="Are you sure you want to delete this loan?"
+                                                                        class="btn btn-sm btn-danger"
+                                                                        title="Delete Loan">
+                                                                        <iconify-icon icon="mdi:delete"></iconify-icon>
+                                                                    </button>
+                                                                @endcan
+                                                            </td>
                                                         </tr>
                                                     @endforeach
                                                 </tbody>
@@ -812,6 +837,7 @@
                                                         <th scope="col" class="table-th">Date</th>
                                                         <th scope="col" class="table-th">Amount</th>
                                                         <th scope="col" class="table-th">Description</th>
+                                                        <th scope="col" class="table-th">Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody
@@ -822,6 +848,17 @@
                                                                 {{ $purchase->created_at->format('d/m/Y') }}</td>
                                                             <td class="table-td">{{ $purchase->amount }}</td>
                                                             <td class="table-td">{{ $purchase->desc ?? '-' }}</td>
+                                                            <td class="table-td">
+                                                                @can('deletePurchase', $employee)
+                                                                    <button 
+                                                                        wire:click="deletePurchase({{ $purchase->id }})"
+                                                                        wire:confirm="Are you sure you want to delete this purchase?"
+                                                                        class="btn btn-sm btn-danger"
+                                                                        title="Delete Purchase">
+                                                                        <iconify-icon icon="mdi:delete"></iconify-icon>
+                                                                    </button>
+                                                                @endcan
+                                                            </td>
                                                         </tr>
                                                     @endforeach
                                                 </tbody>
@@ -1778,5 +1815,92 @@
                     </div>
                 </div>
             </div>
+    @endif
+</div>
+
+<!-- Edit Extra Payment Modal -->
+<div>
+    @if ($showEditExtraPaymentModal)
+        <x-modal wire:model="showEditExtraPaymentModal">
+            <x-slot name="title">Edit Extra Payment Due Date</x-slot>
+
+            <div class="space-y-6">
+                @if ($errors->any())
+                    <div class="alert alert-warning mb-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            <div>
+                                <p class="font-medium">Please fix the following errors:</p>
+                                <ul>
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                <div class="grid grid-cols-1 gap-4">
+                    <div>
+                        <label for="editExtraPaymentDueDate" class="form-label">Due Date*</label>
+                        <input type="date"
+                            class="form-control @error('editExtraPaymentDueDate') !border-danger-500 @enderror"
+                            wire:model="editExtraPaymentDueDate">
+                        @error('editExtraPaymentDueDate')
+                            <span class="font-Inter text-sm text-danger-500">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    @if ($editingExtraPayment)
+                        <div class="bg-slate-50 dark:bg-slate-700 p-4 rounded-lg">
+                            <h6 class="font-medium text-slate-900 dark:text-white mb-2">Payment Details</h6>
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <span class="text-slate-500 dark:text-slate-400">Name:</span>
+                                    <span class="ml-2 font-medium">{{ $editingExtraPayment->name }}</span>
+                                </div>
+                                <div>
+                                    <span class="text-slate-500 dark:text-slate-400">Amount:</span>
+                                    <span class="ml-2 font-medium">{{ number_format($editingExtraPayment->amount, 2) }}</span>
+                                </div>
+                                <div>
+                                    <span class="text-slate-500 dark:text-slate-400">Status:</span>
+                                    <span class="ml-2">
+                                        @if ($editingExtraPayment->status == 'pending')
+                                            <span class="badge bg-warning">Pending</span>
+                                        @elseif($editingExtraPayment->status == 'approved')
+                                            <span class="badge bg-info">Approved</span>
+                                        @elseif($editingExtraPayment->status == 'paid')
+                                            <span class="badge bg-success">Paid</span>
+                                        @elseif($editingExtraPayment->status == 'rejected')
+                                            <span class="badge bg-danger">Rejected</span>
+                                        @endif
+                                    </span>
+                                </div>
+                                <div>
+                                    <span class="text-slate-500 dark:text-slate-400">Current Due Date:</span>
+                                    <span class="ml-2 font-medium">{{ $editingExtraPayment->due_date->format('d/m/Y') }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="flex items-center justify-end p-6 space-x-2 border-t border-slate-200 rounded-b dark:border-slate-600">
+                <button wire:click="closeEditExtraPaymentModal" type="button"
+                    class="btn inline-flex justify-center btn-outline-dark">Cancel</button>
+                <button wire:click="saveExtraPaymentEdit" type="button" wire:target='saveExtraPaymentEdit'
+                    wire:loading.remove class="btn inline-flex justify-center btn-dark">Update</button>
+                <button wire:loading wire:target="saveExtraPaymentEdit" type="button"
+                    class="btn inline-flex justify-center btn-dark">
+                    <span class="flex items-center">
+                        <iconify-icon icon="line-md:loading-twotone-loop" width="25" height="25"></iconify-icon>
+                    </span>
+                </button>
+            </div>
+        </x-modal>
     @endif
 </div>

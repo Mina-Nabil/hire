@@ -30,6 +30,7 @@ class ExtraPayment extends Model
         'status',
         'payable_id',
         'payable_type',
+        'payroll_id',
     ];
     
 
@@ -82,6 +83,40 @@ class ExtraPayment extends Model
             report($e);
             AppLog::error('Error creating extra payment', $e->getMessage());
             throw new AppException('Error creating extra payment');
+        }
+    }
+
+    /**
+     * Edit an extra payment's due date
+     * @param string $due_date
+     * @return void
+     * @throws AppException
+     */
+    public function editExtraPayment(string $due_date)
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        if (!$user->can('editExtraPayment', $this->employee)) {
+            throw new AppException('You dont have permission to edit extra payment');
+        }
+
+        // Check if payment is paid or linked to payroll
+        if ($this->status === self::STATUS_PAID || !is_null($this->payroll_id)) {
+            throw new AppException('Cannot edit extra payment: Payment is already paid or linked to payroll');
+        }
+
+        try {
+            DB::transaction(function () use ($due_date) {
+                $oldDueDate = $this->due_date;
+                $this->due_date = $due_date;
+                $this->save();
+                
+                AppLog::info('Extra Payment Edited', "Employee: {$this->employee->name}, Payment: {$this->name}, Old Due Date: $oldDueDate, New Due Date: $due_date", loggable: $this);
+            });
+        } catch (Exception $e) {
+            report($e);
+            AppLog::error('Error editing extra payment', $e->getMessage());
+            throw new AppException('Error editing extra payment');
         }
     }
 }

@@ -27,6 +27,12 @@ class Purchase extends Model
         return $this->belongsTo(Employee::class);
     }
 
+    ///relationships////
+    public function extraPayments()
+    {
+        return $this->morphMany(ExtraPayment::class, 'payable');
+    }
+
         /**
      * Create a loan
      * @param Employee $employee
@@ -94,6 +100,47 @@ class Purchase extends Model
             report($e);
             AppLog::error('Error creating purchase', $e->getMessage());
             throw new AppException('Error creating purchase');
+        }
+    }
+
+    /**
+     * Delete a purchase
+     * @param Employee $employee
+     * @return void
+     * @throws AppException
+     */
+    public function deletePurchase(Employee $employee)
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        if (!$user->can('deletePurchase', $employee)) {
+            throw new AppException('You dont have permission to delete purchase');
+        }
+
+        // Check if any extra payments are linked to payrolls
+        $linkedPayments = $this->extraPayments()
+            ->whereNotNull('payroll_id')
+            ->orWhere('status', ExtraPayment::STATUS_PAID)
+            ->count();
+
+        if ($linkedPayments > 0) {
+            throw new AppException('Cannot delete purchase: Some payments are already linked to payrolls or paid');
+        }
+
+        try {
+            DB::transaction(function () use ($employee) {
+                // Delete all associated extra payments first
+                $this->extraPayments()->delete();
+                
+                // Delete the purchase itself
+                $this->delete();
+                
+                AppLog::info('Purchase Deleted', "Employee: $employee->name, Amount: {$this->amount}, Desc: {$this->desc}", loggable: $this);
+            });
+        } catch (Exception $e) {
+            report($e);
+            AppLog::error('Error deleting purchase', $e->getMessage());
+            throw new AppException('Error deleting purchase');
         }
     }
 }

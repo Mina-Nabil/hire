@@ -226,7 +226,8 @@ class Payroll extends Model
         $totalPenaltiesAmount = 0;
         $totalOvertimeAmount = 0;
         $totalEmployeeInsurance = 0;
-
+        $totalEmployeeBaseBenefits = 0;
+        $totalOtherBaseBenefits = 0;
         // Use DB::transaction as described with a function that uses the variables
         DB::transaction(function () use (
             $creatorId,
@@ -244,6 +245,8 @@ class Payroll extends Model
             &$totalPenaltiesAmount,
             &$totalOvertimeAmount,
             &$totalEmployeeInsurance,
+            &$totalEmployeeBaseBenefits,
+            &$totalOtherBaseBenefits,
             &$benefitPaymentIds
         ) {
             // 1. Create the payroll record
@@ -328,6 +331,8 @@ class Payroll extends Model
                 $totalPenaltiesAmount += $employeeData['penalties_amount'] ?? 0;
                 $totalOvertimeAmount += $employeeData['overtime_amount'] ?? 0;
                 $totalTaxAmount += $taxAmount;
+                $totalEmployeeBaseBenefits += $employeeData['employee_base_benefits'] ?? 0;
+                $totalOtherBaseBenefits += $employeeData['other_base_benefits'] ?? 0;
 
                 // Link extra payments to this payroll
                 if (isset($employeeData['extra_payment_ids']) && is_array($employeeData['extra_payment_ids'])) {
@@ -380,6 +385,8 @@ class Payroll extends Model
                 'total_employee_medical' => $totalEmployeeMedical,
                 'total_penalties_amount' => $totalPenaltiesAmount,
                 'total_overtime_amount' => $totalOvertimeAmount,
+                'total_employee_base_benefits' => $totalEmployeeBaseBenefits,
+                'total_other_base_benefits' => $totalOtherBaseBenefits,
             ]);
 
             // Log the creation of the payroll
@@ -445,6 +452,7 @@ class Payroll extends Model
         try {
             DB::transaction(function () {
                 $this->payrollEmployees()->delete();
+                $this->extraPayments()->update(['payroll_id' => null, 'status' => ExtraPayment::STATUS_APPROVED]);
                 $this->delete();
             });
         } catch (\Exception $e) {

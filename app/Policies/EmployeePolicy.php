@@ -27,6 +27,21 @@ class EmployeePolicy
         return $user->is_admin || $user->is_hr;
     }
 
+    public function deleteLoan(User $user, Employee $employee): bool
+    {
+        return $user->is_admin || $user->is_hr;
+    }
+
+    public function deletePurchase(User $user, Employee $employee): bool
+    {
+        return $user->is_admin || $user->is_hr;
+    }
+
+    public function editExtraPayment(User $user, Employee $employee): bool
+    {
+        return $user->is_admin || $user->is_hr;
+    }
+
     public function createExtraPayment(User $user, Employee $employee): bool
     {
         return $user->is_admin || $user->is_hr;

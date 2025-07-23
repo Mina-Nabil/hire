@@ -101,4 +101,51 @@ class Loan extends Model
             throw new AppException('Error creating loan');
         }
     }
+
+    /**
+     * Delete a loan
+     * @param Employee $employee
+     * @return void
+     * @throws AppException
+     */
+    public function deleteLoan(Employee $employee)
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        if (!$user->can('deleteLoan', $employee)) {
+            throw new AppException('You dont have permission to delete loan');
+        }
+
+        // Check if any extra payments are linked to payrolls
+        $linkedPayments = $this->extraPayments()
+            ->whereNotNull('payroll_id')
+            ->orWhere('status', ExtraPayment::STATUS_PAID)
+            ->count();
+
+        if ($linkedPayments > 0) {
+            throw new AppException('Cannot delete loan: Some payments are already linked to payrolls or paid');
+        }
+
+        try {
+            DB::transaction(function () use ($employee) {
+                // Delete all associated extra payments first
+                $this->extraPayments()->delete();
+                
+                // Delete the loan itself
+                $this->delete();
+                
+                AppLog::info('Loan Deleted', "Employee: $employee->name, Amount: {$this->amount}, Desc: {$this->desc}", loggable: $this);
+            });
+        } catch (Exception $e) {
+            report($e);
+            AppLog::error('Error deleting loan', $e->getMessage());
+            throw new AppException('Error deleting loan');
+        }
+    }
+
+    ///relationships////
+    public function extraPayments()
+    {
+        return $this->morphMany(ExtraPayment::class, 'payable');
+    }
 }

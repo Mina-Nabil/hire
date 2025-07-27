@@ -1,3 +1,6 @@
+<div>
+
+
 <div class="space-y-5 profile-page mx-auto">
     <div class="flex justify-between">
         <div class="flex gap-5">
@@ -1903,4 +1906,6 @@
             </div>
         </x-modal>
     @endif
+</div>
+
 </div>

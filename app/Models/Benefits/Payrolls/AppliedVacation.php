@@ -13,6 +13,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AppliedVacation extends Model
 {
@@ -81,7 +82,10 @@ class AppliedVacation extends Model
 
     public static function getAppliedHours($employeeId, $startDate, $endDate, $vacationBenefitName, $vacationBenefitId = null)
     {
-        return self::currentBalance($employeeId, $startDate, $endDate, $vacationBenefitName, $vacationBenefitId)->sum('hours');
+        $query = self::currentBalance($employeeId, $startDate, $endDate, $vacationBenefitName, $vacationBenefitId);
+        Log::info($query->toSql());
+        Log::info($query->get());
+        return $query->sum('hours');
     }
 
     ///scopes

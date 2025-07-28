@@ -155,7 +155,9 @@
                                                 {{ count($employeeData['vacationBenefits']) }} benefits
                                             </span>
                                         @else
-                                            <span class="text-slate-500 text-xs text-nowrap">No benefits</span>
+                                            <span class="text-slate-500 text-xs text-nowrap"
+                                                wire:click="loadVacationPackage({{ $employee->id }})">No benefits found on
+                                                profile - Click to reload new package</span>
                                         @endif
                                     </td>
                                     <td class="table-td">

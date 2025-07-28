@@ -199,7 +199,7 @@ class BulkVacationIndex extends Component
     {
         $benefit = $this->employeesData[$employeeId]['vacationBenefits'][$key];
         $value = $benefit['inc_rate'];
-        $startDate = Carbon::parse($benefit['start_date'] ?? $this->employeesData[$employeeId]['packageStartDate'] ?? Carbon::now()->format('Y-m-d'));
+        $startDate = Carbon::parse($this->employeesData[$employeeId]['packageStartDate'] ?? $benefit['start_date'] ?? Carbon::now()->format('Y-m-d'));
         $startDate = $startDate->isBefore(Carbon::now()->startOfYear()) ? Carbon::now()->startOfYear() : $startDate;
         switch ($benefit['type']) {
             case VacationDetail::TYPE_YEARLY:

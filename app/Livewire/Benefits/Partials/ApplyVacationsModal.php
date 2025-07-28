@@ -145,19 +145,19 @@ class ApplyVacationsModal extends Component
             case VacationDetail::TYPE_YEARLY:
                 $endOfYear = $startDate->clone()->endOfYear();
                 $leftRatio = $endOfYear->diffInDays($startDate, true) / 365;
-                $appliedVacations = AppliedVacation::getAppliedHours($this->selectedEmployee->id, $startDate, $endOfYear, $this->vacationBenefits[$key]['name'], $this->vacationBenefits[$key]['id'] ?? null);
+                $appliedVacations = AppliedVacation::getAppliedHours($this->selectedEmployee->id, $startDate, $endOfYear, $this->vacationBenefits[$key]['name']);
                 $this->vacationBenefits[$key]['current_balance'] = round(($value * $leftRatio) - $appliedVacations, 2);
                 break;
             case VacationDetail::TYPE_MONTHLY:
-                $appliedVacations = AppliedVacation::getAppliedHours($this->selectedEmployee->id, Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth(), $this->vacationBenefits[$key]['name'], $this->vacationBenefits[$key]['id'] ?? null);
+                $appliedVacations = AppliedVacation::getAppliedHours($this->selectedEmployee->id, Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth(), $this->vacationBenefits[$key]['name']);
                 $this->vacationBenefits[$key]['current_balance'] = round($value - $appliedVacations, 2);
                 break;
             case VacationDetail::TYPE_WEEKLY:
-                $appliedVacations = AppliedVacation::getAppliedHours($this->selectedEmployee->id, Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek(), $this->vacationBenefits[$key]['name'], $this->vacationBenefits[$key]['id'] ?? null);
+                $appliedVacations = AppliedVacation::getAppliedHours($this->selectedEmployee->id, Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek(), $this->vacationBenefits[$key]['name']);
                 $this->vacationBenefits[$key]['current_balance'] = round($value - $appliedVacations, 2);
                 break;
             case VacationDetail::TYPE_QUARTERLY:
-                $appliedVacations = AppliedVacation::getAppliedHours($this->selectedEmployee->id, Carbon::now()->startOfQuarter(), Carbon::now()->endOfQuarter(), $this->vacationBenefits[$key]['name'], $this->vacationBenefits[$key]['id'] ?? null);
+                $appliedVacations = AppliedVacation::getAppliedHours($this->selectedEmployee->id, Carbon::now()->startOfQuarter(), Carbon::now()->endOfQuarter(), $this->vacationBenefits[$key]['name']);
                 $this->vacationBenefits[$key]['current_balance'] = round($value - $appliedVacations, 2);
                 break;
 

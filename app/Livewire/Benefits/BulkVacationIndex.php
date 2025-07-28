@@ -207,26 +207,19 @@ class BulkVacationIndex extends Component
             case VacationDetail::TYPE_YEARLY:
                 $endOfYear = $startDate->clone()->endOfYear();
                 $leftRatio = $endOfYear->diffInDays($startDate, true) / 365;
-                $appliedVacations = AppliedVacation::getAppliedHours($employeeId, $startDate, $endOfYear, $benefit['name'], $benefit['id'] ?? null);
+                $appliedVacations = AppliedVacation::getAppliedHours($employeeId, $startDate, $endOfYear, $benefit['name']);
                 $this->employeesData[$employeeId]['vacationBenefits'][$key]['current_balance'] = round(($value * $leftRatio) - $appliedVacations, 2);
                 break;
             case VacationDetail::TYPE_MONTHLY:
-                $startDate = Carbon::now()->startOfMonth();
-                $endDate = Carbon::now()->endOfMonth();
-                $appliedVacations = AppliedVacation::getAppliedHours($employeeId, $startDate, $endDate, $benefit['name'], $benefit['id'] ?? null);
-                Log::info($benefit['name']);
-                Log::info($startDate);
-                Log::info($endDate);
-                Log::info($appliedVacations);
-                Log::info($value);
+                $appliedVacations = AppliedVacation::getAppliedHours($employeeId, Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth(), $benefit['name']);
                 $this->employeesData[$employeeId]['vacationBenefits'][$key]['current_balance'] = round($value - $appliedVacations, 2);
                 break;
             case VacationDetail::TYPE_WEEKLY:
-                $appliedVacations = AppliedVacation::getAppliedHours($employeeId, Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek(), $benefit['name'], $benefit['id'] ?? null);
+                $appliedVacations = AppliedVacation::getAppliedHours($employeeId, Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek(), $benefit['name']);
                 $this->employeesData[$employeeId]['vacationBenefits'][$key]['current_balance'] = round($value - $appliedVacations, 2);
                 break;
             case VacationDetail::TYPE_QUARTERLY:
-                $appliedVacations = AppliedVacation::getAppliedHours($employeeId, Carbon::now()->startOfQuarter(), Carbon::now()->endOfQuarter(), $benefit['name'], $benefit['id'] ?? null);
+                $appliedVacations = AppliedVacation::getAppliedHours($employeeId, Carbon::now()->startOfQuarter(), Carbon::now()->endOfQuarter(), $benefit['name']);
                 $this->employeesData[$employeeId]['vacationBenefits'][$key]['current_balance'] = round($value - $appliedVacations, 2);
                 break;
             case VacationDetail::TYPE_DAILY:

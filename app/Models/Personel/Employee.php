@@ -592,6 +592,7 @@ class Employee extends Model
                     'vacation_benefit_id' => $vacationBenefit->id,
                     'hours' => $hours_count,
                     'new_balance' => $currentBalance - $hours_count,
+                    'name' => $vacationBenefit->name,
                     'status' => $is_approved ? AppliedVacation::STATUS_APPROVED : AppliedVacation::STATUS_PENDING,
                 ]);
                 // dd($days);

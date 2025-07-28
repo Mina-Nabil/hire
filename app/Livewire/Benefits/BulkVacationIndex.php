@@ -93,7 +93,9 @@ class BulkVacationIndex extends Component
             $employeeData['selectedPackage'] = $selectedPackage;
 
             // Load existing vacation benefits
-            $vacationBenefits = $employee->vacationBenefits()->byPackage($selectedPackageId)->get()->map(function ($benefit) {
+            $vacationBenefits = $employee->vacationBenefits()
+            ->current(Carbon::now())
+            ->byPackage($selectedPackageId)->get()->map(function ($benefit) {
                 $tmpVacationDetail = VacationDetail::find($benefit->vacation_detail_id);
                 return [
                     'vacation_detail_id' => $benefit->vacation_detail_id,

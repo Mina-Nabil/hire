@@ -45,29 +45,30 @@ class ApplyVacationsModal extends Component
         }
 
         $this->selectedPackage = VacationPackage::with(['vacationDetails'])->findOrFail($this->selectedPackageId);
-        $this->vacationBenefits = $this->selectedEmployee->vacationBenefits()->byPackage($this->selectedPackageId)->get()->map(function ($benefit) {
-            $tmpVacationDetail = VacationDetail::find($benefit->vacation_detail_id);
-            return [
-                'vacation_detail_id' => $benefit->vacation_detail_id,
-                'name' => $benefit->name,
-                'inc_rate' => $benefit->inc_rate,
-                'max_balance' => $benefit->max_balance,
-                'hour_price' => $benefit->hour_price,
-                'current_balance' => $benefit->current_balance,
-                'original_current_balance' => $benefit->current_balance,
-                'type' => $benefit->type,
-                'start_date' => $benefit->start_date,
-                'end_date' => $benefit->end_date,
-                'inc_rate_min' => $tmpVacationDetail->inc_rate_min,
-                'inc_rate_max' => $tmpVacationDetail->inc_rate_max,
-                'max_balance_min' => $tmpVacationDetail->max_balance_min,
-                'max_balance_max' => $tmpVacationDetail->max_balance_max,
-                'hour_price_min' => $tmpVacationDetail->hour_price_min,
-                'hour_price_max' => $tmpVacationDetail->hour_price_max,
-                'automatic_add_to_balance' => $benefit->automatic_add_to_balance ?? false,
-                'is_disabled' => true,
-            ];
-        })->toArray();
+        $this->vacationBenefits = $this->selectedEmployee->vacationBenefits()->current(Carbon::now())
+            ->byPackage($this->selectedPackageId)->get()->map(function ($benefit) {
+                $tmpVacationDetail = VacationDetail::find($benefit->vacation_detail_id);
+                return [
+                    'vacation_detail_id' => $benefit->vacation_detail_id,
+                    'name' => $benefit->name,
+                    'inc_rate' => $benefit->inc_rate,
+                    'max_balance' => $benefit->max_balance,
+                    'hour_price' => $benefit->hour_price,
+                    'current_balance' => $benefit->current_balance,
+                    'original_current_balance' => $benefit->current_balance,
+                    'type' => $benefit->type,
+                    'start_date' => $benefit->start_date,
+                    'end_date' => $benefit->end_date,
+                    'inc_rate_min' => $tmpVacationDetail->inc_rate_min,
+                    'inc_rate_max' => $tmpVacationDetail->inc_rate_max,
+                    'max_balance_min' => $tmpVacationDetail->max_balance_min,
+                    'max_balance_max' => $tmpVacationDetail->max_balance_max,
+                    'hour_price_min' => $tmpVacationDetail->hour_price_min,
+                    'hour_price_max' => $tmpVacationDetail->hour_price_max,
+                    'automatic_add_to_balance' => $benefit->automatic_add_to_balance ?? false,
+                    'is_disabled' => true,
+                ];
+            })->toArray();
 
         if (count($this->vacationBenefits)) {
             if ($this->vacationBenefits[0]['start_date']) {

@@ -99,6 +99,7 @@ class BulkVacationIndex extends Component
             ->byPackage($selectedPackageId)->get()->map(function ($benefit) {
                 $tmpVacationDetail = VacationDetail::find($benefit->vacation_detail_id);
                 return [
+                    'id' => $benefit->id,
                     'vacation_detail_id' => $benefit->vacation_detail_id,
                     'name' => $benefit->name,
                     'inc_rate' => $benefit->inc_rate,

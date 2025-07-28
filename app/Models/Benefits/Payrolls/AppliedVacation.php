@@ -79,9 +79,9 @@ class AppliedVacation extends Model
         }
     }
 
-    public static function getAppliedHours($startDate, $endDate, $vacationBenefitName, $vacationBenefitId = null)
+    public static function getAppliedHours($employeeId, $startDate, $endDate, $vacationBenefitName, $vacationBenefitId = null)
     {
-        return self::currentBalance($startDate, $endDate, $vacationBenefitName, $vacationBenefitId)->sum('hours');
+        return self::currentBalance($employeeId, $startDate, $endDate, $vacationBenefitName, $vacationBenefitId)->sum('hours');
     }
 
     ///scopes
@@ -100,9 +100,11 @@ class AppliedVacation extends Model
         return $query;
     }
 
-    public function scopeCurrentBalance($query, Carbon $startDate, Carbon $endDate, $vacationBenefitName, $vacationBenefitId = null)
+    public function scopeCurrentBalance($query, $employeeId, Carbon $startDate, Carbon $endDate, $vacationBenefitName, $vacationBenefitId = null)
     {
-        $query->whereNot('status', self::STATUS_REJECTED)
+        $query
+            ->where('employee_id', $employeeId)
+        ->whereNot('status', self::STATUS_REJECTED)
             ->whereHas('vacationDays', function ($q) use ($startDate, $endDate) {
                 $q->where('vacation_date', '>=', $startDate->format('Y-m-d'))
                     ->where('vacation_date', '<=', $endDate->format('Y-m-d'));

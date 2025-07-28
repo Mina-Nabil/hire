@@ -115,7 +115,7 @@
                                             style="min-width: 180px;"
                                             wire:change="loadVacationPackage({{ $employee->id }})"
                                             class="form-control text-xs py-1 px-2 w-full">
-                                            <option value="">Select Package</option>
+                                            <option value="" selected>Select Package</option>
                                             @foreach ($packages as $package)
                                                 <option value="{{ $package->id }}">{{ $package->name }}</option>
                                             @endforeach

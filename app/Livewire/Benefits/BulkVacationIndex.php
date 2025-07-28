@@ -136,8 +136,12 @@ class BulkVacationIndex extends Component
             $employeeData['deleteOldConf'] = true;
         } else {
             // Set default values
-            $employeeData['selectedPackageId'] = VacationPackage::first()->id;
-            $this->loadVacationPackage($employeeId);
+            $employeeData['selectedPackageId'] = null;
+            $employeeData['selectedPackage'] = null;
+            $employeeData['vacationBenefits'] = [];
+            $employeeData['packageStartDate'] = Carbon::now()->format('Y-m-d');
+            $employeeData['packageEndDate'] = null;
+            $employeeData['deleteOldConf'] = true;
         }
 
         $this->employeesData[$employeeId] = $employeeData;

@@ -145,25 +145,25 @@ class ApplyVacationsModal extends Component
             case VacationDetail::TYPE_YEARLY:
                 $endOfYear = $startDate->clone()->endOfYear();
                 $leftRatio = $endOfYear->diffInDays($startDate, true) / 365;
-                $appliedVacations = AppliedVacation::currentBalance($this->vacationBenefits[$key], $startDate, $endOfYear)->count();
+                $appliedVacations = AppliedVacation::currentBalance($startDate, $endOfYear, $this->vacationBenefits[$key]['name'], $this->vacationBenefits[$key]['id'] ?? null)->count();
                 $this->vacationBenefits[$key]['current_balance'] = ($value * $leftRatio) - $appliedVacations;
                 break;
             case VacationDetail::TYPE_MONTHLY:
                 $endOfMonth = $startDate->clone()->endOfMonth();
                 $leftRatio = $endOfMonth->diffInDays($startDate, true) / 30;
-                $appliedVacations = AppliedVacation::currentBalance($this->vacationBenefits[$key], $startDate, $endOfMonth)->count();
+                $appliedVacations = AppliedVacation::currentBalance($startDate, $endOfMonth, $this->vacationBenefits[$key]['name'], $this->vacationBenefits[$key]['id'] ?? null)->count();
                 $this->vacationBenefits[$key]['current_balance'] = ($value * $leftRatio) - $appliedVacations;
                 break;
             case VacationDetail::TYPE_WEEKLY:
                 $endOfWeek = $startDate->clone()->endOfWeek();
                 $leftRatio = $endOfWeek->diffInDays($startDate, true) / 7;
-                $appliedVacations = AppliedVacation::currentBalance($this->vacationBenefits[$key], $startDate, $endOfWeek)->count();
+                $appliedVacations = AppliedVacation::currentBalance($startDate, $endOfWeek, $this->vacationBenefits[$key]['name'], $this->vacationBenefits[$key]['id'] ?? null)->count();
                 $this->vacationBenefits[$key]['current_balance'] = ($value * $leftRatio) - $appliedVacations;
                 break;
             case VacationDetail::TYPE_QUARTERLY:
                 $endOfQuarter = $startDate->clone()->endOfQuarter();
                 $leftRatio = $endOfQuarter->diffInDays($startDate, true) / 90;
-                $appliedVacations = AppliedVacation::currentBalance($this->vacationBenefits[$key], $startDate, $endOfQuarter)->count();
+                $appliedVacations = AppliedVacation::currentBalance($startDate, $endOfQuarter, $this->vacationBenefits[$key]['name'], $this->vacationBenefits[$key]['id'] ?? null)->count();
                 $this->vacationBenefits[$key]['current_balance'] = ($value * $leftRatio) - $appliedVacations;
                 break;
 

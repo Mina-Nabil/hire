@@ -13,7 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('applied_vacations', function (Blueprint $table) {
-            $table->string('name')->nullable()->after('vacation_detail_id');
+            $table->string('name')->nullable();
         });
         foreach(AppliedVacation::all() as $appliedVacation){
             $appliedVacation->name = $appliedVacation->vacationBenefit->name;

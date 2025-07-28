@@ -3,6 +3,7 @@
 namespace App\Livewire\Benefits;
 
 use App\Models\Benefits\Configurations\VacationPackage;
+use App\Models\Benefits\Payrolls\AppliedVacation;
 use App\Models\Benefits\Vacations\VacationDetail;
 use App\Models\Personel\Employee;
 use App\Traits\AlertFrontEnd;
@@ -135,12 +136,8 @@ class BulkVacationIndex extends Component
             $employeeData['deleteOldConf'] = true;
         } else {
             // Set default values
-            $employeeData['selectedPackageId'] = null;
-            $employeeData['selectedPackage'] = null;
-            $employeeData['vacationBenefits'] = [];
-            $employeeData['packageStartDate'] = Carbon::now()->format('Y-m-d');
-            $employeeData['packageEndDate'] = null;
-            $employeeData['deleteOldConf'] = true;
+            $employeeData['selectedPackageId'] = VacationPackage::first()->id;
+            $this->loadVacationPackage($employeeId);
         }
 
         $this->employeesData[$employeeId] = $employeeData;
@@ -191,6 +188,7 @@ class BulkVacationIndex extends Component
         $benefit = $this->employeesData[$employeeId]['vacationBenefits'][$key];
         $value = $benefit['inc_rate'];
         $currentBalance = $benefit['original_current_balance'] ?? 0;
+        $appliedVacations = AppliedVacation::where('employee_id', $employeeId)->where('vacation_detail_id', $benefit['vacation_detail_id'])->get();
         $startDate = Carbon::parse($benefit['start_date'] ?? $this->employeesData[$employeeId]['packageStartDate'] ?? Carbon::now()->format('Y-m-d'));
         $startDate = $startDate->isBefore(Carbon::now()->startOfYear()) ? Carbon::now()->startOfYear() : $startDate;
         switch ($benefit['type']) {

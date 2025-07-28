@@ -8,6 +8,7 @@ use App\Models\Benefits\Vacations\VacationBenefit;
 use App\Models\Benefits\Payrolls\Payroll;
 use App\Models\Benefits\Vacations\VacationDay;
 use App\Models\Users\AppLog;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -91,6 +92,18 @@ class AppliedVacation extends Model
                     $q->where('manager_id', $loggedInUser->employee_id);
                 });
         });
+        return $query;
+    }
+
+    public function scopeCurrentBalance($query, $vacationDetail, Carbon $startDate, Carbon $endDate)
+    {
+        $query->where('status', self::STATUS_APPROVED)
+            ->where('start_date', '<=', $startDate->format('Y-m-d'))
+            ->where('end_date', '>=', $endDate->format('Y-m-d'))
+            ->where(function ($q) use ($vacationDetail) {
+                $q->where('vacation_detail_id', $vacationDetail->id)
+                    ->orWhere('name', $vacationDetail->name);
+            });
         return $query;
     }
 

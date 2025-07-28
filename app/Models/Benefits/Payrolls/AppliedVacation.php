@@ -79,6 +79,16 @@ class AppliedVacation extends Model
         }
     }
 
+    public static function getAppliedHours($startDate, $endDate, $vacationBenefitName, $vacationBenefitId = null)
+    {
+        $vacationBenefits = self::currentBalance($startDate, $endDate, $vacationBenefitName, $vacationBenefitId)->get();
+        $appliedHours = 0;
+        foreach ($vacationBenefits as $vacationBenefit) {
+            $appliedHours += $vacationBenefit->vacationDays->sum('hours');
+        }
+        return $appliedHours;
+    }
+
     ///scopes
     public function scopeUserData($query)
     {

@@ -98,8 +98,10 @@ class AppliedVacation extends Model
     public function scopeCurrentBalance($query, $vacationDetail, Carbon $startDate, Carbon $endDate)
     {
         $query->where('status', self::STATUS_APPROVED)
-            ->where('start_date', '<=', $startDate->format('Y-m-d'))
-            ->where('end_date', '>=', $endDate->format('Y-m-d'))
+            ->whereHas('vacationDays', function ($q) use ($startDate, $endDate) {
+                $q->where('start_date', '<=', $startDate->format('Y-m-d'))
+                    ->where('end_date', '>=', $endDate->format('Y-m-d'));
+            })
             ->where(function ($q) use ($vacationDetail) {
                 $q->where('vacation_detail_id', $vacationDetail->id)
                     ->orWhere('name', $vacationDetail->name);

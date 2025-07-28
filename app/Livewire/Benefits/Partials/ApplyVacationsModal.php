@@ -150,8 +150,6 @@ class ApplyVacationsModal extends Component
                 break;
             case VacationDetail::TYPE_MONTHLY:
                 $appliedVacations = AppliedVacation::getAppliedHours($this->selectedEmployee->id, Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth(), $this->vacationBenefits[$key]['name'], $this->vacationBenefits[$key]['id'] ?? null);
-                Log::info($appliedVacations);
-                Log::info($value);
                 $this->vacationBenefits[$key]['current_balance'] = round($value - $appliedVacations, 2);
                 break;
             case VacationDetail::TYPE_WEEKLY:

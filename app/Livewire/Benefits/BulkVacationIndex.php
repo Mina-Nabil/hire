@@ -120,16 +120,20 @@ class BulkVacationIndex extends Component
             $employeeData['vacationBenefits'] = $vacationBenefits;
 
             // Set start and end dates
-            if (count($vacationBenefits)) {
-                if ($vacationBenefits[0]['start_date']) {
-                    $employeeData['packageStartDate'] = Carbon::parse($vacationBenefits[0]['start_date'])->format('Y-m-d');
-                } else {
-                    $employeeData['packageStartDate'] = Carbon::now()->format('Y-m-d');
-                }
-                if ($vacationBenefits[0]['end_date']) {
-                    $employeeData['packageEndDate'] = Carbon::parse($vacationBenefits[0]['end_date'])->format('Y-m-d');
-                } else {
-                    $employeeData['packageEndDate'] = null;
+            if ($employee->benefitConfiguration->start_date) {
+                $employeeData['packageStartDate'] = Carbon::parse($employee->benefitConfiguration->start_date)->format('Y-m-d');
+            } else {
+                if (count($vacationBenefits)) {
+                    if ($vacationBenefits[0]['start_date']) {
+                        $employeeData['packageStartDate'] = Carbon::parse($vacationBenefits[0]['start_date'])->format('Y-m-d');
+                    } else {
+                        $employeeData['packageStartDate'] = Carbon::now()->format('Y-m-d');
+                    }
+                    if ($vacationBenefits[0]['end_date']) {
+                        $employeeData['packageEndDate'] = Carbon::parse($vacationBenefits[0]['end_date'])->format('Y-m-d');
+                    } else {
+                        $employeeData['packageEndDate'] = null;
+                    }
                 }
             }
 

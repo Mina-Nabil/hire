@@ -100,7 +100,7 @@ class AppliedVacation extends Model
         return $query;
     }
 
-    public function scopeCurrentBalance($query, $employeeId, Carbon $startDate, Carbon $endDate, $vacationBenefitName, $vacationBenefitId = null)
+    public function scopeCurrentBalance($query, $employeeId, Carbon $startDate, Carbon $endDate, $vacationBenefitName)
     {
         $query
             ->where('employee_id', $employeeId)
@@ -109,13 +109,7 @@ class AppliedVacation extends Model
                 $q->where('vacation_date', '>=', $startDate->format('Y-m-d'))
                     ->where('vacation_date', '<=', $endDate->format('Y-m-d'));
             })
-            ->where(function ($q) use ($vacationBenefitId, $vacationBenefitName) {
-                $q->when($vacationBenefitId, function ($q) use ($vacationBenefitId) {
-                    $q->where('vacation_benefit_id', $vacationBenefitId);
-                })->when(!$vacationBenefitId && $vacationBenefitName, function ($q) use ($vacationBenefitName) {
-                    $q->where('name', $vacationBenefitName);
-                });
-            });
+            ->where('name', $vacationBenefitName);
         return $query;
     }
 

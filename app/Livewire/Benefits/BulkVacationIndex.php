@@ -211,8 +211,12 @@ class BulkVacationIndex extends Component
                 $this->employeesData[$employeeId]['vacationBenefits'][$key]['current_balance'] = round(($value * $leftRatio) - $appliedVacations, 2);
                 break;
             case VacationDetail::TYPE_MONTHLY:
-                $appliedVacations = AppliedVacation::getAppliedHours($employeeId, Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth(), $benefit['name'], $benefit['id'] ?? null);
+                $startDate = Carbon::now()->startOfMonth();
+                $endDate = Carbon::now()->endOfMonth();
+                $appliedVacations = AppliedVacation::getAppliedHours($employeeId, $startDate, $endDate, $benefit['name'], $benefit['id'] ?? null);
                 Log::info($benefit['name']);
+                Log::info($startDate);
+                Log::info($endDate);
                 Log::info($appliedVacations);
                 Log::info($value);
                 $this->employeesData[$employeeId]['vacationBenefits'][$key]['current_balance'] = round($value - $appliedVacations, 2);

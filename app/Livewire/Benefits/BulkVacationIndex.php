@@ -206,6 +206,9 @@ class BulkVacationIndex extends Component
                 $endOfYear = $startDate->clone()->endOfYear();
                 $leftRatio = $endOfYear->diffInDays($startDate, true) / 365;
                 $appliedVacations = AppliedVacation::currentBalance($startDate, $endOfYear, $benefit['name'], $benefit['id'] ?? null)->count();
+                Log::info($appliedVacations);
+                Log::info($value);
+                Log::info($leftRatio);
                 $this->employeesData[$employeeId]['vacationBenefits'][$key]['current_balance'] = ($value * $leftRatio) - $appliedVacations;
                 break;
             case VacationDetail::TYPE_MONTHLY:

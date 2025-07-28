@@ -302,7 +302,7 @@ class Employee extends Model
         } catch (Exception $e) {
             report($e);
             AppLog::error('Error applying vacation package', $e->getMessage(), loggable: $this);
-            throw new AppException('Error applying benefits package');
+            throw new AppException('Error applying benefits package - try without deleting old configuration');
         }
     }
 

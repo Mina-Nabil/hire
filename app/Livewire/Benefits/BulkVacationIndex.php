@@ -139,7 +139,7 @@ class BulkVacationIndex extends Component
                     $employeeData['packageEndDate'] = null;
                 }
             } else {
-                $employeeData['packageStartDate'] = Carbon::startOfYear()->format('Y-m-d');
+                $employeeData['packageStartDate'] = Carbon::now()->startOfYear()->format('Y-m-d');
                 $employeeData['packageEndDate'] = null;
             }
 

@@ -212,7 +212,7 @@ class BulkVacationIndex extends Component
                 break;
             case VacationDetail::TYPE_MONTHLY:
                 $endOfMonth = $startDate->clone()->endOfMonth();
-                $leftRatio = $endOfMonth->diffInDays($startDate, true) / 30;
+                $leftRatio = $endOfMonth->diffInDays($startDate, true) / $startDate->daysInMonth;
                 $appliedVacations = AppliedVacation::getAppliedHours($employeeId, $startDate, $endOfMonth, $benefit['name'], $benefit['id'] ?? null);
                 $this->employeesData[$employeeId]['vacationBenefits'][$key]['current_balance'] = round(($value * $leftRatio) - $appliedVacations, 2);
                 break;
@@ -224,7 +224,7 @@ class BulkVacationIndex extends Component
                 break;
             case VacationDetail::TYPE_QUARTERLY:
                 $endOfQuarter = $startDate->clone()->endOfQuarter();
-                $leftRatio = $endOfQuarter->diffInDays($startDate, true) / 90;
+                $leftRatio = $endOfQuarter->diffInDays($startDate, true) / $startDate->daysInQuarter;
                 $appliedVacations = AppliedVacation::getAppliedHours($employeeId, $startDate, $endOfQuarter, $benefit['name'], $benefit['id'] ?? null);
                 $this->employeesData[$employeeId]['vacationBenefits'][$key]['current_balance'] = round(($value * $leftRatio) - $appliedVacations, 2);
                 break;

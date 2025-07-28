@@ -109,8 +109,8 @@ class AppliedVacation extends Model
     {
         $query->whereNot('status', self::STATUS_REJECTED)
             ->whereHas('vacationDays', function ($q) use ($startDate, $endDate) {
-                $q->where('vacation_date', '<=', $startDate->format('Y-m-d'))
-                    ->where('vacation_date', '>=', $endDate->format('Y-m-d'));
+                $q->where('vacation_date', '>=', $startDate->format('Y-m-d'))
+                    ->where('vacation_date', '<=', $endDate->format('Y-m-d'));
             })
             ->where(function ($q) use ($vacationBenefitId, $vacationBenefitName) {
                 $q->when($vacationBenefitId, function ($q) use ($vacationBenefitId) {

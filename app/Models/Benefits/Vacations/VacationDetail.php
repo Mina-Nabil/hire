@@ -4,6 +4,7 @@ namespace App\Models\Benefits\Vacations;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Benefits\Configurations\SalaryGrade;
+use App\Models\Benefits\Configurations\VacationPackage;
 
 class VacationDetail extends Model
 {
@@ -38,8 +39,8 @@ class VacationDetail extends Model
     ];
 
 
-    public function salaryGrade()
+    public function vacationPackage()
     {
-        return $this->belongsTo(SalaryGrade::class);
+        return $this->belongsTo(VacationPackage::class);
     }
 }

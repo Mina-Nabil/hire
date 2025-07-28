@@ -286,7 +286,7 @@ class Employee extends Model
                 if ($delete_old_conf) {
                     $this->vacationBenefits()->delete();
                 } else {
-                    $start_date = Carbon::parse($this->vacationBenefits()->first()->start_date);
+                    $start_date = $this->benefitConfiguration->start_date ? Carbon::parse($this->benefitConfiguration->start_date) : Carbon::parse($this->vacationBenefits()->first()->start_date);
                     $this->vacationBenefits()->update([
                         'end_date' => $start_date->subDay()->format('Y-m-d'),
                     ]);

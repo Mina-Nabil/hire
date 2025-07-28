@@ -176,7 +176,7 @@ return new class extends Migration
             //deduct from vacation balance and give money to employee
             $table->id();
             $table->foreignIdFor(Employee::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(VacationBenefit::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(VacationBenefit::class)->constrained()->restrictOnDelete();
             $table->foreignIdFor(Payroll::class)->nullable()->constrained()->cascadeOnDelete();
             $table->decimal('amount', 10, 2);
             $table->decimal('new_balance', 10, 2);
@@ -202,7 +202,7 @@ return new class extends Migration
             //remove from vacation balance
             $table->id();
             $table->foreignIdFor(Employee::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(VacationBenefit::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(VacationBenefit::class)->constrained()->restrictOnDelete();
             $table->foreignIdFor(Payroll::class)->nullable()->constrained()->nullOnDelete();
             $table->enum('status', AppliedVacation::STATUS_LIST)->default(AppliedVacation::STATUS_PENDING);
             $table->unsignedInteger('hours');
@@ -221,7 +221,7 @@ return new class extends Migration
             //add to vacation balance
             $table->id();
             $table->foreignIdFor(Employee::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(VacationBenefit::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(VacationBenefit::class)->constrained()->restrictOnDelete();
             $table->decimal('days', 10, 2);
             $table->decimal('new_balance', 10, 2);
             $table->timestamps();

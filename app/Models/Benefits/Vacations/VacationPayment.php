@@ -23,4 +23,10 @@ class VacationPayment extends Model
         return $this->belongsTo(Employee::class);
     }
     
+
+    public function vacationBenefit()
+    {
+        return $this->belongsTo(VacationBenefit::class);
+    }
+
 }

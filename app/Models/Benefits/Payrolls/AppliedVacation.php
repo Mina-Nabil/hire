@@ -84,7 +84,8 @@ class AppliedVacation extends Model
     {
         $query = self::currentBalance($employeeId, $startDate, $endDate, $vacationBenefitName, $vacationBenefitId);
         Log::info($query->toSql());
-        Log::info($query->get());
+        Log::info($query->getBindings());
+        // Log::info($query->get());
         return $query->sum('hours');
     }
 

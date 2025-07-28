@@ -149,7 +149,7 @@ class BulkVacationIndex extends Component
 
     public function loadVacationPackage($employeeId)
     {
-        if (!$this->employeesData[$employeeId]['selectedPackageId']) {
+        if (!$this->employeesData[$employeeId]['selectedPackageId'] || $this->employeesData[$employeeId]['selectedPackageId'] == 'select') {
             return;
         }
 

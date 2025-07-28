@@ -83,9 +83,6 @@ class AppliedVacation extends Model
     public static function getAppliedHours($employeeId, $startDate, $endDate, $vacationBenefitName, $vacationBenefitId = null)
     {
         $query = self::currentBalance($employeeId, $startDate, $endDate, $vacationBenefitName, $vacationBenefitId);
-        Log::info($query->toSql());
-        Log::info($query->getBindings());
-        // Log::info($query->get());
         return $query->sum('hours');
     }
 

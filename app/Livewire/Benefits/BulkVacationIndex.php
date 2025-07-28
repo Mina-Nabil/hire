@@ -205,7 +205,7 @@ class BulkVacationIndex extends Component
             case VacationDetail::TYPE_YEARLY:
                 $endOfYear = $startDate->clone()->endOfYear();
                 $leftRatio = $endOfYear->diffInDays($startDate, true) / 365;
-                $appliedVacations = AppliedVacation::currentBalance($startDate, $endOfYear, $benefit['name'], $benefit['id'] ?? null)->count();
+                $appliedVacations = AppliedVacation::currentBalance($startDate, $endOfYear, $benefit['name'], $benefit['id'] ?? null)->sum('vacation_days.hours');
                 Log::info($appliedVacations);
                 Log::info($value);
                 Log::info($leftRatio);
@@ -214,19 +214,19 @@ class BulkVacationIndex extends Component
             case VacationDetail::TYPE_MONTHLY:
                 $endOfMonth = $startDate->clone()->endOfMonth();
                 $leftRatio = $endOfMonth->diffInDays($startDate, true) / 30;
-                $appliedVacations = AppliedVacation::currentBalance($startDate, $endOfMonth, $benefit['name'], $benefit['id'] ?? null)->count();
+                $appliedVacations = AppliedVacation::currentBalance($startDate, $endOfMonth, $benefit['name'], $benefit['id'] ?? null)->sum('vacation_days.hours');
                 $this->employeesData[$employeeId]['vacationBenefits'][$key]['current_balance'] = ($value * $leftRatio) - $appliedVacations;
                 break;
             case VacationDetail::TYPE_WEEKLY:
                 $endOfWeek = $startDate->clone()->endOfWeek();
                 $leftRatio = $endOfWeek->diffInDays($startDate, true) / 7;
-                $appliedVacations = AppliedVacation::currentBalance($startDate, $endOfWeek, $benefit['name'], $benefit['id'] ?? null)->count();
+                $appliedVacations = AppliedVacation::currentBalance($startDate, $endOfWeek, $benefit['name'], $benefit['id'] ?? null)->sum('vacation_days.hours');
                 $this->employeesData[$employeeId]['vacationBenefits'][$key]['current_balance'] = ($value * $leftRatio) - $appliedVacations;
                 break;
             case VacationDetail::TYPE_QUARTERLY:
                 $endOfQuarter = $startDate->clone()->endOfQuarter();
                 $leftRatio = $endOfQuarter->diffInDays($startDate, true) / 90;
-                $appliedVacations = AppliedVacation::currentBalance($startDate, $endOfQuarter, $benefit['name'], $benefit['id'] ?? null)->count();
+                $appliedVacations = AppliedVacation::currentBalance($startDate, $endOfQuarter, $benefit['name'], $benefit['id'] ?? null)->sum('vacation_days.hours');
                 $this->employeesData[$employeeId]['vacationBenefits'][$key]['current_balance'] = ($value * $leftRatio) - $appliedVacations;
                 break;
             case VacationDetail::TYPE_DAILY:

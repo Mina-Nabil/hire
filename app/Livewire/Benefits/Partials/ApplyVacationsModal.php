@@ -146,25 +146,25 @@ class ApplyVacationsModal extends Component
                 $endOfYear = $startDate->clone()->endOfYear();
                 $leftRatio = $endOfYear->diffInDays($startDate, true) / 365;
                 $appliedVacations = AppliedVacation::getAppliedHours($this->selectedEmployee->id, $startDate, $endOfYear, $this->vacationBenefits[$key]['name'], $this->vacationBenefits[$key]['id'] ?? null);
-                $this->vacationBenefits[$key]['current_balance'] = ($value * $leftRatio) - $appliedVacations;
+                $this->vacationBenefits[$key]['current_balance'] = round(($value * $leftRatio) - $appliedVacations, 2);
                 break;
             case VacationDetail::TYPE_MONTHLY:
                 $endOfMonth = $startDate->clone()->endOfMonth();
                 $leftRatio = $endOfMonth->diffInDays($startDate, true) / 30;
                 $appliedVacations = AppliedVacation::getAppliedHours($this->selectedEmployee->id, $startDate, $endOfMonth, $this->vacationBenefits[$key]['name'], $this->vacationBenefits[$key]['id'] ?? null);
-                $this->vacationBenefits[$key]['current_balance'] = ($value * $leftRatio) - $appliedVacations;
+                $this->vacationBenefits[$key]['current_balance'] = round(($value * $leftRatio) - $appliedVacations, 2);
                 break;
             case VacationDetail::TYPE_WEEKLY:
                 $endOfWeek = $startDate->clone()->endOfWeek();
                 $leftRatio = $endOfWeek->diffInDays($startDate, true) / 7;
                 $appliedVacations = AppliedVacation::getAppliedHours($this->selectedEmployee->id, $startDate, $endOfWeek, $this->vacationBenefits[$key]['name'], $this->vacationBenefits[$key]['id'] ?? null);
-                $this->vacationBenefits[$key]['current_balance'] = ($value * $leftRatio) - $appliedVacations;
+                $this->vacationBenefits[$key]['current_balance'] = round(($value * $leftRatio) - $appliedVacations, 2);
                 break;
             case VacationDetail::TYPE_QUARTERLY:
                 $endOfQuarter = $startDate->clone()->endOfQuarter();
                 $leftRatio = $endOfQuarter->diffInDays($startDate, true) / 90;
                 $appliedVacations = AppliedVacation::getAppliedHours($this->selectedEmployee->id, $startDate, $endOfQuarter, $this->vacationBenefits[$key]['name'], $this->vacationBenefits[$key]['id'] ?? null);
-                $this->vacationBenefits[$key]['current_balance'] = ($value * $leftRatio) - $appliedVacations;
+                $this->vacationBenefits[$key]['current_balance'] = round(($value * $leftRatio) - $appliedVacations, 2);
                 break;
 
             case VacationDetail::TYPE_DAILY:

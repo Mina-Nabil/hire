@@ -4110,7 +4110,7 @@ class Employee extends Model
         $workingDayEndMax = $benefitConfig->working_day_end_max;
 
         // Get public holidays in the date range
-        $publicHolidays = PublicHoliday::whereBetween('date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+        $publicHolidays = PublicHoliday::whereBetween('date', [$startDate->format('Y-m-d 00:00:00'), $endDate->format('Y-m-d 23:59:59')])
             ->pluck('date')
             ->map(function ($date) {
                 return Carbon::parse($date)->format('Y-m-d');
@@ -4120,7 +4120,7 @@ class Employee extends Model
         $approvedVacations = $this->appliedVacations()
             ->where('status', AppliedVacation::STATUS_APPROVED)
             ->whereHas('vacationDays', function ($query) use ($startDate, $endDate) {
-                $query->whereBetween('vacation_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')]);
+                $query->whereBetween('vacation_date', [$startDate->format('Y-m-d 00:00:00'), $endDate->format('Y-m-d 23:59:59')]);
             })
             ->with('vacationDays')
             ->get();

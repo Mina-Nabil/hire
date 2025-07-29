@@ -4103,7 +4103,6 @@ class Employee extends Model
             ]; // No benefit configuration
         }
 
-        $dailyWorkingHours = $benefitConfig->daily_working_hours ?? 8;
         $workingDayStartMin = $benefitConfig->working_day_start_min;
         $workingDayStartMax = $benefitConfig->working_day_start_max;
         $workingDayEndMin = $benefitConfig->working_day_end_min;
@@ -4124,11 +4123,11 @@ class Employee extends Model
             })
             ->with('vacationDays')
             ->get();
-
+        Log::info('approved vacations', ['approvedVacations' => $approvedVacations->count()]);
         $totalVacationHours = 0;
         $totalPenaltyHours = 0;
         // Get missed working hours (full days with no attendance) - already excludes public holidays
-        $missedDays = $this->getMissedWorkingDays($penaltyDays, (clone $approvedVacations), $totalPenaltyHours, $totalVacationHours, $startDate, $endDate, true);
+        // $missedDays = $this->getMissedWorkingDays($penaltyDays, (clone $approvedVacations), $totalPenaltyHours, $totalVacationHours, $startDate, $endDate, true);
 
         // Get all attendance records for the period
         $attendanceQuery = $this->attendances()
@@ -4227,16 +4226,11 @@ class Employee extends Model
                     $attendance->save();
                 }
 
-                if ($this->id == 1) {
-                    Log::info('penalty hours for day', ['penaltyHoursForDay' => $penaltyHoursForDay]);
-                }
                 $totalPenaltyHours += $penaltyHoursForDay;
                 $totalVacationHours += $vacationHoursForDay;
             }
         }
-        if ($this->id == 1) {
-            Log::info('total penalty hours 2', ['totalPenaltyHours' => $totalPenaltyHours]);
-        }
+
         return [
             'total_penalty_hours' => $totalPenaltyHours,
             'total_vacation_hours' => $totalVacationHours,

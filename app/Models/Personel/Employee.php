@@ -4407,6 +4407,7 @@ class Employee extends Model
                     Log::info('actualPenaltyHours', ['actualPenaltyHours' => $actualPenaltyHours]);
                     Log::info('workingDiff', ['workingDiff' => $workingDiff]);
                     Log::info('vacationHours', ['vacationHours' => $vacationHours]);
+                    Log::info('effectiveWorkingHours', ['effectiveWorkingHours' => $effectiveWorkingHours]);
                     $penaltyDays[] = [
                         'date' => $attendanceStart->format('Y-m-d'),
                         'hours' => $actualPenaltyHours,

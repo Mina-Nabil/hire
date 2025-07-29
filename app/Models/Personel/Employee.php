@@ -3921,7 +3921,9 @@ class Employee extends Model
 
         // Check if the missing days are in the vacation days
         foreach ($missingDays as $missingDay) {
-            $vacationHours = $approvedVacations->where('vacationDays.vacation_date', $missingDay)->sum('hours');
+            $vacationHours = $approvedVacations->filter(function ($vacation) use ($missingDay) {
+                return $vacation->vacationDays->contains('vacation_date', $missingDay);
+            })->sum('hours');
             $totalVacationHours += $vacationHours;
             $missingHours = ($this->benefitConfiguration?->daily_working_hours ?? 8) - $vacationHours;
             if ($missingHours > 0) {
@@ -4150,7 +4152,9 @@ class Employee extends Model
 
             // Handle no start or end time
             if ((!$attendance->start_time && $attendance->end_time) || ($attendance->start_time && !$attendance->end_time)) {
-                $vacationHours = (clone $approvedVacations)->where('vacationDays.vacation_date', $attendance->date)->sum('hours');
+                $vacationHours = (clone $approvedVacations)->filter(function ($vacation) use ($attendance) {
+                    return $vacation->vacationDays->contains('vacation_date', $attendance->date);
+                })->sum('hours');
                 $penaltyHours = $this->benefitConfiguration->daily_working_hours - $vacationHours;
                 if ($penaltyHours > 0) {
                     $penaltyDays[] = [
@@ -4163,7 +4167,9 @@ class Employee extends Model
                     $penaltyHoursForDay += $penaltyHours;
                 }
             } elseif (!$attendance->start_time && !$attendance->end_time) {
-                $vacationHours = (clone $approvedVacations)->where('vacationDays.vacation_date', $attendance->date)->sum('hours');
+                $vacationHours = (clone $approvedVacations)->filter(function ($vacation) use ($attendance) {
+                    return $vacation->vacationDays->contains('vacation_date', $attendance->date);
+                })->sum('hours');
 
                 $penaltyHours = $this->benefitConfiguration->daily_working_hours - $vacationHours;
                 if ($penaltyHours > 0) {
@@ -4265,7 +4271,9 @@ class Employee extends Model
     ) {
         $penaltiesGenerated = 0;
         $penaltyHours = 0;
-        $vacationHours = $approvedVacations->where('vacationDays.vacation_date', $attendanceStart->format('Y-m-d'))->sum('hours');
+        $vacationHours = $approvedVacations->filter(function ($vacation) use ($attendanceStart) {
+            return $vacation->vacationDays->contains('vacation_date', $attendanceStart->format('Y-m-d'));
+        })->sum('hours');
         Log::info('Checking ' . $date . ' for employee ' . $this->id);
         Log::info('vacation hours', ['vacationHours' => $vacationHours]);
         // If no time constraints are set, use the actual hours worked
@@ -4425,7 +4433,9 @@ class Employee extends Model
         $allowedStartMax = Carbon::parse($busArrival->date . ' ' . $busArrival->time);
         $allowedEndMin = Carbon::parse($attendanceStart->format('Y-m-d') . ' ' . $workingDayEndMin);
 
-        $vacationHours = $approvedVacations->where('vacationDays.vacation_date', $attendanceStart->format('Y-m-d'))->sum('hours');
+        $vacationHours = $approvedVacations->filter(function ($vacation) use ($attendanceStart) {
+            return $vacation->vacationDays->contains('vacation_date', $attendanceStart->format('Y-m-d'));
+        })->sum('hours');
 
         // Leaving early penalty
         if ($attendanceEnd->lt($allowedEndMin)) {
@@ -4481,7 +4491,9 @@ class Employee extends Model
     ) {
         $penaltyHours = 0;
         $allowedStartMax = Carbon::parse($workingDayStartMax);
-        $vacationHours = $approvedVacations->where('vacationDays.vacation_date', $attendanceStart->format('Y-m-d'))->sum('hours');
+        $vacationHours = $approvedVacations->filter(function ($vacation) use ($attendanceStart) {
+            return $vacation->vacationDays->contains('vacation_date', $attendanceStart->format('Y-m-d'));
+        })->sum('hours');
         if ($attendanceStart->gt($allowedStartMax)) {
             $penaltyHours += $attendanceStart->diffInHours($allowedStartMax, true);
             if ($penaltyHours > $vacationHours) {

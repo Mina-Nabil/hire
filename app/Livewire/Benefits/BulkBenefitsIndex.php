@@ -217,7 +217,7 @@ class BulkBenefitsIndex extends Component
         }
 
         $this->employeesData[$employeeId]['selectedPackage'] = $package;
-        $this->employeesData[$employeeId]['packageStartDate'] = Carbon::parse($package->start_date)->format('Y-m-d');
+        // $this->employeesData[$employeeId]['packageStartDate'] = Carbon::parse($package->start_date)->format('Y-m-d');
         $this->employeesData[$employeeId]['packageDetails'] = $package->packageDetails->mapWithKeys(function ($detail) {
             return [
                 $detail->name => [

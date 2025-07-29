@@ -4287,6 +4287,7 @@ class Employee extends Model
                     $vacationHours = 0;
                     $actualPenaltyHours = $this->calculateLateArrivalPenalty(($this->benefitConfiguration->daily_working_hours - $workingHours) * 60);
                     if ($actualPenaltyHours) {
+                        Log::info('actualPenaltyHours', ['actualPenaltyHours' => $actualPenaltyHours]);
                         $penaltyDays[] = [
                             'date' => $date,
                             'hours' => $actualPenaltyHours,
@@ -4325,12 +4326,12 @@ class Employee extends Model
 
         if ($attendanceStart->gt($allowedStartMax)) {
             $startDiff = $attendanceStart->diffInHours($allowedStartMax, true);
-            Log::info('startDiff', ['startDiff' => $startDiff]);
+            // Log::info('startDiff', ['startDiff' => $startDiff]);
             $penaltyHours += $startDiff;
-            Log::info('penaltyHours', ['penaltyHours' => $penaltyHours]);
-            Log::info('vacationHours', ['vacationHours' => $vacationHours]);
+            // Log::info('penaltyHours', ['penaltyHours' => $penaltyHours]);
+            // Log::info('vacationHours', ['vacationHours' => $vacationHours]);
             if ($penaltyHours > $vacationHours) {
-                Log::info('penaltyHours > vacationHours');
+                // Log::info('penaltyHours > vacationHours');
                 // If employee has less vacation hours than penalty hours, calculate the penalty hours
                 $penaltyHours = ($penaltyHours - $vacationHours);
                 $vacationHoursForDay += $vacationHours;
@@ -4338,6 +4339,10 @@ class Employee extends Model
                 $vacationHours = 0;
                 $actualPenaltyHours = $this->calculateLateArrivalPenalty($penaltyHours * 60);
                 if ($actualPenaltyHours) {
+                    Log::info('date', ['date' => $attendanceStart->format('Y-m-d')]);
+                    Log::info('actualPenaltyHours', ['actualPenaltyHours' => $actualPenaltyHours]);
+                    Log::info('penaltyHours', ['penaltyHours' => $penaltyHours]);
+                    Log::info('vacationHours', ['vacationHours' => $vacationHours]);
                     $penaltyDays[] = [
                         'date' => $attendanceStart->format('Y-m-d'),
                         'hours' => $actualPenaltyHours,

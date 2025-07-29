@@ -4275,7 +4275,6 @@ class Employee extends Model
             return $vacation->vacationDays->contains('vacation_date', $attendanceStart->format('Y-m-d'));
         })->sum('hours');
         Log::info('Checking ' . $date . ' for employee ' . $this->id);
-        Log::info('vacation hours', ['vacationHours' => $vacationHours]);
         // If no time constraints are set, use the actual hours worked
         if (!$workingDayStartMin || !$workingDayStartMax || !$workingDayEndMin || !$workingDayEndMax) {
             $workingHours = $attendanceStart->diffInHours($attendanceEnd);
@@ -4329,7 +4328,9 @@ class Employee extends Model
             Log::info('startDiff', ['startDiff' => $startDiff]);
             $penaltyHours += $startDiff;
             Log::info('penaltyHours', ['penaltyHours' => $penaltyHours]);
+            Log::info('vacationHours', ['vacationHours' => $vacationHours]);
             if ($penaltyHours > $vacationHours) {
+                Log::info('penaltyHours > vacationHours');
                 // If employee has less vacation hours than penalty hours, calculate the penalty hours
                 $penaltyHours = ($penaltyHours - $vacationHours);
                 $vacationHoursForDay += $vacationHours;

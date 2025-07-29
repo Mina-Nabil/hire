@@ -4127,7 +4127,7 @@ class Employee extends Model
         $totalVacationHours = 0;
         $totalPenaltyHours = 0;
         // Get missed working hours (full days with no attendance) - already excludes public holidays
-        // $missedDays = $this->getMissedWorkingDays($penaltyDays, (clone $approvedVacations), $totalPenaltyHours, $totalVacationHours, $startDate, $endDate, true);
+        $this->getMissedWorkingDays($penaltyDays, (clone $approvedVacations), $totalPenaltyHours, $totalVacationHours, $startDate, $endDate, true);
 
         // Get all attendance records for the period
         $attendanceQuery = $this->attendances()

@@ -4328,7 +4328,7 @@ class Employee extends Model
             $startDiff = $attendanceStart->diffInHours($allowedStartMax, true);
             Log::info('startDiff', ['startDiff' => $startDiff]);
             $penaltyHours += $startDiff;
-
+            Log::info('penaltyHours', ['penaltyHours' => $penaltyHours]);
             if ($penaltyHours > $vacationHours) {
                 // If employee has less vacation hours than penalty hours, calculate the penalty hours
                 $penaltyHours = ($penaltyHours - $vacationHours);

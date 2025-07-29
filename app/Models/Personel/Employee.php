@@ -4326,12 +4326,9 @@ class Employee extends Model
 
         if ($attendanceStart->gt($allowedStartMax)) {
             $startDiff = $attendanceStart->diffInHours($allowedStartMax, true);
-            // Log::info('startDiff', ['startDiff' => $startDiff]);
             $penaltyHours += $startDiff;
-            // Log::info('penaltyHours', ['penaltyHours' => $penaltyHours]);
-            // Log::info('vacationHours', ['vacationHours' => $vacationHours]);
             if ($penaltyHours > $vacationHours) {
-                // Log::info('penaltyHours > vacationHours');
+
                 // If employee has less vacation hours than penalty hours, calculate the penalty hours
                 $penaltyHours = ($penaltyHours - $vacationHours);
                 $vacationHoursForDay += $vacationHours;
@@ -4339,10 +4336,6 @@ class Employee extends Model
                 $vacationHours = 0;
                 $actualPenaltyHours = $this->calculateLateArrivalPenalty($penaltyHours * 60);
                 if ($actualPenaltyHours) {
-                    // Log::info('date', ['date' => $attendanceStart->format('Y-m-d')]);
-                    // Log::info('actualPenaltyHours', ['actualPenaltyHours' => $actualPenaltyHours]);
-                    // Log::info('penaltyHours', ['penaltyHours' => $penaltyHours]);
-                    // Log::info('vacationHours', ['vacationHours' => $vacationHours]);
                     $penaltyDays[] = [
                         'date' => $attendanceStart->format('Y-m-d'),
                         'hours' => $actualPenaltyHours,
@@ -4353,8 +4346,8 @@ class Employee extends Model
                 }
             } else {
                 // If employee has enough vacation hours, reduce the vacation hours
+                $vacationHoursForDay += $penaltyHours;
                 $vacationHours = $vacationHours - $penaltyHours;
-                $vacationHoursForDay += $vacationHours;
                 $penaltyHours = 0;
             }
         } else {
@@ -4383,8 +4376,8 @@ class Employee extends Model
                 }
                 $vacationHours = 0;
             } else {
+                $vacationHoursForDay += $penaltyHours;
                 $vacationHours = $vacationHours - $penaltyHours;
-                $vacationHoursForDay += $vacationHours;
                 $penaltyHours = 0;
             }
         } else {
@@ -4397,7 +4390,9 @@ class Employee extends Model
             $workingDiff = $this->benefitConfiguration->daily_working_hours - $effectiveWorkingHours - $vacationHours - $vacationHoursForDay;
             if ($workingDiff > 0) {
                 $penaltyHours += $workingDiff;
-                $vacationHoursForDay += $vacationHours;
+                if ($vacationHours > 0) {
+                    $vacationHoursForDay += $workingDiff;
+                }
                 $penaltyHoursForDay += $workingDiff;
                 $vacationHours = 0;
                 $actualPenaltyHours = $this->calculateLateArrivalPenalty($workingDiff * 60);

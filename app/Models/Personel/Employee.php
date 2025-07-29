@@ -4353,8 +4353,8 @@ class Employee extends Model
                 }
             } else {
                 // If employee has enough vacation hours, reduce the vacation hours
-                $vacationHoursForDay += $vacationHours;
                 $vacationHours = $vacationHours - $penaltyHours;
+                $vacationHoursForDay += $vacationHours;
                 $penaltyHours = 0;
             }
         } else {
@@ -4383,8 +4383,8 @@ class Employee extends Model
                 }
                 $vacationHours = 0;
             } else {
-                $vacationHoursForDay += $vacationHours;
                 $vacationHours = $vacationHours - $penaltyHours;
+                $vacationHoursForDay += $vacationHours;
                 $penaltyHours = 0;
             }
         } else {
@@ -4394,12 +4394,8 @@ class Employee extends Model
 
         if ($penaltiesGenerated == 0) {
             $effectiveWorkingHours = $effectiveStart->diffInHours($effectiveEnd, true);
-            $workingDiff = $this->benefitConfiguration->daily_working_hours - $effectiveWorkingHours - $vacationHoursForDay - $vacationHours;
+            $workingDiff = $this->benefitConfiguration->daily_working_hours - $effectiveWorkingHours - $vacationHours - $vacationHoursForDay;
             if ($workingDiff > 0) {
-                Log::info('date', ['date' => $attendanceStart->format('Y-m-d')]);
-                Log::info('vacationHours', ['vacationHours' => $vacationHours]);
-                Log::info('workingDiff', ['workingDiff' => $workingDiff]);
-                Log::info('effectiveWorkingHours', ['effectiveWorkingHours' => $effectiveWorkingHours]);
                 $penaltyHours += $workingDiff;
                 $vacationHoursForDay += $vacationHours;
                 $penaltyHoursForDay += $workingDiff;

@@ -21,10 +21,10 @@ return new class extends Migration
             $table->foreign('vacation_benefit_id')->references('id')->on('vacation_benefits')->onDelete('restrict');
         });
 
-        Schema::table('vacation_benefits', function (Blueprint $table) {
-            $table->dropForeign(['vacation_detail_id']);
-            $table->foreign('vacation_detail_id')->references('id')->on('vacation_details')->onDelete('restrict');
-        });
+        // Schema::table('vacation_benefits', function (Blueprint $table) {
+        //     $table->dropForeign(['vacation_detail_id']);
+        //     $table->foreign('vacation_detail_id')->references('id')->on('vacation_details')->onDelete('restrict');
+        // });
     }
 
     /**

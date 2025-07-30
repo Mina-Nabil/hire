@@ -56,6 +56,7 @@ class Payroll extends Model
     ];
 
     const EMPLOYEE_SHARE_SOCIAL_INSURANCE = 0.11;
+    const EMPLOYEE_ABOVE_60_SHARE_SOCIAL_INSURANCE = 0.01;
     const EMPLOYER_SHARE_SOCIAL_INSURANCE = 0.1875;
 
     // Tax brackets and rates

@@ -2931,6 +2931,12 @@ class Employee extends Model
         })->get();
     }
 
+
+    public function getAgeAttribute()
+    {
+        return $this->birth_date ? Carbon::now()->diffInYears($this->birth_date, true) : null;
+    }
+
     //// relations ////
     public function user()
     {

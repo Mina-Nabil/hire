@@ -315,7 +315,7 @@ class CreatePayroll extends Component
 
             $grossSalary = ($employee->benefitConfiguration?->gross_salary ?? 0) * $grossPercentage / 100;
             $insuranceAmount = $employee->benefitConfiguration?->insurance_amount ?? 0;
-            $employeeInsurance = $insuranceAmount * Payroll::EMPLOYEE_SHARE_SOCIAL_INSURANCE;
+            $employeeInsurance = $insuranceAmount * ($employee->age >= 60 ? Payroll::EMPLOYEE_ABOVE_60_SHARE_SOCIAL_INSURANCE : Payroll::EMPLOYEE_SHARE_SOCIAL_INSURANCE);
             $employerInsurance = $insuranceAmount * Payroll::EMPLOYER_SHARE_SOCIAL_INSURANCE;
             $totalInsurance = $employeeInsurance + $employerInsurance;
             $otherAmount = $grossSalary - $insuranceAmount - $employeeInsurance ?? 0;

@@ -420,7 +420,7 @@ class CreatePayroll extends Component
             $adjDesc = '';
 
             // Calculate net income with overtime and adjustment
-            $netAfterDeductions = $netAfterPenalty + $extraPayments + $overtimeAmount + $adjAmount - $employeeMedical;
+            $netAfterDeductions = $netAfterPenalty + $overtimeAmount + $adjAmount;
 
             // Add to department totals
             $departmentGroups[$departmentId]['totals']['gross_salary'] += $grossSalary;

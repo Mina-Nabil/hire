@@ -235,7 +235,19 @@ class Attendance extends Model
             DB::transaction(function () use ($attendance) {
                 foreach ($attendance as $attendanceData) {
                     if (!isset($attendanceData['error']) || !$attendanceData['error']) {
-                        $attendanceRecord = Attendance::create($attendanceData);
+                        $attendanceRecord = Attendance::updateOrCreate(
+                            [
+                                'employee_id' => $attendanceData['employee_id'],
+                                'date' => $attendanceData['date'],
+                            ],
+                            [
+                                'start_time' => $attendanceData['start_time'],
+                                'end_time' => $attendanceData['end_time'],
+                                'hours' => $attendanceData['hours'],
+                                'extra_hours' => $attendanceData['extra_hours'],
+                                'is_extra_hours_approved' => $attendanceData['is_extra_hours_approved'],
+                            ]
+                        );
                         $attendanceRecord->generateOvertime();
 
                         // Check if employee worked on a day they shouldn't have and add vacation balance

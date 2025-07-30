@@ -72,7 +72,7 @@ class ExtraPayment extends Model
                     'amount' => $amount,
                     'due_date' => $due_date,
                     'desc' => $desc,
-                    'status' => self::STATUS_PENDING,
+                    'status' => self::STATUS_APPROVED, //only hr and admin can create extra payment
                 ]);
 
                 AppLog::info('Extra Payment Created', "Employee: $employee->name, Amount: $amount, Name: $name", loggable: $extraPayment);

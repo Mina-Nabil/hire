@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\IncrementVacationBenefits;
 use App\Jobs\ProcessDailyAttendanceJob;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -16,6 +17,13 @@ Schedule::job(new ProcessDailyAttendanceJob())
     ->description('Process daily attendance records from employee punches')
     ->withoutOverlapping() // Prevent multiple instances from running simultaneously
     ->appendOutputTo(storage_path('logs/daily-attendance-processing.log'));
+
+Schedule::job(new IncrementVacationBenefits())
+    ->daily()
+    ->at('02:00') // Run at 2:00 AM to increment vacation benefits
+    ->description('Increment vacation benefits')
+    ->withoutOverlapping() // Prevent multiple instances from running simultaneously
+    ->appendOutputTo(storage_path('logs/increment-vacation-benefits.log'));
 
 // Add a command to manually trigger the attendance processing for a specific date
 Artisan::command('attendance:process {date?}', function (string $date = null) {

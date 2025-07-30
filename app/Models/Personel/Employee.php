@@ -4881,10 +4881,9 @@ class Employee extends Model
         return $this->hasMany(\App\Models\Benefits\Payrolls\ExtraPayment::class);
     }
 
-    public function getNegativeExtraPayments($startDate, $endDate): float
+    public function getExtraPayments($startDate, $endDate): float
     {
         return $this->extraPayments()
-            ->where('amount', '<', 0)
             ->whereBetween('due_date', [$startDate, $endDate])
             ->where('status', \App\Models\Benefits\Payrolls\ExtraPayment::STATUS_APPROVED)
             ->sum('amount') ?? 0;

@@ -356,7 +356,7 @@ class CreatePayroll extends Component
             $netAfterPenalty = $netIncome - $penaltyAmount;
 
             // Get extra payments
-            $extraPayments = $employee->getNegativeExtraPayments($this->startDate, $this->endDate);
+            $extraPayments = $employee->getExtraPayments($this->startDate, $this->endDate);
 
             // Calculate overtime
             $overtimeHours = 0;

@@ -488,7 +488,7 @@ class Attendance extends Model
         $isAppliedVacation = AppliedVacation::where('employee_id', $employee->id)
             ->where('status', AppliedVacation::STATUS_APPROVED)
             ->whereHas('vacationDays', function ($query) use ($date) {
-                $query->where('date', $date->format('Y-m-d'));
+                $query->where('vacation_date', $date->format('Y-m-d'));
             })
             ->exists();
         if ($isAppliedVacation) {

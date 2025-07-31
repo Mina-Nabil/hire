@@ -501,7 +501,7 @@ class Attendance extends Model
     {
         /** @var User $user */
         $user = Auth::user();
-        if (!$user->can('editAttendance', $this->employee)) {
+        if (!$user->can('update', $this)) {
             throw new AppException('You dont have permission to edit attendance');
         }
 

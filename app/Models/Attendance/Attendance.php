@@ -142,9 +142,42 @@ class Attendance extends Model
         for ($row = 2; $row <= $highestRow; $row++) {
 
             $employeeName = trim($sheet->getCell('A' . $row)->getValueString());
-            if (!$employeeName) continue;
+            if (!$employeeName) {
+                $attendance[] = [
+                    'employee_id' => "Not Found",
+                    'employee' => null,
+                    'uploaded_name' => $employeeName,
+                    'attendance_type' => "N/A",
+                    'date' => null,
+                    'start_time' => null,
+                    'end_time' => null,
+                    'hours' => null,
+                    'extra_hours' => null,
+                    'is_extra_hours_approved' => null,
+                    'is_approved' => null,
+                    "error" => true,
+                    'creator_id' => Auth::id(),
+                ];
+                continue;
+            }
 
-            if (!$sheet->getCell('B' . $row)->getValue() || !$sheet->getCell('C' . $row)->getValue()) continue; //if the start time is empty, skip the row
+            if (!$sheet->getCell('B' . $row)->getValue() || !$sheet->getCell('C' . $row)->getValue()) {
+                $attendance[] = [
+                    'employee_id' => "Not Found",
+                    'employee' => null,
+                    'uploaded_name' => $employeeName,
+                    'attendance_type' => "N/A",
+                    'date' => null,
+                    'start_time' => null,
+                    'end_time' => null,
+                    'hours' => null,
+                    'extra_hours' => null,
+                    'is_extra_hours_approved' => null,
+                    'is_approved' => null,
+                    "error" => true,
+                    'creator_id' => Auth::id(),
+                ];
+            } //if the start time is empty, skip the row
 
             $attendanceDay = new Carbon(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($sheet->getCell('B' . $row)->getValue()));
             $attendanceStartDate = new Carbon(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($sheet->getCell('C' . $row)->getValue()));

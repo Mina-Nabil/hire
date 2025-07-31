@@ -1948,7 +1948,7 @@
                                     <div>
                                         <span class="text-slate-500 dark:text-slate-400">Current Due Date:</span>
                                         <span
-                                            class="ml-2 font-medium">{{ $editingExtraPayment->due_date->format('d/m/Y') }}</span>
+                                            class="ml-2 font-medium">{{ $editingExtraPayment->due_date }}</span>
                                     </div>
                                 </div>
                             </div>

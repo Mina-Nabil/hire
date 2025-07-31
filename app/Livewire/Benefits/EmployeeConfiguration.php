@@ -597,6 +597,21 @@ class EmployeeConfiguration extends Component
         }
     }
 
+    // --------- Extra Payment Delete Function ---------
+    public function deleteExtraPayment($extraPaymentId)
+    {
+        try {
+            $extraPayment = ExtraPayment::findOrFail($extraPaymentId);
+            $extraPayment->deleteExtraPayment();
+            $this->alertSuccess('Extra payment deleted successfully.');
+        } catch (AppException $e) {
+            $this->alertError($e->getMessage());
+        } catch (Exception $e) {
+            report($e);
+            $this->alertError('Error deleting extra payment. Please try again.');
+        }
+    }
+
     // --------- Extra Payment Edit Functions ---------
     public $showEditExtraPaymentModal = false;
     public $editingExtraPayment = null;

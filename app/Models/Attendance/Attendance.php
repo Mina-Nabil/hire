@@ -209,6 +209,7 @@ class Attendance extends Model
                     "error" => true,
                     'creator_id' => Auth::id(),
                 ];
+                continue;
             }
 
             $attendanceType = $employee->benefitConfiguration->attendance_calculation;

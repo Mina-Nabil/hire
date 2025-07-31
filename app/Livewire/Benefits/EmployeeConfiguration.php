@@ -621,7 +621,7 @@ class EmployeeConfiguration extends Component
     {
         try {
             $this->editingExtraPayment = ExtraPayment::findOrFail($extraPaymentId);
-            $this->editExtraPaymentDueDate = $this->editingExtraPayment->due_date?->format('Y-m-d') ?? null;
+            $this->editExtraPaymentDueDate = $this->editingExtraPayment->due_date;
             $this->showEditExtraPaymentModal = true;
         } catch (Exception $e) {
             $this->alertError('Error loading extra payment. Please try again.');

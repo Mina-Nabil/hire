@@ -482,7 +482,7 @@
                                                         @foreach ($extraPayments as $payment)
                                                             <tr>
                                                                 <td class="table-td">
-                                                                    {{ $payment->created_at->format('d/m/Y') }}</td>
+                                                                    {{ $payment->due_date }}</td>
                                                                 <td class="table-td">{{ $payment->amount }}</td>
                                                                 <td class="table-td">
                                                                     @if ($payment->payable_id)

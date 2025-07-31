@@ -504,17 +504,30 @@
                                                                 </td>
                                                                 <td class="table-td">{{ $payment->desc ?? '-' }}</td>
                                                                 <td class="table-td">
-                                                                    @can('editExtraPayment', $employee)
-                                                                        @if ($payment->status !== 'paid' && is_null($payment->payroll_id))
-                                                                            <button
-                                                                                wire:click="editExtraPayment({{ $payment->id }})"
-                                                                                class="btn btn-sm btn-primary"
-                                                                                title="Edit Due Date">
-                                                                                <iconify-icon
-                                                                                    icon="mdi:edit"></iconify-icon>
-                                                                            </button>
-                                                                        @endif
-                                                                    @endcan
+                                                                    <div class="flex space-x-2">
+                                                                        @can('editExtraPayment', $employee)
+                                                                            @if ($payment->status !== 'paid' && is_null($payment->payroll_id))
+                                                                                <button
+                                                                                    wire:click="editExtraPayment({{ $payment->id }})"
+                                                                                    class="btn btn-sm btn-primary"
+                                                                                    title="Edit Due Date">
+                                                                                    <iconify-icon
+                                                                                        icon="mdi:edit"></iconify-icon>
+                                                                                </button>
+                                                                            @endif
+                                                                        @endcan
+                                                                        @can('deleteExtraPayment', $employee)
+                                                                            @if ($payment->status !== 'paid' && is_null($payment->payroll_id))
+                                                                                <button
+                                                                                    wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to delete this extra payment?',color:'danger',callback:'deleteExtraPayment',params:{{ $payment->id }}})"
+                                                                                    class="btn btn-sm btn-danger"
+                                                                                    title="Delete Extra Payment">
+                                                                                    <iconify-icon
+                                                                                        icon="mdi:delete"></iconify-icon>
+                                                                                </button>
+                                                                            @endif
+                                                                        @endcan
+                                                                    </div>
                                                                 </td>
                                                             </tr>
                                                         @endforeach

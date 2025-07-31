@@ -282,6 +282,7 @@ class Attendance extends Model
                                 'hours' => $attendanceData['hours'],
                                 'extra_hours' => $attendanceData['extra_hours'],
                                 'is_extra_hours_approved' => $attendanceData['is_extra_hours_approved'],
+                                'creator_id' => Auth::id(),
                             ]
                         );
                         $attendanceRecord->generateOvertime();

@@ -230,7 +230,7 @@
                                     </td>
                                     <td class="table-td">
                                         <div class="flex items-center gap-2">
-                                            @if ($isManager || $isHr || $isAdmin)
+                                            @if ($isHr || $isAdmin)
                                                 <button wire:click="openEditTimes({{ $attendance->id }})" 
                                                     class="action-btn" type="button" 
                                                     title="Edit Attendance Times">

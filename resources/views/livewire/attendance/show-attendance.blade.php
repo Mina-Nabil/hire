@@ -70,6 +70,7 @@
                                 <th scope="col" class="table-th">Hours</th>
                                 <th scope="col" class="table-th">Extra Hours</th>
                                 <th scope="col" class="table-th">Extra Hours Status</th>
+                                <th scope="col" class="table-th">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
@@ -227,7 +228,17 @@
                                             @endif
                                         @endif
                                     </td>
-                                    
+                                    <td class="table-td">
+                                        <div class="flex items-center gap-2">
+                                            @if ($isManager || $isHr)
+                                                <button wire:click="openEditTimes({{ $attendance->id }})" 
+                                                    class="action-btn" type="button" 
+                                                    title="Edit Attendance Times">
+                                                    <iconify-icon icon="heroicons:clock"></iconify-icon>
+                                                </button>
+                                            @endif
+                                        </div>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -304,6 +315,67 @@
             <x-secondary-button wire:click="closeExtraHoursModal">Cancel</x-secondary-button>
             <x-primary-button wire:click.prevent="saveExtraHours" 
                 loadingFunction="saveExtraHours">Save Changes</x-primary-button>
+        </x-slot>
+    </x-modal>
+
+    <!-- Edit Attendance Times Modal -->
+    <x-modal wire:model="showEditTimesModal">
+        <x-slot name="title">Edit Attendance Times</x-slot>
+        
+        <!-- Modal body -->
+        <div class="p-6 space-y-4">
+            <div class="from-group">
+                <label class="form-label">Employee</label>
+                <input type="text" class="form-control" disabled value="{{ $editTimesEmployeeName }}">
+            </div>
+            
+            <div class="from-group">
+                <label class="form-label">Date</label>
+                <input type="text" class="form-control" disabled value="{{ $editTimesAttendanceDate }}">
+            </div>
+            
+            <div class="from-group">
+                <label class="form-label">Current Hours</label>
+                <input type="text" class="form-control" disabled value="{{ $editTimesCurrentHours }}">
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div class="from-group">
+                    <label class="form-label">Start Time <span class="text-danger-500">*</span></label>
+                    <input type="time" class="form-control @error('editStartTime') !border-danger-500 @enderror" 
+                        wire:model="editStartTime">
+                    @error('editStartTime')
+                        <span class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                    @enderror
+                </div>
+                
+                <div class="from-group">
+                    <label class="form-label">End Time</label>
+                    <input type="time" class="form-control @error('editEndTime') !border-danger-500 @enderror" 
+                        wire:model="editEndTime">
+                    @error('editEndTime')
+                        <span class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                    @enderror
+                </div>
+            </div>
+            
+            <div class="bg-slate-50 dark:bg-slate-700 p-3 rounded-md">
+                <div class="flex items-start">
+                    <iconify-icon class="text-lg text-warning-500 mr-2 mt-0.5" 
+                        icon="heroicons-outline:exclamation-circle"></iconify-icon>
+                    <p class="text-sm text-slate-600 dark:text-slate-300">
+                        Changing attendance times will automatically recalculate hours and overtime. 
+                        End time is optional - if not provided, the system will use the employee's daily working hours.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal footer -->
+        <x-slot name="footer">
+            <x-secondary-button wire:click="closeEditTimesModal">Cancel</x-secondary-button>
+            <x-primary-button wire:click.prevent="saveAttendanceTimes" 
+                loadingFunction="saveAttendanceTimes">Save Changes</x-primary-button>
         </x-slot>
     </x-modal>
 </div>

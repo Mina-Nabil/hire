@@ -490,6 +490,61 @@ class Attendance extends Model
     }
 
     /**
+     * Edit attendance times
+     * 
+     * @param string $start_time
+     * @param string|null $end_time
+     * @return void
+     * @throws AppException
+     */
+    public function editAttendanceTimes(string $start_time, ?string $end_time = null)
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        if (!$user->can('editAttendance', $this->employee)) {
+            throw new AppException('You dont have permission to edit attendance');
+        }
+
+        // Check if attendance is linked to payroll
+        if (!is_null($this->payroll_id)) {
+            throw new AppException('Cannot edit attendance: Record is linked to payroll');
+        }
+
+        try {
+            DB::transaction(function () use ($start_time, $end_time) {
+                $oldStartTime = $this->start_time;
+                $oldEndTime = $this->end_time;
+                $oldHours = $this->hours;
+
+                $this->start_time = $start_time;
+                $this->end_time = $end_time;
+
+                // Recalculate hours based on new times
+                if ($end_time) {
+                    $startTime = Carbon::parse($start_time);
+                    $endTime = Carbon::parse($end_time);
+                    $this->hours = abs(round($endTime->diffInHours($startTime), 2));
+                } else {
+                    // If no end time, use the employee's daily working hours
+                    $benefitConfig = $this->employee->benefitConfiguration;
+                    $this->hours = $benefitConfig ? $benefitConfig->daily_working_hours : 8;
+                }
+
+                $this->save();
+
+                // Regenerate overtime if needed
+                $this->generateOvertime();
+
+                AppLog::info('Attendance Times Edited', "Employee: {$this->employee->name}, Date: {$this->date}, Old Start: $oldStartTime, New Start: $start_time, Old End: $oldEndTime, New End: $end_time, Old Hours: $oldHours, New Hours: {$this->hours}", loggable: $this);
+            });
+        } catch (Exception $e) {
+            report($e);
+            AppLog::error('Error editing attendance times', $e->getMessage());
+            throw new AppException('Error editing attendance times');
+        }
+    }
+
+    /**
      * Check if employee worked on a day they shouldn't have and add vacation balance if applicable
      * 
      * @return void

@@ -32,6 +32,15 @@ class ShowAttendance extends Component
     public $isManager = false;
     public $isHr = false;
 
+    // Modal for attendance times editing
+    public $showEditTimesModal = false;
+    public $editingTimesAttendanceId = null;
+    public $editStartTime = '';
+    public $editEndTime = '';
+    public $editTimesEmployeeName = '';
+    public $editTimesAttendanceDate = '';
+    public $editTimesCurrentHours = '';
+
     public function mount()
     {
         // Check if the current user is a manager or HR
@@ -184,6 +193,55 @@ class ShowAttendance extends Component
             $this->closeExtraHoursModal();
         } catch (\Exception $e) {
             $this->alertError('Failed to update extra hours: ' . $e->getMessage());
+        }
+    }
+
+    // Open the modal to edit attendance times
+    public function openEditTimes($attendanceId)
+    {
+        $attendance = Attendance::with('employee')->findOrFail($attendanceId);
+        $this->editingTimesAttendanceId = $attendanceId;
+        $this->editStartTime = $attendance->start_time;
+        $this->editEndTime = $attendance->end_time;
+        $this->editTimesEmployeeName = $attendance->employee ? $attendance->employee->name : 'N/A';
+        $this->editTimesAttendanceDate = $attendance->date;
+        $this->editTimesCurrentHours = $attendance->hours;
+        $this->showEditTimesModal = true;
+    }
+    
+    // Close the modal and reset fields
+    public function closeEditTimesModal()
+    {
+        $this->showEditTimesModal = false;
+        $this->reset(['editingTimesAttendanceId', 'editStartTime', 'editEndTime', 'editTimesEmployeeName', 'editTimesAttendanceDate', 'editTimesCurrentHours']);
+    }
+    
+    // Save attendance times from the modal
+    public function saveAttendanceTimes()
+    {
+        // Validate
+        $this->validate([
+            'editStartTime' => 'required|date_format:H:i',
+            'editEndTime' => 'nullable|date_format:H:i|after:editStartTime',
+        ], [
+            'editStartTime.required' => 'Start time is required.',
+            'editStartTime.date_format' => 'Start time must be in HH:MM format.',
+            'editEndTime.date_format' => 'End time must be in HH:MM format.',
+            'editEndTime.after' => 'End time must be after start time.',
+        ]);
+        
+        try {
+            $attendance = Attendance::findOrFail($this->editingTimesAttendanceId);
+            
+            // Update the attendance times using the model method
+            $attendance->editAttendanceTimes($this->editStartTime, $this->editEndTime);
+            
+            $this->alertSuccess('Attendance times updated successfully!');
+            $this->closeEditTimesModal();
+        } catch (AppException $e) {
+            $this->alertError($e->getMessage());
+        } catch (\Exception $e) {
+            $this->alertError('Failed to update attendance times: ' . $e->getMessage());
         }
     }
 

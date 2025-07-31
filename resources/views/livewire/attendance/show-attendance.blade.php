@@ -230,13 +230,13 @@
                                     </td>
                                     <td class="table-td">
                                         <div class="flex items-center gap-2">
-                                            @if ($isHr || $isAdmin)
+                                            @can('update', $attendance)
                                                 <button wire:click="openEditTimes({{ $attendance->id }})" 
                                                     class="action-btn" type="button" 
                                                     title="Edit Attendance Times">
                                                     <iconify-icon icon="heroicons:clock"></iconify-icon>
                                                 </button>
-                                            @endif
+                                            @endcan
                                         </div>
                                     </td>
                                 </tr>

@@ -17,6 +17,7 @@
                 <th class="table-th">Before Tax</th>
                 <th class="table-th">Tax Amount</th>
                 <th class="table-th">Net After Tax Amount</th>
+                <th class="table-th">Employee Medical</th>
                 <th class="table-th">Employer Insurance</th>
                 <th class="table-th">Actions</th>
             </tr>
@@ -130,6 +131,7 @@
                         {{ number_format($payrollEmployee->net_after_deductions, 2) }}</td>
                     <td class="table-td">{{ number_format($payrollEmployee->tax_amount, 2) }}</td>
                     <td class="table-td">{{ number_format($payrollEmployee->after_tax_salary, 2) }}</td>
+                    <td class="table-td">{{ number_format($payrollEmployee->employee_medical, 2) }}</td>
                     <td class="table-td">{{ number_format($payrollEmployee->employer_insurance, 2) }}</td>
                     <td class="table-td">
                         <div class="flex space-x-2">
@@ -259,6 +261,11 @@
                 <td class="table-td border-t-2 border-slate-200 dark:border-slate-600">
                     <div class="text-sm font-bold">
                         {{ number_format($totals['after_tax_salary'], 2) }}
+                    </div>
+                </td>
+                <td class="table-td border-t-2 border-slate-200 dark:border-slate-600">
+                    <div class="text-sm font-bold">
+                        {{ number_format($totals['employee_medical'], 2) }}
                     </div>
                 </td>
                 <td class="table-td border-t-2 border-slate-200 dark:border-slate-600">

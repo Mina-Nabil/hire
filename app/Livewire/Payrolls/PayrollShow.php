@@ -488,6 +488,7 @@ class PayrollShow extends Component
                 'employer_insurance' => $totalsQuery->sum('employer_insurance'),
                 'employee_insurance' => $totalsQuery->sum('employee_insurance'),
                 'after_tax_salary' => $totalsQuery->sum('after_tax_salary'),
+                'employee_medical' => $totalsQuery->sum('employee_medical'),
             ];
             
             $data = [

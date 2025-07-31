@@ -102,7 +102,7 @@ class EmployeeConfiguration extends Component
         'desc' => '',
     ];
 
-    public $listeners = ['refreshConfiguration'];
+    public $listeners = ['refreshConfiguration', 'deleteExtraPayment'];
 
     public function refreshConfiguration()
     {

@@ -31,6 +31,7 @@ class ShowAttendance extends Component
     public $attendanceHours = '';
     public $isManager = false;
     public $isHr = false;
+    public $isAdmin = false;
 
     // Modal for attendance times editing
     public $showEditTimesModal = false;
@@ -46,7 +47,7 @@ class ShowAttendance extends Component
         // Check if the current user is a manager or HR
         $user = Auth::user();
         $this->isHr = $user && $user->is_hr;
-        
+        $this->isAdmin = $user && $user->is_admin;
         $employee = Employee::where('user_id', $user->id)->first();
         $this->isManager = $employee && $employee->is_manager;
     }
@@ -286,7 +287,8 @@ class ShowAttendance extends Component
         return view('livewire.attendance.show-attendance', [
             'attendances' => $attendances,
             'isManager' => $this->isManager,
-            'isHr' => $this->isHr
+            'isHr' => $this->isHr,
+            'isAdmin' => $this->isAdmin,
         ])->layout($layout);
     }
 }

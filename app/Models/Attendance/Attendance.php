@@ -143,21 +143,7 @@ class Attendance extends Model
 
             $employeeName = trim($sheet->getCell('A' . $row)->getValueString());
             if (!$employeeName) {
-                $attendance[] = [
-                    'employee_id' => "Not Found",
-                    'employee' => null,
-                    'uploaded_name' => $employeeName,
-                    'attendance_type' => "N/A",
-                    'date' => null,
-                    'start_time' => null,
-                    'end_time' => null,
-                    'hours' => null,
-                    'extra_hours' => null,
-                    'is_extra_hours_approved' => null,
-                    'is_approved' => null,
-                    "error" => true,
-                    'creator_id' => Auth::id(),
-                ];
+               
                 continue;
             }
 

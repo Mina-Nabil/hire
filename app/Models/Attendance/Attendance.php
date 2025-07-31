@@ -193,7 +193,23 @@ class Attendance extends Model
                 ];
                 continue;
             }
-            if (!$employee->benefitConfiguration || !$employee->benefitConfiguration->attendance_calculation)  continue;
+            if (!$employee->benefitConfiguration || !$employee->benefitConfiguration->attendance_calculation) { 
+                $attendance[] = [
+                    'employee_id' => "Not Found",
+                    'employee' => null,
+                    'uploaded_name' => $employeeName . " (No Attendance Calculation)",
+                    'attendance_type' => "N/A",
+                    'date' => $attendanceStartDate->format('Y-m-d'),
+                    'start_time' => $attendanceStartDate->format('H:i'),
+                    'end_time' => $attendanceEndDate ? $attendanceEndDate->format('H:i') : null,
+                    'hours' => null,
+                    'extra_hours' => null,
+                    'is_extra_hours_approved' => null,
+                    'is_approved' => null,
+                    "error" => true,
+                    'creator_id' => Auth::id(),
+                ];
+            }
 
             $attendanceType = $employee->benefitConfiguration->attendance_calculation;
 

@@ -119,4 +119,39 @@ class ExtraPayment extends Model
             throw new AppException('Error editing extra payment');
         }
     }
+
+    /**
+     * Delete an extra payment
+     * @return void
+     * @throws AppException
+     */
+    public function deleteExtraPayment()
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        if (!$user->can('deleteExtraPayment', $this->employee)) {
+            throw new AppException('You dont have permission to delete extra payment');
+        }
+
+        // Check if payment is paid or linked to payroll
+        if ($this->status === self::STATUS_PAID || !is_null($this->payroll_id)) {
+            throw new AppException('Cannot delete extra payment: Payment is already paid or linked to payroll');
+        }
+
+        try {
+            DB::transaction(function () {
+                $employeeName = $this->employee->name;
+                $paymentName = $this->name;
+                $amount = $this->amount;
+                
+                $this->delete();
+                
+                AppLog::info('Extra Payment Deleted', "Employee: $employeeName, Payment: $paymentName, Amount: $amount", loggable: null);
+            });
+        } catch (Exception $e) {
+            report($e);
+            AppLog::error('Error deleting extra payment', $e->getMessage());
+            throw new AppException('Error deleting extra payment');
+        }
+    }
 }

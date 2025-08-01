@@ -38,7 +38,7 @@ class ApplicantsCreateMin extends Component
     public $vacancyQuestions = [];
     // Current step
     public $currentStep = 1;
-    public $totalSteps = 8;
+    public $totalSteps = 2;
     // Current language
     public $locale;
 

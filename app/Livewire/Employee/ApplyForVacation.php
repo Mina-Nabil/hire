@@ -29,6 +29,7 @@ class ApplyForVacation extends Component
     public $fromDate;
     public $toDate;
     public $description;
+    public $isMission = false;
     public $showConfirmModal = false;
     public $selectedBenefit = null;
 
@@ -166,22 +167,25 @@ class ApplyForVacation extends Component
         }
 
         $this->validate([
-            'selectedBenefitId' => 'required',
+            'selectedBenefitId' => 'required_if:isMission,false',
             'days' => 'required|array|min:1',
             'days.*.vacation_date' => 'required|date',
             'days.*.hours' => 'required|numeric|min:1|max:24',
             'description' => 'nullable|string|max:255',
+            'isMission' => 'nullable|boolean',
         ]);
 
 
         try {
-            $this->selectedBenefit = VacationBenefit::findOrFail($this->selectedBenefitId);
-
-            if ($this->selectedBenefit->current_balance < $this->totalHours) {
-                $this->alertError('You don\'t have enough balance for this vacation request');
-                return;
+            if ($this->isMission) {
+                $this->selectedBenefit = null;
+            } else {
+                $this->selectedBenefit = VacationBenefit::findOrFail($this->selectedBenefitId);
+                if ($this->selectedBenefit->current_balance < $this->totalHours) {
+                    $this->alertError('You don\'t have enough balance for this vacation request');
+                    return;
+                }
             }
-
             $this->showConfirmModal = true;
         } catch (\Exception $e) {
             $this->alertError('Error: ' . $e->getMessage());
@@ -196,22 +200,29 @@ class ApplyForVacation extends Component
     public function submit()
     {
         if (empty($this->days)) {
-            $this->alertError('You must add at least one day for vacation');
+            $this->alertError('You must add at least one day for vacation or mission');
             return;
         }
 
         try {
-            $vacationBenefit = VacationBenefit::findOrFail($this->selectedBenefitId);
-
-            if ($vacationBenefit->current_balance < $this->totalHours) {
-                $this->alertError('You don\'t have enough balance for this vacation request');
-                return;
+            if ($this->isMission) {
+                $vacationBenefit = null;
+            } else {
+                $vacationBenefit = VacationBenefit::findOrFail($this->selectedBenefitId);
+                if ($vacationBenefit->current_balance < $this->totalHours) {
+                    $this->alertError('You don\'t have enough balance for this vacation or mission');
+                    return;
+                }
             }
 
-            $this->employee->applyForVacation($vacationBenefit, $this->totalHours, $this->days);
+            $this->employee->applyForVacation($this->isMission ? null : $vacationBenefit, $this->totalHours, $this->days, false, $this->isMission);
 
             $this->showConfirmModal = false;
-            $this->alertSuccess('Vacation request submitted successfully');
+            if ($this->isMission) {
+                $this->alertSuccess('Mission submitted successfully');
+            } else {
+                $this->alertSuccess('Vacation submitted successfully');
+            }
             $this->resetForm();
             $this->loadVacationBenefits();
         } catch (\Exception $e) {

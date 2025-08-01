@@ -165,7 +165,7 @@
                                 <li>
                                     <a class="{{ request()->routeIs('applied-vacation.index') ? 'active' : '' }}"
                                         href="{{ url('/attendance/applied-vacation') }}">
-                                        Applied Vacations</a>
+                                        Applied Time off</a>
                                 </li>
                             @endcan
                             {{-- @can('viewAny', App\Models\Attendance\Attendance::class)
@@ -179,7 +179,7 @@
                                 <li>
                                     <a class="{{ request()->routeIs('employee.apply-for-vacation') ? 'active' : '' }}"
                                         href="{{ route('employee.apply-for-vacation') }}">
-                                        Add a Vacation</a>
+                                        Add a Vacation/Mission</a>
                                 </li>
                             @endcan
 

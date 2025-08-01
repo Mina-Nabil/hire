@@ -2,7 +2,7 @@
     <div>
         <div class="card">
             <div class="card-header">
-                <h4 class="card-title">Apply for Vacation For ({{ $employee->name }})</h4>
+                <h4 class="card-title">Apply for {{ $isMission ? 'Mission' : 'Vacation' }} For ({{ $employee->name }})</h4>
             </div>
             <div class="card-body px-6 pb-6">
                 @if (!$employee)
@@ -12,7 +12,7 @@
                 @else
                     <form wire:submit.prevent="openConfirmModal">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5 mt-5">
-                            <!-- Vacation Type Selection -->
+                            <!-- Employee Selection -->
                             <x-select wire:model.live="selectedEmployee" label="Select Another Employee"
                                 errorMessage="{{ $errors->first('selectedEmployee') }}"
                                 class="w-full {{ $errors->has('selectedEmployee') ? '!border-danger-500' : '' }}">
@@ -24,17 +24,32 @@
                                 @endforeach
                             </x-select>
 
-                            <!-- Vacation Type Selection -->
-                            <x-select wire:model.live="selectedBenefitId" label="Vacation Type*"
-                                errorMessage="{{ $errors->first('selectedBenefitId') }}"
-                                class="w-full {{ $errors->has('selectedBenefitId') ? '!border-danger-500' : '' }}">
-                                <option value="">-- Select Vacation Type --</option>
-                                @foreach ($vacationBenefits as $benefit)
-                                    <option value="{{ $benefit->id }}">
-                                        {{ $benefit->name }} (Available: {{ $benefit->current_balance }} hours)
-                                    </option>
-                                @endforeach
-                            </x-select>
+                            <div>
+                                <!-- Mission Switch -->
+                                <div class="flex items-center space-x-3">
+                              
+
+                                    <!-- Vacation Type Selection -->
+                                    @if (!$isMission)
+                                        <x-select wire:model.live="selectedBenefitId" label="Vacation Type*"
+                                            errorMessage="{{ $errors->first('selectedBenefitId') }}" class="w-full">
+                                            <option value="">-- Select Vacation Type --</option>
+                                            @foreach ($vacationBenefits as $benefit)
+                                                <option value="{{ $benefit->id }}">
+                                                    {{ $benefit->name }} (Available: {{ $benefit->current_balance }}
+                                                    hours)
+                                                </option>
+                                            @endforeach
+                                        </x-select>
+                                    @endif
+                                    <label class="flex items-center cursor-pointer mt-5">
+                                        <input type="checkbox" wire:model.live="isMission"
+                                            class="form-checkbox h-5 w-5 text-primary-600">
+                                        <span class="ml-2 text-sm font-medium text-slate-700">Is Mission</span>
+                                    </label>
+
+                                </div>
+                            </div>
 
 
                             <div class="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -98,7 +113,8 @@
                                 </div>
                             </div>
                         @endif
-                        @if (count($vacationBenefits) === 0)
+
+                        @if (count($vacationBenefits) === 0 && !$isMission)
                             <div class="alert alert-info">
                                 Employee don't have any available vacation benefits or have no balance.
                             </div>
@@ -107,7 +123,7 @@
                             <div class="flex justify-end md:w-full">
                                 <x-primary-button type="submit" class="w-auto sm:w-full"
                                     loadingFunction="openConfirmModal">
-                                    Review Application
+                                    Review {{ $isMission ? 'Mission' : 'Vacation' }} Application
                                 </x-primary-button>
                             </div>
                         @endif
@@ -119,30 +135,35 @@
         <!-- Confirmation Modal -->
         <x-modal wire:model="showConfirmModal" maxWidth="4xl">
             <x-slot name="title">
-                Confirm Vacation Application
+                Confirm {{ $isMission ? 'Mission' : 'Vacation' }} Application
             </x-slot>
 
             <div class="py-4">
                 <div class="mb-5">
                     <h5 class="font-medium text-lg mb-3">Application Summary</h5>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div class="border rounded p-3">
-                            <p class="text-sm text-slate-500">Vacation Type</p>
-                            <p class="font-medium">{{ $selectedBenefit->name ?? '' }}</p>
-                        </div>
+                        @if (!$isMission)
+                            <div class="border rounded p-3">
+                                <p class="text-sm text-slate-500">Vacation Type</p>
+                                <p class="font-medium">{{ $selectedBenefit->name ?? '' }}</p>
+                            </div>
+                        @endif
                         <div class="border rounded p-3">
                             <p class="text-sm text-slate-500">Total Hours</p>
                             <p class="font-medium">{{ $totalHours }} hours</p>
                         </div>
-                        <div class="border rounded p-3">
-                            <p class="text-sm text-slate-500">Current Balance</p>
-                            <p class="font-medium">{{ $selectedBenefit->current_balance ?? 0 }} hours</p>
-                        </div>
-                        <div class="border rounded p-3">
-                            <p class="text-sm text-slate-500">New Balance After Approval</p>
-                            <p class="font-medium">{{ ($selectedBenefit->current_balance ?? 0) - $totalHours }} hours
-                            </p>
-                        </div>
+                        @if (!$isMission)
+                            <div class="border rounded p-3">
+                                <p class="text-sm text-slate-500">Current Balance</p>
+                                <p class="font-medium">{{ $selectedBenefit->current_balance ?? 0 }} hours</p>
+                            </div>
+                            <div class="border rounded p-3">
+                                <p class="text-sm text-slate-500">New Balance After Approval</p>
+                                <p class="font-medium">{{ ($selectedBenefit->current_balance ?? 0) - $totalHours }}
+                                    hours
+                                </p>
+                            </div>
+                        @endif
                         @if ($description)
                             <div class="border rounded p-3 md:col-span-2">
                                 <p class="text-sm text-slate-500">Reason</p>
@@ -187,7 +208,8 @@
                 <div class="mt-5 bg-yellow-50 p-3 rounded border border-yellow-200">
                     <p class="text-sm text-yellow-800">
                         <iconify-icon icon="mdi:information-outline" class="text-lg mr-1"></iconify-icon>
-                        Please confirm vacation application. Once submitted, it will be pending approval from HR.
+                        Please confirm {{ $isMission ? 'mission' : 'vacation' }} application. Once submitted, it will
+                        be pending approval from HR.
                     </p>
                 </div>
             </div>
@@ -198,16 +220,17 @@
                         Cancel
                     </button>
                     <x-primary-button wire:click="submit" loadingFunction="submit">
-                        Confirm & Submit
+                        Confirm & Submit {{ $isMission ? 'Mission' : 'Vacation' }}
                     </x-primary-button>
                 </div>
             </x-slot>
         </x-modal>
 
         <!-- Vacation Benefits Info -->
-        <div class="card mt-5">
+        <div class="card mt-5" {{ $isMission ? 'style="opacity: 0.5; pointer-events: none;"' : '' }}>
             <div class="card-header mb-5">
-                <h4 class="card-title">Vacation Benefits</h4>
+                <h4 class="card-title">
+                    {{ $isMission ? 'Vacation Benefits (Disabled for Mission)' : 'Vacation Benefits' }}</h4>
             </div>
             <div class="card-body px-6 pb-6">
                 @if (count($vacationBenefits) === 0)

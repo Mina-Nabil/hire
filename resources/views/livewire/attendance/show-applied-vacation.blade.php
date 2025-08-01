@@ -2,7 +2,7 @@
     <div class="flex justify-between flex-wrap items-center">
         <div class="md:mb-6 mb-4 flex space-x-3 rtl:space-x-reverse">
             <h4 class="font-medium lg:text-2xl text-xl capitalize text-slate-900 inline-block ltr:pr-4 rtl:pl-4">
-                Applied Vacation Records
+                Applied Time off Records
             </h4>
         </div>
     </div>
@@ -70,7 +70,7 @@
                         <thead class="border-t border-slate-100 dark:border-slate-800 bg-slate-200 dark:bg-slate-700">
                             <tr>
                                 <th scope="col" class="table-th">Employee</th>
-                                <th scope="col" class="table-th">Vacation Benefit</th>
+                                <th scope="col" class="table-th">Time off</th>
                                 <th scope="col" class="table-th">Days</th>
                                 <th scope="col" class="table-th">Hours</th>
                                 <th scope="col" class="table-th">New Balance</th>
@@ -109,7 +109,11 @@
                                     <td class="table-td">
                                         <div>
                                             <span class="text-sm text-slate-600 dark:text-slate-300">
-                                                {{ $appliedVacation->vacationBenefit ? $appliedVacation->vacationBenefit->name : 'N/A' }}
+                                                @if ($appliedVacation->is_mission)
+                                                    Mission
+                                                @else
+                                                    {{ $appliedVacation->vacationBenefit ? $appliedVacation->vacationBenefit->name : 'N/A' }}
+                                                @endif
                                             </span>
                                         </div>
                                     </td>

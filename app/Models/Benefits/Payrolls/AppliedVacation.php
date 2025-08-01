@@ -27,7 +27,8 @@ class AppliedVacation extends Model
         'days',
         'hours',
         'new_balance',
-        'note'
+        'note',
+        'is_mission',
     ];
     const STATUS_PENDING = 'pending';
     const STATUS_APPROVED = 'approved';
@@ -44,7 +45,7 @@ class AppliedVacation extends Model
         /** @var User $user */
         $user = Auth::user();
         if (!$user->can('approve', $this)) {
-            throw new AppException('You dont have permission to approve vacation');
+            throw new AppException('You dont have permission to approve vacation or mission');
         }
 
         $this->status = self::STATUS_APPROVED;
@@ -58,7 +59,7 @@ class AppliedVacation extends Model
         /** @var User $user */
         $user = Auth::user();
         if (!$user->can('reject', $this)) {
-            throw new AppException('You dont have permission to reject vacation');
+            throw new AppException('You dont have permission to reject vacation or mission');
         }
 
         try {

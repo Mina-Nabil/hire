@@ -548,61 +548,71 @@ class Employee extends Model
      * ]
      * @return void
      */
-    public function applyForVacation(VacationBenefit $vacationBenefit, float $hours_count, array $days = [], bool $is_approved = false)
+    public function applyForVacation(?VacationBenefit $vacationBenefit = null, float $hours_count, array $days = [], bool $is_approved = false, bool $is_mission = false)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
         if (!$loggedInUser->can('applyForVacation', $this)) {
-            throw new AppException('You dont have permission to apply for vacation');
+            throw new AppException('You dont have permission to apply for vacation or mission');
         }
 
-        $currentBalance = $vacationBenefit->current_balance;
-
-        if ($currentBalance < $hours_count) {
-            throw new AppException('You dont have enough vacation days');
-        }
-        $vacationBenefit->load('vacationDetail');
-        $applyDeadline = $vacationBenefit->apply_deadline;
-        $deadlineDate = Carbon::now()->addDays($applyDeadline)->setTime(23, 59, 59);
-
-        if (!$loggedInUser->can('applyLateForAny', AppliedVacation::class) && !$loggedInUser->can('applyForVacationLate', $this)) {
-            foreach ($days as $day) {
-                $dayDate = Carbon::parse($day['vacation_date']);
-                if ($dayDate->isBefore($deadlineDate)) {
-                    throw new AppException('You cannot apply for vacation after the apply deadline');
+        if ($is_mission) {
+            $currentBalance = $hours_count;
+        } else {
+            $currentBalance = $vacationBenefit->current_balance;
+            if ($currentBalance < $hours_count) {
+                throw new AppException('You dont have enough vacation days');
+            }
+            $vacationBenefit->load('vacationDetail');
+            $applyDeadline = $vacationBenefit->apply_deadline;
+            $deadlineDate = Carbon::now()->addDays($applyDeadline)->setTime(23, 59, 59);
+            if (!$loggedInUser->can('applyLateForAny', AppliedVacation::class) && !$loggedInUser->can('applyForVacationLate', $this)) {
+                foreach ($days as $day) {
+                    $dayDate = Carbon::parse($day['vacation_date']);
+                    if ($dayDate->isBefore($deadlineDate)) {
+                        throw new AppException('You cannot apply for vacation after the apply deadline');
+                    }
                 }
             }
         }
 
-        foreach ($days as $day) {
-            $dayDate = Carbon::parse($day['vacation_date']);
-            if ($this->appliedVacations()->where('vacation_benefit_id', $vacationBenefit->id)
-                ->whereNot('status', AppliedVacation::STATUS_REJECTED)->whereHas('vacationDays', function ($query) use ($dayDate) {
-                    $query->where('vacation_date', $dayDate);
-                })->exists()
-            ) {
-                throw new AppException('You have already applied for vacation on this date');
-            }
-        }
+        // foreach ($days as $day) {
+        //     $dayDate = Carbon::parse($day['vacation_date']);
+        //     if ($this->appliedVacations()
+        //         ->when(!$is_mission, function ($query) use ($vacationBenefit) {
+        //             $query->where('vacation_benefit_id', $vacationBenefit?->id);
+        //         })->when($is_mission, function ($query) {
+        //             $query->where('is_mission', true);
+        //         })
+        //         ->whereNot('status', AppliedVacation::STATUS_REJECTED)->whereHas('vacationDays', function ($query) use ($dayDate) {
+        //             $query->where('vacation_date', $dayDate);
+        //         })->exists()
+        //     ) {
+        //         throw new AppException('You have already applied for vacation or mission on this date');
+        //     }
+        // }
 
 
         try {
-            DB::transaction(function () use ($hours_count, $days, $currentBalance, $vacationBenefit, $is_approved, $loggedInUser) {
+            DB::transaction(function () use ($hours_count, $days, $currentBalance, $vacationBenefit, $is_approved, $loggedInUser, $is_mission) {
                 $appliedVacation = $this->appliedVacations()->create([
-                    'vacation_benefit_id' => $vacationBenefit->id,
+                    'vacation_benefit_id' => $vacationBenefit?->id,
                     'hours' => $hours_count,
                     'new_balance' => $currentBalance - $hours_count,
-                    'name' => $vacationBenefit->name,
+                    'name' => $is_mission ? 'Mission' : $vacationBenefit?->name,
+                    'is_mission' => $is_mission,
                     'status' => $is_approved ? AppliedVacation::STATUS_APPROVED : AppliedVacation::STATUS_PENDING,
                 ]);
                 // dd($days);
                 if (count($days) > 0) {
                     $appliedVacation->vacationDays()->createMany($days);
                 }
-                $vacationBenefit->update([
-                    'current_balance' => $currentBalance - $hours_count,
-                ]);
-                AppLog::info('Vacation Applied', 'Vacation applied for employee: ' . $this->name, loggable: $this);
+                if (!$is_mission) {
+                    $vacationBenefit->update([
+                        'current_balance' => $currentBalance - $hours_count,
+                    ]);
+                }
+                AppLog::info($is_mission ? 'Mission Applied' : 'Vacation Applied', $is_mission ? 'Mission applied for employee: ' . $this->name : 'Vacation applied for employee: ' . $this->name, loggable: $this);
                 if ($loggedInUser->can('approve', $appliedVacation)) {
                     $appliedVacation->approve();
                 }

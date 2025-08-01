@@ -29,7 +29,7 @@ return [
     'gender' => 'Gender',
     'marital_status' => 'Marital Status',
     'military_status' => 'Military Status',
-    'social_number' => 'ID Number',
+    'social_number' => 'National ID',
     'application_channel' => 'Application Channel',
     'select_city' => 'Select City',
     'select_area' => 'Select Area',
@@ -139,4 +139,9 @@ return [
     'switch_language' => 'Switch Language',
     'english' => 'English',
     'arabic' => 'العربية',
+
+    'basic' => "Basic",
+    'good' => "Good",
+    'very_good' => "Very Good",
+    'excellent' => "Excellent",
 ]; 

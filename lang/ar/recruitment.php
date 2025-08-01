@@ -139,4 +139,9 @@ return [
     'switch_language' => 'تغيير اللغة',
     'english' => 'English',
     'arabic' => 'العربية',
+
+    'basic' => "أساسي",
+    'good' => "جيد",
+    'very_good' => "جيد جدا",
+    'excellent' => "ممتاز",
 ]; 

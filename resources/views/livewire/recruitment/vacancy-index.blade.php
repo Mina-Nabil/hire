@@ -44,11 +44,13 @@
                             </thead>
                             <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
                                 @forelse($vacancies as $vacancy)
-                                    <tr class="even:bg-slate-100 dark:even:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer" wire:click="showVacancy({{ $vacancy->id }})">
+                                    <tr class="even:bg-slate-100 dark:even:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer"
+                                        wire:click="showVacancy({{ $vacancy->id }})">
                                         <td class="table-td">{{ $vacancy->position->name }}</td>
                                         <td class="table-td">{{ ucfirst(str_replace('_', ' ', $vacancy->type)) }}</td>
                                         <td class="table-td">
-                                            <span class="badge {{ $vacancy->status === 'open' ? 'bg-success-500' : 'bg-danger-500' }} bg-opacity-50 text-dark capitalize">
+                                            <span
+                                                class="badge {{ $vacancy->status === 'open' ? 'bg-success-500' : 'bg-danger-500' }} bg-opacity-50 text-dark capitalize">
                                                 {{ ucfirst($vacancy->status) }}
                                             </span>
                                         </td>
@@ -70,7 +72,7 @@
                                                 </button>
                                                 <button wire:click.stop='copyMinUrl({{ $vacancy->id }})'
                                                     class="action-btn text-success">
-                                                    <iconify-icon icon="heroicons:link"></iconify-icon>
+                                                    <iconify-icon icon="heroicons:clock-20-solid"></iconify-icon>
                                                 </button>
                                                 @can('update', $vacancy)
                                                     <button wire:click="openEditVacancySec({{ $vacancy->id }})"
@@ -374,7 +376,8 @@
                                     </div>
                                 @endforeach
 
-                                <button type="button" wire:click="addQuestion" class="btn btn-outline-primary btn-sm flex items-center">
+                                <button type="button" wire:click="addQuestion"
+                                    class="btn btn-outline-primary btn-sm flex items-center">
                                     <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2 text-sm"
                                         icon="ph:plus-bold"></iconify-icon>
                                     Add Question
@@ -413,7 +416,8 @@
                                     </div>
                                 @endforeach
 
-                                <button type="button" wire:click="addSlot" class="btn btn-outline-primary btn-sm flex items-center">
+                                <button type="button" wire:click="addSlot"
+                                    class="btn btn-outline-primary btn-sm flex items-center">
                                     <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2 text-sm"
                                         icon="ph:plus-bold"></iconify-icon>
                                     Add Slot

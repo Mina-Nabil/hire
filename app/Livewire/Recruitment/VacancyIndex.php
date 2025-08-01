@@ -496,6 +496,12 @@ class VacancyIndex extends Component
         $this->dispatch('copyUrl', url: $url);
     }
 
+    public function copyMinUrl($id)
+    {
+        $url = route('applicants.guest.create-min', ['vacancyID' => id_hash($id)]);
+        $this->dispatch('copyUrl', url: $url);
+    }
+
 
     public function mount()
     {

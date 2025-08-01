@@ -68,6 +68,10 @@
                                                     class="action-btn text-success">
                                                     <iconify-icon icon="heroicons:link"></iconify-icon>
                                                 </button>
+                                                <button wire:click.stop='copyMinUrl({{ $vacancy->id }})'
+                                                    class="action-btn text-success">
+                                                    <iconify-icon icon="heroicons:link"></iconify-icon>
+                                                </button>
                                                 @can('update', $vacancy)
                                                     <button wire:click="openEditVacancySec({{ $vacancy->id }})"
                                                         class="action-btn text-primary">

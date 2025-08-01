@@ -41,6 +41,7 @@ use App\Livewire\Employee\RequestHrLetter;
 use App\Livewire\Employee\HrLetterRequests;
 use App\Livewire\Employee\OvertimeRequests;
 use App\Livewire\Employee\EmployeeOvertimeRequests;
+use App\Livewire\Recruitment\ApplicantsCreateMin;
 use App\Livewire\Settings\AppLogIndex;
 
 Route::group(['middleware' => ['auth', 'type:employee|hr|admin']], function () {
@@ -129,6 +130,7 @@ Route::group(['middleware' => ['auth', 'type:admin|hr']], function () {
 Route::group(['middleware' => 'guest'], function () {
     Route::get('/login', Login::class)->name('login');
     Route::get('/recruitment/apply/{vacancyID}/{referralID?}', ApplicantsCreate::class)->name('applicants.guest.create');
+    Route::get('/recruitment/apply-min/{vacancyID}/{referralID?}', ApplicantsCreateMin::class)->name('applicants.guest.create-min');
     Route::get('/thank-you', function () {
         return view('thank-you');
     })->name('thank-you');

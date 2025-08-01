@@ -596,7 +596,7 @@ class Employee extends Model
         try {
             DB::transaction(function () use ($hours_count, $days, $currentBalance, $vacationBenefit, $is_approved, $loggedInUser, $is_mission) {
                 $appliedVacation = $this->appliedVacations()->create([
-                    'vacation_benefit_id' => $vacationBenefit?->id,
+                    'vacation_benefit_id' => $is_mission ? null : $vacationBenefit?->id,
                     'hours' => $hours_count,
                     'new_balance' => $currentBalance - $hours_count,
                     'name' => $is_mission ? 'Mission' : $vacationBenefit?->name,

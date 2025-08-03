@@ -268,6 +268,7 @@ class Attendance extends Model
     public static function saveAttendance($attendance)
     {
         try {
+            Log::info('Saving attendance', $attendance);
             DB::transaction(function () use ($attendance) {
                 foreach ($attendance as $attendanceData) {
                     if (!isset($attendanceData['error']) || !$attendanceData['error']) {

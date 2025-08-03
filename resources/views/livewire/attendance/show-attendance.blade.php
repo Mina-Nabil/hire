@@ -100,7 +100,7 @@
                                         </div>
                                     </td>
                                     <td class="table-td">
-                                        @if ($attendance->is_approved === null)
+                                        @if (!$attendance->is_approved)
                                             @if (
                                                 $isManager &&
                                                     $attendance->employee &&

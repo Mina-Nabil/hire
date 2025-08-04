@@ -103,7 +103,6 @@ class ShowAttendance extends Component
 
         try {
             $attendance = Attendance::findOrFail($attendanceId);
-            $attendance->authorize('approve', $attendance);
             $attendance->approveAttendance();
             $this->alertSuccess('Attendance record approved successfully!');
         } catch (AppException $e) {

@@ -19,6 +19,11 @@ class PayrollIndex extends Component
     public $sortField = 'created_at';
     public $sortDirection = 'desc';
     
+    // Modal properties
+    public $showEmployeeModal = false;
+    public $selectedPayroll = null;
+    public $payrollEmployees = [];
+    
     public function mount()
     {
         // Verify the user has permission to view payrolls
@@ -33,6 +38,26 @@ class PayrollIndex extends Component
             $this->sortField = $field;
             $this->sortDirection = 'asc';
         }
+    }
+    
+    public function showEmployees($payrollId)
+    {
+        $this->selectedPayroll = Payroll::find($payrollId);
+        
+        if ($this->selectedPayroll) {
+            $this->payrollEmployees = $this->selectedPayroll->payrollEmployees()
+                ->with('employee')
+                ->orderBy('employee.name')
+                ->get();
+            $this->showEmployeeModal = true;
+        }
+    }
+    
+    public function closeEmployeeModal()
+    {
+        $this->showEmployeeModal = false;
+        $this->selectedPayroll = null;
+        $this->payrollEmployees = [];
     }
     
     public function render()

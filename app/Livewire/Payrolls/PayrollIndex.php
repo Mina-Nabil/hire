@@ -49,6 +49,7 @@ class PayrollIndex extends Component
                 ->with('employee')
                 ->join('employees', 'payroll_employees.employee_id', '=', 'employees.id')
                 ->orderBy('employees.name')
+                ->select('payroll_employees.*')
                 ->get();
             $this->showEmployeeModal = true;
         }

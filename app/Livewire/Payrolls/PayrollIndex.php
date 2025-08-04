@@ -47,7 +47,6 @@ class PayrollIndex extends Component
         if ($this->selectedPayroll) {
             $this->payrollEmployees = $this->selectedPayroll->payrollEmployees()
                 ->with('employee')
-                ->orderBy('employee.name')
                 ->get();
             $this->showEmployeeModal = true;
         }

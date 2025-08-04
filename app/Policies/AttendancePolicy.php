@@ -40,6 +40,15 @@ class AttendancePolicy
         return $user->is_admin || $user->is_hr;
     }
 
+    public function approve(User $user, Attendance $attendance): bool
+    {
+        return ($user->employee?->is_manager &&
+            $attendance->employee &&
+            $attendance->employee->benefitConfiguration &&
+            $attendance->employee->benefitConfiguration->manager_id === $user->employee_id) ||
+            $user->is_admin || $user->is_hr;
+    }
+
     /**
      * Determine whether the user can delete the model.
      */

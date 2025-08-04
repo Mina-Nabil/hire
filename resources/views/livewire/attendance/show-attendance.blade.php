@@ -101,11 +101,7 @@
                                     </td>
                                     <td class="table-td">
                                         @if (!$attendance->is_approved)
-                                            @if (
-                                                $isManager &&
-                                                    $attendance->employee &&
-                                                    $attendance->employee->benefitConfiguration &&
-                                                    $attendance->employee->benefitConfiguration->manager_id === Auth::user()->employee_id)
+                                            @can('approve', $attendance)
                                                 <div class="dropdown relative">
                                                     <button
                                                         class="btn inline-flex justify-center btn-warning items-center btn-sm"
@@ -139,7 +135,7 @@
                                                     class="inline-block px-3 min-w-[90px] text-center py-1 rounded-[999px] bg-opacity-25 text-warning-500 bg-warning-500 text-xs">
                                                     Pending Manager Approval
                                                 </span>
-                                            @endif
+                                            @endcan
                                         @elseif($attendance->is_approved)
                                             <span
                                                 class="inline-block px-3 min-w-[90px] text-center py-1 rounded-[999px] bg-opacity-25 text-success-500 bg-success-500 text-xs">

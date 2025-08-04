@@ -201,11 +201,6 @@
                                     @foreach($payrollEmployees as $payrollEmployee)
                                         <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                                             <div class="flex items-center space-x-3">
-                                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                                                    <span class="text-blue-600 font-medium text-sm">
-                                                        {{ strtoupper(substr($payrollEmployee->employee->name ?? 'N/A', 0, 1)) }}
-                                                    </span>
-                                                </div>
                                                 <div>
                                                     <p class="font-medium text-gray-900">
                                                         {{ $payrollEmployee->employee->name ?? 'N/A' }}

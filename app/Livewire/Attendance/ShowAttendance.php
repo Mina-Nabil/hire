@@ -20,6 +20,7 @@ class ShowAttendance extends Component
     public $search = '';
     public $startDate = '';
     public $endDate = '';
+    public $isApproved = '';
     public $showFilters = false;
     
     // Modal for extra hours editing
@@ -59,7 +60,7 @@ class ShowAttendance extends Component
 
     public function resetFilters()
     {
-        $this->reset(['search', 'startDate', 'endDate']);
+        $this->reset(['search', 'startDate', 'endDate', 'isApproved']);
     }
 
     public function approveExtraHours($attendanceId)
@@ -247,6 +248,15 @@ class ShowAttendance extends Component
             })
             ->when($this->endDate, function ($query) {
                 $query->where('date', '<=', $this->endDate);
+            })
+            ->when($this->isApproved !== '', function ($query) {
+                if ($this->isApproved === 'approved') {
+                    $query->where('is_approved', true);
+                } elseif ($this->isApproved === 'rejected') {
+                    $query->where('is_approved', false);
+                } elseif ($this->isApproved === 'pending') {
+                    $query->whereNull('is_approved');
+                }
             });
 
         $attendances = $query->paginate(50);

@@ -273,7 +273,7 @@ class Payroll extends Model
 
                 $netAmountBeforeTax = ($employeeData['net_after_deductions'] ?? 0) + ($employeeData['overtime_amount'] ?? 0);
                 $taxAmount = self::calculateTaxAmount($netAmountBeforeTax);
-                $netAmountAfterTax = $netAmountBeforeTax - $taxAmount - ($employeeData['employee_medical'] ?? 0) + ($employeeData['extra_payments'] ?? 0);
+                $netAmountAfterTax = $netAmountBeforeTax + ($employeeData['employee_base_benefits'] ?? 0) - $taxAmount - ($employeeData['employee_medical'] ?? 0) + ($employeeData['extra_payments'] ?? 0);
 
                 // Create payroll_employee record with fields that exist in the database schema
                 $payrollEmployee = $payroll->payrollEmployees()->create([

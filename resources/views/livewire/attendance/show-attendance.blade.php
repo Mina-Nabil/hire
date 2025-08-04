@@ -43,7 +43,7 @@
 
         @if ($showFilters)
             <div class="p-4">
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-3 gap-2">
                     <div>
                         <label class="form-label text-sm">Date From</label>
                         <input type="date" wire:model.live="startDate" class="form-control">
@@ -51,6 +51,15 @@
                     <div>
                         <label class="form-label text-sm">Date To</label>
                         <input type="date" wire:model.live="endDate" class="form-control">
+                    </div>
+                    <div>
+                        <label class="form-label text-sm">Approval Status</label>
+                        <select wire:model.live="isApproved" class="form-control">
+                            <option value="">All Statuses</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                            <option value="pending">Pending</option>
+                        </select>
                     </div>
                 </div>
             </div>

@@ -330,8 +330,7 @@ class CreatePayroll extends Component
 
             // Get daily working hours from employee benefit configuration
             $dailyWorkingHours = $employee->benefitConfiguration?->daily_working_hours ?? 8;
-            // dd('hourly rate: ' . $employee->calculateHourlyRate(), 'day price: ' . $dayPrice / $dailyWorkingHours);
-            // Calculate penalty hours using the new penalty offset method
+
             $hourlyRate = $dayPrice / $dailyWorkingHours;
             $penaltyData = $employee->calculatePenaltyWithVacationOffset($this->startDate, $this->endDate, $hourlyRate);
 
@@ -343,15 +342,6 @@ class CreatePayroll extends Component
             // $usedApprovedVacations = $penaltyData['used_approved_vacations'];
             $availableVacationBenefits = $penaltyData['available_vacation_benefits'];
             $penaltyAmount = $penaltyData['direct_deduction_amount'];
-
-
-            if($employee->id == 1) {
-                Log::info('penalty data', ['penaltyData' => $penaltyData]);
-            }
-            // Log::info('penalty data', ['penaltyData' => $penaltyData]);
-            // Convert total hours to days for display purposes
-
-            // The penalty amount is now only the direct deduction amount (after vacation offset)
 
             $netAfterPenalty = $netIncome - $penaltyAmount;
 

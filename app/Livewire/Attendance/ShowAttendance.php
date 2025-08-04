@@ -100,23 +100,10 @@ class ShowAttendance extends Component
     
     public function approveAttendance($attendanceId)
     {
-        if (!$this->isManager) {
-            $this->alertError('Only managers can approve attendance records.');
-            return;
-        }
-        
+
         try {
             $attendance = Attendance::findOrFail($attendanceId);
-            
-            // Verify the manager is authorized to approve this employee's attendance
-            $userEmployee = Employee::where('user_id', Auth::id())->first();
-            $employeeConfig = $attendance->employee->benefitConfiguration;
-            
-            if (!$userEmployee || !$employeeConfig || $employeeConfig->manager_id !== $userEmployee->id) {
-                $this->alertError('You are not authorized to approve this attendance record.');
-                return;
-            }
-            
+            $attendance->authorize('approve', $attendance);
             $attendance->approveAttendance();
             $this->alertSuccess('Attendance record approved successfully!');
         } catch (AppException $e) {

@@ -143,7 +143,7 @@ class Attendance extends Model
 
             $employeeName = trim($sheet->getCell('A' . $row)->getValueString());
             if (!$employeeName) {
-               
+
                 continue;
             }
 
@@ -193,7 +193,7 @@ class Attendance extends Model
                 ];
                 continue;
             }
-            if (!$employee->benefitConfiguration || !$employee->benefitConfiguration->attendance_calculation) { 
+            if (!$employee->benefitConfiguration || !$employee->benefitConfiguration->attendance_calculation) {
                 $attendance[] = [
                     'employee_id' => "Not Found",
                     'employee' => null,
@@ -447,6 +447,12 @@ class Attendance extends Model
      */
     public function approveAttendance()
     {
+        /** @var User $user */
+        $user = Auth::user();
+        if (!$user->can('approve', $this)) {
+            throw new AppException('You dont have permission to approve attendance');
+        }
+
         try {
             $this->is_approved = true;
             $employee = $this->employee->name ?? 'Unknown Employee';

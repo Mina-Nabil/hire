@@ -311,6 +311,9 @@ class Attendance extends Model
      */
     public function generateOvertime()
     {
+        /** @var User $user */
+        $user = Auth::user();
+
         $employeeConfiguration = $this->employee->benefitConfiguration;
 
         if (!$employeeConfiguration->is_generate_overtime) return;
@@ -330,7 +333,8 @@ class Attendance extends Model
                 'employee_id' => $this->employee_id,
                 'creator_id' => $this->employee->user_id,
                 'date' => $startDate->format('Y-m-d'),
-                'status' => 'pending',
+                'status' => $user?->can('updateOvertime', $this->employee) ? Overtime::STATUS_APPROVED : Overtime::STATUS_PENDING,
+                'approved_at' => $user?->can('updateOvertime', $this->employee) ? now() : null,
                 'admin_note' => 'Generated after attendance submission',
             ], [
                 'start_time' => $startTime->format('H:i'),

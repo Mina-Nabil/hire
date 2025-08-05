@@ -356,51 +356,13 @@ class CreatePayroll extends Component
             $createdOvertimeIds = [];
             $potentialOvertimeData = [];
 
-            if ($isAutomaticOvertime) {
-                // Calculate potential overtime from attendance without creating records yet
-                $attendances = $employee->attendances()
-                    ->where('is_approved', true)
-                    ->whereBetween('date', [$this->startDate, $this->endDate])
-                    ->whereNull('payroll_id')
-                    ->get();
 
-                foreach ($attendances as $attendance) {
-                    $dailyHours = $attendance->hours;
-
-                    // Check if this day has overtime
-                    if ($dailyHours - $dailyWorkingHours >= 1) {
-                        $overtimeHours += ($dailyHours - $dailyWorkingHours);
-
-                        // Store potential overtime data for later creation
-                        $potentialOvertimeData[] = [
-                            'attendance_id' => $attendance->id,
-                            'date' => $attendance->date,
-                            'hours' => $dailyHours - $dailyWorkingHours,
-                            'start_time' => $attendance->start_time,
-                            'end_time' => $attendance->end_time,
-                        ];
-                    }
-                }
-
-                // Also include existing approved overtime records for this period
-                $existingOvertimeHours = $employee->overtimes()
-                    ->where('status', Overtime::STATUS_APPROVED)
-                    ->whereBetween('date', [$this->startDate, $this->endDate])
-                    ->whereNull('payroll_id')
-                    ->sum('hours');
-
-                $overtimeHours += $existingOvertimeHours;
-            } else {
-                // Use only explicitly created and approved overtime records
-                $overtimeHours = $employee->overtimes()
-                    ->where('status', Overtime::STATUS_APPROVED)
-                    ->whereBetween('approved_at', [$this->startDate, $this->endDate])
-                    ->whereNull('payroll_id')
-                    ->sum('hours');
-
-                // No new overtime records are created in manual mode
-                $createdOvertimeIds = [];
-            }
+            // Use only explicitly created and approved overtime records
+            $overtimeHours = $employee->overtimes()
+                ->where('status', Overtime::STATUS_APPROVED)
+                ->whereBetween('approved_at', [$this->startDate, $this->endDate])
+                ->whereNull('payroll_id')
+                ->sum('hours');
 
             // Calculate overtime amount
             $overtimeAmount = $overtimeHours * $hourlyRate * $overtimeRate;

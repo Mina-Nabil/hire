@@ -4622,10 +4622,9 @@ class Employee extends Model
         return $this->attendances()
             ->where('date', '>=', $startDate->format('Y-m-d'))
             ->where('date', '<=', $endDate->format('Y-m-d'))
-            ->where('is_approved', true)
+            ->where('status', Overtime::STATUS_APPROVED)
             ->whereNull('payroll_id')
-            ->where('is_extra_hours_approved', true)
-            ->sum('extra_hours');
+            ->sum('hours');
     }
 
     /**

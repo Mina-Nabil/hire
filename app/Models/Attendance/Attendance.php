@@ -322,7 +322,8 @@ class Attendance extends Model
         if ($overtime <= 1) return;
 
         $startDate = Carbon::parse($this->date);
-        $endDate = Carbon::parse($this->date);
+        $startTime = Carbon::parse($this->start_time);
+        $endTime = Carbon::parse($this->end_time);
 
         try {
             return Overtime::updateOrCreate([
@@ -332,8 +333,8 @@ class Attendance extends Model
                 'status' => 'pending',
                 'admin_note' => 'Generated after attendance submission',
             ], [
-                'start_time' => $endDate->format('H:i'),
-                'end_time' => $endDate->format('H:i'),
+                'start_time' => $startTime->format('H:i'),
+                'end_time' => $endTime->format('H:i'),
                 'hours' => $overtime,
             ]);
         } catch (Exception $e) {

@@ -4620,8 +4620,8 @@ class Employee extends Model
         $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
 
         return $this->attendances()
-            ->where('date', '>=', $startDate->format('Y-m-d'))
-            ->where('date', '<=', $endDate->format('Y-m-d'))
+            ->where('approved_at', '>=', $startDate->format('Y-m-d'))
+            ->where('approved_at', '<=', $endDate->format('Y-m-d'))
             ->where('status', Overtime::STATUS_APPROVED)
             ->whereNull('payroll_id')
             ->sum('hours');

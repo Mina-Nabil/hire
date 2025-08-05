@@ -360,7 +360,7 @@ class CreatePayroll extends Component
             // Use only explicitly created and approved overtime records
             $overtimeHours = $employee->overtimes()
                 ->where('status', Overtime::STATUS_APPROVED)
-                ->whereBetween('approved_at', [$this->startDate, $this->endDate])
+                // ->whereBetween('approved_at', [$this->startDate, $this->endDate])
                 ->whereNull('payroll_id')
                 ->sum('hours');
 

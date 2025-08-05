@@ -539,7 +539,7 @@ class EmployeeConfiguration extends Component
     public function saveExtraPayment()
     {
         $this->validate([
-            'extraPayment.amount' => 'required|numeric|min:0.01',
+            'extraPayment.amount' => 'required|numeric',
             'extraPayment.due_date' => 'required|date',
             'extraPayment.desc' => 'required|string',
         ], [

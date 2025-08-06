@@ -163,7 +163,29 @@ class Attendance extends Model
                     "error" => true,
                     'creator_id' => Auth::id(),
                 ];
-            } //if the start time is empty, skip the row
+            } 
+            
+            //if the start time is empty, skip the row
+            if ($sheet->getCell('B' . $row)->getValue() == null) {
+                $attendance[] = [
+                    'employee_id' => "No Start Time",
+                    'employee' => null,
+                    'uploaded_name' => "No Start Time",
+                    'attendance_type' => "N/A",
+                    'date' => null,
+                    'start_time' => null,
+                    'end_time' => null,
+                    'hours' => null,
+                    'extra_hours' => null,
+                    'is_extra_hours_approved' => null,
+                    'is_approved' => null,
+                    "error" => true,
+                    'creator_id' => Auth::id(),
+                ];
+
+                continue;
+            }
+
 
             $attendanceDay = new Carbon(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($sheet->getCell('B' . $row)->getValue()));
             $attendanceStartDate = new Carbon(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($sheet->getCell('C' . $row)->getValue()));

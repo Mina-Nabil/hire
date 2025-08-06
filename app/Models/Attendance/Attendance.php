@@ -344,7 +344,7 @@ class Attendance extends Model
 
         $overtime = $this->getOvertimeHours($employeeConfiguration);
 
-        if ($overtime <= 1) return;
+        if ($overtime <= 0.98) return;
 
         $startDate = Carbon::parse($this->date);
         $startTime = Carbon::parse($this->start_time);

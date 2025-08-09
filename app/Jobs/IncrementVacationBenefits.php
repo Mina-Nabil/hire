@@ -37,21 +37,21 @@ class IncrementVacationBenefits implements ShouldQueue
         foreach ($vacationBenefits as $vacationBenefit) {
             switch ($vacationBenefit->type) {
                 case VacationDetail::TYPE_MONTHLY:
-                    if ($now->dayOfMonth === 1 || $this->forceType === VacationDetail::TYPE_MONTHLY) {
+                    if ($this->forceType === VacationDetail::TYPE_MONTHLY || $now->dayOfMonth === 1) {
                         $newBalance = min($vacationBenefit->current_balance + $vacationBenefit->inc_rate, $vacationBenefit->max_balance);
                         $vacationBenefit->update([
                             'current_balance' => $newBalance,
                         ]);
-                        Log::info("Incrementing monthly vacation benefit for {$vacationBenefit->employee->name} ({$vacationBenefit->employee->id})");
+                        Log::info("Incrementing monthly vacation benefit for {$vacationBenefit->employee->name} ({$vacationBenefit->employee->id}) - {$vacationBenefit->current_balance} -> {$newBalance}");
                     }
                     break;
                 case VacationDetail::TYPE_YEARLY:
-                    if ($now->dayOfYear === 1 || $this->forceType === VacationDetail::TYPE_YEARLY) {
+                    if ($this->forceType === VacationDetail::TYPE_YEARLY || $now->dayOfYear === 1) {
                         $newBalance = min($vacationBenefit->current_balance + $vacationBenefit->inc_rate, $vacationBenefit->max_balance);
                         $vacationBenefit->update([
                             'current_balance' => $newBalance,
                         ]);
-                        Log::info("Incrementing yearly vacation benefit for {$vacationBenefit->employee->name} ({$vacationBenefit->employee->id})");
+                        Log::info("Incrementing yearly vacation benefit for {$vacationBenefit->employee->name} ({$vacationBenefit->employee->id}) - {$vacationBenefit->current_balance} -> {$newBalance}");
                     }
                     break;
 
@@ -64,22 +64,22 @@ class IncrementVacationBenefits implements ShouldQueue
                     break;
 
                 case VacationDetail::TYPE_WEEKLY:
-                    if ($now->dayOfWeek === 6 || $this->forceType === VacationDetail::TYPE_WEEKLY) {
+                    if ($this->forceType === VacationDetail::TYPE_WEEKLY || $now->dayOfWeek === 6) {
                         $newBalance = min($vacationBenefit->current_balance + $vacationBenefit->inc_rate, $vacationBenefit->max_balance);
                         $vacationBenefit->update([
                             'current_balance' => $newBalance,
                         ]);
-                        Log::info("Incrementing weekly vacation benefit for {$vacationBenefit->employee->name} ({$vacationBenefit->employee->id})");
+                        Log::info("Incrementing weekly vacation benefit for {$vacationBenefit->employee->name} ({$vacationBenefit->employee->id}) - {$vacationBenefit->current_balance} -> {$newBalance}");
                     }
                     break;
 
                 case VacationDetail::TYPE_QUARTERLY:
-                    if ($now->dayOfQuarter === 1 || $this->forceType === VacationDetail::TYPE_QUARTERLY) {
+                    if ($this->forceType === VacationDetail::TYPE_QUARTERLY || $now->dayOfQuarter === 1) {
                         $newBalance = min($vacationBenefit->current_balance + $vacationBenefit->inc_rate, $vacationBenefit->max_balance);
                         $vacationBenefit->update([
                             'current_balance' => $newBalance,
                         ]);
-                        Log::info("Incrementing quarterly vacation benefit for {$vacationBenefit->employee->name} ({$vacationBenefit->employee->id})");
+                        Log::info("Incrementing quarterly vacation benefit for {$vacationBenefit->employee->name} ({$vacationBenefit->employee->id}) - {$vacationBenefit->current_balance} -> {$newBalance}");
                     }
                     break;
 

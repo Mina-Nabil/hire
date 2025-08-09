@@ -67,8 +67,8 @@ class VacationBenefit extends Model
     public function applyDeadline(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => $this->vacationDetail?->apply_deadline ?? ($value ?? 0),
-            set: fn ($value) => $value,
+            get: fn($value) => $this->vacationDetail?->apply_deadline ?? ($value ?? 0),
+            set: fn($value) => $value,
         );
     }
 
@@ -206,10 +206,11 @@ class VacationBenefit extends Model
     public function scopeCurrent($query, $onDate)
     {
         return $query->where(function ($query) use ($onDate) {
+            $query->where('vacation_benefits.start_date', '<=', $onDate);
             $query->where(function ($q) use ($onDate) {
-                $q->where('vacation_benefits.start_date', '<=', $onDate)
-                    ->where('vacation_benefits.end_date', '>=', $onDate);
-            })->orWhereNull('vacation_benefits.end_date');
+                $q->where('vacation_benefits.end_date', '>=', $onDate)
+                    ->orWhereNull('vacation_benefits.end_date');
+            });
         });
     }
 }

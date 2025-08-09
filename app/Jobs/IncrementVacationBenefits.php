@@ -30,6 +30,10 @@ class IncrementVacationBenefits implements ShouldQueue
         $now = Carbon::now();
         $vacationBenefits = VacationBenefit::current($now)->get();
 
+        Log::info("Incrementing vacation benefits for {$now->toDateString()}");
+        Log::info("Force type: {$this->forceType}");
+        Log::info("Vacation benefits: " . $vacationBenefits->count());
+
         foreach ($vacationBenefits as $vacationBenefit) {
             switch ($vacationBenefit->type) {
                 case VacationDetail::TYPE_MONTHLY:

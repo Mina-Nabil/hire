@@ -207,8 +207,8 @@ class VacationBenefit extends Model
     {
         return $query->where(function ($query) use ($onDate) {
             $query->where(function ($q) use ($onDate) {
-                $q->where('vacation_benefits.end_date', '>=', $onDate)
-                    ->where('vacation_benefits.end_date', '<=', $onDate);
+                $q->where('vacation_benefits.start_date', '<=', $onDate)
+                    ->where('vacation_benefits.end_date', '>=', $onDate);
             })->orWhereNull('vacation_benefits.end_date');
         });
     }

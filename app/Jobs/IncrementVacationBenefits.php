@@ -17,7 +17,7 @@ class IncrementVacationBenefits implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct()
+    public function __construct(private $forceType = null)
     {
         //
     }
@@ -33,7 +33,7 @@ class IncrementVacationBenefits implements ShouldQueue
         foreach ($vacationBenefits as $vacationBenefit) {
             switch ($vacationBenefit->type) {
                 case VacationDetail::TYPE_MONTHLY:
-                    if ($now->isStartOfMonth()) {
+                    if ($now->dayOfMonth === 1 || $this->forceType === VacationDetail::TYPE_MONTHLY) {
                         $newBalance = min($vacationBenefit->current_balance + $vacationBenefit->inc_rate, $vacationBenefit->max_balance);
                         $vacationBenefit->update([
                             'current_balance' => $newBalance,
@@ -42,7 +42,7 @@ class IncrementVacationBenefits implements ShouldQueue
                     }
                     break;
                 case VacationDetail::TYPE_YEARLY:
-                    if ($now->isStartOfYear()) {
+                    if ($now->dayOfYear === 1 || $this->forceType === VacationDetail::TYPE_YEARLY) {
                         $newBalance = min($vacationBenefit->current_balance + $vacationBenefit->inc_rate, $vacationBenefit->max_balance);
                         $vacationBenefit->update([
                             'current_balance' => $newBalance,
@@ -60,7 +60,7 @@ class IncrementVacationBenefits implements ShouldQueue
                     break;
 
                 case VacationDetail::TYPE_WEEKLY:
-                    if ($now->isStartOfWeek()) {
+                    if ($now->dayOfWeek === 6 || $this->forceType === VacationDetail::TYPE_WEEKLY) {
                         $newBalance = min($vacationBenefit->current_balance + $vacationBenefit->inc_rate, $vacationBenefit->max_balance);
                         $vacationBenefit->update([
                             'current_balance' => $newBalance,
@@ -70,7 +70,7 @@ class IncrementVacationBenefits implements ShouldQueue
                     break;
 
                 case VacationDetail::TYPE_QUARTERLY:
-                    if ($now->isStartOfQuarter()) {
+                    if ($now->dayOfQuarter === 1 || $this->forceType === VacationDetail::TYPE_QUARTERLY) {
                         $newBalance = min($vacationBenefit->current_balance + $vacationBenefit->inc_rate, $vacationBenefit->max_balance);
                         $vacationBenefit->update([
                             'current_balance' => $newBalance,

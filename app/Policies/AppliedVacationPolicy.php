@@ -45,6 +45,6 @@ class AppliedVacationPolicy
      */
     public function reject(User $user, AppliedVacation $appliedVacation): bool
     {
-        return $user->is_admin || $user->is_hr || (($user->employee_id === $appliedVacation->employee->manager_id || $user->employee_id === $appliedVacation->employee->id) && $appliedVacation->status === AppliedVacation::STATUS_PENDING);
+        return $appliedVacation->status !== AppliedVacation::STATUS_REJECTED && ($user->is_admin || $user->is_hr || (($user->employee_id === $appliedVacation->employee->manager_id || $user->employee_id === $appliedVacation->employee->id) && $appliedVacation->status === AppliedVacation::STATUS_PENDING));
     }
 }

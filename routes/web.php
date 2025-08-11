@@ -44,26 +44,6 @@ use App\Livewire\Employee\EmployeeOvertimeRequests;
 use App\Livewire\Recruitment\ApplicantsCreateMin;
 use App\Livewire\Settings\AppLogIndex;
 
-Route::group(['middleware' => ['auth', 'type:employee|hr|admin']], function () {
-    Route::get('/attendance', App\Livewire\Attendance\ShowAttendance::class)->name('attendance.index');
-    Route::get('/employee/benefits', EmployeeBenefitsView::class)->name('employee.benefits');
-    Route::get('/employee/apply-for-vacation', ApplyForVacation::class)->name('employee.apply-for-vacation');
-    Route::get('/employee/request-hr-letter', RequestHrLetter::class)->name('employee.request-hr-letter');
-    Route::get('/employee/documents', EmployeeDocumentView::class)->name('employee.documents');
-    Route::get('/employee/overtime-requests', EmployeeOvertimeRequests::class)->name('employee.overtime-requests');
-    Route::get('/attendance/applied-vacation', App\Livewire\Attendance\ShowAppliedVacation::class)->name('applied-vacation.index');
-    Route::get('/attendance', App\Livewire\Attendance\ShowAttendance::class)->name('attendance.index');
-    Route::get('/recruitment/vacancies/{id}', VacancyShow::class)->name('recruitment.vacancies.show');
-    Route::get('/recruitment/vacancies', VacancyIndex::class)->name('recruitment.vacancies');
-    Route::get('/recruitment/applicants/{applicant}', ApplicantShow::class)->name('recruitment.applicants.show');
-    Route::get('/calendar', Calendar::class)->name('calendar');
-    Route::get('/profile', Profile::class);
-
-    Route::get('/logout', function () {
-        Auth::logout();
-        return redirect()->route('login');
-    });
-});
 
 Route::group(['middleware' => ['auth', 'type:admin|hr']], function () {
     Route::get('/', Dashboard::class)->name('home');
@@ -151,4 +131,26 @@ Route::group(['middleware' => 'guest'], function () {
     Route::match(['get', 'post'], '/iclock/ping', [ZKDeviceController::class, 'ping']);
     Route::match(['get', 'post'], '/iclock', [ZKDeviceController::class, 'ping']);
 
+});
+
+
+Route::group(['middleware' => ['auth', 'type:employee|hr|admin']], function () {
+    Route::get('/attendance', App\Livewire\Attendance\ShowAttendance::class)->name('attendance.index');
+    Route::get('/employee/benefits', EmployeeBenefitsView::class)->name('employee.benefits');
+    Route::get('/employee/apply-for-vacation', ApplyForVacation::class)->name('employee.apply-for-vacation');
+    Route::get('/employee/request-hr-letter', RequestHrLetter::class)->name('employee.request-hr-letter');
+    Route::get('/employee/documents', EmployeeDocumentView::class)->name('employee.documents');
+    Route::get('/employee/overtime-requests', EmployeeOvertimeRequests::class)->name('employee.overtime-requests');
+    Route::get('/attendance/applied-vacation', App\Livewire\Attendance\ShowAppliedVacation::class)->name('applied-vacation.index');
+    Route::get('/attendance', App\Livewire\Attendance\ShowAttendance::class)->name('attendance.index');
+    Route::get('/recruitment/vacancies/{id}', VacancyShow::class)->name('recruitment.vacancies.show');
+    Route::get('/recruitment/vacancies', VacancyIndex::class)->name('recruitment.vacancies');
+    Route::get('/recruitment/applicants/{applicant}', ApplicantShow::class)->name('recruitment.applicants.show');
+    Route::get('/calendar', Calendar::class)->name('calendar');
+    Route::get('/profile', Profile::class);
+
+    Route::get('/logout', function () {
+        Auth::logout();
+        return redirect()->route('login');
+    });
 });

@@ -433,7 +433,7 @@ class VacancyShow extends Component
     public function scheduleInterview()
     {
         $this->validate([
-            'interviewDate' => 'required|date|after_or_equal:today',
+            'interviewDate' => 'required|date',
             'interviewTime' => 'required',
             'interviewType' => 'required|string|max:255',
             'interviewLocation' => 'nullable|string|max:255',

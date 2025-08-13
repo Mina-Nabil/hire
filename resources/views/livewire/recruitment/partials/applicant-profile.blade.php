@@ -325,7 +325,7 @@
                                     </p>
                                     @if ($experience->salary)
                                         <p class="text-sm text-slate-500 mt-1">
-                                            Salary: {{ $experience->formatted_salary }}
+                                            Salary: {{ $experience->salary }}
                                         </p>
                                     @endif
                                     @if ($experience->leaving_reason)

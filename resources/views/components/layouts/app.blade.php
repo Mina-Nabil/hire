@@ -300,7 +300,7 @@
                                         href="{{ url('/recruitment/applicants') }}">Applicants</a>
                                 </li>
                             @endcan
-                            @can('viewAny', App\Models\Heirarchy\Position::class)
+                            @can('viewAny', App\Models\Recruitment\Vacancies\Vacancy::class)
                                 <li>
                                     <a class="{{ request()->routeIs('recruitment.vacancies') ? 'active' : '' }}"
                                         href="{{ url('/recruitment/vacancies') }}">Vacancies</a>

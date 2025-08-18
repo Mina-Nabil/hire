@@ -67,10 +67,12 @@ class AppliedVacation extends Model
                 $this->status = self::STATUS_REJECTED;
                 $this->note = $note;
                 $this->save();
-                $this->vacationBenefit->update([
-                    'current_balance' => $this->vacationBenefit->current_balance + $this->hours,
-                ]);
-                $this->new_balance = $this->vacationBenefit->current_balance;
+                if ($this->vacationBenefit) {
+                    $this->vacationBenefit->update([
+                        'current_balance' => $this->vacationBenefit->current_balance + $this->hours,
+                    ]);
+                    $this->new_balance = $this->vacationBenefit->current_balance;
+                }
                 $this->save();
             });
             AppLog::info('Vacation Rejected', "Employee: $this->employee->name, Vacation: $this->vacationBenefit->name", loggable: $this);
@@ -107,7 +109,7 @@ class AppliedVacation extends Model
     {
         $query
             ->where('employee_id', $employeeId)
-        ->whereNot('status', self::STATUS_REJECTED)
+            ->whereNot('status', self::STATUS_REJECTED)
             ->whereHas('vacationDays', function ($q) use ($startDate, $endDate) {
                 $q->where('vacation_date', '>=', $startDate->format('Y-m-d'))
                     ->where('vacation_date', '<=', $endDate->format('Y-m-d'));

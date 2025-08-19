@@ -174,6 +174,7 @@ class PositionIndex extends Component
     {
         $this->validate([
             'positionName' => 'required|string|max:255',
+            'code' => 'required',
             'positionArabicName' => 'required|string|max:255',
             'selectedDepartmentId' => 'required|exists:departments,id',
             'jobDescription' => 'nullable|string',

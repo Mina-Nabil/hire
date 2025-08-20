@@ -512,7 +512,8 @@ class VacancyIndex extends Component
 
     public function render()
     {
-        $vacancies = Vacancy::withCount('applications', 'vacancy_questions', 'vacancy_slots')->with([
+        $vacancies = Vacancy::withCount('applications', 'vacancy_questions', 'vacancy_slots')
+        ->with([
             'position',
             'assigned_to_user',
         ])
@@ -521,6 +522,7 @@ class VacancyIndex extends Component
             })
             ->orderBy('created_at', 'desc')
             ->checkPermissions()
+            ->hideTibian()
             ->paginate(30);
 
 

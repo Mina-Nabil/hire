@@ -61,4 +61,14 @@ class InterviewFeedback extends Model
             throw new AppException('Failed to edit feedback.');
         }
     }
+
+    public static function stepToStatus(string $step)
+    {
+        return match ($step) {
+            'Move to Next Round' => self::RESULT_PASSED,
+            'Make Offer' => self::RESULT_PASSED,
+            'Reject' => self::RESULT_FAILED,
+            'Keep on Hold' => self::RESULT_ON_HOLD,
+        };
+    }
 }

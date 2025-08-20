@@ -783,6 +783,14 @@ class Applicant extends Model
         });
     }
 
+    public function scopeWithNoInterviews($query, int $vacancyId)
+    {
+        return $query->whereHas('applications', function ($q) use ($vacancyId) {
+            $q->where('vacancy_id', $vacancyId)
+                ->whereDoesntHave('interviews');
+        });
+    }
+
     /**
      * Scope to get applicants with accepted offers who are not yet hired
      */

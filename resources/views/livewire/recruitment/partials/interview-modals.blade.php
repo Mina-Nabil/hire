@@ -32,6 +32,37 @@
                     @endforeach
                 </x-select>
 
+                <x-select title="Interview Level" wire:model="interviewLevel"
+                    errorMessage="{{ $errors->first('interviewLevel') }}">
+                    <option value="">-- Select Level --</option>
+                    @foreach ($interviewLevels as $level)
+                        <option value="{{ $level }}">{{ str_replace('_', ' ', ucfirst($level)) }}</option>
+                    @endforeach
+                </x-select>
+
+                <div>
+                    <x-input-label>Select Interviewers</x-input-label>
+                    <div class="mt-2 space-y-2 max-h-60 overflow-y-auto border rounded-md p-3">
+                        @if (count($interviewers) > 0)
+                            @foreach ($interviewers as $interviewer)
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="interviewer-{{ $interviewer->id }}"
+                                        wire:model="selectedInterviewers" value="{{ $interviewer->id }}"
+                                        class="form-checkbox h-5 w-5 text-blue-600">
+                                    <label for="interviewer-{{ $interviewer->id }}" class="ml-2 text-gray-700">
+                                        {{ $interviewer->name }} ({{ $interviewer->type }})
+                                    </label>
+                                </div>
+                            @endforeach
+                        @else
+                            <p class="text-gray-500">No interviewers available.</p>
+                        @endif
+                    </div>
+                    @error('selectedInterviewers')
+                        <span class="text-danger mt-1">{{ $message }}</span>
+                    @enderror
+                </div>
+
                 <x-text-input title="Location" wire:model="interviewLocation"
                     errorMessage="{{ $errors->first('interviewLocation') }}"
                     placeholder="Office location or meeting link..." />
@@ -77,13 +108,22 @@
                     </div>
                 </div>
 
+                <x-select title="Next Steps" wire:model="nextStep" errorMessage="{{ $errors->first('nextStep') }}">
+                    <option value="">-- Select Next Steps --</option>
+                    <option value="Move to Next Round">Move to Next Interview</option>
+                    <option value="Make Offer">Make Offer</option>
+                    <option value="Reject">Reject</option>
+                    <option value="Keep on Hold">Keep on Hold</option>
+                </x-select>
+
+                {{-- 
                 <x-select title="Interview Result" wire:model="interviewResult"
                     errorMessage="{{ $errors->first('interviewResult') }}">
                     <option value="">-- Select Result --</option>
                     @foreach ($interviewResults as $result)
                         <option value="{{ $result }}">{{ str_replace('_', ' ', ucfirst($result)) }}</option>
                     @endforeach
-                </x-select>
+                </x-select> --}}
 
                 <div>
                     <x-input-label>Rating (1-10)</x-input-label>
@@ -116,21 +156,14 @@
                     errorMessage="{{ $errors->first('feedbackNotes') }}"
                     placeholder="Any additional comments or observations..." />
 
-                <x-select title="Next Steps" wire:model="nextStep" errorMessage="{{ $errors->first('nextStep') }}">
-                    <option value="">-- Select Next Steps --</option>
-                    <option value="Move to Next Round">Move to Next Round</option>
-                    <option value="Make Offer">Make Offer</option>
-                    <option value="Reject">Reject</option>
-                    <option value="Keep on Hold">Keep on Hold</option>
-                </x-select>
 
-                <x-select title="Update Application Status" wire:model="newApplicationStatus"
+                {{-- <x-select title="Update Application Status" wire:model="newApplicationStatus"
                     errorMessage="{{ $errors->first('newApplicationStatus') }}">
                     <option value="">-- No Application Status Change --</option>
                     @foreach ($applicationStatuses as $status)
                         <option value="{{ $status }}">{{ str_replace('_', ' ', ucfirst($status)) }}</option>
                     @endforeach
-                </x-select>
+                </x-select> --}}
             @else
                 <div class="alert alert-warning">
                     No interview selected for feedback.
@@ -540,14 +573,15 @@
                                 </span>
                             </div>
                         </div>
-                        
+
                         <div class="mt-4">
                             <h4 class="font-medium">Position Details</h4>
                             <p>{{ $selectedApplication->vacancy->position->name }}</p>
-                            <p class="text-sm text-gray-600">{{ $selectedApplication->vacancy->position->department->name }}</p>
+                            <p class="text-sm text-gray-600">
+                                {{ $selectedApplication->vacancy->position->department->name }}</p>
                         </div>
 
-                        @if($selectedApplication->referredBy)
+                        @if ($selectedApplication->referredBy)
                             <div class="mt-4">
                                 <h4 class="font-medium">Referred By</h4>
                                 <p>{{ $selectedApplication->referredBy->name }}</p>
@@ -557,14 +591,14 @@
                 </div>
 
                 <!-- Booked Slots -->
-                @if($selectedApplication->slots->count() > 0)
+                @if ($selectedApplication->slots->count() > 0)
                     <div class="card">
                         <div class="card-header">
                             <h3 class="card-title">Booked Slots</h3>
                         </div>
                         <div class="card-body">
                             <div class="space-y-2">
-                                @foreach($selectedApplication->slots as $slot)
+                                @foreach ($selectedApplication->slots as $slot)
                                     <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
                                         <span>{{ $slot->vacancySlot->start_time->format('d M Y H:i') }}</span>
                                         <span class="text-gray-600">{{ $slot->vacancySlot->duration }} minutes</span>
@@ -576,14 +610,14 @@
                 @endif
 
                 <!-- Questions & Answers -->
-                @if($selectedApplication->answers->count() > 0)
+                @if ($selectedApplication->answers->count() > 0)
                     <div class="card">
                         <div class="card-header">
                             <h3 class="card-title">Questions & Answers</h3>
                         </div>
                         <div class="card-body">
                             <div class="space-y-4">
-                                @foreach($selectedApplication->answers as $answer)
+                                @foreach ($selectedApplication->answers as $answer)
                                     <div class="border-b pb-3">
                                         <p class="font-medium">{{ $answer->answerable->question }}</p>
                                         <p class="mt-1 text-gray-600">{{ $answer->answer }}</p>
@@ -603,10 +637,9 @@
                         <!-- CV -->
                         <div class="mb-4">
                             <h4 class="font-medium mb-2">CV/Resume</h4>
-                            @if($selectedApplication->applicant->cv_path)
-                                <a href="{{ Storage::url($selectedApplication->applicant->cv_path) }}" 
-                                   target="_blank"
-                                   class="btn btn-secondary">
+                            @if ($selectedApplication->applicant->cv_path)
+                                <a href="{{ Storage::url($selectedApplication->applicant->cv_path) }}"
+                                    target="_blank" class="btn btn-secondary">
                                     <i class="fas fa-download mr-2"></i>
                                     Download CV
                                 </a>
@@ -616,7 +649,7 @@
                         </div>
 
                         <!-- Cover Letter -->
-                        @if($selectedApplication->cover_letter)
+                        @if ($selectedApplication->cover_letter)
                             <div>
                                 <h4 class="font-medium mb-2">Cover Letter</h4>
                                 <div class="bg-gray-50 p-4 rounded">
@@ -665,16 +698,16 @@
                     </div>
                 </div>
 
-                @if(!$hrApproved || !$hiringManagerApproved)
+                @if (!$hrApproved || !$hiringManagerApproved)
                     <div class="alert alert-warning">
                         <div class="flex items-center">
                             <i class="fas fa-exclamation-triangle mr-2"></i>
                             <div>
                                 <p class="font-medium">Required Approvals:</p>
-                                @if(!$hrApproved)
+                                @if (!$hrApproved)
                                     <p class="text-sm">- HR Manager approval pending</p>
                                 @endif
-                                @if(!$hiringManagerApproved)
+                                @if (!$hiringManagerApproved)
                                     <p class="text-sm">- Hiring Manager approval pending</p>
                                 @endif
                             </div>
@@ -682,8 +715,8 @@
                     </div>
                 @endif
 
-                <x-text-input label="Offered Monthly Gross Salary" type="number" step="0.01" wire:model="offeredSalary"
-                    errorMessage="{{ $errors->first('offeredSalary') }}" />
+                <x-text-input label="Offered Monthly Gross Salary" type="number" step="0.01"
+                    wire:model="offeredSalary" errorMessage="{{ $errors->first('offeredSalary') }}" />
 
                 <div class="grid grid-cols-2 gap-4">
                     <x-text-input label="Proposed Start Date" type="date" wire:model="proposedStartDate"
@@ -715,8 +748,7 @@
         <x-slot name="footer">
             <div class="mt-4 flex justify-end gap-3">
                 <x-secondary-button wire:click="closeNewOfferModal">Cancel</x-secondary-button>
-                <x-primary-button wire:click.prevent="createOffer" loadingFunction="createOffer"
-                    :disabled="!$hrApproved || !$hiringManagerApproved">
+                <x-primary-button wire:click.prevent="createOffer" loadingFunction="createOffer" :disabled="!$hrApproved || !$hiringManagerApproved">
                     Create Offer
                 </x-primary-button>
             </div>
@@ -736,13 +768,14 @@
                             <p class="font-medium">Editing job offer for:</p>
                             <p>{{ $selectedOffer->application->vacancy->position->name }}
                                 ({{ $selectedOffer->application->vacancy->position->department->name }})</p>
-                            <p class="text-sm mt-1">Applicant: {{ $selectedOffer->application->applicant->full_name }}</p>
+                            <p class="text-sm mt-1">Applicant:
+                                {{ $selectedOffer->application->applicant->full_name }}</p>
                         </div>
                     </div>
                 </div>
 
-                <x-text-input label="Offered Monthly Gross Salary" type="number" step="0.01" wire:model="editOfferedSalary"
-                    errorMessage="{{ $errors->first('editOfferedSalary') }}" />
+                <x-text-input label="Offered Monthly Gross Salary" type="number" step="0.01"
+                    wire:model="editOfferedSalary" errorMessage="{{ $errors->first('editOfferedSalary') }}" />
 
                 <div class="grid grid-cols-2 gap-4">
                     <x-text-input label="Proposed Start Date" type="date" wire:model="editProposedStartDate"
@@ -795,7 +828,8 @@
                             <p>{{ $selectedOffer->application->vacancy->position->name }}
                                 ({{ $selectedOffer->application->vacancy->position->department->name }})</p>
                             <p class="text-sm mt-1">Salary: {{ $selectedOffer->formatted_salary }}</p>
-                            <p class="text-sm">Start Date: {{ $selectedOffer->proposed_start_date->format('d M Y') }}</p>
+                            <p class="text-sm">Start Date: {{ $selectedOffer->proposed_start_date->format('d M Y') }}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -839,7 +873,8 @@
                             <p>{{ $selectedOffer->application->vacancy->position->name }}
                                 ({{ $selectedOffer->application->vacancy->position->department->name }})</p>
                             <p class="text-sm mt-1">Salary: {{ $selectedOffer->formatted_salary }}</p>
-                            <p class="text-sm">Start Date: {{ $selectedOffer->proposed_start_date->format('d M Y') }}</p>
+                            <p class="text-sm">Start Date: {{ $selectedOffer->proposed_start_date->format('d M Y') }}
+                            </p>
                         </div>
                     </div>
                 </div>

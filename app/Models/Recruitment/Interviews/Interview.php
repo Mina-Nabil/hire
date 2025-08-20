@@ -29,6 +29,8 @@ class Interview extends Model
         'location',
         'zoom_link',
         'status',
+        'interview_level',
+        'next_step',
     ];
 
     protected $casts = [
@@ -50,6 +52,8 @@ class Interview extends Model
     const STATUS_SCHEDULED = 'scheduled';
     const STATUS_COMPLETED = 'completed';
     const STATUS_CANCELLED = 'cancelled';
+    const STATUS_REJECTED = 'rejected';
+    const STATUS_ON_HOLD = 'on_hold';
     const STATUS_RESCHEDULED = 'rescheduled';
 
     const INTERVIEW_STATUSES = [
@@ -57,7 +61,32 @@ class Interview extends Model
         self::STATUS_SCHEDULED,
         self::STATUS_COMPLETED,
         self::STATUS_CANCELLED,
+        self::STATUS_REJECTED,
+        self::STATUS_ON_HOLD,
         self::STATUS_RESCHEDULED,
+    ];
+
+    const INTERVIEW_LEVEL_FIRST = 'first';
+    const INTERVIEW_LEVEL_NEXT = 'next';
+    const INTERVIEW_LEVEL_FINAL = 'final';
+
+    const INTERVIEW_LEVELS = [
+        self::INTERVIEW_LEVEL_FIRST,
+        self::INTERVIEW_LEVEL_NEXT,
+        self::INTERVIEW_LEVEL_FINAL,
+    ];
+
+    // Next step options
+    const NEXT_STEP_NEXT_ROUND = 'Move to Next Round';
+    const NEXT_STEP_MAKE_OFFER = 'Make Offer';
+    const NEXT_STEP_REJECT = 'Reject';
+    const NEXT_STEP_ON_HOLD = 'Keep on Hold';
+
+    const NEXT_STEPS = [
+        self::NEXT_STEP_NEXT_ROUND,
+        self::NEXT_STEP_MAKE_OFFER,
+        self::NEXT_STEP_REJECT,
+        self::NEXT_STEP_ON_HOLD,
     ];
 
 
@@ -66,8 +95,10 @@ class Interview extends Model
         return match ($this->status) {
             self::STATUS_PENDING => 'bg-info-200',
             self::STATUS_SCHEDULED => 'bg-warning-200',
+            self::STATUS_ON_HOLD => 'bg-warning-200',
             self::STATUS_COMPLETED => 'bg-success-200',
             self::STATUS_CANCELLED => 'bg-danger-200',
+            self::STATUS_REJECTED => 'bg-danger-200',
             self::STATUS_RESCHEDULED => 'bg-warning-200',
         };
     }
@@ -251,6 +282,23 @@ class Interview extends Model
         }
     }
 
+    public function updateNextStep(string $nextStep): bool
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('update', $this)) {
+            throw new AppException(__('misc.not_authorized'));
+        }
+
+        try {
+            return $this->update(['next_step' => $nextStep]);
+        } catch (Exception $e) {
+            report($e);
+            AppLog::error('Error updating next step', $e->getMessage());
+            throw new AppException('Failed to update next step: ' . $e->getMessage());
+        }
+    }
+
     /**
      * Cancel this interview
      * 
@@ -337,5 +385,22 @@ class Interview extends Model
             });
 
         return $query;
+    }
+
+    public function scopeInterviewLevel($query, string $level)
+    {
+        return $query->where('interview_level', $level);
+    }
+
+    ///static functions
+
+    public static function stepToStatus(string $step)
+    {
+        return match ($step) {
+            'Move to Next Round' => self::STATUS_COMPLETED,
+            'Make Offer' => self::STATUS_COMPLETED,
+            'Reject' => self::STATUS_REJECTED,
+            'Keep on Hold' => self::STATUS_ON_HOLD,
+        };
     }
 }

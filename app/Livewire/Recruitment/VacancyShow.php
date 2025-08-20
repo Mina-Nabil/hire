@@ -58,7 +58,9 @@ class VacancyShow extends Component
     public $slots = [];
 
     // Interview Management Properties (similar to ApplicantShow)
-    public $interviews;
+    public $firstInterviews;
+    public $nextInterviews;
+    public $finalInterviews;
     public $offers;
 
     // Selected Interview
@@ -83,6 +85,7 @@ class VacancyShow extends Component
     public $interviewDate;
     public $interviewTime;
     public $interviewType;
+    public $interviewLevel;
     public $interviewLocation;
     public $interviewNotes;
     public $showSetInterviewersModal = false;
@@ -109,6 +112,7 @@ class VacancyShow extends Component
     public $showUpdateStatusModal = false;
     public $newInterviewStatus;
     public $interviewTypes = Interview::INTERVIEW_TYPES;
+    public $interviewLevels = Interview::INTERVIEW_LEVELS;
     public $interviewStatuses = Interview::INTERVIEW_STATUSES;
     public $applicationStatuses = Application::APPLICATION_STATUSES;
 
@@ -162,7 +166,14 @@ class VacancyShow extends Component
         $this->positions = Position::all();
         $this->users = User::hrOrAdmin()->get();
         $this->managers = User::employeeOnly()->get();
-        $this->interviewers = User::hrOrAdmin()->get();
+        
+        // Get interviewers including hiring manager
+        $vacancy = Vacancy::with('hiring_manager')->find($this->vacancyId);
+        $this->interviewers = User::hrOrAdmin()
+            ->when($vacancy && $vacancy->hiring_manager, function($query) use ($vacancy) {
+                $query->orWhere('id', $vacancy->hiring_manager_id);
+            })
+            ->get();
 
         // Get interviews for this vacancy
         $this->refreshInterviews();
@@ -170,7 +181,15 @@ class VacancyShow extends Component
 
     private function refreshInterviews()
     {
-        $this->interviews = Interview::byVacancyId($this->vacancyId)->get();
+        $this->firstInterviews = Interview::byVacancyId($this->vacancyId)
+            ->interviewLevel(Interview::INTERVIEW_LEVEL_FIRST)
+            ->get();
+        $this->nextInterviews = Interview::byVacancyId($this->vacancyId)
+            ->interviewLevel(Interview::INTERVIEW_LEVEL_NEXT)
+            ->get();
+        $this->finalInterviews = Interview::byVacancyId($this->vacancyId)
+            ->interviewLevel(Interview::INTERVIEW_LEVEL_FINAL)
+            ->get();
         $this->offers = JobOffer::whereHas('application', function ($q) {
             $q->where('vacancy_id', $this->vacancyId);
         })->get();
@@ -411,8 +430,10 @@ class VacancyShow extends Component
         $this->interviewDate = now()->addDays(3)->format('Y-m-d');
         $this->interviewTime = now()->format('H:i');
         $this->interviewType = Interview::TYPE_IN_PERSON;
+        $this->interviewLevel = Interview::INTERVIEW_LEVEL_FIRST;
         $this->interviewLocation = null;
         $this->interviewNotes = null;
+        $this->selectedInterviewers = [];
 
         $this->showNewInterviewModal = true;
     }
@@ -425,8 +446,10 @@ class VacancyShow extends Component
         $this->interviewDate = null;
         $this->interviewTime = null;
         $this->interviewType = null;
+        $this->interviewLevel = null;
         $this->interviewLocation = null;
         $this->interviewNotes = null;
+        $this->selectedInterviewers = [];
         $this->resetValidation();
     }
 
@@ -436,8 +459,10 @@ class VacancyShow extends Component
             'interviewDate' => 'required|date',
             'interviewTime' => 'required',
             'interviewType' => 'required|string|max:255',
+            'interviewLevel' => 'required|string|in:' . implode(',', Interview::INTERVIEW_LEVELS),
             'interviewLocation' => 'nullable|string|max:255',
             'interviewNotes' => 'nullable|string|max:500',
+            'selectedInterviewers' => 'required|array|min:1',
         ]);
 
         try {
@@ -449,6 +474,8 @@ class VacancyShow extends Component
                 Auth::id(),
                 $interviewDateTime,
                 $this->interviewType,
+                $this->interviewLevel,
+                $this->selectedInterviewers,
                 $this->interviewLocation,
                 $this->interviewNotes
             );
@@ -495,32 +522,33 @@ class VacancyShow extends Component
     public function saveInterviewFeedback()
     {
         $this->validate([
-            'interviewResult' => 'required|string|max:255',
+            // 'interviewResult' => 'required|string|max:255',
             'rating' => 'required|integer|min:1|max:10',
             'strengths' => 'nullable|string|max:500',
             'weaknesses' => 'nullable|string|max:500',
             'feedbackNotes' => 'nullable|string|max:1000',
-            'nextStep' => 'nullable|string|max:255',
-            'newApplicationStatus' => 'nullable|string|max:255',
+            'nextStep' => 'required|string|max:255',
+            // 'newApplicationStatus' => 'nullable|string|max:255',
         ]);
 
         try {
             $this->selectedInterview->addFeedback(
                 Auth::id(),
-                $this->interviewResult,
+                InterviewFeedback::stepToStatus($this->nextStep),
                 $this->rating,
                 $this->strengths,
                 $this->weaknesses,
-                $this->feedbackNotes
+                $this->feedbackNotes,
+
             );
 
-            if ($this->selectedInterview->status !== Interview::STATUS_COMPLETED) {
-                $this->selectedInterview->complete();
-            }
+            $this->selectedInterview->updateStatus(Interview::stepToStatus($this->nextStep));
 
-            if ($this->newApplicationStatus) {
-                $this->selectedInterview->application->updateStatus($this->newApplicationStatus);
-            }
+            $this->selectedInterview->updateNextStep($this->nextStep);
+
+            $this->selectedInterview->application->updateStatus(Application::stepToStatus($this->nextStep));
+
+
 
             $this->alert('success', 'Interview feedback saved successfully');
             $this->closeFeedbackModal();
@@ -550,8 +578,12 @@ class VacancyShow extends Component
     // Interview Management - Set Interviewers
     public function openSetInterviewersModal($interviewId)
     {
-        $this->selectedInterview = Interview::find($interviewId);
-        $this->interviewers = User::hrOrAdmin()->get();
+        $this->selectedInterview = Interview::with('application.vacancy.hiring_manager')->find($interviewId);
+        $this->interviewers = User::hrOrAdmin()
+            ->when($this->selectedInterview->application->vacancy->hiring_manager, function($query) {
+                $query->orWhere('id', $this->selectedInterview->application->vacancy->hiring_manager_id);
+            })
+            ->get();
         $this->selectedInterviewers = $this->selectedInterview->interviewers->pluck('id')->toArray();
         $this->showSetInterviewersModal = true;
     }
@@ -584,6 +616,53 @@ class VacancyShow extends Component
             $this->alert('error', 'Failed to assign interviewers: ' . $e->getMessage());
         }
     }
+
+    public function addNextInterview($interviewId)
+    {
+        $interview = Interview::find($interviewId);
+        $this->selectedApplication = $interview->application;
+        if (!$this->selectedApplication) {
+            $this->alert('error', 'Application not found');
+            return;
+        }
+
+        $this->selectedApplicationId = $this->selectedApplication->id;
+
+        // Set default values
+        $this->interviewDate = now()->addDays(3)->format('Y-m-d');
+        $this->interviewTime = now()->format('H:i');
+        $this->interviewType = Interview::TYPE_IN_PERSON;
+        $this->interviewLevel = Interview::INTERVIEW_LEVEL_NEXT;
+        $this->interviewLocation = null;
+        $this->interviewNotes = null;
+        $this->selectedInterviewers = [];
+
+        $this->showNewInterviewModal = true;
+    }
+
+    public function addFinalInterview($interviewId)
+    {
+        $interview = Interview::find($interviewId);
+        $this->selectedApplication = $interview->application;
+        if (!$this->selectedApplication) {
+            $this->alert('error', 'Application not found');
+            return;
+        }
+
+        $this->selectedApplicationId = $this->selectedApplication->id;
+
+        // Set default values
+        $this->interviewDate = now()->addDays(3)->format('Y-m-d');
+        $this->interviewTime = now()->format('H:i');
+        $this->interviewType = Interview::TYPE_IN_PERSON;
+        $this->interviewLevel = Interview::INTERVIEW_LEVEL_FINAL;
+        $this->interviewLocation = null;
+        $this->interviewNotes = null;
+        $this->selectedInterviewers = [];
+
+        $this->showNewInterviewModal = true;
+    }
+
 
     // Interview Management - Reschedule
     public function openRescheduleModal($interviewId)
@@ -689,39 +768,6 @@ class VacancyShow extends Component
         }
     }
 
-    // Interview Management - Complete
-    public function openCompleteModal($interviewId)
-    {
-        $this->selectedInterview = Interview::find($interviewId);
-        $this->showCompleteModal = true;
-    }
-
-    public function closeCompleteModal()
-    {
-        $this->showCompleteModal = false;
-        $this->selectedInterview = null;
-        $this->resetValidation();
-    }
-
-    public function completeInterview()
-    {
-        try {
-            $this->selectedInterview->complete();
-            $this->alert('success', 'Interview marked as completed');
-            $this->closeCompleteModal();
-
-            // Optionally redirect to feedback form
-            $this->openFeedbackModal($this->selectedInterview->id);
-
-            // Refresh interviews data
-            $this->refreshInterviews();
-        } catch (AppException $e) {
-            $this->alert('error', $e->getMessage());
-        } catch (Exception $e) {
-            report($e);
-            $this->alert('error', 'Failed to complete interview: ' . $e->getMessage());
-        }
-    }
 
     // Interview Management - Add Note
     public function openAddNoteModal($interviewId)
@@ -763,13 +809,6 @@ class VacancyShow extends Component
         }
     }
 
-    // Interview Management - Update Status
-    public function openUpdateStatusModal($interviewId)
-    {
-        $this->selectedInterview = Interview::find($interviewId);
-        $this->newInterviewStatus = $this->selectedInterview->status;
-        $this->showUpdateStatusModal = true;
-    }
 
     public function closeUpdateStatusModal()
     {
@@ -1011,9 +1050,12 @@ class VacancyShow extends Component
     public function render()
     {
         $vacancy = Vacancy::with(['vacancy_questions', 'vacancy_slots', 'position', 'assigned_to_user', 'hiring_manager', 'hr_manager'])->find($this->vacancyId);
-        $applicants = Applicant::byVacancyId($this->vacancyId)->when($this->search, function ($query) {
-            $query->search($this->search);
-        })->with('applications')->paginate(10);
+
+        $newApplicants = Applicant::byVacancyId($this->vacancyId)
+            ->withNoInterviews($this->vacancyId)
+            ->when($this->search, function ($query) {
+                $query->search($this->search);
+            })->with('applications')->paginate(10);
 
         $loggedInUser = Auth::user();
         $layout = 'components.layouts.app';
@@ -1023,7 +1065,7 @@ class VacancyShow extends Component
 
         return view('livewire.recruitment.vacancy-show', [
             'vacancy' => $vacancy,
-            'applicants' => $applicants,
+            'newApplicants' => $newApplicants,
             'vacancyTypes' => Vacancy::TYPE_OPTIONS,
             'vacancyStatuses' => Vacancy::STATUS_OPTIONS,
         ])->layout($layout);

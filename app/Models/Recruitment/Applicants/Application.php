@@ -41,6 +41,7 @@ class Application extends Model
     const STATUS_OFFER = 'offer';
     const STATUS_HIRED = 'hired';
     const STATUS_REJECTED = 'rejected';
+    const STATUS_ON_HOLD = 'on_hold';
 
     const APPLICATION_STATUSES = [
         self::STATUS_PENDING,
@@ -49,6 +50,7 @@ class Application extends Model
         self::STATUS_OFFER,
         self::STATUS_HIRED,
         self::STATUS_REJECTED,
+        self::STATUS_ON_HOLD,
     ];
 
     ////attributes
@@ -60,7 +62,8 @@ class Application extends Model
             self::STATUS_INTERVIEW => 'bg-primary-200',
             self::STATUS_OFFER => 'bg-success-200',
             self::STATUS_HIRED => 'bg-success-200',
-            self::STATUS_REJECTED => 'bg-danger-200'
+            self::STATUS_REJECTED => 'bg-danger-200',
+            self::STATUS_ON_HOLD => 'bg-warning-200',
         };
     }
 
@@ -223,6 +226,8 @@ class Application extends Model
         int $userId,
         \DateTime $date,
         string $type,
+        string $interviewLevel = Interview::INTERVIEW_LEVEL_FIRST,
+        ?array $interviewers = [],
         ?string $location = null,
         ?string $zoomLink = null,
     ): Interview {
@@ -234,15 +239,20 @@ class Application extends Model
         }
 
         try {
-            return DB::transaction(function () use ($userId, $date, $type, $location, $zoomLink) {
+            return DB::transaction(function () use ($userId, $date, $type, $interviewLevel, $interviewers, $location, $zoomLink) {
                 $ret = $this->interviews()->create([
                     'user_id' => $userId,
                     'date' => $date,
                     'type' => $type,
+                    'interview_level' => $interviewLevel,
                     'location' => $location,
                     'zoom_link' => $zoomLink,
                     'status' => self::STATUS_PENDING,
                 ]);
+
+                if (!empty($interviewers)) {
+                    $ret->setInterviewers($interviewers);
+                }
 
                 $this->moveToInterview();
 
@@ -403,5 +413,15 @@ class Application extends Model
             AppLog::error('Error creating offer', $e->getMessage());
             throw new AppException('Failed to create offer');
         }
+    }
+
+    public static function stepToStatus(string $step)
+    {
+        return match ($step) {
+            'Move to Next Round' => self::STATUS_INTERVIEW,
+            'Make Offer' => self::STATUS_OFFER,
+            'Reject' => self::STATUS_REJECTED,
+            'Keep on Hold' => self::STATUS_ON_HOLD,
+        };
     }
 }

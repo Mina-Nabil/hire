@@ -145,8 +145,10 @@ class Vacancy extends Model
     public function scopeHideTibian($query)
     {
         if (!env('HIDE_TIBIAN')) return $query;
-
-        return $query->whereNot('vacancies.position_id', 31);
+        $id = Auth::id();
+        return $query->when($id == 22, function ($query) {
+            return $query->whereNot('vacancies.position_id', 31);
+        });
     }
 
     public function scopeCheckPermissions($query)

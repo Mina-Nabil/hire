@@ -29,7 +29,7 @@
                                         <td class="table-td">{{ $interview->date->format('d M Y') }} at
                                             {{ $interview->date->format('H:i') }}</td>
                                         <td class="table-td">{{ $interview->type }}</td>
-                                        <td class="table-td">{{ $interview->user->name }} 
+                                        <td class="table-td">{{ $interview->scheduler->username }} 
                                             @if($interview->interviewers->count() > 0)
                                                 <span class="text-sm text-gray-500">
                                                     ({{ $interview->interviewers->pluck('name')->implode(', ') }})

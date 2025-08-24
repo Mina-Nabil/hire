@@ -129,10 +129,10 @@
                                     <tr>
                                         <th scope="col" class="table-th">Applicant</th>
                                         <th scope="col" class="table-th">Date & Time</th>
-                                        <th scope="col" class="table-th">Type</th>
                                         <th scope="col" class="table-th">Next Step</th>
                                         <th scope="col" class="table-th">Interviewers</th>
                                         <th scope="col" class="table-th">Status</th>
+                                        <th scope="col" class="table-th">Feedbacks</th>
                                         <th scope="col" class="table-th">Actions</th>
                                     </tr>
                                 </thead>
@@ -144,7 +144,6 @@
                                             </td>
                                             <td class="table-td">{{ $interview->date->format('d M Y') }} at
                                                 {{ $interview->date->format('H:i') }}</td>
-                                            <td class="table-td">{{ $interview->type }}</td>
                                             <td class="table-td">{{ $interview->next_step }}</td>
                                             <td class="table-td">
                                                 @foreach ($interview->interviewers as $interviewer)
@@ -155,6 +154,12 @@
                                                 <span class="badge {{ $interview->status_class }}">
                                                     {{ $interview->status }}
                                                 </span>
+                                            </td>
+                                            <td class="table-td">
+                                                <a href="#" class="text-blue-500"
+                                                    wire:click="openShowFeedbacksModal({{ $interview->id }})">
+                                                    {{ $interview->feedbacks->count() }}
+                                                </a>
                                             </td>
                                             <td class="table-td">
                                                 <div class="dropstart relative">
@@ -261,8 +266,8 @@
                                         <th scope="col" class="table-th">Next Step</th>
                                         <th scope="col" class="table-th">Interviewers</th>
                                         <th scope="col" class="table-th">Status</th>
-                                        <th scope="col" class="table-th">Actions</th>
                                         <th scope="col" class="table-th">Feedbacks</th>
+                                        <th scope="col" class="table-th">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody
@@ -392,10 +397,10 @@
                                     <tr>
                                         <th scope="col" class="table-th">Applicant</th>
                                         <th scope="col" class="table-th">Date & Time</th>
-                                        <th scope="col" class="table-th">Type</th>
                                         <th scope="col" class="table-th">Next Step</th>
                                         <th scope="col" class="table-th">Interviewers</th>
                                         <th scope="col" class="table-th">Status</th>
+                                        <th scope="col" class="table-th">Feedbacks</th>
                                         <th scope="col" class="table-th">Actions</th>
                                     </tr>
                                 </thead>
@@ -407,7 +412,6 @@
                                             </td>
                                             <td class="table-td">{{ $interview->date->format('d M Y') }} at
                                                 {{ $interview->date->format('H:i') }}</td>
-                                            <td class="table-td">{{ $interview->type }}</td>
                                             <td class="table-td">{{ $interview->next_step }}</td>
                                             <td class="table-td">
                                                 @foreach ($interview->interviewers as $interviewer)
@@ -418,6 +422,12 @@
                                                 <span class="badge {{ $interview->status_class }}">
                                                     {{ $interview->status }}
                                                 </span>
+                                            </td>
+                                            <td class="table-td">
+                                                <a href="#" class="text-blue-500"
+                                                    wire:click="openShowFeedbacksModal({{ $interview->id }})">
+                                                    {{ $interview->feedbacks->count() }}
+                                                </a>
                                             </td>
                                             <td class="table-td">
                                                 <div class="dropstart relative">

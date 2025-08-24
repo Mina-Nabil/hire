@@ -15,7 +15,8 @@
                                     <th scope="col" class=" table-th">Position</th>
                                     <th scope="col" class=" table-th">Date & Time</th>
                                     <th scope="col" class=" table-th">Type</th>
-                                    <th scope="col" class=" table-th">Location</th>
+                                    <th scope="col" class=" table-th">Creator & Interviewers</th>
+                                    <th scope="col" class=" table-th">Feedbacks</th>
                                     <th scope="col" class=" table-th">Status</th>
                                     <th scope="col" class=" table-th">Actions</th>
                                 </tr>
@@ -28,7 +29,20 @@
                                         <td class="table-td">{{ $interview->date->format('d M Y') }} at
                                             {{ $interview->date->format('H:i') }}</td>
                                         <td class="table-td">{{ $interview->type }}</td>
-                                        <td class="table-td">{{ $interview->location }}</td>
+                                        <td class="table-td">{{ $interview->user->name }} 
+                                            @if($interview->interviewers->count() > 0)
+                                                <span class="text-sm text-gray-500">
+                                                    ({{ $interview->interviewers->pluck('name')->implode(', ') }})
+                                                </span>
+                                            @endif
+
+                                        </td>
+                                        <td class="table-td">
+                                            <a href="#" class="text-blue-500"
+                                                wire:click="openShowFeedbacksModal({{ $interview->id }})">
+                                                {{ $interview->feedbacks->count() }}
+                                            </a>
+                                        </td>
                                         <td class="table-td">
                                             <span class="badge {{ $interview->status_class }}">
                                                 {{ $interview->status }}

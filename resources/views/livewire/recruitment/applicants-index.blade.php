@@ -210,9 +210,8 @@
             </div>
         </div>
 
-        <div style="position: sticky; bottom:0;width:100%; z-index:10;"
-            class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
-            {{ $applicants->links('vendor.livewire.simple-bootstrap') }}
+        <div class="mt-6">
+            {{ $holidays->links('vendor.livewire.simple-bootstrap') }}
         </div>
     </div>
 </div>

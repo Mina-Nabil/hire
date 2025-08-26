@@ -4151,7 +4151,11 @@ class Employee extends Model
             $vacationHoursForDay = 0;
 
             // Handle no start or end time
-            if ((!$attendance->start_time && $attendance->end_time) || ($attendance->start_time && !$attendance->end_time)) {
+            if (
+                $this->benefitConfiguration->attendance_calculation !== BenefitConfiguration::ATTENDANCE_CALCULATION_IN_ONLY &&
+                ((!$attendance->start_time && $attendance->end_time) || ($attendance->start_time && !$attendance->end_time))
+            ) {
+
                 $vacationHours = (clone $approvedVacations)->filter(function ($vacation) use ($attendance) {
                     return $vacation->vacationDays->contains('vacation_date', $attendance->date);
                 })->sum('hours');
@@ -4166,28 +4170,12 @@ class Employee extends Model
                     $vacationHoursForDay += $vacationHours;
                     $penaltyHoursForDay += $penaltyHours;
                 }
-            } elseif (!$attendance->start_time && !$attendance->end_time) {
-                $vacationHours = (clone $approvedVacations)->filter(function ($vacation) use ($attendance) {
-                    return $vacation->vacationDays->contains('vacation_date', $attendance->date);
-                })->sum('hours');
-
-                $penaltyHours = $this->benefitConfiguration->daily_working_hours - $vacationHours;
-                if ($penaltyHours > 0) {
-                    $penaltyDays[] = [
-                        'date' => $attendance->date,
-                        'hours' => $this->calculateLateArrivalPenalty($penaltyHours * 60),
-                        'type' => PenaltyDay::PENALTY_TYPE_MISSING_START_AND_END_TIME,
-                        'employee_id' => $this->id,
-                    ];
-                    $vacationHoursForDay += $vacationHours;
-                    $penaltyHoursForDay += $penaltyHours;
-                }
             } else {
                 $attendanceStart = Carbon::parse($attendance->date . ' ' . $attendance->start_time);
-                $attendanceEnd = Carbon::parse($attendance->date . ' ' . $attendance->end_time);
+                $attendanceEnd = $attendance->end_time ? Carbon::parse($attendance->date . ' ' . $attendance->end_time) : null;
 
                 // Handle midnight crossover
-                if ($attendanceEnd->lt($attendanceStart)) {
+                if ($attendanceEnd && $attendanceEnd->lt($attendanceStart)) {
                     $attendanceEnd->addDay();
                 }
                 if ($this->benefitConfiguration->attendance_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_BUS && $this->benefitConfiguration->bus_id) {

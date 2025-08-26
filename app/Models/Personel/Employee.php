@@ -576,22 +576,6 @@ class Employee extends Model
             }
         }
 
-        // foreach ($days as $day) {
-        //     $dayDate = Carbon::parse($day['vacation_date']);
-        //     if ($this->appliedVacations()
-        //         ->when(!$is_mission, function ($query) use ($vacationBenefit) {
-        //             $query->where('vacation_benefit_id', $vacationBenefit?->id);
-        //         })->when($is_mission, function ($query) {
-        //             $query->where('is_mission', true);
-        //         })
-        //         ->whereNot('status', AppliedVacation::STATUS_REJECTED)->whereHas('vacationDays', function ($query) use ($dayDate) {
-        //             $query->where('vacation_date', $dayDate);
-        //         })->exists()
-        //     ) {
-        //         throw new AppException('You have already applied for vacation or mission on this date');
-        //     }
-        // }
-
 
         try {
             DB::transaction(function () use ($hours_count, $days, $currentBalance, $vacationBenefit, $is_approved, $loggedInUser, $is_mission) {

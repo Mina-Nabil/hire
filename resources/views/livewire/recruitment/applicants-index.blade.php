@@ -19,7 +19,8 @@
 
                 <div class="flex items-center sm:mt-2">
                     @if ($showFilters)
-                        <button type="button" wire:click="resetFilters" class="btn btn-sm btn-outline-danger btn-sm mr-2">
+                        <button type="button" wire:click="resetFilters"
+                            class="btn btn-sm btn-outline-danger btn-sm mr-2">
                             <span class="flex items-center">
                                 <iconify-icon class="text-lg ltr:mr-1 rtl:ml-1 text-sm"
                                     icon="heroicons-outline:x"></iconify-icon>
@@ -207,9 +208,9 @@
                         </div>
                     </div>
                 @endif
-            </div>
-            <div class="mt-6">
-                {{ $applicants->links('vendor.livewire.simple-bootstrap') }}
+                <div class="mt-6">
+                    {{ $applicants->links('vendor.livewire.simple-bootstrap') }}
+                </div>
             </div>
         </div>
 

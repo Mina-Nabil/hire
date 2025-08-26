@@ -21,7 +21,7 @@ class VacancyIndex extends Component
     //page data
     public $positions;
     public $users;
-    public $hiringManagers;
+    public $hiringManagers = [];
 
     // Search
     public $search = '';

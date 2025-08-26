@@ -165,7 +165,7 @@ class VacancyShow extends Component
         $this->questionTypes = BaseQuestion::TYPES;
         $this->positions = Position::all();
         $this->users = User::hrOrAdmin()->get();
-        $this->managers = User::employeeOnly()->get();
+        $this->managers = $vacancy->position->potentialManagers;
         
         // Get interviewers including hiring manager
         $vacancy = Vacancy::with('hiring_manager')->find($this->vacancyId);

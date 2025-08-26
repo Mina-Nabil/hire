@@ -170,7 +170,7 @@ class ApplyForVacation extends Component
             'selectedBenefitId' => 'required_if:isMission,false',
             'days' => 'required|array|min:1',
             'days.*.vacation_date' => 'required|date',
-            'days.*.hours' => 'required|numeric|min:1|max:24',
+            'days.*.hours' => 'required|numeric|min:0.25|max:24',
             'description' => 'nullable|string|max:255',
             'isMission' => 'nullable|boolean',
         ]);

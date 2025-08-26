@@ -211,7 +211,7 @@
         </div>
 
         <div class="mt-6">
-            {{ $holidays->links('vendor.livewire.simple-bootstrap') }}
+            {{ $applicants->links('vendor.livewire.simple-bootstrap') }}
         </div>
     </div>
 </div>

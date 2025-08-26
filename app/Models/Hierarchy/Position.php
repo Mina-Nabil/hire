@@ -292,13 +292,6 @@ class Position extends Model
         return $level;
     }
 
-    public function name() : CastsAttribute
-    {
-        return CastsAttribute::make(
-            get: fn($value) => $this->arabic_name ?? $this->name
-        );
-    }
-
     public function getPotentialManagersAttribute(): array
     {
         $potentialManagers = [];

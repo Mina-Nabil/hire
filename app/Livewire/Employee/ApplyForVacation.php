@@ -161,6 +161,8 @@ class ApplyForVacation extends Component
             $this->generateDays();
         }
 
+        $this->totalHours = collect($this->days)->sum('hours');
+
         if (empty($this->days)) {
             $this->alertError('You must select a date range which covers at least one working day');
             return;

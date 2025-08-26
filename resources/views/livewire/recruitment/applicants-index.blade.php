@@ -208,10 +208,10 @@
                     </div>
                 @endif
             </div>
+            <div class="mt-6">
+                {{ $applicants->links('vendor.livewire.simple-bootstrap') }}
+            </div>
         </div>
 
-        <div class="mt-6">
-            {{ $applicants->links('vendor.livewire.simple-bootstrap') }}
-        </div>
     </div>
 </div>

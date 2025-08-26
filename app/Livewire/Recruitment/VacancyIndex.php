@@ -21,6 +21,7 @@ class VacancyIndex extends Component
     //page data
     public $positions;
     public $users;
+    public $hiringManagers;
 
     // Search
     public $search = '';
@@ -483,6 +484,7 @@ class VacancyIndex extends Component
         $this->arabicJobQualifications = $selectedPosition->arabic_job_qualifications;
         $this->jobBenefits = $selectedPosition->job_benefits;
         $this->arabicJobBenefits = $selectedPosition->arabic_job_benefits;
+        $this->hiringManagers = $selectedPosition->potentialManagers;
     }
 
     public function showVacancy($id)

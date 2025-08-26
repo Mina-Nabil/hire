@@ -177,8 +177,8 @@
                                             class="form-control @error('hiringManagerId') !border-danger-500 @enderror"
                                             wire:model="hiringManagerId">
                                             <option value="">Select a user</option>
-                                            @foreach ($users as $user)
-                                                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                            @foreach ($hiringManagers as $manager)
+                                                <option value="{{ $manager->id }}">{{ $manager->name }}</option>
                                             @endforeach
                                         </select>
                                         @error('hiringManagerId')

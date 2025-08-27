@@ -459,17 +459,8 @@
                                                 {{ $attendance->end_time ? \Carbon\Carbon::parse($attendance->end_time)->format('H:i A') : 'N/A' }}
                                             </td>
                                             <td class="table-td">
-                                                <span
-                                                    class="
-                                            @if ($attendance->penalized_hours > 0) text-danger-500 @else text-success-500 @endif
-                                            ">
-                                                    {{ $attendance->hours ?  sprintf('%02d:%02d', (int) $attendance->hours, fmod($attendance->hours, 1) * 60)  . 'h' : 'N/A' }}
-                                                    @if ($attendance->penalized_hours > 0)
-                                                        <span>
-                                                            -
-                                                            ({{ $attendance->penalized_hours > 1.0 ? number_format($attendance->penalized_hours, 0) . ' h' : number_format($attendance->penalized_hours * 60, 2) . ' min' }})
-                                                        </span>
-                                                    @endif
+                                                <span>
+                                                    {{ $attendance->hours }}
                                                 </span>
                                             </td>
                                             <td class="table-td">

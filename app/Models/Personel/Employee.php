@@ -338,9 +338,13 @@ class Employee extends Model
 
         if ($attendance_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_FIXED) {
             if ($working_day_start_min !== $working_day_start_max) {
+                Log::debug("working_day_start_min: " . $working_day_start_min);
+                Log::debug("working_day_start_max: " . $working_day_start_max);
                 throw new AppException('Working day start min and max must be the same for fixed attendance calculation');
             }
             if ($working_day_end_min !== $working_day_end_max) {
+                Log::debug("working_day_end_min: " . $working_day_end_min);
+                Log::debug("working_day_end_max: " . $working_day_end_max);
                 throw new AppException('Working day end min and max must be the same for fixed attendance calculation');
             }
         }

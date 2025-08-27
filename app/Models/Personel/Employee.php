@@ -342,26 +342,18 @@ class Employee extends Model
             $tmpEndMin = Carbon::parse($working_day_end_min);
             $tmpEndMax = Carbon::parse($working_day_end_max);
             if ($tmpStartMin->diffInHours($tmpStartMax)) {
-                Log::debug("working_day_start_min: " . $working_day_start_min);
-                Log::debug("working_day_start_max: " . $working_day_start_max);
-                Log::debug("daily_working_hours: " . $daily_working_hours);
-                Log::debug("diff: " . $tmpStartMin->diffInHours($tmpStartMax));
                 throw new AppException('Working day start min and max must be the same for fixed attendance calculation');
             }
             if ($tmpEndMin->diffInHours($tmpEndMax)) {
-                Log::debug("working_day_end_min: " . $working_day_end_min);
-                Log::debug("working_day_end_max: " . $working_day_end_max);
-                Log::debug("daily_working_hours: " . $daily_working_hours);
-                Log::debug("diff: " . $tmpEndMin->diffInHours($tmpEndMax));
                 throw new AppException('Working day end min and max must be the same for fixed attendance calculation');
             }
         }
 
         if ($attendance_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_SEMI_FLEXIBLE) {
-            if ($working_day_start_min == $working_day_start_max) {
+            if ($tmpStartMin->eq($tmpStartMax)) {
                 throw new AppException('Working day start min and max must be different for semi-flexible attendance calculation');
             }
-            if ($working_day_end_min == $working_day_end_max) {
+            if ($tmpEndMin->eq($tmpEndMax)) {
                 throw new AppException('Working day end min and max must be different for semi-flexible attendance calculation');
             }
         }
@@ -389,11 +381,11 @@ class Employee extends Model
             }
         }
 
-        if ($working_day_end_min > $working_day_end_max) {
+        if ($tmpEndMin->gt($tmpEndMax)) {
             throw new AppException('Working day end min must be less than or equal to working day end max');
         }
 
-        if ($working_day_start_min > $working_day_start_max) {
+        if ($tmpStartMin->gt($tmpStartMax)) {
             throw new AppException('Working day start min must be less than or equal to working day start max');
         }
 
@@ -4497,13 +4489,9 @@ class Employee extends Model
         $vacationHours = $approvedVacations->filter(function ($vacation) use ($attendanceStart) {
             return $vacation->vacationDays->contains('vacation_date', $attendanceStart->format('Y-m-d'));
         })->sum('hours');
-        Log::info('Calculating penalty for arriving late after in only');
-        Log::info('attendanceStart', ['attendanceStart' => $attendanceStart]);
-        Log::info('allowedStartMax', ['allowedStartMax' => $allowedStartMax]);
+
         if ($attendanceStart->gt($allowedStartMax)) {
             $penaltyHours += $attendanceStart->diffInHours($allowedStartMax, true);
-            Log::info('penaltyHours', ['penaltyHours' => $penaltyHours]);
-            Log::info('vacationHours', ['vacationHours' => $vacationHours]);
             if ($penaltyHours > $vacationHours) {
                 $penaltyHours = ($penaltyHours - $vacationHours);
                 $vacationHoursForDay += $vacationHours;

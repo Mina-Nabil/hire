@@ -118,7 +118,7 @@
                                         </div>
                                     </td>
                                     <td class="table-td">
-                                        <span class="text-sm font-medium">{{ $appliedVacation->days ?? 0 }}</span>
+                                        <span class="text-sm font-medium">{{ $appliedVacation->vacationDays->pluck('vacation_date')->implode(', ') }}</span>
                                     </td>
                                     <td class="table-td">
                                         <span class="text-sm font-medium">{{ $appliedVacation->hours ?? 0 }}</span>

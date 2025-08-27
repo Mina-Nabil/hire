@@ -4497,13 +4497,19 @@ class Employee extends Model
         $vacationHours = $approvedVacations->filter(function ($vacation) use ($attendanceStart) {
             return $vacation->vacationDays->contains('vacation_date', $attendanceStart->format('Y-m-d'));
         })->sum('hours');
+        Log::info('Calculating penalty for arriving late after in only');
+        Log::info('attendanceStart', ['attendanceStart' => $attendanceStart]);
+        Log::info('allowedStartMax', ['allowedStartMax' => $allowedStartMax]);
         if ($attendanceStart->gt($allowedStartMax)) {
             $penaltyHours += $attendanceStart->diffInHours($allowedStartMax, true);
+            Log::info('penaltyHours', ['penaltyHours' => $penaltyHours]);
+            Log::info('vacationHours', ['vacationHours' => $vacationHours]);
             if ($penaltyHours > $vacationHours) {
                 $penaltyHours = ($penaltyHours - $vacationHours);
                 $vacationHoursForDay += $vacationHours;
                 $vacationHours = 0;
                 $actualPenaltyHours = $this->calculateLateArrivalPenalty($attendanceStart->diffInMinutes($allowedStartMax, true));
+                Log::info('actualPenaltyHours', ['actualPenaltyHours' => $actualPenaltyHours]);
                 if ($actualPenaltyHours) {
                     $penaltyHoursForDay += $penaltyHours;
                     $penaltyDays[] = [

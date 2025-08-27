@@ -4493,7 +4493,7 @@ class Employee extends Model
         ?string $workingDayStartMax,
     ) {
         $penaltyHours = 0;
-        $allowedStartMax = Carbon::parse($workingDayStartMax);
+        $allowedStartMax = Carbon::parse($attendanceStart->format('Y-m-d') . ' ' . $workingDayStartMax);
         $vacationHours = $approvedVacations->filter(function ($vacation) use ($attendanceStart) {
             return $vacation->vacationDays->contains('vacation_date', $attendanceStart->format('Y-m-d'));
         })->sum('hours');

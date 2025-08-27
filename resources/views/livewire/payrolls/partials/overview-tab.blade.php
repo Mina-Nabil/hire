@@ -144,7 +144,7 @@
                                 </span>
                             </button>
 
-                            @if (($payrollEmployee->total_penalty_hours ?? 0) > 0)
+                            {{-- @if (($payrollEmployee->total_penalty_hours ?? 0) > 0)
                                 <button type="button" class="btn btn-sm btn-outline-info"
                                     wire:click="showPenaltyBreakdown({{ $payrollEmployee->id }})">
                                     <span class="flex items-center">
@@ -153,7 +153,7 @@
                                         Penalties
                                     </span>
                                 </button>
-                            @endif
+                            @endif --}}
 
                             @if ($payroll->status === \App\Models\Benefits\Payrolls\Payroll::STATUS_PENDING)
                                 <button type="button" class="btn btn-sm btn-outline-secondary"

@@ -12,20 +12,20 @@ use Livewire\Attributes\Title;
 class PayrollShow extends Component
 {
     use AlertFrontEnd, WithPagination;
-    
+
     public $payroll;
     public $search = '';
     public $perPage = 10;
     public $sortField = 'created_at';
     public $sortDirection = 'desc';
-    
+
     // Tab management
     public $activeTab = 'overview';
-    
+
     protected $queryString = ['activeTab'];
-    
+
     protected $listeners = ['approvePayroll', 'deletePayroll'];
-    
+
     // Modal properties
     public $showEmployeeDetailsModal = false;
     public $selectedEmployeeId = null;
@@ -34,13 +34,13 @@ class PayrollShow extends Component
     public $employeeBenefitPayments = [];
     public $employeeOvertimes = [];
     public $employeeExtraPayments = [];
-    
+
     // Adjustment editing properties
     public $showAdjustmentModal = false;
     public $editingPayrollEmployeeId = null;
     public $adjustmentAmount = 0;
     public $adjustmentDescription = '';
-    
+
     // Penalty breakdown modal properties
     public $showPenaltyBreakdownModal = false;
     public $selectedPenaltyEmployee = null;
@@ -49,7 +49,7 @@ class PayrollShow extends Component
     public $employeeAppliedVacations = [];
     public $employeeMissingDays = [];
     public $employeePenaltyDays = [];
-    
+
     // Vacation application for penalty offset modal properties
     public $showVacationApplicationModal = false;
     public $availableVacationBenefits = [];
@@ -57,21 +57,21 @@ class PayrollShow extends Component
     public $vacationHoursToApply = 0;
     public $maxApplicableHours = 0;
     public $remainingPenaltyHours = 0;
-    
+
     public function mount($id)
     {
         $this->payroll = Payroll::with('creator')->findOrFail($id);
-        
+
         // Verify the user has permission to view this payroll
         $this->authorize('view', $this->payroll);
     }
-    
+
     public function setActiveTab($tab)
     {
         $this->activeTab = $tab;
         $this->resetPage(); // Reset pagination when switching tabs
     }
-    
+
     public function sortBy($field)
     {
         if ($this->sortField === $field) {
@@ -81,57 +81,56 @@ class PayrollShow extends Component
             $this->sortDirection = 'asc';
         }
     }
-    
+
     public function approvePayroll()
     {
         $this->authorize('update', $this->payroll);
-        
+
         $res = $this->payroll->approve();
 
-        if($res){
+        if ($res) {
             $this->payroll->refresh();
             $this->alertSuccess('Payroll approved successfully.');
-        }else{
-                $this->alertError('Failed to approve payroll');
+        } else {
+            $this->alertError('Failed to approve payroll');
         }
-
     }
 
     public function deletePayroll()
     {
         $this->authorize('delete', $this->payroll);
-        
+
         $this->payroll->deletePayroll();
         $this->alertSuccess('Payroll deleted successfully.');
         //route to payrolls index
         return redirect()->route('payrolls.index');
     }
-    
+
     public function showEmployeeDetails($payrollEmployeeId)
     {
         $this->selectedPayrollEmployee = \App\Models\Benefits\Payrolls\PayrollEmployee::with('employee')
             ->findOrFail($payrollEmployeeId);
-        
+
         $this->selectedEmployeeId = $this->selectedPayrollEmployee->employee_id;
-        
+
         // Load attendance records for this employee and payroll
         $this->employeeAttendance = \App\Models\Attendance\Attendance::where('employee_id', $this->selectedEmployeeId)
             ->where('payroll_id', $this->payroll->id)
             ->orderBy('date')
             ->get();
-        
+
         // Load benefit payments for this employee and payroll
         $this->employeeBenefitPayments = \App\Models\Benefits\Payrolls\BenefitPayment::where('employee_id', $this->selectedEmployeeId)
             ->where('payroll_id', $this->payroll->id)
             ->orderBy('created_at')
             ->get();
-        
+
         // Load overtime records for this employee and payroll
         $this->employeeOvertimes = \App\Models\Attendance\Overtime::where('employee_id', $this->selectedEmployeeId)
             ->where('payroll_id', $this->payroll->id)
             ->orderBy('date')
             ->get();
-        
+
         // Load extra payments for this employee and payroll
         $this->employeeExtraPayments = \App\Models\Benefits\Payrolls\ExtraPayment::where('employee_id', $this->selectedEmployeeId)
             ->where('payroll_id', $this->payroll->id)
@@ -147,10 +146,21 @@ class PayrollShow extends Component
             ->where('payroll_id', $this->payroll->id)
             ->orderBy('date')
             ->get();
-        
+
+
+        // Load applied vacations for the payroll period
+        $this->employeeAppliedVacations = $this->selectedPayrollEmployee->employee->appliedVacations()
+            ->whereHas('vacationDays', function ($query) {
+                $query->whereBetween('vacation_date', [$this->payroll->start_date, $this->payroll->end_date]);
+            })
+            ->with(['vacationBenefit', 'vacationDays' => function ($query) {
+                $query->whereBetween('vacation_date', [$this->payroll->start_date, $this->payroll->end_date]);
+            }])
+            ->get();
+
         $this->showEmployeeDetailsModal = true;
     }
-    
+
     public function closeEmployeeDetailsModal()
     {
         $this->showEmployeeDetailsModal = false;
@@ -162,14 +172,14 @@ class PayrollShow extends Component
         $this->employeeExtraPayments = [];
         $this->employeeMissingDays = [];
     }
-    
+
     public function showPenaltyBreakdown($payrollEmployeeId)
     {
         $this->selectedPenaltyEmployee = \App\Models\Benefits\Payrolls\PayrollEmployee::with('employee')
             ->findOrFail($payrollEmployeeId);
-        
+
         $employee = $this->selectedPenaltyEmployee->employee;
-        
+
         // Calculate hourly rate using the same logic as CreatePayroll
         $grossSalary = $this->selectedPenaltyEmployee->gross_salary;
         $insuranceAmount = $this->selectedPenaltyEmployee->insurance_amount;
@@ -179,14 +189,14 @@ class PayrollShow extends Component
         $dayPrice = $netIncome / 30;
         $dailyWorkingHours = $employee->benefitConfiguration?->daily_working_hours ?? 8;
         $hourlyRate = $dayPrice / $dailyWorkingHours;
-        
+
         // Calculate penalty breakdown using the correct hourly rate
         $penaltyCalculation = $employee->calculatePenaltyWithVacationOffset(
             $this->payroll->start_date,
             $this->payroll->end_date,
             $hourlyRate, // use the same hourly rate calculation as CreatePayroll
         );
-        
+
         // Get penalty breakdown data
         $this->penaltyBreakdownData = [
             'total_penalty_hours' => $penaltyCalculation['total_penalty_hours'],
@@ -198,17 +208,17 @@ class PayrollShow extends Component
             'available_vacation_benefits' => $penaltyCalculation['available_vacation_benefits'],
             'penalty_days' => $penaltyCalculation['penalty_days']
         ];
-        
+
         // Store available vacation benefits for potential application
         $this->availableVacationBenefits = $penaltyCalculation['available_vacation_benefits'];
         $this->remainingPenaltyHours = $penaltyCalculation['remaining_penalty_hours'];
-        
+
         // Load employee's vacation benefits
         $this->employeeVacationBenefits = $employee->vacationBenefits()
             ->whereNull('end_date')
             ->with('vacationDetail')
             ->get();
-        
+
         // Load applied vacations for the payroll period
         $this->employeeAppliedVacations = $employee->appliedVacations()
             ->whereHas('vacationDays', function ($query) {
@@ -218,10 +228,10 @@ class PayrollShow extends Component
                 $query->whereBetween('vacation_date', [$this->payroll->start_date, $this->payroll->end_date]);
             }])
             ->get();
-        
+
         $this->showPenaltyBreakdownModal = true;
     }
-    
+
     public function closePenaltyBreakdownModal()
     {
         $this->showPenaltyBreakdownModal = false;
@@ -232,23 +242,23 @@ class PayrollShow extends Component
         $this->availableVacationBenefits = [];
         $this->remainingPenaltyHours = 0;
     }
-    
+
     public function openVacationApplicationModal()
     {
         // Check if user can update the payroll
         $this->authorize('update', $this->payroll);
-        
+
         if (empty($this->availableVacationBenefits) || $this->remainingPenaltyHours <= 0) {
             $this->alertError('No vacation benefits available or no remaining penalty hours to offset.');
             return;
         }
-        
+
         $this->selectedVacationBenefitId = null;
         $this->vacationHoursToApply = 0;
         $this->maxApplicableHours = 0;
         $this->showVacationApplicationModal = true;
     }
-    
+
     public function closeVacationApplicationModal()
     {
         $this->showVacationApplicationModal = false;
@@ -256,13 +266,13 @@ class PayrollShow extends Component
         $this->vacationHoursToApply = 0;
         $this->maxApplicableHours = 0;
     }
-    
+
     public function updatedSelectedVacationBenefitId($value)
     {
         if ($value) {
             $selectedBenefit = collect($this->availableVacationBenefits)
                 ->firstWhere('vacation_benefit_id', $value);
-            
+
             if ($selectedBenefit) {
                 $this->maxApplicableHours = $selectedBenefit['max_applicable_hours'];
                 $this->vacationHoursToApply = min($this->remainingPenaltyHours, $this->maxApplicableHours);
@@ -272,49 +282,49 @@ class PayrollShow extends Component
             $this->vacationHoursToApply = 0;
         }
     }
-    
+
     public function applyVacationForPenalty()
     {
         // Check if user can update the payroll
         $this->authorize('update', $this->payroll);
-        
+
         if (!$this->selectedVacationBenefitId || $this->vacationHoursToApply <= 0) {
             $this->alertError('Please select a vacation benefit and specify hours to apply.');
             return;
         }
-        
+
         if ($this->vacationHoursToApply > $this->maxApplicableHours) {
             $this->alertError('Hours to apply cannot exceed the maximum applicable hours.');
             return;
         }
-        
+
         $employee = $this->selectedPenaltyEmployee->employee;
-        
+
         $result = $employee->applyVacationForPenaltyOffset(
             $this->selectedVacationBenefitId,
             $this->vacationHoursToApply,
             $this->payroll->start_date,
             $this->payroll->end_date
         );
-        
+
         if ($result['success']) {
             // Update the payroll employee record with new penalty calculations
             $this->updatePayrollEmployeePenaltyData();
-            
+
             $this->alertSuccess($result['message']);
             $this->closeVacationApplicationModal();
-            
+
             // Refresh the penalty breakdown data
             $this->showPenaltyBreakdown($this->selectedPenaltyEmployee->id);
         } else {
             $this->alertError($result['message']);
         }
     }
-    
+
     private function updatePayrollEmployeePenaltyData()
     {
         $employee = $this->selectedPenaltyEmployee->employee;
-        
+
         // Calculate hourly rate using the same logic as CreatePayroll
         $grossSalary = $this->selectedPenaltyEmployee->gross_salary;
         $insuranceAmount = $this->selectedPenaltyEmployee->insurance_amount;
@@ -324,7 +334,7 @@ class PayrollShow extends Component
         $dayPrice = $netIncome / 30;
         $dailyWorkingHours = $employee->benefitConfiguration?->daily_working_hours ?? 8;
         $hourlyRate = $dayPrice / $dailyWorkingHours;
-        
+
         // Recalculate penalty breakdown using the correct hourly rate
         $penaltyCalculation = $employee->calculatePenaltyWithVacationOffset(
             $this->payroll->start_date,
@@ -332,7 +342,7 @@ class PayrollShow extends Component
             $hourlyRate, // use the same hourly rate calculation as CreatePayroll
             $this->payroll->id // pass the payroll ID to include attendance records
         );
-        
+
         // Update payroll employee record
         $this->selectedPenaltyEmployee->update([
             'total_penalty_hours' => $penaltyCalculation['total_penalty_hours'],
@@ -340,7 +350,7 @@ class PayrollShow extends Component
             'direct_deduction_hours' => $penaltyCalculation['remaining_penalty_hours'],
             'direct_deduction_amount' => $penaltyCalculation['direct_deduction_amount'],
         ]);
-        
+
         // Recalculate net amounts
         $grossSalary = $this->selectedPenaltyEmployee->gross_salary;
         $insuranceAmount = $this->selectedPenaltyEmployee->insurance_amount;
@@ -349,40 +359,40 @@ class PayrollShow extends Component
         $employeeMedical = $this->selectedPenaltyEmployee->employee_medical;
         $employeeDeductions = $this->selectedPenaltyEmployee->employee_deductions;
         $directDeductionAmount = $penaltyCalculation['direct_deduction_amount'];
-        
+
         $netAfterPenalty = $grossSalary + $insuranceAmount + $otherAmount - $employeeInsurance - $employeeMedical - $employeeDeductions - $directDeductionAmount;
-        
+
         $extraPayments = $this->selectedPenaltyEmployee->extra_payments;
         $overtimeAmount = $this->selectedPenaltyEmployee->overtime_amount;
         $adjAmount = $this->selectedPenaltyEmployee->adj_amount;
-        
+
         $netAfterDeductions = $netAfterPenalty + $extraPayments + $overtimeAmount + $adjAmount;
-        
+
         $this->selectedPenaltyEmployee->update([
             'net_after_penalty' => $netAfterPenalty,
             'net_after_deductions' => $netAfterDeductions,
             'paid' => $netAfterDeductions
         ]);
-        
+
         // Update payroll total
         $this->payroll->refresh();
         $newTotal = $this->payroll->payrollEmployees()->sum('paid');
         $this->payroll->update(['total_paid' => $newTotal]);
     }
-    
+
     public function openAdjustmentModal($payrollEmployeeId)
     {
         // Check if user can update the payroll
         $this->authorize('update', $this->payroll);
-        
+
         $payrollEmployee = \App\Models\Benefits\Payrolls\PayrollEmployee::findOrFail($payrollEmployeeId);
-        
+
         $this->editingPayrollEmployeeId = $payrollEmployeeId;
         $this->adjustmentAmount = $payrollEmployee->adj_amount;
         $this->adjustmentDescription = $payrollEmployee->adj_desc;
         $this->showAdjustmentModal = true;
     }
-    
+
     public function closeAdjustmentModal()
     {
         $this->showAdjustmentModal = false;
@@ -390,64 +400,64 @@ class PayrollShow extends Component
         $this->adjustmentAmount = 0;
         $this->adjustmentDescription = '';
     }
-    
+
     public function saveAdjustment()
     {
         // Check if user can update the payroll
         $this->authorize('update', $this->payroll);
-        
+
         if (!$this->editingPayrollEmployeeId) {
             return;
         }
-        
+
         $payrollEmployee = \App\Models\Benefits\Payrolls\PayrollEmployee::findOrFail($this->editingPayrollEmployeeId);
-        
+
         // Store the old net amount for comparison
         $oldNetAmount = $payrollEmployee->paid;
         $oldAdjAmount = $payrollEmployee->adj_amount;
-        
+
         // Update adjustment fields
         $payrollEmployee->adj_amount = $this->adjustmentAmount;
         $payrollEmployee->adj_desc = $this->adjustmentDescription;
-        
+
         // Recalculate net after deductions
         $newNetAmount = $payrollEmployee->net_after_penalty + $payrollEmployee->extra_payments + $payrollEmployee->overtime_amount + $this->adjustmentAmount;
         $payrollEmployee->net_after_deductions = $newNetAmount;
         $payrollEmployee->paid = $newNetAmount; // Update paid amount as well
         $payrollEmployee->tax_amount = Payroll::calculateTaxAmount($newNetAmount);
         $payrollEmployee->after_tax_salary = $newNetAmount - $payrollEmployee->tax_amount;
-        
+
         $payrollEmployee->save();
-        
+
         // Update payroll total if needed
         $paidDifference = $payrollEmployee->paid - $oldNetAmount;
         if ($paidDifference != 0) {
             $this->payroll->total_paid += $paidDifference;
             $this->payroll->save();
         }
-        
+
         // Log the adjustment
         \App\Models\Users\AppLog::info(
             'Payroll Adjustment Updated',
             'Updated adjustment for employee ' . $payrollEmployee->employee->name . ' from ' . $oldAdjAmount . ' to ' . $this->adjustmentAmount,
             loggable: $this->payroll
         );
-        
+
         $this->closeAdjustmentModal();
         $this->alertSuccess('Adjustment updated successfully.');
     }
-    
+
     public function exportPayroll()
     {
         $this->authorize('view', $this->payroll);
-        
+
         return $this->payroll->exportToExcel();
     }
-    
+
     public function render()
     {
         $data = [];
-        
+
         if ($this->activeTab === 'overview') {
             $payrollEmployees = $this->payroll->payrollEmployees()
                 ->with('employee')
@@ -460,7 +470,7 @@ class PayrollShow extends Component
                 })
                 ->orderBy($this->sortField, $this->sortDirection)
                 ->paginate($this->perPage);
-            
+
             // Calculate totals for all employees (not just paginated ones)
             $totalsQuery = $this->payroll->payrollEmployees()
                 ->when($this->search, function ($query) {
@@ -470,7 +480,7 @@ class PayrollShow extends Component
                             ->orWhere('department', 'like', '%' . $this->search . '%');
                     });
                 });
-            
+
             $totals = [
                 'total_employees' => $totalsQuery->count(),
                 'gross_salary' => $totalsQuery->sum('gross_salary'),
@@ -490,7 +500,7 @@ class PayrollShow extends Component
                 'after_tax_salary' => $totalsQuery->sum('after_tax_salary'),
                 'employee_medical' => $totalsQuery->sum('employee_medical'),
             ];
-            
+
             $data = [
                 'payrollEmployees' => $payrollEmployees,
                 'totals' => $totals
@@ -507,7 +517,7 @@ class PayrollShow extends Component
                 })
                 ->orderBy($this->sortField, $this->sortDirection)
                 ->paginate($this->perPage);
-            
+
             $data['benefitPayments'] = $benefitPayments;
         } elseif ($this->activeTab === 'overtime') {
             $overtimes = $this->payroll->overtimes()
@@ -519,7 +529,7 @@ class PayrollShow extends Component
                 })
                 ->orderBy($this->sortField, $this->sortDirection)
                 ->paginate($this->perPage);
-            
+
             $data['overtimes'] = $overtimes;
         } elseif ($this->activeTab === 'extra-payments') {
             $extraPayments = $this->payroll->extraPayments()
@@ -531,10 +541,10 @@ class PayrollShow extends Component
                 })
                 ->orderBy($this->sortField, $this->sortDirection)
                 ->paginate($this->perPage);
-            
+
             $data['extraPayments'] = $extraPayments;
         }
-        
+
         return view('livewire.payrolls.payroll-show', $data);
     }
-} 
+}

@@ -396,6 +396,14 @@
                                 </button>
                             </li>
                             <li class="mr-2">
+                                <button @click="activeTab = 'time-off'"
+                                    :class="activeTab === 'time-off' ? 'border-primary-500 text-primary-500' :
+                                        'border-transparent text-slate-500 hover:text-slate-600 hover:border-slate-300'"
+                                    class="inline-block py-2 px-4 text-sm font-medium border-b-2">
+                                    Applied Time Off
+                                </button>
+                            </li>
+                            <li class="mr-2">
                                 <button @click="activeTab = 'benefits'"
                                     :class="activeTab === 'benefits' ? 'border-primary-500 text-primary-500' :
                                         'border-transparent text-slate-500 hover:text-slate-600 hover:border-slate-300'"
@@ -542,6 +550,33 @@
                                     @endforelse
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+
+                    <div x-show="activeTab === 'time-off'" class="mt-4">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
+                                <thead>
+                                    <tr>
+                                        <th class="table-th">Date</th>
+                                        <th class="table-th">Hours</th>
+
+                                    <tbody
+                                        class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
+                                        @forelse($employeeAppliedVacations as $appliedVacation)
+                                            <tr>
+                                                <td class="table-td">{{ $appliedVacation->created_at->format('d M Y') }}</td>
+                                                <td class="table-td">{{ $appliedVacation->hours }}</td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="2" class="table-td text-center py-4">No applied time off
+                                                    found</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
 

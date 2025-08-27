@@ -93,12 +93,16 @@
                     <div class="text-base font-semibold">{{ number_format($payroll->total_tax_amount, 2) }}</div>
                 </div>
                 <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-4">
-                    <h5 class="text-sm font-medium text-slate-500 dark:text-slate-300 mb-1">Total Employee Benefits Amount</h5>
-                    <div class="text-base font-semibold">{{ number_format($payroll->total_employee_base_benefits, 2) }}</div>
+                    <h5 class="text-sm font-medium text-slate-500 dark:text-slate-300 mb-1">Total Employee Benefits
+                        Amount</h5>
+                    <div class="text-base font-semibold">{{ number_format($payroll->total_employee_base_benefits, 2) }}
+                    </div>
                 </div>
                 <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-4">
-                    <h5 class="text-sm font-medium text-slate-500 dark:text-slate-300 mb-1">Total Other Benefits Amount</h5>
-                    <div class="text-base font-semibold">{{ number_format($payroll->total_other_base_benefits, 2) }}</div>
+                    <h5 class="text-sm font-medium text-slate-500 dark:text-slate-300 mb-1">Total Other Benefits Amount
+                    </h5>
+                    <div class="text-base font-semibold">{{ number_format($payroll->total_other_base_benefits, 2) }}
+                    </div>
                 </div>
 
                 <div class="bg-slate-50 dark:bg-slate-700 rounded-md p-4">
@@ -369,12 +373,14 @@
                                 {{ number_format($selectedPayrollEmployee->after_tax_salary, 2) }}</div>
                         </div>
                         <div class="bg-primary-50 dark:bg-primary-900/20 rounded-md p-3 md:col-span-2">
-                            <h5 class="text-xs font-medium text-primary-500 dark:text-primary-400 mb-1">Employee Benefits Amount</h5>
+                            <h5 class="text-xs font-medium text-primary-500 dark:text-primary-400 mb-1">Employee
+                                Benefits Amount</h5>
                             <div class="text-lg font-semibold text-primary-600 dark:text-primary-400">
                                 {{ number_format($selectedPayrollEmployee->employee_base_benefits, 2) }}</div>
                         </div>
                         <div class="bg-primary-50 dark:bg-primary-900/20 rounded-md p-3 md:col-span-2">
-                            <h5 class="text-xs font-medium text-primary-500 dark:text-primary-400 mb-1">Other Benefits Amount</h5>
+                            <h5 class="text-xs font-medium text-primary-500 dark:text-primary-400 mb-1">Other Benefits
+                                Amount</h5>
                             <div class="text-lg font-semibold text-primary-600 dark:text-primary-400">
                                 {{ number_format($selectedPayrollEmployee->other_base_benefits, 2) }}</div>
                         </div>
@@ -539,7 +545,8 @@
                                             <td class="table-td">
                                                 {{ \Carbon\Carbon::parse($penaltyDay->date)->format('d M Y') }}
                                             </td>
-                                            <td class="table-td">{{ ucfirst(str_replace('_', ' ', $penaltyDay->type)) }}</td>
+                                            <td class="table-td">
+                                                {{ ucfirst(str_replace('_', ' ', $penaltyDay->type)) }}</td>
                                             <td class="table-td">{{ $penaltyDay->hours }}</td>
                                         </tr>
                                     @empty
@@ -556,27 +563,59 @@
                     <div x-show="activeTab === 'time-off'" class="mt-4">
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
+
                                 <thead>
                                     <tr>
-                                        <th class="table-th">Date</th>
-                                        <th class="table-th">Hours</th>
+                                        <th class="table-th">Vacation Benefit</th>
+                                        <th class="table-th">Total Hours</th>
+                                        <th class="table-th">Days Count</th>
+                                        <th class="table-th">Status</th>
+                                        <th class="table-th">Used for Penalty</th>
+                                    </tr>
+                                </thead>
 
-                                    <tbody
-                                        class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
-                                        @forelse($employeeAppliedVacations as $appliedVacation)
-                                            <tr>
-                                                <td class="table-td">{{ $appliedVacation->created_at->format('d M Y') }}</td>
-                                                <td class="table-td">{{ $appliedVacation->hours }}</td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="2" class="table-td text-center py-4">No applied time off
-                                                    found</td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
+
+                                <tbody
+                                    class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
+                                    @forelse($employeeAppliedVacations as $appliedVacation)
+                                        @php
+                                            $totalHoursInPeriod = $appliedVacation->vacationDays->sum('hours');
+                                            $daysCount = $appliedVacation->vacationDays->count();
+                                        @endphp
+                                        <tr>
+                                            <td class="table-td">
+                                                {{ $appliedVacation->vacationBenefit->name ?? 'N/A' }}
+                                            </td>
+                                            <td class="table-td">{{ number_format($totalHoursInPeriod, 1) }} hours
+                                            </td>
+                                            <td class="table-td">{{ $daysCount }} days</td>
+                                            <td class="table-td">
+                                                @if ($appliedVacation->status === 'approved')
+                                                    <span class="badge bg-success-500 text-white">Approved</span>
+                                                @elseif($appliedVacation->status === 'pending')
+                                                    <span class="badge bg-warning-500 text-white">Pending</span>
+                                                @else
+                                                    <span
+                                                        class="badge bg-slate-500 text-white">{{ ucfirst($appliedVacation->status) }}</span>
+                                                @endif
+                                            </td>
+                                            <td class="table-td">
+                                                @if (str_contains($appliedVacation->admin_note ?? '', 'Auto-created from attendance during payroll creation'))
+                                                    <span class="badge bg-info-500 text-white">Auto-Applied</span>
+                                                @else
+                                                    <span class="badge bg-slate-500 text-white">Manual</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="5" class="table-td text-center py-4">No applied vacations
+                                                in
+                                                this period</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 

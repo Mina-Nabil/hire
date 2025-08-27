@@ -568,9 +568,8 @@
                                     <tr>
                                         <th class="table-th">Vacation Benefit</th>
                                         <th class="table-th">Total Hours</th>
-                                        <th class="table-th">Days Count</th>
+                                        <th class="table-th">Days</th>
                                         <th class="table-th">Status</th>
-                                        <th class="table-th">Used for Penalty</th>
                                     </tr>
                                 </thead>
 
@@ -578,17 +577,13 @@
                                 <tbody
                                     class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
                                     @forelse($employeeAppliedVacations as $appliedVacation)
-                                        @php
-                                            $totalHoursInPeriod = $appliedVacation->vacationDays->sum('hours');
-                                            $daysCount = $appliedVacation->vacationDays->count();
-                                        @endphp
                                         <tr>
                                             <td class="table-td">
                                                 {{ $appliedVacation->vacationBenefit->name ?? 'N/A' }}
                                             </td>
-                                            <td class="table-td">{{ number_format($totalHoursInPeriod, 1) }} hours
+                                            <td class="table-td">{{ $appliedVacation->vacationDays->sum('hours') }}
                                             </td>
-                                            <td class="table-td">{{ $daysCount }} days</td>
+                                            <td class="table-td">{{ $appliedVacation->vacationDays->pluck('vacation_date')->implode(', ') }}</td>
                                             <td class="table-td">
                                                 @if ($appliedVacation->status === 'approved')
                                                     <span class="badge bg-success-500 text-white">Approved</span>
@@ -599,13 +594,7 @@
                                                         class="badge bg-slate-500 text-white">{{ ucfirst($appliedVacation->status) }}</span>
                                                 @endif
                                             </td>
-                                            <td class="table-td">
-                                                @if (str_contains($appliedVacation->admin_note ?? '', 'Auto-created from attendance during payroll creation'))
-                                                    <span class="badge bg-info-500 text-white">Auto-Applied</span>
-                                                @else
-                                                    <span class="badge bg-slate-500 text-white">Manual</span>
-                                                @endif
-                                            </td>
+                                            
                                         </tr>
                                     @empty
                                         <tr>

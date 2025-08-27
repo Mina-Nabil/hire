@@ -583,7 +583,9 @@
                                             </td>
                                             <td class="table-td">{{ $appliedVacation->vacationDays->sum('hours') }}
                                             </td>
-                                            <td class="table-td">{{ $appliedVacation->vacationDays->pluck('vacation_date')->implode(', ') }}</td>
+                                            <td class="table-td">
+                                                {{ $appliedVacation->vacationDays->pluck('vacation_date')->implode(', ') }}
+                                            </td>
                                             <td class="table-td">
                                                 @if ($appliedVacation->status === 'approved')
                                                     <span class="badge bg-success-500 text-white">Approved</span>
@@ -594,7 +596,7 @@
                                                         class="badge bg-slate-500 text-white">{{ ucfirst($appliedVacation->status) }}</span>
                                                 @endif
                                             </td>
-                                            
+
                                         </tr>
                                     @empty
                                         <tr>

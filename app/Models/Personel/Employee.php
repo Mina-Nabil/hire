@@ -341,10 +341,10 @@ class Employee extends Model
             $tmpStartMax = Carbon::parse($working_day_start_max);
             $tmpEndMin = Carbon::parse($working_day_end_min);
             $tmpEndMax = Carbon::parse($working_day_end_max);
-            if ($tmpStartMin->diffInHours($tmpStartMax) != $daily_working_hours) {
+            if ($tmpStartMin->diffInHours($tmpStartMax)) {
                 throw new AppException('Working day start min and max must be the same for fixed attendance calculation');
             }
-            if ($tmpEndMin->diffInHours($tmpEndMax) != $daily_working_hours) {
+            if ($tmpEndMin->diffInHours($tmpEndMax)) {
                 throw new AppException('Working day end min and max must be the same for fixed attendance calculation');
             }
         }

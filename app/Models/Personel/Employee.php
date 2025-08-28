@@ -3930,7 +3930,7 @@ class Employee extends Model
                 return $vacation->vacationDays->contains('vacation_date', $missingDay);
             })->sum('hours');
             $totalVacationHours += $vacationHours;
-            $missingHours = (max(8, $this->benefitConfiguration?->daily_working_hours ?? 8)) - $vacationHours;
+            $missingHours = (min(8, $this->benefitConfiguration?->daily_working_hours ?? 8)) - $vacationHours;
             if ($missingHours > 0) {
                 $totalPenaltyHours += $missingHours;
                 $penaltyDays[] = [

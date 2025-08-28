@@ -158,9 +158,14 @@
                                             <div class="flex-shrink-0 flex items-center pt-1">
                                                 <input type="checkbox"
                                                     wire:model.live="employeesData.{{ $employee->id }}.isTaxable"
+                                                    @checked($employeeData['isTaxable'])
                                                     class="form-checkbox rounded text-xs w-3 h-3"
                                                     id="taxable{{ $employee->id }}"
                                                     title="Taxable">
+                                                <label class="ml-2 text-sm text-slate-700"
+                                                    for="taxable{{ $employee->id }}">
+                                                    Tax?
+                                                </label>
                                             </div>
                                         </div>
                                     </td>

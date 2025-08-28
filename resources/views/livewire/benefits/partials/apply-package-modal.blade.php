@@ -108,7 +108,8 @@
 
                                             <div class="col-span-2">
                                                 <label class="flex items-center">
-                                                    <input type="checkbox" wire:model="isTaxable" class="form-checkbox">
+                                                    <input type="checkbox" wire:model="isTaxable" class="form-checkbox"
+                                                        @checked($isTaxable)>
                                                     <span class="ml-2">Is Taxable</span>
                                                 </label>
                                                 <p class="text-sm text-gray-500 mt-1">

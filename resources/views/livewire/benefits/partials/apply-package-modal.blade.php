@@ -106,6 +106,16 @@
                                                     errorMessage="{{ $errors->first('insuranceAmount') }}" />
                                             </div>
 
+                                            <div class="col-span-2">
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" wire:model="isTaxable" class="form-checkbox">
+                                                    <span class="ml-2">Is Taxable</span>
+                                                </label>
+                                                <p class="text-sm text-gray-500 mt-1">
+                                                    Check if this benefit configuration should be subject to taxation
+                                                </p>
+                                            </div>
+
                                         </div>
                                     </div>
                                     @foreach ($packageDetails as $index => $detail)

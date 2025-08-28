@@ -133,12 +133,26 @@
                                         @endif
                                     </td>
                                     <td class="table-td">
-                                        <input type="number" style="min-width: 160px;"
-                                            wire:model.live="employeesData.{{ $employee->id }}.grossSalary"
-                                            class="form-control text-xs py-1 px-2 h-8 w-full"
-                                            placeholder="Gross Salary"
-                                            @if (!empty($employeeData['selectedPackage'])) min="{{ $employeeData['selectedPackage']->gross_min }}"
-                                                   max="{{ $employeeData['selectedPackage']->gross_max }}" @endif>
+                                        <div class="space-y-2">
+                                            <input type="number" style="min-width: 160px;"
+                                                wire:model.live="employeesData.{{ $employee->id }}.grossSalary"
+                                                class="form-control text-xs py-1 px-2 h-8 w-full"
+                                                placeholder="Gross Salary"
+                                                @if (!empty($employeeData['selectedPackage'])) min="{{ $employeeData['selectedPackage']->gross_min }}"
+                                                       max="{{ $employeeData['selectedPackage']->gross_max }}" @endif>
+                                            
+                                            <div class="flex items-center">
+                                                <input type="checkbox"
+                                                    wire:model.live="employeesData.{{ $employee->id }}.isTaxable"
+                                                    class="form-checkbox rounded text-xs"
+                                                    id="taxable{{ $employee->id }}">
+                                                <label class="ml-1 text-xs text-slate-700"
+                                                    for="taxable{{ $employee->id }}">
+                                                    Taxable
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
                                         @if (!empty($employeeData['errors']['grossSalary']))
                                             <div class="text-red-500 text-xs mt-1 truncate"
                                                 title="{{ implode(', ', $employeeData['errors']['grossSalary']) }}">

@@ -124,6 +124,7 @@ class Employee extends Model
     protected static function booted()
     {
         static::addGlobalScope('hrAccessibleEmployees', function ($builder) {
+            /** @var User $user */
             $user = Auth::user();
 
             // If no user is logged in or if they are admin, don't restrict
@@ -183,9 +184,10 @@ class Employee extends Model
      * @param float $grossSalary
      * @param int $manager_id
      * @param bool $delete_old_conf delete old configuration if true and end old configuration if false
+     * @param bool $is_taxable whether the benefit configuration is taxable
      * @return void
      */
-    public function applyBenefitsPackage(SalaryGrade $salaryGrade, Carbon $start_date, $package_details, $grossSalary, $insuranceAmount, $manager_id = null, bool $delete_old_conf = true)
+    public function applyBenefitsPackage(SalaryGrade $salaryGrade, Carbon $start_date, $package_details, $grossSalary, $insuranceAmount, $manager_id = null, bool $delete_old_conf = true, bool $is_taxable = true)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -208,7 +210,7 @@ class Employee extends Model
         }
 
         try {
-            DB::transaction(function () use ($package_details, $salaryGrade, $grossSalary, $manager_id, $delete_old_conf, $insuranceAmount, $start_date) {
+            DB::transaction(function () use ($package_details, $salaryGrade, $grossSalary, $manager_id, $delete_old_conf, $insuranceAmount, $start_date, $is_taxable) {
                 if ($delete_old_conf) {
                     $this->baseBenefits()->delete();
                 } else {
@@ -232,6 +234,7 @@ class Employee extends Model
                     'insurance_amount' => $insuranceAmount,
                     'manager_id' => $manager_id,
                     'start_date' => $start_date->format('Y-m-d'),
+                    'is_taxable' => $is_taxable,
                 ]);
                 AppLog::info('Benefits Package Applied', 'Benefits package applied for employee: ' . $this->name, loggable: $this);
             });

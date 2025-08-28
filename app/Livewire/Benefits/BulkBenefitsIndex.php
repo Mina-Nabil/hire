@@ -105,6 +105,7 @@ class BulkBenefitsIndex extends Component
             'packageStartDate' => '',
             'packageEndDate' => '',
             'deleteOldConf' => true,
+            'isTaxable' => true,
             'managersList' => [],
             'isLoading' => false,
             'errors' => []
@@ -117,6 +118,7 @@ class BulkBenefitsIndex extends Component
             $employeeData['grossSalary'] = $employee->benefitConfiguration->gross_salary;
             $employeeData['insuranceAmount'] = $employee->benefitConfiguration->insurance_amount;
             $employeeData['managerId'] = $employee->benefitConfiguration->manager_id;
+            $employeeData['isTaxable'] = $employee->benefitConfiguration->is_taxable ?? true;
 
             // Load existing package details
             $savedPackageDetails = $employee->baseBenefits()
@@ -328,7 +330,8 @@ class BulkBenefitsIndex extends Component
                 $employeeData['grossSalary'],
                 $employeeData['insuranceAmount'],
                 $employeeData['managerId'],
-                $employeeData['deleteOldConf']
+                $employeeData['deleteOldConf'],
+                $employeeData['isTaxable']
             );
 
             $this->alertSuccess('Benefits package applied successfully for ' . $employee->name);

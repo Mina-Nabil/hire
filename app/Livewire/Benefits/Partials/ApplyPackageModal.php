@@ -29,6 +29,7 @@ class ApplyPackageModal extends Component
     public $packageStartDate;
     public $packageEndDate;
     public $deleteOldConf = true;
+    public $isTaxable = true;
 
     public $listeners = ['editConfiguration'];
 
@@ -43,6 +44,7 @@ class ApplyPackageModal extends Component
             $this->grossSalary = $this->selectedEmployee->benefitConfiguration->gross_salary;
             $this->insuranceAmount = $this->selectedEmployee->benefitConfiguration->insurance_amount;
             $this->packageStartDate = Carbon::parse($this->selectedEmployee->benefitConfiguration->start_date)->format('Y-m-d');
+            $this->isTaxable = $this->selectedEmployee->benefitConfiguration->is_taxable ?? true;
 
             $savedPackageDetails = $this->selectedEmployee->baseBenefits()
                 ->bySalaryGrade($this->selectedPackageId)->get()->mapWithKeys(function ($benefit) {
@@ -201,7 +203,8 @@ class ApplyPackageModal extends Component
                 $this->grossSalary,
                 $this->insuranceAmount,
                 $this->managerId,
-                $this->deleteOldConf
+                $this->deleteOldConf,
+                $this->isTaxable
             );
 
             $this->alertSuccess('Benefits package applied successfully!');

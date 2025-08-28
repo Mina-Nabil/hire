@@ -44,7 +44,8 @@ class BenefitConfiguration extends Model
         'is_generate_overtime',
         'overtime_max_time',
         'is_require_attendance_approval',
-        'bus_id'
+        'bus_id',
+        'is_taxable'
     ];
 
     public function employee()

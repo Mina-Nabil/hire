@@ -337,23 +337,23 @@ class Employee extends Model
     ) {
 
         if ($attendance_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_FIXED) {
-            $tmpStartMin = Carbon::parse($working_day_start_min);
-            $tmpStartMax = Carbon::parse($working_day_start_max);
-            $tmpEndMin = Carbon::parse($working_day_end_min);
-            $tmpEndMax = Carbon::parse($working_day_end_max);
-            if ($tmpStartMin->diffInHours($tmpStartMax)) {
+            $tmpStartMin = $working_day_start_min ? Carbon::parse($working_day_start_min) : null;
+            $tmpStartMax = $working_day_start_max ? Carbon::parse($working_day_start_max) : null;
+            $tmpEndMin = $working_day_end_min ? Carbon::parse($working_day_end_min) : null;
+            $tmpEndMax = $working_day_end_max ? Carbon::parse($working_day_end_max) : null;
+            if ($tmpStartMin && $tmpStartMax && $tmpStartMin->diffInHours($tmpStartMax)) {
                 throw new AppException('Working day start min and max must be the same for fixed attendance calculation');
             }
-            if ($tmpEndMin->diffInHours($tmpEndMax)) {
+            if ($tmpEndMin && $tmpEndMax && $tmpEndMin->diffInHours($tmpEndMax)) {
                 throw new AppException('Working day end min and max must be the same for fixed attendance calculation');
             }
         }
 
         if ($attendance_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_SEMI_FLEXIBLE) {
-            if ($tmpStartMin->eq($tmpStartMax)) {
+            if ($tmpStartMin && $tmpStartMax && $tmpStartMin->eq($tmpStartMax)) {
                 throw new AppException('Working day start min and max must be different for semi-flexible attendance calculation');
             }
-            if ($tmpEndMin->eq($tmpEndMax)) {
+            if ($tmpEndMin && $tmpEndMax && $tmpEndMin->eq($tmpEndMax)) {
                 throw new AppException('Working day end min and max must be different for semi-flexible attendance calculation');
             }
         }

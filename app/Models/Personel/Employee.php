@@ -336,11 +336,12 @@ class Employee extends Model
         $is_generate_overtime = false
     ) {
 
+        $tmpStartMin = $working_day_start_min ? Carbon::parse($working_day_start_min) : null;
+        $tmpStartMax = $working_day_start_max ? Carbon::parse($working_day_start_max) : null;
+        $tmpEndMin = $working_day_end_min ? Carbon::parse($working_day_end_min) : null;
+        $tmpEndMax = $working_day_end_max ? Carbon::parse($working_day_end_max) : null;
+        
         if ($attendance_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_FIXED) {
-            $tmpStartMin = $working_day_start_min ? Carbon::parse($working_day_start_min) : null;
-            $tmpStartMax = $working_day_start_max ? Carbon::parse($working_day_start_max) : null;
-            $tmpEndMin = $working_day_end_min ? Carbon::parse($working_day_end_min) : null;
-            $tmpEndMax = $working_day_end_max ? Carbon::parse($working_day_end_max) : null;
             if ($tmpStartMin && $tmpStartMax && $tmpStartMin->diffInHours($tmpStartMax)) {
                 throw new AppException('Working day start min and max must be the same for fixed attendance calculation');
             }

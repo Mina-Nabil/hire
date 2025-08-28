@@ -133,7 +133,7 @@
                                         @endif
                                     </td>
                                     <td class="table-td">
-                                        <div class="flex items-start gap-2" style="min-width: 160px;">
+                                        <div class="flex items-start gap-2" style="min-width: 200px;">
                                             <div class="flex-1">
                                                 <input type="number"
                                                     wire:model.live="employeesData.{{ $employee->id }}.grossSalary"

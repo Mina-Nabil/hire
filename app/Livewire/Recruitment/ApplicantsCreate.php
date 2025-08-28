@@ -700,7 +700,9 @@ class ApplicantsCreate extends Component
                 }
 
                 foreach ($this->questionAnswers as $i => $qa) {
-                    $application->addAnswer($qa['answer'], $this->allVacancyQuestions[$i]['object']);
+                    if(array_key_exists($i, $this->allVacancyQuestions)){
+                        $application->addAnswer($qa['answer'], $this->allVacancyQuestions[$i]['object']);
+                    }
                 }
             });
 

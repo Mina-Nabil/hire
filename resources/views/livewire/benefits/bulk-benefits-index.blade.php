@@ -49,7 +49,7 @@
                                 <th scope="col" class="table-th text-nowrap" style="width: 180px;"
                                     title="Salary Grade">Salary Grade</th>
                                 <th scope="col" class="table-th text-nowrap" style="width: 160px;"
-                                    title="Gross Salary">Gross Salary</th>
+                                    title="Gross Salary">Gross (Taxable?)</th>
                                 <th scope="col" class="table-th text-nowrap" style="width: 150px;" title="Insurance">
                                     Insurance</th>
                                 <th scope="col" class="table-th text-nowrap" style="width: 150px;"
@@ -133,37 +133,36 @@
                                         @endif
                                     </td>
                                     <td class="table-td">
-                                        <div class="space-y-2">
-                                            <input type="number" style="min-width: 160px;"
-                                                wire:model.live="employeesData.{{ $employee->id }}.grossSalary"
-                                                class="form-control text-xs py-1 px-2 h-8 w-full"
-                                                placeholder="Gross Salary"
-                                                @if (!empty($employeeData['selectedPackage'])) min="{{ $employeeData['selectedPackage']->gross_min }}"
-                                                       max="{{ $employeeData['selectedPackage']->gross_max }}" @endif>
+                                        <div class="flex items-start gap-2" style="min-width: 160px;">
+                                            <div class="flex-1">
+                                                <input type="number"
+                                                    wire:model.live="employeesData.{{ $employee->id }}.grossSalary"
+                                                    class="form-control text-xs py-1 px-2 h-8 w-full"
+                                                    placeholder="Gross Salary"
+                                                    @if (!empty($employeeData['selectedPackage'])) min="{{ $employeeData['selectedPackage']->gross_min }}"
+                                                           max="{{ $employeeData['selectedPackage']->gross_max }}" @endif>
+                                                
+                                                @if (!empty($employeeData['errors']['grossSalary']))
+                                                    <div class="text-red-500 text-xs mt-1 truncate"
+                                                        title="{{ implode(', ', $employeeData['errors']['grossSalary']) }}">
+                                                        {{ implode(', ', $employeeData['errors']['grossSalary']) }}
+                                                    </div>
+                                                @endif
+                                                @if (!empty($employeeData['selectedPackage']))
+                                                    <span
+                                                        class="text-xs text-slate-500 text-nowrap">{{ $employeeData['selectedPackage']->gross_min }}
+                                                        - {{ $employeeData['selectedPackage']->gross_max }}</span>
+                                                @endif
+                                            </div>
                                             
-                                            <div class="flex items-center">
+                                            <div class="flex-shrink-0 flex items-center pt-1">
                                                 <input type="checkbox"
                                                     wire:model.live="employeesData.{{ $employee->id }}.isTaxable"
-                                                    class="form-checkbox rounded text-xs"
-                                                    id="taxable{{ $employee->id }}">
-                                                <label class="ml-1 text-xs text-slate-700"
-                                                    for="taxable{{ $employee->id }}">
-                                                    Taxable
-                                                </label>
+                                                    class="form-checkbox rounded text-xs w-3 h-3"
+                                                    id="taxable{{ $employee->id }}"
+                                                    title="Taxable">
                                             </div>
                                         </div>
-                                        
-                                        @if (!empty($employeeData['errors']['grossSalary']))
-                                            <div class="text-red-500 text-xs mt-1 truncate"
-                                                title="{{ implode(', ', $employeeData['errors']['grossSalary']) }}">
-                                                {{ implode(', ', $employeeData['errors']['grossSalary']) }}
-                                            </div>
-                                        @endif
-                                        @if (!empty($employeeData['selectedPackage']))
-                                            <span
-                                                class="text-xs text-slate-500 text-nowrap">{{ $employeeData['selectedPackage']->gross_min }}
-                                                - {{ $employeeData['selectedPackage']->gross_max }}</span>
-                                        @endif
                                     </td>
                                     <td class="table-td">
                                         <input type="number"

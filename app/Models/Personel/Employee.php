@@ -382,11 +382,11 @@ class Employee extends Model
             }
         }
 
-        if ($tmpEndMin->gt($tmpEndMax)) {
+        if ($tmpEndMin && $tmpEndMax && $tmpEndMin->gt($tmpEndMax)) {
             throw new AppException('Working day end min must be less than or equal to working day end max');
         }
 
-        if ($tmpStartMin->gt($tmpStartMax)) {
+        if ($tmpStartMin && $tmpStartMax && $tmpStartMin->gt($tmpStartMax)) {
             throw new AppException('Working day start min must be less than or equal to working day start max');
         }
 

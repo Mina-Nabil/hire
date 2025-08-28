@@ -340,7 +340,7 @@ class Employee extends Model
         $tmpStartMax = $working_day_start_max ? Carbon::parse($working_day_start_max) : null;
         $tmpEndMin = $working_day_end_min ? Carbon::parse($working_day_end_min) : null;
         $tmpEndMax = $working_day_end_max ? Carbon::parse($working_day_end_max) : null;
-        
+
         if ($attendance_calculation == BenefitConfiguration::ATTENDANCE_CALCULATION_FIXED) {
             if ($tmpStartMin && $tmpStartMax && $tmpStartMin->diffInHours($tmpStartMax)) {
                 throw new AppException('Working day start min and max must be the same for fixed attendance calculation');
@@ -3930,7 +3930,7 @@ class Employee extends Model
                 return $vacation->vacationDays->contains('vacation_date', $missingDay);
             })->sum('hours');
             $totalVacationHours += $vacationHours;
-            $missingHours = ($this->benefitConfiguration?->daily_working_hours ?? 8) - $vacationHours;
+            $missingHours = (max(8, $this->benefitConfiguration?->daily_working_hours ?? 8)) - $vacationHours;
             if ($missingHours > 0) {
                 $totalPenaltyHours += $missingHours;
                 $penaltyDays[] = [

@@ -271,7 +271,7 @@ class Payroll extends Model
                     continue; // Skip if employee not found
                 }
 
-                $netAmountBeforeTax = ($employeeData['net_after_deductions'] ?? 0) + ($employeeData['overtime_amount'] ?? 0);
+                $netAmountBeforeTax = ($employeeData['net_after_deductions'] ?? 0);
                 $taxAmount = $employee->benefitConfiguration->is_taxable ? self::calculateTaxAmount($netAmountBeforeTax) : 0;
                 $netAmountAfterTax = $netAmountBeforeTax + ($employeeData['employee_base_benefits'] ?? 0) - $taxAmount - ($employeeData['employee_medical'] ?? 0) + ($employeeData['extra_payments'] ?? 0);
 

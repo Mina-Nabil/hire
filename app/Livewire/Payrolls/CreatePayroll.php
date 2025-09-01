@@ -232,7 +232,7 @@ class CreatePayroll extends Component
 
         // Recalculate net after deductions with adjustment
         $employee = &$this->payrollData[$departmentId]['employees'][$employeeIndex];
-        $employee['net_after_deductions'] = $employee['net_after_penalty'] + $employee['extra_payments'] + $this->adjustmentAmount;
+        $employee['net_after_deductions'] = $employee['net_after_penalty'] + $employee['extra_payments'] + $employee['overtime_amount'] + $this->adjustmentAmount;
 
         $this->closeAdjustmentModal();
         $this->alertSuccess('Adjustment saved successfully.');

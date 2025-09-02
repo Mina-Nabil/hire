@@ -35,7 +35,7 @@
                                                 <ul>
 
                                                     @foreach ($application->slots as $slot)
-                                                    <li>{{ $slot->vacancySlot->date->format('d M Y') }}  {{ $slot->vacancySlot->start_time->format('H:i') }} -> {{ $slot->vacancySlot->end_time->format('H:i') }}</li>
+                                                    <li>{{ $slot->vacancySlot->date->format('d M Y') }}  {{ $slot->vacancySlot->start_time->format('H:i A') }} -> {{ $slot->vacancySlot->end_time->format('H:i A') }}</li>
                                                     @endforeach
                                                 </ul>
                                                 </td>

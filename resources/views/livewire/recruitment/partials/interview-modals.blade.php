@@ -600,7 +600,7 @@
                             <div class="space-y-2">
                                 @foreach ($selectedApplication->slots as $slot)
                                     <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
-                                        <span>{{ $slot->vacancySlot->date->format('d M Y') }}  {{ $slot->vacancySlot->start_time->format('H:i') }} -> {{ $slot->vacancySlot->end_time->format('H:i') }}</span>
+                                        <span>{{ $slot->vacancySlot->date->format('d M Y') }}  {{ $slot->vacancySlot->start_time->format('H:i A') }} -> {{ $slot->vacancySlot->end_time->format('H:i A') }}</span>
                                         <span class="text-gray-600">{{ $slot->vacancySlot->duration }} minutes</span>
                                     </div>
                                 @endforeach

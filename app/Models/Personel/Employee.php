@@ -3720,9 +3720,9 @@ class Employee extends Model
         foreach ($activeBenefits as $benefit) {
             $amountRatio = 100;
             if ($benefit->end_date) {
-                $amountRatio = $benefit->end_date->diffInDays($startDate, true) / $noOfDays;
+                $amountRatio = 100 * $benefit->end_date->diffInDays($startDate, true) / $noOfDays;
             } else if ($benefit->start_date->isAfter($startDate)) {
-                $amountRatio = $benefit->start_date->diffInDays($startDate, true) / $noOfDays;
+                $amountRatio = 100 * $benefit->start_date->diffInDays($startDate, true) / $noOfDays;
             }
             $amount += ($benefit->amount * ($amountRatio / 100)) * days_coefficient($noOfDays, $benefit->type);
         }
@@ -3742,9 +3742,9 @@ class Employee extends Model
         foreach ($activeBenefits as $benefit) {
             $amountRatio = 100;
             if ($benefit->end_date) {
-                $amountRatio = $benefit->end_date->diffInDays($startDate, true) / $noOfDays;
+                $amountRatio = 100 * $benefit->end_date->diffInDays($startDate, true) / $noOfDays;
             } else if ($benefit->start_date->isAfter($startDate)) {
-                $amountRatio = $benefit->start_date->diffInDays($startDate, true) / $noOfDays;
+                $amountRatio = 100 * $benefit->start_date->diffInDays($startDate, true) / $noOfDays;
             }
             $amount += $benefit->amount * ($amountRatio / 100) * days_coefficient($noOfDays, $benefit->type);
         }

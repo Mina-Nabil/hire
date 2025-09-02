@@ -18,6 +18,7 @@
                                         <th scope="col" class=" table-th">Position</th>
                                         <th scope="col" class=" table-th">Department</th>
                                         <th scope="col" class=" table-th">Applied Date</th>
+                                        <th scope="col" class=" table-th">Booked Slots</th>
                                         <th scope="col" class=" table-th">Status</th>
                                         <th scope="col" class=" table-th">Actions</th>
                                     </tr>
@@ -31,6 +32,14 @@
                                             </td>
                                             <td class="table-td">{{ $application->created_at->format('d M Y') }}</td>
                                             <td class="table-td">
+                                                <ul>
+
+                                                    @foreach ($application->slots as $slot)
+                                                    <li>{{ $slot->vacancySlot->date->format('d M Y') }}  {{ $slot->vacancySlot->start_time->format('H:i') }} -> {{ $slot->vacancySlot->end_time->format('H:i') }}</li>
+                                                    @endforeach
+                                                </ul>
+                                                </td>
+                                                <td class="table-td">
                                                 <span class="badge {{ $application->status_class }}">
                                                     {{ $application->status }}
                                                 </span>

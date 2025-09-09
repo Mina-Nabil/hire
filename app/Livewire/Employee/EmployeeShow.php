@@ -483,6 +483,8 @@ class EmployeeShow extends Component
             $this->graduation_year = $this->employee->info->graduation_year;
             $this->military_status = $this->employee->info->military_status ?? Applicant::MILITARY_STATUS[0];
             $this->marital_status = $this->employee->info->marital_status ?? Applicant::MARITAL_STATUS[0];
+            $this->employee_code = $this->employee->info->employee_code;
+            $this->device_id = $this->employee->info->device_id;
         } else {
             // Default values for new employee info
             $this->insurance_office_id = $this->insuranceOffices->first()->id ?? null;

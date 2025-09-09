@@ -144,7 +144,7 @@ class ApplyPackageModal extends Component
             return;
         }
 
-        $this->selectedPackage = SalaryGrade::with(['packageDetails', 'vacationDetails'])->findOrFail($this->selectedPackageId);
+        $this->selectedPackage = SalaryGrade::with(['packageDetails'])->findOrFail($this->selectedPackageId);
 
         // Initialize package details with min values
         $this->packageDetails = $this->selectedPackage->packageDetails->map(function ($detail) {

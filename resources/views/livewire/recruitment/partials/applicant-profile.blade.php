@@ -140,7 +140,7 @@
                                     <p class="font-medium">Resume/CV</p>
                                 </div>
                                 <div>
-                                    <a href="{{ Storage::url($applicant->cv_url) }}" target="_blank"
+                                    <a href="{{ $applicant->full_cv_url }}" target="_blank"
                                         class="btn btn-sm btn-outline-primary">
                                         <i class="fas fa-download"></i>
                                     </a>

@@ -379,7 +379,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="flex space-x-2">
-                                                    <a href="{{ Storage::url($document->file_path) }}"
+                                                    <a href="{{ $document->full_url }}"
                                                         target="_blank" class="btn btn-sm btn-outline-primary">
                                                         <i class="fas fa-download mr-1 text-blue-500"></i> Download
                                                     </a>

@@ -160,7 +160,9 @@ class ZKDeviceController extends Controller
                 Log::info("[ZKTeco] Employee not found by device_id {$user_id} using relationship, trying direct lookup");
 
                 // Direct lookup in employee_info table
-                $employeeInfo = DB::table('employee_info')->where('device_id', $user_id)->first();
+                $employeeInfo = DB::table('employee_info')->where('device_id', $user_id)
+                ->orderBy('id', 'desc')
+                ->first();
                 if ($employeeInfo) {
                     Log::info("[ZKTeco] Found employee_info record directly", [
                         'employee_id' => $employeeInfo->employee_id,

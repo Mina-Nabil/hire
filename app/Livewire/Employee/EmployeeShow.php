@@ -509,7 +509,7 @@ class EmployeeShow extends Component
             'military_status' => 'required|string|max:50',
             'marital_status' => 'required|string|max:50',
             'employee_code' => 'nullable|string|max:50',
-            'device_id' => 'nullable|string|max:50',
+            'device_id' => 'nullable|string|max:50|unique:employee_info,device_id,' . $this->employee->info->id,
         ]);
 
         $res = $this->employee->updateEmployeeInfo(

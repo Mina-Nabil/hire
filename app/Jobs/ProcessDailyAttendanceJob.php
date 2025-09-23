@@ -43,8 +43,10 @@ class ProcessDailyAttendanceJob implements ShouldQueue
             ->where('status', Employee::STATUS_ACTIVE)
             ->whereNotNull('employment_date')
             ->where('employment_date', '<=', $this->targetDate)
-            ->with(['benefitConfiguration', 'workingDays'])
-            ->get();
+            ->with(['benefitConfiguration', 'workingDays']);
+
+        Log::debug('Employees Query', ['query' => $activeEmployees->toSql(), 'bindings' => $activeEmployees->getBindings()]);
+        $activeEmployees = $activeEmployees->get();
 
         Log::info('Found active employees for processing', [
             'count' => $activeEmployees->count(),

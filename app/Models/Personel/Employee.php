@@ -4276,7 +4276,7 @@ class Employee extends Model
             $workingHours = $attendanceStart->diffInHours($attendanceEnd);
             if ($workingHours < $this->benefitConfiguration->daily_working_hours) {
                 $penaltyHours = $this->benefitConfiguration->daily_working_hours - $workingHours;
-                if ($penaltyHours > $vacationHours) {
+                if ($vacationHours < 8 && $penaltyHours > $vacationHours) {
                     $penaltyHours = ($penaltyHours - $vacationHours);
                     $vacationHoursForDay += $vacationHours;
                     $penaltyHoursForDay += $penaltyHours;
@@ -4291,7 +4291,7 @@ class Employee extends Model
                         ];
                     }
                 } else {
-                    $vacationHoursForDay += $penaltyHours;
+                    $vacationHoursForDay += min(8, $penaltyHours);
                     $penaltyHours = 0;
                 }
             }
@@ -4322,7 +4322,7 @@ class Employee extends Model
         if ($attendanceStart->gt($allowedStartMax)) {
             $startDiff = $attendanceStart->diffInHours($allowedStartMax, true);
             $penaltyHours += $startDiff;
-            if ($penaltyHours > $vacationHours) {
+            if ($vacationHours < 8 && $penaltyHours > $vacationHours) {
 
                 // If employee has less vacation hours than penalty hours, calculate the penalty hours
                 $penaltyHours = ($penaltyHours - $vacationHours);
@@ -4341,7 +4341,7 @@ class Employee extends Model
                 }
             } else {
                 // If employee has enough vacation hours, reduce the vacation hours
-                $vacationHoursForDay += $penaltyHours;
+                $vacationHoursForDay += min(8, $penaltyHours);
                 $vacationHours = $vacationHours - $penaltyHours;
                 $penaltyHours = 0;
             }
@@ -4354,7 +4354,7 @@ class Employee extends Model
         if ($attendanceEnd->lt($allowedEndMin)) {
             $earlyDeparture = $allowedEndMin->diffInHours($attendanceEnd, true);
             $penaltyHours += $earlyDeparture;
-            if ($penaltyHours > $vacationHours) {
+            if ($vacationHours < 8 && $penaltyHours > $vacationHours) {
                 if ($this->id == 16) {
                     Log::info('attendanceEnd', ['attendanceEnd' => $attendanceEnd]);
                     Log::info('allowedEndMin', ['allowedEndMin' => $allowedEndMin]);
@@ -4363,7 +4363,7 @@ class Employee extends Model
                     Log::info('earlyDeparture', ['earlyDeparture' => $earlyDeparture]);
                 }
                 $penaltyHours = ($penaltyHours - $vacationHours);
-                $vacationHoursForDay += $vacationHours;
+                $vacationHoursForDay += min(8, $vacationHours);
                 $penaltyHoursForDay += $penaltyHours;
                 $vacationHours = 0;
                 $actualPenaltyHours = $this->calculateEarlyDeparturePenalty(($earlyDeparture - $vacationHours) * 60);
@@ -4378,7 +4378,7 @@ class Employee extends Model
                 }
                 $vacationHours = 0;
             } else {
-                $vacationHoursForDay += $penaltyHours;
+                $vacationHoursForDay += min(8, $penaltyHours);
                 $vacationHours = $vacationHours - $penaltyHours;
                 $penaltyHours = 0;
             }

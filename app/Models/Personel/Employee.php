@@ -4283,7 +4283,6 @@ class Employee extends Model
                     $vacationHours = 0;
                     $actualPenaltyHours = $this->calculateLateArrivalPenalty(($this->benefitConfiguration->daily_working_hours - $workingHours) * 60);
                     if ($actualPenaltyHours) {
-                        Log::info('actualPenaltyHours', ['actualPenaltyHours' => $actualPenaltyHours]);
                         $penaltyDays[] = [
                             'date' => $date,
                             'hours' => $actualPenaltyHours,

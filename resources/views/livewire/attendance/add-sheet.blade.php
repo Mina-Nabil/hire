@@ -100,6 +100,80 @@
                 </div>
             </div>
         @endif
+
+        @if (!empty($zktecoResults))
+            <header class="card-header noborder">
+                <div class="flex justify-between items-center w-full">
+                    <div class="flex-col space-y-1">
+                        <h4 class="card-title">ZKTeco Device File Processing Results</h4>
+                        <span class="text-sm text-slate-500 mt-1">
+                            {{ $zktecoResults['punches_created'] }} punches created for {{ count($zktecoResults['dates_processed']) }} dates
+                        </span>
+                    </div>
+                    <div class="flex space-x-2">
+                        <x-secondary-button wire:click="clearUploadedAttendance">Clear</x-secondary-button>
+                    </div>
+                </div>
+            </header>
+            <div class="card-body">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-success-50 dark:bg-success-500/10 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <iconify-icon icon="ph:check-circle-bold" class="text-success-500 text-2xl mr-3"></iconify-icon>
+                            <div>
+                                <h5 class="text-success-700 dark:text-success-400 font-medium">Punches Created</h5>
+                                <p class="text-success-600 dark:text-success-300 text-2xl font-bold">{{ $zktecoResults['punches_created'] }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-info-50 dark:bg-info-500/10 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <iconify-icon icon="ph:calendar-bold" class="text-info-500 text-2xl mr-3"></iconify-icon>
+                            <div>
+                                <h5 class="text-info-700 dark:text-info-400 font-medium">Dates Processed</h5>
+                                <p class="text-info-600 dark:text-info-300 text-2xl font-bold">{{ count($zktecoResults['dates_processed']) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-warning-50 dark:bg-warning-500/10 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <iconify-icon icon="ph:warning-bold" class="text-warning-500 text-2xl mr-3"></iconify-icon>
+                            <div>
+                                <h5 class="text-warning-700 dark:text-warning-400 font-medium">Errors</h5>
+                                <p class="text-warning-600 dark:text-warning-300 text-2xl font-bold">{{ count($zktecoResults['errors']) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if (!empty($zktecoResults['dates_processed']))
+                    <div class="mb-6">
+                        <h6 class="text-slate-700 dark:text-slate-300 font-medium mb-2">Processed Dates:</h6>
+                        <div class="flex flex-wrap gap-2">
+                            @foreach ($zktecoResults['dates_processed'] as $date)
+                                <span class="badge badge-success">{{ $date }}</span>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
+                @if (!empty($zktecoResults['errors']))
+                    <div>
+                        <h6 class="text-slate-700 dark:text-slate-300 font-medium mb-2">Errors Encountered:</h6>
+                        <div class="bg-danger-50 dark:bg-danger-500/10 p-4 rounded-lg">
+                            <ul class="text-danger-700 dark:text-danger-400 text-sm space-y-1">
+                                @foreach ($zktecoResults['errors'] as $error)
+                                    <li class="flex items-start">
+                                        <iconify-icon icon="ph:x-circle" class="text-danger-500 mr-2 mt-0.5"></iconify-icon>
+                                        {{ $error }}
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        @endif
     </div>
 
     @if ($showUploadModal)
@@ -107,7 +181,21 @@
             <x-slot name="title">Upload Attendance Sheet</x-slot>
             <!-- Modal body -->
             <div class="p-6 space-y-4">
-                <div class="from-group">
+                <div class="form-group">
+                    <div class="input-area">
+                        <label for="fileType" class="form-label">File Type</label>
+                        <select wire:model.live="fileType" class="form-control">
+                            <option value="standard">Standard Attendance Sheet</option>
+                            <option value="zkteco">ZKTeco Device File</option>
+                        </select>
+                        <p class="text-sm text-slate-500 mt-1">
+                            <span x-show="$wire.fileType === 'standard'">Standard Excel format with employee names and times</span>
+                            <span x-show="$wire.fileType === 'zkteco'">ZKTeco device export with device_id and movement data</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="form-group">
                     <div class="input-area">
                         <label for="file" class="form-label">Select File</label>
                         <input type="file" wire:model.live="file"
@@ -118,6 +206,21 @@
                         <span class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
                     @enderror
                 </div>
+
+                @if($fileType === 'zkteco')
+                    <div class="bg-info-50 dark:bg-info-500/10 p-4 rounded-lg">
+                        <div class="flex items-start">
+                            <iconify-icon icon="ph:info-bold" class="text-info-500 text-xl mr-3 mt-0.5"></iconify-icon>
+                            <div class="text-info-700 dark:text-info-400 text-sm">
+                                <h6 class="font-medium mb-1">ZKTeco Device File Format:</h6>
+                                <ul class="list-disc list-inside space-y-1">
+                                    <li>Column C should contain device_id (employee identifier)</li>
+                                    <li>Column D should contain timestamp and movement type</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                @endif
             </div>
             <!-- Modal footer -->
             <x-slot name="footer">

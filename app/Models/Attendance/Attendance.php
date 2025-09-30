@@ -3,6 +3,8 @@
 namespace App\Models\Attendance;
 
 use App\Exceptions\AppException;
+use App\Jobs\ProcessDailyAttendanceJob;
+use App\Models\Attendance\DailyPunch;
 use App\Models\Attendance\PublicHoliday;
 use App\Models\Benefits\Configurations\BenefitConfiguration;
 use App\Models\Benefits\Payrolls\AppliedVacation;
@@ -273,6 +275,211 @@ class Attendance extends Model
 
         AppLog::info('Uploaded Attendance');
         return $attendance;
+    }
+
+    /**
+     * Process ZKTeco device attendance data from Excel file and create DailyPunch records
+     * Format: Column C = device_id, Column E = timestamp with movement type
+     */
+    public static function processZKTecoAttendanceFile($file)
+    {
+        $spreadsheet = IOFactory::load($file);
+        $sheet = $spreadsheet->getSheet(0);
+        $highestRow = $sheet->getHighestRow();
+
+        $processedPunches = [];
+        $processedDates = [];
+        $errors = [];
+
+        Log::info('[ZKTeco Excel] Starting to process attendance file', [
+            'total_rows' => $highestRow - 1, // Subtract header row
+            'file_path' => $file
+        ]);
+
+        for ($row = 2; $row <= $highestRow; $row++) {
+            try {
+                // Get device_id from column C (الإسم)
+                $deviceId = trim($sheet->getCell('C' . $row)->getValueString());
+                if (!$deviceId) {
+                    continue;
+                }
+
+                // Get timestamp and movement type from column D (  التاريخ والوقت)
+                $movementData = trim($sheet->getCell('D' . $row)->getValue());
+                if (!$movementData) {
+                    continue;
+                }
+
+                // Parse the movement data: "8/26/2025 14:49 A8P"
+                $punchData = self::parseMovementData($movementData);
+                if (!$punchData) {
+                    $errors[] = "Row {$row}: Could not parse movement data: {$movementData}";
+                    continue;
+                }
+
+                // Find employee by device_id
+                $employee = self::findEmployeeByDeviceId($deviceId);
+                if (!$employee) {
+                    $errors[] = "Row {$row}: Employee not found for device_id: {$deviceId}";
+                    continue;
+                }
+
+                // Create punch record
+                $punch = [
+                    'employee_id' => $employee->id,
+                    'punch_time' => $punchData['datetime'],
+                    'punch_state' => self::mapPunchState(trim($sheet->getCell('E' . $row)->getValueString())),
+                    'verify_mode' => null,
+                    'work_code' => trim($sheet->getCell('F' . $row)->getValueString()) ?? "101",
+                    'raw_log' => $movementData,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+
+                // Check if punch already exists
+                $existingPunch = DailyPunch::where('employee_id', $employee->id)
+                    ->where('punch_time', $punchData['datetime'])
+                    ->first();
+
+                if (!$existingPunch) {
+                    $dailyPunch = DailyPunch::create($punch);
+                    $processedPunches[] = $dailyPunch;
+                    
+                    // Track dates for job dispatching
+                    $dateKey = $punchData['datetime']->format('Y-m-d');
+                    if (!in_array($dateKey, $processedDates)) {
+                        $processedDates[] = $dateKey;
+                    }
+
+                    Log::debug('[ZKTeco Excel] Created punch', [
+                        'employee_id' => $employee->id,
+                        'employee_name' => $employee->name,
+                        'device_id' => $deviceId,
+                        'punch_time' => $punchData['datetime']->format('Y-m-d H:i:s'),
+                        'movement_type' => trim($sheet->getCell('E' . $row)->getValueString()),
+                        'device_serial' => $punchData['device_serial']
+                    ]);
+                } else {
+                    Log::debug('[ZKTeco Excel] Punch already exists', [
+                        'employee_id' => $employee->id,
+                        'punch_time' => $punchData['datetime']->format('Y-m-d H:i:s')
+                    ]);
+                }
+
+            } catch (\Exception $e) {
+                $errors[] = "Row {$row}: " . $e->getMessage();
+                Log::error('[ZKTeco Excel] Error processing row', [
+                    'row' => $row,
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+            }
+        }
+
+        // Dispatch jobs for each day with new punches
+        foreach ($processedDates as $date) {
+            self::dispatchDailyAttendanceJob($date);
+        }
+
+        Log::info('[ZKTeco Excel] Processing completed', [
+            'total_processed_punches' => count($processedPunches),
+            'dates_processed' => count($processedDates),
+            'error_count' => count($errors),
+            'processed_dates' => $processedDates
+        ]);
+
+        AppLog::info('Processed ZKTeco Attendance File', [
+            'punches_created' => count($processedPunches),
+            'dates_processed' => count($processedDates),
+            'errors' => count($errors)
+        ]);
+
+        return [
+            'punches_created' => count($processedPunches),
+            'dates_processed' => $processedDates,
+            'errors' => $errors,
+            'punches' => $processedPunches
+        ];
+    }
+
+    /**
+     * Parse movement data from ZKTeco format
+     * Format: "8/26/2025 14:49 A8P 101 حضور"
+     */
+    private static function parseMovementData($movementData)
+    {
+
+        try {
+
+
+            // Parse datetime
+            $datetime = new Carbon(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($movementData));
+            
+            // Apply timezone offset if configured
+            if (env('BASMA_TIMEZONE')) {
+                $timeDiff = (float) env('BASMA_TIMEZONE');
+                $datetime = $datetime->addHours($timeDiff);
+            }
+
+            return [
+                'datetime' => $datetime,
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('[ZKTeco Excel] Error parsing movement data', [
+                'movement_data' => $movementData,
+                'error' => $e->getMessage()
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Find employee by device_id from EmployeeInfo
+     */
+    private static function findEmployeeByDeviceId($deviceId)
+    {
+        return Employee::whereHas('info', function ($query) use ($deviceId) {
+            $query->where('device_id', $deviceId);
+        })->with('info')->first();
+    }
+
+    /**
+     * Map Arabic movement types to punch states
+     */
+    private static function mapPunchState($movementType)
+    {
+        $mapping = [
+            'حضور' => 0,        // Check-in
+            'إنصراف' => 1,      // Check-out  
+            'نهاية إضافي' => 1,  // End of overtime (also check-out)
+        ];
+
+        return $mapping[$movementType] ?? null;
+    }
+
+    /**
+     * Dispatch ProcessDailyAttendanceJob for a specific date
+     */
+    private static function dispatchDailyAttendanceJob($date)
+    {
+        try {
+            $targetDate = Carbon::parse($date);
+            
+            // Dispatch the job
+            ProcessDailyAttendanceJob::dispatch($targetDate);
+            
+            Log::info('[ZKTeco Excel] Dispatched daily attendance job', [
+                'date' => $date,
+                'target_date' => $targetDate->format('Y-m-d')
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('[ZKTeco Excel] Error dispatching daily attendance job', [
+                'date' => $date,
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 
     public static function handleAttendanceFromDevice($request)

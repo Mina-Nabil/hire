@@ -17,8 +17,10 @@ class AddSheet extends Component
     public $showDownloadModal = false;
     public $file;
     public $uploading = false;
+    public $fileType = 'standard'; // 'standard' or 'zkteco'
 
     public $uploadedAttendance = [];
+    public $zktecoResults = [];
 
     protected $rules = [
         'file' => 'required|file|mimes:xlsx,xls|max:20480', // 20MB Max
@@ -32,7 +34,7 @@ class AddSheet extends Component
     public function closeUploadModal()
     {
         $this->showUploadModal = false;
-        $this->reset(['file', 'uploading']);
+        $this->reset(['file', 'uploading', 'fileType']);
     }
 
     public function uploadSheet()
@@ -41,9 +43,29 @@ class AddSheet extends Component
 
         try {
             $this->uploading = true;
-            $this->uploadedAttendance = Attendance::getUploadedAttendance($this->file->getRealPath());
-            $this->closeUploadModal();
-            $this->alertSuccess('Attendance sheet processed successfully!');
+            
+            if ($this->fileType === 'zkteco') {
+                // Process ZKTeco device file
+                $this->zktecoResults = Attendance::processZKTecoAttendanceFile($this->file->getRealPath());
+                $this->closeUploadModal();
+                
+                $message = sprintf(
+                    'ZKTeco attendance file processed successfully! Created %d punches for %d dates.',
+                    $this->zktecoResults['punches_created'],
+                    count($this->zktecoResults['dates_processed'])
+                );
+                
+                if (!empty($this->zktecoResults['errors'])) {
+                    $message .= ' ' . count($this->zktecoResults['errors']) . ' errors encountered.';
+                }
+                
+                $this->alertSuccess($message);
+            } else {
+                // Process standard attendance file
+                $this->uploadedAttendance = Attendance::getUploadedAttendance($this->file->getRealPath());
+                $this->closeUploadModal();
+                $this->alertSuccess('Attendance sheet processed successfully!');
+            }
         } catch (\Exception $e) {
             $this->alertError($e->getMessage());
         } finally {
@@ -54,6 +76,7 @@ class AddSheet extends Component
     public function clearUploadedAttendance()
     {
         $this->uploadedAttendance = [];
+        $this->zktecoResults = [];
     }
 
     public function saveAttendance()

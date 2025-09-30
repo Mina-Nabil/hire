@@ -357,7 +357,7 @@ class Attendance extends Model
                         'device_id' => $deviceId,
                         'punch_time' => $punchData['datetime']->format('Y-m-d H:i:s'),
                         'movement_type' => trim($sheet->getCell('E' . $row)->getValueString()),
-                        'device_serial' => $punchData['device_serial']
+                        'device_serial' => null
                     ]);
                 } else {
                     Log::debug('[ZKTeco Excel] Punch already exists', [

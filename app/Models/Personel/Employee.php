@@ -4356,6 +4356,13 @@ class Employee extends Model
             $earlyDeparture = $allowedEndMin->diffInHours($attendanceEnd, true);
             $penaltyHours += $earlyDeparture;
             if ($penaltyHours > $vacationHours) {
+                if ($this->id == 16) {
+                    Log::info('attendanceEnd', ['attendanceEnd' => $attendanceEnd]);
+                    Log::info('allowedEndMin', ['allowedEndMin' => $allowedEndMin]);
+                    Log::info('penaltyHours', ['penaltyHours' => $penaltyHours]);
+                    Log::info('vacationHours', ['vacationHours' => $vacationHours]);
+                    Log::info('earlyDeparture', ['earlyDeparture' => $earlyDeparture]);
+                }
                 $penaltyHours = ($penaltyHours - $vacationHours);
                 $vacationHoursForDay += $vacationHours;
                 $penaltyHoursForDay += $penaltyHours;

@@ -4133,7 +4133,7 @@ class Employee extends Model
             })
             ->with('vacationDays')
             ->get();
-        Log::info('approved vacations', ['approvedVacations' => $approvedVacations->count()]);
+
         $totalVacationHours = 0;
         $totalPenaltyHours = 0;
         // Get missed working hours (full days with no attendance) - already excludes public holidays

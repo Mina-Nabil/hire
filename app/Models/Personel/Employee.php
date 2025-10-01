@@ -3882,7 +3882,7 @@ class Employee extends Model
         $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
 
         if($this->employment_date->isAfter($startDate)) {
-            $startDate = $endDate->clone()->startOfMonth();
+            $startDate = $this->employment_date->clone();
         }
 
         // Get the working days of the employee

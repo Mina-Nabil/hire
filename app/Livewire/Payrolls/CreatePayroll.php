@@ -308,11 +308,10 @@ class CreatePayroll extends Component
             } else if ($employeeTerminationDate && $employeeTerminationDate->isAfter($this->startDate) && $employeeTerminationDate->isBefore($this->endDate)) {
                 $includedDays = $employeeTerminationDate->diffInDays($this->startDate);
                 $grossPercentage = (min($includedDays, 30) / 30) * 100;
-            } 
-            // else if ($employeeStartDate->isAfter($this->startDate) && $employeeStartDate->isBefore($this->endDate)) {
-            //     $includedDays = $employeeStartDate->diffInDays($this->endDate);
-            //     $grossPercentage = (min($includedDays, 30) / 30) * 100;
-            // }
+            } else if ($employeeStartDate->isAfter($this->startDate) && $employeeStartDate->isBefore($this->endDate)) {
+                $includedDays = $employeeStartDate->diffInDays($this->endDate);
+                $grossPercentage = (min($includedDays, 30) / 30) * 100;
+            }
 
             $grossSalary = ($employee->benefitConfiguration?->gross_salary ?? 0) * $grossPercentage / 100;
             $insuranceAmount = $employee->benefitConfiguration?->insurance_amount ?? 0;

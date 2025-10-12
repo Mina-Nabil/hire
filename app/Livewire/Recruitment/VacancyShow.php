@@ -183,16 +183,24 @@ class VacancyShow extends Component
     {
         $this->firstInterviews = Interview::byVacancyId($this->vacancyId)
             ->interviewLevel(Interview::INTERVIEW_LEVEL_FIRST)
+            ->orderBy('date', 'desc')
             ->get();
+
         $this->nextInterviews = Interview::byVacancyId($this->vacancyId)
             ->interviewLevel(Interview::INTERVIEW_LEVEL_NEXT)
+            ->orderBy('date', 'desc')
             ->get();
+
         $this->finalInterviews = Interview::byVacancyId($this->vacancyId)
             ->interviewLevel(Interview::INTERVIEW_LEVEL_FINAL)
+            ->orderBy('date', 'desc')
             ->get();
+
         $this->offers = JobOffer::whereHas('application', function ($q) {
             $q->where('vacancy_id', $this->vacancyId);
-        })->get();
+        })
+        ->orderBy('created_at', 'desc')
+        ->get();
     }
 
     public function loadVacancyControls()
@@ -1055,7 +1063,9 @@ class VacancyShow extends Component
             ->withNoInterviews($this->vacancyId)
             ->when($this->search, function ($query) {
                 $query->search($this->search);
-            })->with('applications')->paginate(10);
+            })->with('applications')
+            ->orderBy('applicants.created_at', 'desc')
+            ->paginate(10);
 
         $loggedInUser = Auth::user();
         $layout = 'components.layouts.app';

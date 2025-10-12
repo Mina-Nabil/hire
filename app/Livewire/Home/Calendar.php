@@ -191,12 +191,12 @@ class Calendar extends Component
         foreach (Interview::userData()->get() as $t) {
             $events[] =  [
                 'id'        => "interview" . $t->id,
-                'title'     => "Interview with " . $t->application->applicant->name,
+                'title'     => "Interview: " . $t->application->applicant->first_name . " " . $t->application->applicant->last_name,
                 'backgroundColor' => '#75d193', //green
                 'allDay'    => false,
                 'start'     => (new Carbon($t->date))->toIso8601String(),
                 'end'       => (new Carbon($t->date))->addHours(1)->toIso8601String(),
-                'url'       => $t->zoom_link ?? url('/recruitment/vacancies/' . $t->application->vacancy->id)
+                'url'       => url('/recruitment/applicants/' . $t->application->applicant->id)
             ];
         }
 

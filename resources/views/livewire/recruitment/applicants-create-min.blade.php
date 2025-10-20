@@ -35,9 +35,8 @@
                                 @break
 
                                 @case(2)
-                                {{ __('recruitment.vacancy') }}
+                                    {{ __('recruitment.vacancy') }}
                                 @break
-
                             @endswitch
                         </div>
 
@@ -173,9 +172,9 @@
                             @enderror
                         </div>
 
-                       
-                           
-                     
+
+
+
 
                         <!-- Social Number -->
                         <div class="form-group sm:col-span-3">
@@ -215,7 +214,7 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                
+
 
                         <!-- CV -->
                         <div class="form-group">
@@ -242,56 +241,142 @@
 
                 @endif
 
-              
+
                 <!-- Step 2: Vacancy & Application -->
                 @if ($currentStep === 2)
                     <h4 class="text-xl font-medium mb-5">{{ __('recruitment.vacancy_application_details') }}</h4>
 
-             
-                        <!-- Vacancy Information -->
 
-                        <div class="flex justify-between">
+                    <!-- Vacancy Information -->
 
-                            <div class="w-full p-4 bg-slate-50 rounded-md mb-6">
-                                <h5 class="font-medium mb-2">{{ __('recruitment.vacancy_details') }}:</h5>
-                                <p><strong>{{ __('recruitment.position') }}:</strong>
-                                    {{ $selectedVacancy?->position?->name }}</p>
-                                <p><strong>{{ __('recruitment.department') }}:</strong>
-                                    {{ $selectedVacancy?->position?->department?->name }}</p>
-                                <p><strong>{{ __('recruitment.opening_date') }}:</strong>
-                                    {{ $selectedVacancy?->created_at->format('d M Y') }}
-                                </p>
-                                <p><strong>{{ __('recruitment.closing_date') }}:</strong>
-                                    {{ $selectedVacancy?->closing_date }}
-                                </p>
-                                <p><strong>{{ __('recruitment.status') }}:</strong> <span
-                                        class="badge {{ $selectedVacancy?->status === 'open' ? 'bg-success-500' : 'bg-danger-500' }}">{{ ucfirst($selectedVacancy?->status) }}</span>
-                                </p>
-                            </div>
-            
+                    <div class="flex justify-between">
+
+                        <div class="w-full p-4 bg-slate-50 rounded-md mb-6">
+                            <h5 class="font-medium mb-2">{{ __('recruitment.vacancy_details') }}:</h5>
+                            <p><strong>{{ __('recruitment.position') }}:</strong>
+                                {{ $selectedVacancy?->position?->name }}</p>
+                            <p><strong>{{ __('recruitment.department') }}:</strong>
+                                {{ $selectedVacancy?->position?->department?->name }}</p>
+                            <p><strong>{{ __('recruitment.opening_date') }}:</strong>
+                                {{ $selectedVacancy?->created_at->format('d M Y') }}
+                            </p>
+                            <p><strong>{{ __('recruitment.closing_date') }}:</strong>
+                                {{ $selectedVacancy?->closing_date }}
+                            </p>
+                            <p><strong>{{ __('recruitment.status') }}:</strong> <span
+                                    class="badge {{ $selectedVacancy?->status === 'open' ? 'bg-success-500' : 'bg-danger-500' }}">{{ ucfirst($selectedVacancy?->status) }}</span>
+                            </p>
                         </div>
 
-                        <!-- Pick Preferred Interview Slot -->
-                        @if ($selectedVacancy->vacancy_slots->count() > 0)
-                            <div class="mb-6">
-                                <h5 class="font-medium mb-4">{{ __('recruitment.preferred_interview_slot') }}</h5>
+                    </div>
 
-                                <x-select wire:model="slotId">
-                                    <option value="">{{ __('recruitment.all_slots_ok') }}</option>
-                                    @foreach ($selectedVacancy->vacancy_slots as $slot)
-                                        <option value="{{ $slot->id }}">
-                                            {{ $slot->date->format('d M Y') }} -
-                                            {{ $slot->start_time->format('H:i') }} to
-                                            {{ $slot->end_time->format('H:i') }}
-                                        </option>
-                                    @endforeach
-                                </x-select>
+                    <!-- Pick Preferred Interview Slot -->
+                    @if ($selectedVacancy->vacancy_slots->count() > 0)
+                        <div class="mb-6">
+                            <h5 class="font-medium mb-4">{{ __('recruitment.preferred_interview_slot') }}</h5>
 
-                            </div>
-                        @endif
+                            <x-select wire:model="slotId">
+                                <option value="">{{ __('recruitment.all_slots_ok') }}</option>
+                                @foreach ($selectedVacancy->vacancy_slots as $slot)
+                                    <option value="{{ $slot->id }}">
+                                        {{ $slot->date->format('d M Y') }} -
+                                        {{ $slot->start_time->format('H:i') }} to
+                                        {{ $slot->end_time->format('H:i') }}
+                                    </option>
+                                @endforeach
+                            </x-select>
 
-                     
-            
+                        </div>
+                    @endif
+
+                    <!-- Base Questions (if any) -->
+                    @if (count($allVacancyQuestions) > 0)
+                        <div class="mb-6">
+                            <h5 class="font-medium mb-4">{{ __('recruitment.application_questions') }}</h5>
+                            @foreach ($allVacancyQuestions as $index => $question)
+                                <div class="mb-4 p-4 border rounded-md">
+                                    <p class="font-medium mb-2">{{ $index + 1 }}.
+                                        {{ $question['question'] }}
+                                        @if ($question['required'])
+                                            <span class="text-danger-500">*</span>
+                                        @endif
+                                    </p>
+
+                                    @if ($question['type'] === 'textarea')
+                                        <div class="form-group">
+                                            <textarea wire:model="questionAnswers.{{ $index }}.answer" @if ($locale === 'ar') dir="rtl" @endif
+                                                class="form-control @error('questionAnswers.' . $index . '.answer') !border-danger-500 @enderror" rows="3"></textarea>
+                                        </div>
+                                    @elseif ($question['type'] === 'radio')
+                                        <div class="space-y-2">
+                                            @foreach ($question['options_array'] as $optionIndex => $option)
+                                                <label class="flex items-center">
+                                                    <input type="radio"
+                                                        @if ($locale === 'ar') dir="rtl" @endif
+                                                        wire:model="questionAnswers.{{ $index }}.answer"
+                                                        value="{{ $option }}" class="form-radio"
+                                                        name="radio{{ $optionIndex }}">
+                                                    <span
+                                                        class="text-sm font-medium text-slate-600 ml-2 @error('questionAnswers.' . $question['id'] . '.answer') !border-danger-500 @enderror ">{{ $option }}</span>
+                                                </label>
+                                            @endforeach
+                                        </div>
+                                    @elseif ($question['type'] === 'checkbox')
+                                        <div class="space-y-2">
+                                            <label class="flex items-center">
+                                                <input type="checkbox"
+                                                    @if ($locale === 'ar') dir="rtl" @endif
+                                                    wire:model="questionAnswers.{{ $index }}.answer"
+                                                    value="true" class="form-checkbox">
+                                                <span
+                                                    class="text-sm font-medium text-slate-600 ml-2">{{ __('recruitment.true') }}</span>
+                                            </label>
+                                        </div>
+                                    @elseif ($question['type'] === 'select')
+                                        <div class="form-group">
+                                            <select wire:model="questionAnswers.{{ $index }}.answer"
+                                                @if ($locale === 'ar') dir="rtl" @endif
+                                                class="form-control @error('questionAnswers.' . $index . '.answer') !border-danger-500 @enderror">
+                                                <option value="">{{ __('recruitment.select_option') }}
+                                                </option>
+                                                @foreach ($question['options_array'] as $option)
+                                                    <option value="{{ $option }}">{{ $option }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    @elseif ($question['type'] === 'date')
+                                        <div class="form-group">
+                                            <input type="date" @if ($locale === 'ar') dir="rtl" @endif
+                                                wire:model="questionAnswers.{{ $index }}.answer"
+                                                class="form-control @error('questionAnswers.' . $index . '.answer') !border-danger-500 @enderror">
+                                        </div>
+                                    @elseif($question['type'] === 'number')
+                                        <div class="form-group">
+                                            <input type="number" @if ($locale === 'ar') dir="rtl" @endif
+                                                wire:model="questionAnswers.{{ $index }}.answer"
+                                                class="form-control @error('questionAnswers.' . $index . '.answer') !border-danger-500 @enderror">
+                                        </div>
+                                    @else
+                                        <div class="form-group">
+                                            <input type="text" @if ($locale === 'ar') dir="rtl" @endif
+                                                wire:model="questionAnswers.{{ $index }}.answer"
+                                                class="form-control @error('questionAnswers.' . $index . '.answer') !border-danger-500 @enderror">
+                                        </div>
+                                    @endif
+                                    @error('questionAnswers.' . $index . '.answer')
+                                        <bdi>
+                                            <span
+                                                class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                        </bdi>
+                                    @enderror
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+
+
+
 
                     <!-- Cover Letter -->
                     <div class="form-group mb-4">
@@ -308,7 +393,7 @@
                         @enderror
                     </div>
 
-       
+
                 @endif
 
                 <!-- Step navigation -->

@@ -525,7 +525,8 @@ class ApplicantsCreate extends Component
     public function clearSelectedVacancy()
     {
         $this->selectedVacancy = null;
-        $this->allVacancyQuestions = [];
+        $this->allVacancyQuestions = [];    
+        $this->questionAnswers = [];
     }
 
     public function validateAnsweredQuestions()

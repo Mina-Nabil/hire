@@ -57,6 +57,8 @@ class ApplicantsCreateMin extends Component
 
     // Step 2: Vacancy & Application
     public $selectedVacancy = null;
+    public $allVacancyQuestions = [];
+    public $questionAnswers = [];
     public $selectedReferral = null;
     public $vacancyId = null;
     public $coverLetter = null;
@@ -150,6 +152,38 @@ class ApplicantsCreateMin extends Component
     {
         if ($value) {
             $this->selectedVacancy = Vacancy::with('vacancy_questions', 'vacancy_slots')->findOrFail($value);
+
+            foreach ($this->baseQuestions as $question) {
+                $this->allVacancyQuestions[] = [
+                    'id' => $question->id,
+                    'origin' => "base",
+                    'required' => $question->required,
+                    'question' => $question->question,
+                    'type' => $question->type,
+                    'options_array' => $question->options_array
+                ];
+                $this->questionAnswers[] = [
+                    'id' => $question->id,
+                    'origin' => "base",
+                    'answer' => '',
+                ];
+            }
+
+            foreach ($this->selectedVacancy->vacancy_questions as $question) {
+                $this->allVacancyQuestions[] = [
+                    'id' => $question->id,
+                    'origin' => "vacancy",
+                    'required' => $question->required,
+                    'question' => $question->question,
+                    'type' => $question->type,
+                    'options_array' => $question->options_array
+                ];
+                $this->questionAnswers[] = [
+                    'id' => $question->id,
+                    'origin' => "vacancy",
+                    'answer' => '',
+                ];
+            }
         }
     }
 
@@ -157,7 +191,37 @@ class ApplicantsCreateMin extends Component
     {
         $this->selectedVacancy = null;
         $this->allVacancyQuestions = [];
+        $this->questionAnswers = [];
     }
+
+    public function validateAnsweredQuestions()
+    {
+        $validationRules = [];
+        $messages = [];
+        foreach ($this->allVacancyQuestions as $index => &$question) {
+            if ($question['origin'] == "vacancy") {
+                $questionObject = $this->selectedVacancy->vacancy_questions->where('id', $question['id'])->first();
+                if ($questionObject->required) {
+                    $validationRules["questionAnswers.{$index}.answer"] = 'required';
+                    $messages["questionAnswers.{$index}.answer.required"] = 'The question is required';
+                }
+            } else {
+                $questionObject = BaseQuestion::where('id', $question['id'])->first();
+                if ($questionObject->required) {
+                    $validationRules["questionAnswers.{$index}.answer"] = 'required';
+                    $messages["questionAnswers.{$index}.answer.required"] = 'The question is required';
+                }
+            }
+            $question["object"] = $questionObject;
+        }
+
+        if (count($validationRules) > 0) {
+            $this->validate($validationRules, $messages);
+        } else {
+            return true;
+        }
+    }
+
 
 
 
@@ -178,6 +242,7 @@ class ApplicantsCreateMin extends Component
     public function createApplicant()
     {
         $this->validateVacancyAndApplication();
+        $this->validateAnsweredQuestions();
 
         try {
             DB::transaction(function () {
@@ -222,6 +287,11 @@ class ApplicantsCreateMin extends Component
                 // 11. Create application answers
                 if ($this->slotId) {
                     $application->bookSlot($this->slotId);
+                }
+                foreach ($this->questionAnswers as $i => $qa) {
+                    if (array_key_exists($i, $this->allVacancyQuestions)) {
+                        $application->addAnswer($qa['answer'], $this->allVacancyQuestions[$i]['object']);
+                    }
                 }
             });
 

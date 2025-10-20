@@ -73,6 +73,7 @@ class ApplicantsCreateMin extends Component
         $vacancyID = decrypt($vacancyID);
         $this->vacancyId = $vacancyID;
         $this->selectedVacancy = Vacancy::findOrFail($vacancyID);
+        $this->updatedVacancyId($vacancyID);
 
         if ($referralID) {
             $referralID = decrypt($referralID);

@@ -165,10 +165,13 @@ class Attendance extends Model
                     "error" => true,
                     'creator_id' => Auth::id(),
                 ];
-            } 
-            
+            }
+
             //if the start time is empty, skip the row
-            if ($sheet->getCell('B' . $row)->getValue() == null) {
+            if (
+                $sheet->getCell('B' . $row)->getValue() == null
+                || $sheet->getCell('C' . $row)->getValue() == null
+            ) {
                 $attendance[] = [
                     'employee_id' => "No Start Time",
                     'employee' => null,
@@ -344,7 +347,7 @@ class Attendance extends Model
                 if (!$existingPunch) {
                     $dailyPunch = DailyPunch::create($punch);
                     $processedPunches[] = $dailyPunch;
-                    
+
                     // Track dates for job dispatching
                     $dateKey = $punchData['datetime']->format('Y-m-d');
                     if (!in_array($dateKey, $processedDates)) {
@@ -365,7 +368,6 @@ class Attendance extends Model
                         'punch_time' => $punchData['datetime']->format('Y-m-d H:i:s')
                     ]);
                 }
-
             } catch (\Exception $e) {
                 $errors[] = "Row {$row}: " . $e->getMessage();
                 Log::error('[ZKTeco Excel] Error processing row', [
@@ -414,7 +416,7 @@ class Attendance extends Model
 
             // Parse datetime
             $datetime = new Carbon(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($movementData));
-            
+
             // Apply timezone offset if configured
             if (env('BASMA_TIMEZONE')) {
                 $timeDiff = (float) env('BASMA_TIMEZONE');
@@ -424,7 +426,6 @@ class Attendance extends Model
             return [
                 'datetime' => $datetime,
             ];
-
         } catch (\Exception $e) {
             Log::error('[ZKTeco Excel] Error parsing movement data', [
                 'movement_data' => $movementData,
@@ -465,15 +466,14 @@ class Attendance extends Model
     {
         try {
             $targetDate = Carbon::parse($date);
-            
+
             // Dispatch the job
             ProcessDailyAttendanceJob::dispatch($targetDate);
-            
+
             Log::info('[ZKTeco Excel] Dispatched daily attendance job', [
                 'date' => $date,
                 'target_date' => $targetDate->format('Y-m-d')
             ]);
-
         } catch (\Exception $e) {
             Log::error('[ZKTeco Excel] Error dispatching daily attendance job', [
                 'date' => $date,

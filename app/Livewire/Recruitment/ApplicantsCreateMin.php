@@ -71,8 +71,12 @@ class ApplicantsCreateMin extends Component
         $this->locale = Session::get('locale', 'en');
         App::setLocale($this->locale);
 
+        try {
+            $vacancyID = decrypt($vacancyID);
+        } catch (Exception $e) {
+            abort(404);
+        }
 
-        $vacancyID = decrypt($vacancyID);
         $this->vacancyId = $vacancyID;
         $this->selectedVacancy = Vacancy::findOrFail($vacancyID);
         $this->updatedVacancyId($vacancyID);

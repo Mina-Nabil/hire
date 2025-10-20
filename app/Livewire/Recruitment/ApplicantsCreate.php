@@ -113,7 +113,12 @@ class ApplicantsCreate extends Component
         App::setLocale($this->locale);
 
         if ($vacancyID) {
-            $vacancyID = decrypt($vacancyID);
+            try {
+                $vacancyID = decrypt($vacancyID);
+            } catch (Exception $e) {
+                abort(404);
+            }
+
             $this->vacancyId = $vacancyID;
             $this->selectedVacancy = Vacancy::findOrFail($vacancyID);
             $this->updatedVacancyId($vacancyID);
@@ -525,7 +530,7 @@ class ApplicantsCreate extends Component
     public function clearSelectedVacancy()
     {
         $this->selectedVacancy = null;
-        $this->allVacancyQuestions = [];    
+        $this->allVacancyQuestions = [];
         $this->questionAnswers = [];
     }
 
@@ -702,7 +707,7 @@ class ApplicantsCreate extends Component
                 }
 
                 foreach ($this->questionAnswers as $i => $qa) {
-                    if(array_key_exists($i, $this->allVacancyQuestions)){
+                    if (array_key_exists($i, $this->allVacancyQuestions)) {
                         $application->addAnswer($qa['answer'], $this->allVacancyQuestions[$i]['object']);
                     }
                 }
@@ -710,7 +715,7 @@ class ApplicantsCreate extends Component
 
             $this->alertSuccess('Applicant created successfully!');
             $user = Auth::user();
-            if(!$user){
+            if (!$user) {
                 return redirect()->to('/thank-you');
             }
             return redirect()->to('/recruitment/applicants');

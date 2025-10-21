@@ -564,6 +564,10 @@ class Employee extends Model
             throw new AppException('You dont have permission to apply for vacation or mission');
         }
 
+        if($vacationBenefit && $vacationBenefit->employee_id != $this->id){
+            throw new AppException('You cannot apply for vacation for another employee');
+        }
+
         if ($is_mission) {
             $currentBalance = $hours_count;
         } else {

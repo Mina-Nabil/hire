@@ -6,6 +6,7 @@ use App\Models\Attendance\Attendance;
 use App\Models\Personel\Employee;
 use App\Traits\AlertFrontEnd;
 use App\Exceptions\AppException;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -189,8 +190,8 @@ class ShowAttendance extends Component
     {
         $attendance = Attendance::with('employee')->findOrFail($attendanceId);
         $this->editingTimesAttendanceId = $attendanceId;
-        $this->editStartTime = $attendance->start_time;
-        $this->editEndTime = $attendance->end_time;
+        $this->editStartTime = Carbon::parse($attendance->start_time)->format('H:i');
+        $this->editEndTime = Carbon::parse($attendance->end_time)->format('H:i');
         $this->editTimesEmployeeName = $attendance->employee ? $attendance->employee->name : 'N/A';
         $this->editTimesAttendanceDate = $attendance->date;
         $this->editTimesCurrentHours = $attendance->hours;

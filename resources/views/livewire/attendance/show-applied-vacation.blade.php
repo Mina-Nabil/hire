@@ -84,6 +84,8 @@
                                 <th scope="col" class="table-th">Hours</th>
                                 <th scope="col" class="table-th">New Balance</th>
                                 <th scope="col" class="table-th">Status</th>
+                                <th scope="col" class="table-th">Created At</th>
+                                <th scope="col" class="table-th">Approved By</th>
                                 <th scope="col" class="table-th">Payroll</th>
                                 <th scope="col" class="table-th">Actions</th>
                             </tr>
@@ -143,6 +145,20 @@
                                             <span class="badge badge-success">Approved</span>
                                         @else
                                             <span class="badge badge-danger">Rejected</span>
+                                        @endif
+                                    </td>
+                                    <td class="table-td">
+                                        <span class="text-sm text-slate-600 dark:text-slate-300">
+                                            {{ $appliedVacation->created_at ? $appliedVacation->created_at->format('M d, Y') : 'N/A' }}
+                                        </span>
+                                    </td>
+                                    <td class="table-td">
+                                        @if ($appliedVacation->approvedBy)
+                                            <span class="text-sm text-slate-600 dark:text-slate-300">
+                                                {{ $appliedVacation->approvedBy->name }}
+                                            </span>
+                                        @else
+                                            <span class="text-xs text-slate-400">Not approved</span>
                                         @endif
                                     </td>
                                     <td class="table-td">
@@ -328,6 +344,16 @@
                                         {{ $selectedAppliedVacation->payroll->title }}
                                     @else
                                         <span class="text-slate-400">No payroll assigned</span>
+                                    @endif
+                                </p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-slate-600 dark:text-slate-300">Approved By</label>
+                                <p class="mt-1 text-slate-900 dark:text-white">
+                                    @if ($selectedAppliedVacation->approvedBy)
+                                        {{ $selectedAppliedVacation->approvedBy->name }}
+                                    @else
+                                        <span class="text-slate-400">Not approved yet</span>
                                     @endif
                                 </p>
                             </div>

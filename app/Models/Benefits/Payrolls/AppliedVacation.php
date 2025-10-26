@@ -8,6 +8,7 @@ use App\Models\Benefits\Vacations\VacationBenefit;
 use App\Models\Benefits\Payrolls\Payroll;
 use App\Models\Benefits\Vacations\VacationDay;
 use App\Models\Users\AppLog;
+use App\Models\Users\User;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
@@ -29,6 +30,7 @@ class AppliedVacation extends Model
         'new_balance',
         'note',
         'is_mission',
+        'approved_by_id',
     ];
     const STATUS_PENDING = 'pending';
     const STATUS_APPROVED = 'approved';
@@ -49,6 +51,7 @@ class AppliedVacation extends Model
         }
 
         $this->status = self::STATUS_APPROVED;
+        $this->approved_by_id = $user->id;
         $this->save();
         AppLog::info('Vacation Approved', "Employee: $this->employee->name, Vacation: $this->vacationBenefit->name", loggable: $this);
     }
@@ -148,5 +151,10 @@ class AppliedVacation extends Model
     public function vacationDays()
     {
         return $this->hasMany(VacationDay::class);
+    }
+
+    public function approvedBy()
+    {
+        return $this->belongsTo(User::class, 'approved_by_id');
     }
 }

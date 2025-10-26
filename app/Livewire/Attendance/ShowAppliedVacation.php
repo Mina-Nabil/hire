@@ -52,7 +52,7 @@ class ShowAppliedVacation extends Component
 
     public function openVacationDetailsModal($appliedVacationId)
     {
-        $this->selectedAppliedVacation = AppliedVacation::with(['employee', 'vacationBenefit', 'payroll'])->findOrFail($appliedVacationId);
+        $this->selectedAppliedVacation = AppliedVacation::with(['employee', 'vacationBenefit', 'payroll', 'approvedBy'])->findOrFail($appliedVacationId);
         $this->showVacationDetailsModal = true;
     }
 
@@ -93,7 +93,7 @@ class ShowAppliedVacation extends Component
     public function render()
     {
         $query = AppliedVacation::userData()
-            ->with(['employee', 'vacationBenefit', 'payroll'])
+            ->with(['employee', 'vacationBenefit', 'payroll', 'approvedBy'])
             ->when($this->search, function ($query) {
                 $query->whereHas('employee', function ($q) {
                     $q->where('name', 'like', '%' . $this->search . '%')

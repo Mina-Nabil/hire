@@ -120,6 +120,10 @@ class AppliedVacation extends Model
 
     public function scopeByTypeName($query, $typeName)
     {
+        if ($typeName === 'Mission') {
+            return $query->where('is_mission', true);
+        }
+        
         return $query->whereHas('vacationBenefit', function ($q) use ($typeName) {
             $q->where('name', $typeName);
         });

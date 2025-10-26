@@ -116,7 +116,9 @@ class ShowAppliedVacation extends Component
             });
 
         $appliedVacations = $query->latest()->paginate(10);
-        $benefitNames = VacationBenefit::select('name')->whereNotNull('name')->distinct()->get()->pluck('name');
+        $benefitNames = VacationBenefit::select('name')->whereNotNull('name')->distinct()->get()->pluck('name')->toArray();
+        // Add 'Mission' to the list of benefit names
+        $benefitNames[] = 'Mission';
 
         $loggedInUser = Auth::user();
         if($loggedInUser->is_admin || $loggedInUser->is_hr){

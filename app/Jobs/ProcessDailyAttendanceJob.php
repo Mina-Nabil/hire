@@ -74,22 +74,6 @@ class ProcessDailyAttendanceJob implements ShouldQueue
                 //     continue;
                 // }
 
-                // Check if attendance record already exists for this date
-                $existingAttendance = Attendance::where('employee_id', $employee->id)
-                    ->where('date', $this->targetDate->format('Y-m-d'))
-                    ->first();
-
-                if ($existingAttendance) {
-                    Log::debug('Attendance record already exists', [
-                        'employee_id' => $employee->id,
-                        'employee_name' => $employee->name,
-                        'date' => $this->targetDate->format('Y-m-d'),
-                        'attendance_id' => $existingAttendance->id
-                    ]);
-                    $skippedCount++;
-                    continue;
-                }
-
                 // Process daily punches for this employee
                 $this->processEmployeeDailyPunches($employee, $this->targetDate);
                 

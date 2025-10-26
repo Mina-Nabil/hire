@@ -253,6 +253,11 @@ class Applicant extends Model
         return $this->morphMany(Document::class, 'doc_owner');
     }
 
+    public function answers(): HasManyThrough
+    {
+        return $this->hasManyThrough(ApplicationAnswer::class, Application::class);
+    }
+
     ///static methods
 
     /**

@@ -287,6 +287,41 @@
                 </div>
             </div>
 
+            <div class="card mb-6 p-4">
+                <div class="card-header py-3 flex justify-between items-center">
+                    <h5 class="font-medium m-0">Questions</h5>
+                </div>
+                <div class="card-body mt-2">
+                    @if ($applicant->answers && $applicant->answers->count() > 0)
+                        <div class="divide-y">
+                            @foreach ($applicant->answers as $answer)
+                                <div class="p-4">
+                                    <div class="mb-2">
+                                        <span class="badge bg-primary text-white text-xs">
+                                            {{ $answer->application->vacancy->position->name ?? 'N/A' }}
+                                        </span>
+                                    </div>
+                                    @if ($answer->answerable)
+                                        <h6 class="font-medium text-sm mb-1">
+                                            {{ $answer->answerable->question }}
+                                        </h6>
+                                    @endif
+                                    @if ($answer->answer)
+                                        <p class="text-slate-600 mt-2">
+                                            {{ $answer->answer }}
+                                        </p>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="p-4 text-center">
+                            <p class="text-slate-500">No questions answered</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
             @if ($applicant->health?->has_health_issues)
                 <div class="card mb-6 p-4">
                     <div class="card-header py-3 flex justify-between items-center">

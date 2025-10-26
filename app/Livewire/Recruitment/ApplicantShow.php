@@ -543,7 +543,11 @@ class ApplicantShow extends Component
             'references',
             'skills',
             'health',
-            'documents'
+            'documents',
+            'answers',
+            'answers.answerable',
+            'answers.application',
+            'answers.application.vacancy.position',
         ]);
 
         $this->refreshApplicantRelations();

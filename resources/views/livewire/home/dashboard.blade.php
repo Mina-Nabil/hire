@@ -228,7 +228,7 @@
                                 <div class="flex justify-between items-center">
                                     <div class="flex-1">
                                         <div class="flex items-center space-x-3 mb-2">
-                                            <p class="font-medium">{{ $attendance->date}}</p>
+                                            <p class="font-medium">{{ $attendance->date }}</p>
                                             @if($attendance->is_approved)
                                                 <span class="badge bg-success text-white">Approved</span>
                                             @elseif($attendance->is_approved === false)

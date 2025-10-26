@@ -203,13 +203,17 @@ class Application extends Model
                     'vacancy_slot_id' => $vacancySlotId,
                 ]);
 
-                $this->interviews()->create([
-                    'user_id' => $this->vacancy->assign_to,
-                    'date' => $slot->date->format('Y-m-d') . ' ' . $slot->start_time->format('H:i'),
-                    'type' => Interview::TYPE_IN_PERSON,
-                    'interview_level' => Interview::INTERVIEW_LEVEL_FIRST,
-                    'status' => Interview::STATUS_PENDING,
-                ]);
+                if ($this->vacancy->assign_to) {
+                    $this->interviews()->create([
+                        'user_id' => $this->vacancy->assign_to,
+                        'date' => $slot->date->format('Y-m-d') . ' ' . $slot->start_time->format('H:i'),
+                        'type' => Interview::TYPE_IN_PERSON,
+                        'interview_level' => Interview::INTERVIEW_LEVEL_FIRST,
+                        'status' => Interview::STATUS_PENDING,
+                    ]);
+                }
+
+
 
                 AppLog::info('Slot Booked', 'Slot booked for applicant: ' . $this->applicant->full_name, loggable: $this);
                 return $slot;

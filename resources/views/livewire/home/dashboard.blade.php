@@ -164,8 +164,8 @@
                         <div class="p-4 cursor-pointer">
                             <div class="flex justify-between items-start">
                                 <div class="flex-1">
-                                    <p class="font-medium mb-1">{{ $applicant->first_name }} {{ $applicant->last_name }}</p> - Applied on {{ $applicant->applications->first()->created_at->format('M d, Y') }}
-                                    <p class="text-slate-500 text-sm mb-1">{{ $applicant->email }}</p>
+                                    <p class="font-medium mb-1">{{ $applicant->first_name }} {{ $applicant->last_name }} - Applied on {{ $applicant->applications->first()->created_at->format('M d, Y') }}
+                                    <p class="text-slate-500 text-sm mb-1">{{ $applicant->email }}</p> </p>
                                     @if($applicant->phone)
                                         <p class="text-slate-500 text-sm">{{ $applicant->phone }}</p>
                                     @endif

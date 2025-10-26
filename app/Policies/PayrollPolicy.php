@@ -13,7 +13,7 @@ class PayrollPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->is_admin;
+        return $user->is_admin || $user->is_hr;
     }
 
     /**
@@ -21,7 +21,7 @@ class PayrollPolicy
      */
     public function view(User $user, Payroll $payroll): bool
     {
-        return $user->is_admin;
+        return $user->is_admin || $user->is_hr;
     }
 
     /**

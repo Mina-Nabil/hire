@@ -103,14 +103,14 @@
                                         href="{{ url('/payrolls') }}">Closing History</a>
                                 </li>
                             @endcan
-                            @can('viewAny', App\Models\Payroll\Payroll::class)
+                            @can('create', App\Models\Payroll\Payroll::class)
                                 <li>
                                     <a class="{{ request()->routeIs('payrolls.create') ? 'active' : '' }}"
                                         href="{{ url('/payrolls/create') }}">
                                         Create Payroll</a>
                                 </li>
                             @endcan
-                            @can('viewAny', App\Models\Payroll\Payroll::class)
+                            @can('create', App\Models\Attendance\Attendance::class)
                                 <li>
                                     <a class="{{ request()->routeIs('submit-attendance') ? 'active' : '' }}"
                                         href="{{ url('/payrolls/submit-attendance') }}">

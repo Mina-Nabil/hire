@@ -199,7 +199,7 @@ class Application extends Model
                     throw new AppException('This slot does not belong to the vacancy of this application');
                 }
 
-                $slot = $this->slots()->create([
+                $applicationSlot = $this->slots()->create([
                     'vacancy_slot_id' => $vacancySlotId,
                 ]);
 

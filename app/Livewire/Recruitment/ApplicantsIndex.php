@@ -50,7 +50,7 @@ class ApplicantsIndex extends Component
 
     public function updatedCityId()
     {
-        if($this->cityId) {
+        if ($this->cityId) {
             $this->areas = City::find($this->cityId)->areas;
         } else {
             $this->areas = [];
@@ -62,6 +62,7 @@ class ApplicantsIndex extends Component
     public function render()
     {
         $applicants = Applicant::query()
+            ->latest()
             ->when($this->search, function ($query) {
                 $query->search($this->search);
             })
@@ -151,4 +152,4 @@ class ApplicantsIndex extends Component
     {
         $this->resetPage();
     }
-} 
+}

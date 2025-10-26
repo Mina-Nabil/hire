@@ -1,69 +1,58 @@
-<div class="container-fluid">
+<div>
     {{-- Flash Messages --}}
     @if (session()->has('message'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
             {{ session('message') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
     @if (session()->has('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
             {{ session('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
-    <div class="row">
-        <div class="col-12">
-            <h2 class="mb-4">Dashboard</h2>
-        </div>
-    </div>
+    <h2 class="font-bold text-2xl mb-6">Dashboard</h2>
 
-    <div class="row">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         {{-- Latest Attendance Card --}}
         @if($employee && $latestAttendance->count() > 0)
-        <div class="col-lg-6 col-md-12 mb-4">
-            <div class="card h-100">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-clock me-2"></i>
-                        Latest Attendance Records
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Start Time</th>
-                                    <th>End Time</th>
-                                    <th>Hours</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($latestAttendance as $attendance)
-                                <tr>
-                                    <td>{{ $attendance->date->format('M d, Y') }}</td>
-                                    <td>{{ $attendance->start_time }}</td>
-                                    <td>{{ $attendance->end_time ?? 'N/A' }}</td>
-                                    <td>{{ $attendance->hours }}</td>
-                                    <td>
-                                        @if($attendance->is_approved)
-                                            <span class="badge bg-success">Approved</span>
-                                        @elseif($attendance->is_approved === false)
-                                            <span class="badge bg-danger">Rejected</span>
-                                        @else
-                                            <span class="badge bg-warning">Pending</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+        <div class="card">
+            <div class="card-header py-3">
+                <h5 class="font-medium m-0">
+                    <i class="fas fa-clock mr-2"></i>
+                    Latest Attendance Records
+                </h5>
+            </div>
+            <div class="card-body mt-2">
+                <div class="divide-y">
+                    @foreach($latestAttendance as $attendance)
+                    <div class="p-4">
+                        <div class="flex justify-between items-center">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-3 mb-2">
+                                    <p class="font-medium">{{ $attendance->date->format('M d, Y') }}</p>
+                                    @if($attendance->is_approved)
+                                        <span class="badge bg-success text-white">Approved</span>
+                                    @elseif($attendance->is_approved === false)
+                                        <span class="badge bg-danger text-white">Rejected</span>
+                                    @else
+                                        <span class="badge bg-warning text-white">Pending</span>
+                                    @endif
+                                </div>
+                                <div class="text-sm text-slate-500">
+                                    <span>{{ $attendance->start_time }}</span>
+                                    @if($attendance->end_time)
+                                        <span> - {{ $attendance->end_time }}</span>
+                                    @endif
+                                    <span> · {{ $attendance->hours }} hrs</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -71,102 +60,84 @@
 
         {{-- Latest Applied Vacations Card --}}
         @if($employee && $latestAppliedVacations->count() > 0)
-        <div class="col-lg-6 col-md-12 mb-4">
-            <div class="card h-100">
-                <div class="card-header bg-success text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-calendar-alt me-2"></i>
-                        Latest Applied Vacations
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Type</th>
-                                    <th>Days</th>
-                                    <th>Status</th>
-                                    <th>Applied Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($latestAppliedVacations as $vacation)
-                                <tr>
-                                    <td>{{ $vacation->vacationBenefit->name ?? 'N/A' }}</td>
-                                    <td>{{ $vacation->vacationDays->count() }}</td>
-                                    <td>
-                                        @if($vacation->status === 'approved')
-                                            <span class="badge bg-success">Approved</span>
-                                        @elseif($vacation->status === 'rejected')
-                                            <span class="badge bg-danger">Rejected</span>
-                                        @else
-                                            <span class="badge bg-warning">Pending</span>
-                                        @endif
-                                    </td>
-                                    <td>{{ $vacation->created_at->format('M d, Y') }}</td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+        <div class="card">
+            <div class="card-header py-3">
+                <h5 class="font-medium m-0">
+                    <i class="fas fa-calendar-alt mr-2"></i>
+                    Latest Applied Vacations
+                </h5>
+            </div>
+            <div class="card-body mt-2">
+                <div class="divide-y">
+                    @foreach($latestAppliedVacations as $vacation)
+                    <div class="p-4">
+                        <div class="flex justify-between items-center">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-3 mb-2">
+                                    <p class="font-medium">{{ $vacation->vacationBenefit->name ?? 'N/A' }}</p>
+                                    @if($vacation->status === 'approved')
+                                        <span class="badge bg-success text-white">Approved</span>
+                                    @elseif($vacation->status === 'rejected')
+                                        <span class="badge bg-danger text-white">Rejected</span>
+                                    @else
+                                        <span class="badge bg-warning text-white">Pending</span>
+                                    @endif
+                                </div>
+                                <div class="text-sm text-slate-500">
+                                    <span>{{ $vacation->vacationDays->count() }} days</span>
+                                    <span> · Applied {{ $vacation->created_at->format('M d, Y') }}</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                    @endforeach
                 </div>
             </div>
         </div>
         @endif
+    </div>
 
-        {{-- Admin/HR Only Cards --}}
-        @if($user->is_admin || $user->is_hr)
-        
+    {{-- Admin/HR Only Cards --}}
+    @if($user->is_admin || $user->is_hr)
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         {{-- Upcoming Interviews Card --}}
         @if($upcomingInterviews->count() > 0)
-        <div class="col-lg-6 col-md-12 mb-4">
-            <div class="card h-100">
-                <div class="card-header bg-warning text-dark">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-user-tie me-2"></i>
-                        Upcoming Interviews (Next 7 Days)
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Applicant</th>
-                                    <th>Position</th>
-                                    <th>Date & Time</th>
-                                    <th>Type</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($upcomingInterviews as $interview)
-                                <tr>
-                                    <td>{{ $interview->application->applicant->first_name }} {{ $interview->application->applicant->last_name }}</td>
-                                    <td>{{ $interview->application->vacancy->title ?? 'N/A' }}</td>
-                                    <td>{{ $interview->date->format('M d, Y H:i') }}</td>
-                                    <td>
-                                        @if($interview->type === 'in_person')
-                                            <span class="badge bg-primary">In Person</span>
-                                        @elseif($interview->type === 'online')
-                                            <span class="badge bg-info">Online</span>
-                                        @else
-                                            <span class="badge bg-secondary">Phone</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if($interview->status === 'scheduled')
-                                            <span class="badge bg-success">Scheduled</span>
-                                        @else
-                                            <span class="badge bg-warning">Pending</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+        <div class="card">
+            <div class="card-header py-3">
+                <h5 class="font-medium m-0">
+                    <i class="fas fa-user-tie mr-2"></i>
+                    Upcoming Interviews (Next 7 Days)
+                </h5>
+            </div>
+            <div class="card-body mt-2">
+                <div class="divide-y">
+                    @foreach($upcomingInterviews as $interview)
+                    <div class="p-4">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <p class="font-medium">{{ $interview->application->applicant->first_name }} {{ $interview->application->applicant->last_name }}</p>
+                                    @if($interview->status === 'scheduled')
+                                        <span class="badge bg-success text-white">Scheduled</span>
+                                    @else
+                                        <span class="badge bg-warning text-white">Pending</span>
+                                    @endif
+                                </div>
+                                <p class="text-slate-600 text-sm mb-1">{{ $interview->application->vacancy->title ?? 'N/A' }}</p>
+                                <p class="text-slate-500 text-sm">
+                                    {{ $interview->date->format('M d, Y H:i') }}
+                                    @if($interview->type === 'in_person')
+                                        <span class="badge bg-primary text-white ml-2">In Person</span>
+                                    @elseif($interview->type === 'online')
+                                        <span class="badge bg-info text-white ml-2">Online</span>
+                                    @else
+                                        <span class="badge bg-secondary text-white ml-2">Phone</span>
+                                    @endif
+                                </p>
+                            </div>
+                        </div>
                     </div>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -174,124 +145,102 @@
 
         {{-- Latest Applicants Card --}}
         @if($latestApplicants->count() > 0)
-        <div class="col-lg-6 col-md-12 mb-4">
-            <div class="card h-100">
-                <div class="card-header bg-info text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-users me-2"></i>
-                        Latest Applicants
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Phone</th>
-                                    <th>Applied For</th>
-                                    <th>Applied Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($latestApplicants as $applicant)
-                                <tr>
-                                    <td>{{ $applicant->first_name }} {{ $applicant->last_name }}</td>
-                                    <td>{{ $applicant->email }}</td>
-                                    <td>{{ $applicant->phone }}</td>
-                                    <td>
-                                        @if($applicant->applications->count() > 0)
-                                            {{ $applicant->applications->first()->vacancy->title ?? 'N/A' }}
-                                        @else
-                                            N/A
-                                        @endif
-                                    </td>
-                                    <td>{{ $applicant->created_at->format('M d, Y') }}</td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+        <div class="card">
+            <div class="card-header py-3">
+                <h5 class="font-medium m-0">
+                    <i class="fas fa-users mr-2"></i>
+                    Latest Applicants
+                </h5>
+            </div>
+            <div class="card-body mt-2">
+                <div class="divide-y">
+                    @foreach($latestApplicants as $applicant)
+                    <div class="p-4">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <p class="font-medium mb-1">{{ $applicant->first_name }} {{ $applicant->last_name }}</p>
+                                <p class="text-slate-500 text-sm mb-1">{{ $applicant->email }}</p>
+                                @if($applicant->phone)
+                                    <p class="text-slate-500 text-sm">{{ $applicant->phone }}</p>
+                                @endif
+                                @if($applicant->applications->count() > 0)
+                                    <p class="text-slate-600 text-sm mt-1">
+                                        Applied for: {{ $applicant->applications->first()->vacancy->title ?? 'N/A' }}
+                                    </p>
+                                @endif
+                            </div>
+                            <div class="text-slate-500 text-sm">
+                                {{ $applicant->created_at->format('M d, Y') }}
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-        </div>
-        @endif
-
-        {{-- Pending Vacation Requests Card --}}
-        @if($pendingVacationRequests->count() > 0)
-        <div class="col-lg-12 col-md-12 mb-4">
-            <div class="card h-100">
-                <div class="card-header bg-danger text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                        Pending Vacation Requests
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Employee</th>
-                                    <th>Vacation Type</th>
-                                    <th>Days Requested</th>
-                                    <th>Request Date</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($pendingVacationRequests as $request)
-                                <tr>
-                                    <td>{{ $request->employee->name ?? 'N/A' }}</td>
-                                    <td>{{ $request->vacationBenefit->name ?? 'N/A' }}</td>
-                                    <td>{{ $request->vacationDays->count() }}</td>
-                                    <td>{{ $request->created_at->format('M d, Y') }}</td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <button class="btn btn-success btn-sm" wire:click="approveVacation({{ $request->id }})">
-                                                <i class="fas fa-check"></i> Approve
-                                            </button>
-                                            <button class="btn btn-danger btn-sm" wire:click="rejectVacation({{ $request->id }})">
-                                                <i class="fas fa-times"></i> Reject
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-        @endif
-
-        @endif
-
-        {{-- Empty State Messages --}}
-        @if($employee && $latestAttendance->count() === 0 && $latestAppliedVacations->count() === 0)
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body text-center">
-                    <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
-                    <h5 class="text-muted">No Data Available</h5>
-                    <p class="text-muted">You don't have any attendance records or vacation applications yet.</p>
-                </div>
-            </div>
-        </div>
-        @endif
-
-        @if(($user->is_admin || $user->is_hr) && $upcomingInterviews->count() === 0 && $latestApplicants->count() === 0 && $pendingVacationRequests->count() === 0)
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body text-center">
-                    <i class="fas fa-tachometer-alt fa-3x text-muted mb-3"></i>
-                    <h5 class="text-muted">No Administrative Data</h5>
-                    <p class="text-muted">No upcoming interviews, new applicants, or pending vacation requests at the moment.</p>
+                    @endforeach
                 </div>
             </div>
         </div>
         @endif
     </div>
+
+    {{-- Pending Vacation Requests Card --}}
+    @if($pendingVacationRequests->count() > 0)
+    <div class="card mb-6">
+        <div class="card-header py-3">
+            <h5 class="font-medium m-0">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                Pending Vacation Requests
+            </h5>
+        </div>
+        <div class="card-body mt-2">
+            <div class="divide-y">
+                @foreach($pendingVacationRequests as $request)
+                <div class="p-4">
+                    <div class="flex justify-between items-center">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-3 mb-2">
+                                <p class="font-medium">{{ $request->employee->name ?? 'N/A' }}</p>
+                                <span class="badge bg-warning text-white">Pending</span>
+                            </div>
+                            <p class="text-slate-600 text-sm mb-1">{{ $request->vacationBenefit->name ?? 'N/A' }}</p>
+                            <p class="text-slate-500 text-sm">
+                                {{ $request->vacationDays->count() }} days requested
+                                · Applied {{ $request->created_at->format('M d, Y') }}
+                            </p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="btn btn-sm btn-success" wire:click="approveVacation({{ $request->id }})">
+                                <i class="fas fa-check mr-1"></i> Approve
+                            </button>
+                            <button class="btn btn-sm btn-danger" wire:click="rejectVacation({{ $request->id }})">
+                                <i class="fas fa-times mr-1"></i> Reject
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+    @endif
+    @endif
+
+    {{-- Empty State Messages --}}
+    @if($employee && $latestAttendance->count() === 0 && $latestAppliedVacations->count() === 0)
+    <div class="card">
+        <div class="card-body text-center py-8">
+            <i class="fas fa-chart-line fa-3x text-slate-400 mb-3"></i>
+            <h5 class="font-medium text-slate-600 mb-2">No Data Available</h5>
+            <p class="text-slate-500">You don't have any attendance records or vacation applications yet.</p>
+        </div>
+    </div>
+    @endif
+
+    @if(($user->is_admin || $user->is_hr) && $upcomingInterviews->count() === 0 && $latestApplicants->count() === 0 && $pendingVacationRequests->count() === 0)
+    <div class="card">
+        <div class="card-body text-center py-8">
+            <i class="fas fa-tachometer-alt fa-3x text-slate-400 mb-3"></i>
+            <h5 class="font-medium text-slate-600 mb-2">No Administrative Data</h5>
+            <p class="text-slate-500">No upcoming interviews, new applicants, or pending vacation requests at the moment.</p>
+        </div>
+    </div>
+    @endif
 </div>

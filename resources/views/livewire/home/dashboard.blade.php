@@ -160,25 +160,33 @@
             <div class="card-body mt-2">
                 <div class="divide-y">
                     @foreach($latestApplicants as $applicant)
-                    <div class="p-4">
-                        <div class="flex justify-between items-start">
-                            <div class="flex-1">
-                                <p class="font-medium mb-1">{{ $applicant->first_name }} {{ $applicant->last_name }}</p>
-                                <p class="text-slate-500 text-sm mb-1">{{ $applicant->email }}</p>
-                                @if($applicant->phone)
-                                    <p class="text-slate-500 text-sm">{{ $applicant->phone }}</p>
-                                @endif
-                                @if($applicant->applications->count() > 0)
-                                    <p class="text-slate-600 text-sm mt-1">
-                                        Applied for: {{ $applicant->applications->first()->vacancy->title ?? 'N/A' }}
-                                    </p>
-                                @endif
-                            </div>
-                            <div class="text-slate-500 text-sm">
-                                {{ $applicant->created_at->format('M d, Y') }}
+                    <a href="{{ route('recruitment.applicants.show', $applicant->id) }}" class="block hover:bg-slate-50 transition-colors">
+                        <div class="p-4 cursor-pointer">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1">
+                                    <p class="font-medium mb-1">{{ $applicant->first_name }} {{ $applicant->last_name }}</p>
+                                    <p class="text-slate-500 text-sm mb-1">{{ $applicant->email }}</p>
+                                    @if($applicant->phone)
+                                        <p class="text-slate-500 text-sm">{{ $applicant->phone }}</p>
+                                    @endif
+                                    @if($applicant->applications->count() > 0)
+                                        <p class="text-slate-600 text-sm mt-1">
+                                            Applied for: {{ $applicant->applications->first()->vacancy->title ?? 'N/A' }}
+                                        </p>
+                                        @if($applicant->applications->first()->vacancy && $applicant->applications->first()->vacancy->position)
+                                            <p class="text-slate-500 text-sm">
+                                                Position: {{ $applicant->applications->first()->vacancy->position->name }}
+                                            </p>
+                                        @endif
+                                    @endif
+                                </div>
+                                <div class="text-slate-500 text-sm">
+                                    <span class="block">{{ $applicant->created_at->format('M d, Y') }}</span>
+                                    <i class="fas fa-chevron-right mt-2 text-slate-400"></i>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                     @endforeach
                 </div>
             </div>

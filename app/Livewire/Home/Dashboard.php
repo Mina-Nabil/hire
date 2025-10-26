@@ -72,7 +72,7 @@ class Dashboard extends Component
         // Load latest 10 applicants
         $this->latestApplicants = Applicant::orderBy('created_at', 'desc')
             ->limit(10)
-            ->with(['applications.vacancy'])
+            ->with(['applications.vacancy.position', 'applications'])
             ->get();
 
         // Load pending vacation requests

@@ -89,69 +89,68 @@
                             </span>
                         </a>
                     </li>
-                    @if (!env('HIDE_TIBIAN', false) || Auth::id() !== 22)
-                        <li class="">
-                            <a href="javascript:void(0)" class="navItem">
-                                <span class="flex items-center">
-                                    <span>Payroll</span>
-                                </span>
-                                <iconify-icon class="icon-arrow" icon="heroicons-outline:chevron-right"></iconify-icon>
-                            </a>
-                            <ul class="sidebar-submenu">
-                                @can('viewAny', App\Models\Payroll\Payroll::class)
-                                    <li>
-                                        <a class="{{ request()->routeIs('payrolls.index') ? 'active' : '' }}"
-                                            href="{{ url('/payrolls') }}">Closing History</a>
-                                    </li>
-                                @endcan
-                                @can('viewAny', App\Models\Payroll\Payroll::class)
-                                    <li>
-                                        <a class="{{ request()->routeIs('payrolls.create') ? 'active' : '' }}"
-                                            href="{{ url('/payrolls/create') }}">
-                                            Create Payroll</a>
-                                    </li>
-                                @endcan
-                                @can('viewAny', App\Models\Payroll\Payroll::class)
-                                    <li>
-                                        <a class="{{ request()->routeIs('submit-attendance') ? 'active' : '' }}"
-                                            href="{{ url('/payrolls/submit-attendance') }}">
-                                            Submit Attendance</a>
-                                    </li>
-                                @endcan
-                                @can('viewAny', App\Models\Attendance\Attendance::class)
-                                    <li>
-                                        <a class="{{ request()->routeIs('attendance.index') ? 'active' : '' }}"
-                                            href="{{ url('/attendance') }}">
-                                            Attendance Records</a>
-                                    </li>
-                                @endcan
+                    <li class="">
+                        <a href="javascript:void(0)" class="navItem">
+                            <span class="flex items-center">
+                                <span>Payroll</span>
+                            </span>
+                            <iconify-icon class="icon-arrow" icon="heroicons-outline:chevron-right"></iconify-icon>
+                        </a>
+                        <ul class="sidebar-submenu">
+                            @can('viewAny', App\Models\Payroll\Payroll::class)
+                                <li>
+                                    <a class="{{ request()->routeIs('payrolls.index') ? 'active' : '' }}"
+                                        href="{{ url('/payrolls') }}">Closing History</a>
+                                </li>
+                            @endcan
+                            @can('viewAny', App\Models\Payroll\Payroll::class)
+                                <li>
+                                    <a class="{{ request()->routeIs('payrolls.create') ? 'active' : '' }}"
+                                        href="{{ url('/payrolls/create') }}">
+                                        Create Payroll</a>
+                                </li>
+                            @endcan
+                            @can('viewAny', App\Models\Payroll\Payroll::class)
+                                <li>
+                                    <a class="{{ request()->routeIs('submit-attendance') ? 'active' : '' }}"
+                                        href="{{ url('/payrolls/submit-attendance') }}">
+                                        Submit Attendance</a>
+                                </li>
+                            @endcan
+                            @can('viewAny', App\Models\Attendance\Attendance::class)
+                                <li>
+                                    <a class="{{ request()->routeIs('attendance.index') ? 'active' : '' }}"
+                                        href="{{ url('/attendance') }}">
+                                        Attendance Records</a>
+                                </li>
+                            @endcan
 
-                                @can('viewAny', App\Models\Attendance\BusArrival::class)
-                                    <li class="">
-                                        <a href="javascript:void(0)" class="navItem">
-                                            <span class="flex items-center">
-                                                <span>Bus Arrivals</span>
-                                            </span>
-                                            <iconify-icon class="icon-arrow"
-                                                icon="heroicons-outline:chevron-right"></iconify-icon>
-                                        </a>
-                                        <ul class="sidebar-submenu">
-                                            <li>
-                                                <a class="{{ request()->routeIs('attendance.bus-arrivals') ? 'active' : '' }}"
-                                                    href="{{ url('/attendance/bus-arrivals') }}">
-                                                    Upload Bus Arrivals</a>
-                                            </li>
-                                            <li>
-                                                <a class="{{ request()->routeIs('attendance.bus-arrivals.records') ? 'active' : '' }}"
-                                                    href="{{ url('/attendance/bus-arrivals/records') }}">
-                                                    Bus Arrival Records</a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                @endcan
-                            </ul>
-                        </li>
-                    @endif
+                            @can('viewAny', App\Models\Attendance\BusArrival::class)
+                                <li class="">
+                                    <a href="javascript:void(0)" class="navItem">
+                                        <span class="flex items-center">
+                                            <span>Bus Arrivals</span>
+                                        </span>
+                                        <iconify-icon class="icon-arrow"
+                                            icon="heroicons-outline:chevron-right"></iconify-icon>
+                                    </a>
+                                    <ul class="sidebar-submenu">
+                                        <li>
+                                            <a class="{{ request()->routeIs('attendance.bus-arrivals') ? 'active' : '' }}"
+                                                href="{{ url('/attendance/bus-arrivals') }}">
+                                                Upload Bus Arrivals</a>
+                                        </li>
+                                        <li>
+                                            <a class="{{ request()->routeIs('attendance.bus-arrivals.records') ? 'active' : '' }}"
+                                                href="{{ url('/attendance/bus-arrivals/records') }}">
+                                                Bus Arrival Records</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            @endcan
+                        </ul>
+                    </li>
+
 
                     <li class="">
                         <a href="javascript:void(0)" class="navItem">
@@ -198,7 +197,7 @@
                         </ul>
                     </li>
 
-                    @if (!env('HIDE_TIBIAN', false) || Auth::id() !== 22)
+                    @if (!$user->permit_tibian)
                         <li class="">
                             <a href="javascript:void(0)" class="navItem">
                                 <span class="flex items-center">
@@ -348,7 +347,7 @@
 
                         </ul>
                     </li>
-                    @if (Auth::id() !== 22 || !env('HIDE_TIBIAN', false))
+                    @if (!$user->permit_tibian)
                         <li class="">
                             <a href="javascript:void(0)" class="navItem">
                                 <span class="flex items-center">

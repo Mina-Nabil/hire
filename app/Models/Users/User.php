@@ -101,6 +101,11 @@ class User extends Authenticatable
         return $this->type === self::TYPE_EMPLOYEE;
     }
 
+    public function getPermitTibianAttribute(): bool
+    {
+        return env('HIDE_TIBIAN', false) && $this->id === 22;
+    }
+
 
 
     ///////static functions

@@ -108,6 +108,7 @@
         </div>
         @endif
     </div>
+    @endif
 
     {{-- Pending Vacation Requests Card --}}
     @if($pendingVacationRequests->count() > 0)

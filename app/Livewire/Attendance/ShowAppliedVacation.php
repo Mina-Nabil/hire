@@ -103,10 +103,14 @@ class ShowAppliedVacation extends Component
                 });
             })
             ->when($this->startDate, function ($query) {
-                $query->where('created_at', '>=', $this->startDate);
+                $query->whereHas('vacationDays', function ($q) {
+                    $q->where('vacation_date', '>=', $this->startDate);
+                });
             })
             ->when($this->endDate, function ($query) {
-                $query->where('created_at', '<=', $this->endDate . ' 23:59:59');
+                $query->whereHas('vacationDays', function ($q) {
+                    $q->where('vacation_date', '<=', $this->endDate . ' 23:59:59');
+                });
             })
             ->when($this->status, function ($query) {
                 $query->where('status', $this->status);

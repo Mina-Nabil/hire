@@ -170,9 +170,6 @@
                                         <p class="text-slate-500 text-sm">{{ $applicant->phone }}</p>
                                     @endif
                                     @if($applicant->applications->count() > 0)
-                                        <p class="text-slate-600 text-sm mt-1">
-                                            Applied for: {{ $applicant->applications->first()->vacancy->title ?? 'N/A' }}
-                                        </p>
                                         @if($applicant->applications->first()->vacancy && $applicant->applications->first()->vacancy->position)
                                             <p class="text-slate-500 text-sm">
                                                 Position: {{ $applicant->applications->first()->vacancy->position->name }}

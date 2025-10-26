@@ -339,35 +339,33 @@ class Attendance extends Model
                     'updated_at' => now(),
                 ];
 
-                // Check if punch already exists
-                $existingPunch = DailyPunch::where('employee_id', $employee->id)
-                    ->where('punch_time', $punchData['datetime'])
-                    ->first();
+                $dailyPunch = DailyPunch::updateOrCreate([
+                    'employee_id' => $employee->id,
+                    'punch_time' => $punchData['datetime'],
+                ], [
+                    'punch_state' => self::mapPunchState(trim($sheet->getCell('E' . $row)->getValueString())),
+                    'verify_mode' => null,
+                    'work_code' => trim($sheet->getCell('F' . $row)->getValueString()) ?? "101",
+                    'raw_log' => $movementData,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+                $processedPunches[] = $dailyPunch;
 
-                if (!$existingPunch) {
-                    $dailyPunch = DailyPunch::create($punch);
-                    $processedPunches[] = $dailyPunch;
-
-                    // Track dates for job dispatching
-                    $dateKey = $punchData['datetime']->format('Y-m-d');
-                    if (!in_array($dateKey, $processedDates)) {
-                        $processedDates[] = $dateKey;
-                    }
-
-                    Log::debug('[ZKTeco Excel] Created punch', [
-                        'employee_id' => $employee->id,
-                        'employee_name' => $employee->name,
-                        'device_id' => $deviceId,
-                        'punch_time' => $punchData['datetime']->format('Y-m-d H:i:s'),
-                        'movement_type' => trim($sheet->getCell('E' . $row)->getValueString()),
-                        'device_serial' => null
-                    ]);
-                } else {
-                    Log::debug('[ZKTeco Excel] Punch already exists', [
-                        'employee_id' => $employee->id,
-                        'punch_time' => $punchData['datetime']->format('Y-m-d H:i:s')
-                    ]);
+                // Track dates for job dispatching
+                $dateKey = $punchData['datetime']->format('Y-m-d');
+                if (!in_array($dateKey, $processedDates)) {
+                    $processedDates[] = $dateKey;
                 }
+
+                Log::debug('[ZKTeco Excel] Created punch', [
+                    'employee_id' => $employee->id,
+                    'employee_name' => $employee->name,
+                    'device_id' => $deviceId,
+                    'punch_time' => $punchData['datetime']->format('Y-m-d H:i:s'),
+                    'movement_type' => trim($sheet->getCell('E' . $row)->getValueString()),
+                    'device_serial' => null
+                ]);
             } catch (\Exception $e) {
                 $errors[] = "Row {$row}: " . $e->getMessage();
                 Log::error('[ZKTeco Excel] Error processing row', [

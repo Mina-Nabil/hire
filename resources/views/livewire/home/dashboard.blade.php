@@ -184,39 +184,96 @@
     {{-- Pending Vacation Requests Card --}}
     @if($pendingVacationRequests->count() > 0)
     <div class="card mb-6">
-        <div class="card-header py-3">
+        <div class="card-header noborder">
             <h5 class="font-medium m-0">
                 <i class="fas fa-exclamation-triangle mr-2"></i>
                 Pending Vacation Requests
             </h5>
         </div>
-        <div class="card-body mt-2">
-            <div class="divide-y">
-                @foreach($pendingVacationRequests as $request)
-                <div class="p-4">
-                    <div class="flex justify-between items-center">
-                        <div class="flex-1">
-                            <div class="flex items-center space-x-3 mb-2">
-                                <p class="font-medium">{{ $request->employee->name ?? 'N/A' }}</p>
-                                <span class="badge bg-warning text-white">Pending</span>
-                            </div>
-                            <p class="text-slate-600 text-sm mb-1">{{ $request->vacationBenefit->name ?? 'N/A' }}</p>
-                            <p class="text-slate-500 text-sm">
-                                {{ $request->vacationDays->count() }} days requested
-                                · Applied {{ $request->created_at->format('M d, Y') }}
-                            </p>
-                        </div>
-                        <div class="flex space-x-2">
-                            <button class="btn btn-sm btn-success" wire:click="approveVacation({{ $request->id }})">
-                                <i class="fas fa-check mr-1"></i> Approve
-                            </button>
-                            <button class="btn btn-sm btn-danger" wire:click="rejectVacation({{ $request->id }})">
-                                <i class="fas fa-times mr-1"></i> Reject
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                @endforeach
+        <div class="card-body">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
+                    <thead class="border-t border-slate-100 dark:border-slate-800 bg-slate-200 dark:bg-slate-700">
+                        <tr>
+                            <th scope="col" class="table-th">Employee</th>
+                            <th scope="col" class="table-th">Time off</th>
+                            <th scope="col" class="table-th">Days</th>
+                            <th scope="col" class="table-th">Hours</th>
+                            <th scope="col" class="table-th">New Balance</th>
+                            <th scope="col" class="table-th">Status</th>
+                            <th scope="col" class="table-th">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
+                        @foreach ($pendingVacationRequests as $request)
+                        <tr class="even:bg-slate-100 dark:even:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700">
+                            <td class="table-td">
+                                <div class="flex items-center">
+                                    @if ($request->employee && $request->employee->full_image_url)
+                                    <div class="flex-none">
+                                        <div class="h-10 w-10 rounded-full overflow-hidden mr-2">
+                                            <img src="{{ $request->employee->full_image_url }}" alt="{{ $request->employee->name }}"
+                                                class="h-full w-full object-cover">
+                                        </div>
+                                    </div>
+                                    @endif
+                                    <div>
+                                        <span class="text-sm text-slate-600 dark:text-slate-300 capitalize">
+                                            {{ $request->employee ? $request->employee->name : 'N/A' }}
+                                        </span>
+                                        @if ($request->employee)
+                                        <span class="block text-xs text-slate-500">
+                                            {{ $request->employee->email }}
+                                        </span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="table-td">
+                                <div>
+                                    <span class="text-sm text-slate-600 dark:text-slate-300">
+                                        @if ($request->is_mission)
+                                        Mission
+                                        @else
+                                        {{ $request->vacationBenefit ? $request->vacationBenefit->name : 'N/A' }}
+                                        @endif
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="table-td">
+                                <span class="text-sm font-medium">{{ $request->vacationDays->pluck('vacation_date')->implode(', ') }}</span>
+                            </td>
+                            <td class="table-td">
+                                <span class="text-sm font-medium">{{ $request->hours ?? 0 }}</span>
+                            </td>
+                            <td class="table-td">
+                                <span class="text-sm font-medium">{{ $request->new_balance ?? 0 }}</span>
+                            </td>
+                            <td class="table-td">
+                                @if ($request->status === 'pending')
+                                <span class="badge badge-warning">Pending</span>
+                                @elseif ($request->status === 'approved')
+                                <span class="badge badge-success">Approved</span>
+                                @else
+                                <span class="badge badge-danger">Rejected</span>
+                                @endif
+                            </td>
+                            <td class="table-td">
+                                <div class="flex space-x-2">
+                                    <button wire:click="approveVacation({{ $request->id }})"
+                                        class="action-btn text-success-500" title="Approve">
+                                        <iconify-icon icon="heroicons:check"></iconify-icon>
+                                    </button>
+                                    <button wire:click="rejectVacation({{ $request->id }})"
+                                        class="action-btn text-danger-500" title="Reject">
+                                        <iconify-icon icon="heroicons:x-mark"></iconify-icon>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

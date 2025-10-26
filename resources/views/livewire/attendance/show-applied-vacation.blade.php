@@ -84,8 +84,8 @@
                                 <th scope="col" class="table-th">Hours</th>
                                 <th scope="col" class="table-th">New Balance</th>
                                 <th scope="col" class="table-th">Status</th>
-                                <th scope="col" class="table-th">Created At</th>
-                                <th scope="col" class="table-th">Approved By</th>
+                                <th scope="col" class="table-th">Created</th>
+                                <th scope="col" class="table-th">Approved</th>
                                 <th scope="col" class="table-th">Payroll</th>
                                 <th scope="col" class="table-th">Actions</th>
                             </tr>

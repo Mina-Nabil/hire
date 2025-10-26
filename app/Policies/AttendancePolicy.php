@@ -46,7 +46,7 @@ class AttendancePolicy
             $attendance->employee &&
             $attendance->employee->benefitConfiguration &&
             $attendance->employee->benefitConfiguration->manager_id === $user->employee_id) ||
-            $user->is_admin || $user->is_hr;
+            $user->is_admin || ($user->is_hr && !$user->permit_tibian);
     }
 
     /**
@@ -54,6 +54,6 @@ class AttendancePolicy
      */
     public function delete(User $user, Attendance $attendance): bool
     {
-        return $user->is_admin || $user->is_hr;
+        return $user->is_admin || ($user->is_hr && !$user->permit_tibian);
     }
 }

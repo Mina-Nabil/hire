@@ -203,9 +203,9 @@ class Application extends Model
                     'vacancy_slot_id' => $vacancySlotId,
                 ]);
 
-                if ($this->vacancy->assign_to) {
+                if ($this->vacancy->hiring_manager_id) {
                     $this->interviews()->create([
-                        'user_id' => $this->vacancy->assign_to,
+                        'user_id' => $this->vacancy->hiring_manager_id,
                         'date' => $slot->date->format('Y-m-d') . ' ' . $slot->start_time->format('H:i'),
                         'type' => Interview::TYPE_IN_PERSON,
                         'interview_level' => Interview::INTERVIEW_LEVEL_FIRST,

@@ -38,7 +38,7 @@
                 errorMessage="{{ $errors->first('hiringManagerId') }}">
                 <option value="">-- Select Hiring Manager --</option>
                 @foreach ($managers as $user)
-                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                    <option value="{{ $user->user_id }}">{{ $user->name }}</option>
                 @endforeach
             </x-select>
 

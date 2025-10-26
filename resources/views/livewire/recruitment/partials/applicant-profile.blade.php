@@ -297,7 +297,7 @@
                             @foreach ($applicant->answers as $answer)
                                 <div class="p-4">
                                     <div class="mb-2">
-                                        <span class="badge bg-primary text-white text-xs">
+                                        <span class="badge bg-primary text-xs">
                                             {{ $answer->application->vacancy->position->name ?? 'N/A' }}
                                         </span>
                                     </div>

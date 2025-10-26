@@ -216,7 +216,7 @@ class Application extends Model
 
 
                 AppLog::info('Slot Booked', 'Slot booked for applicant: ' . $this->applicant->full_name, loggable: $this);
-                return $slot;
+                return $applicationSlot;
             });
         } catch (Exception $e) {
             report($e);

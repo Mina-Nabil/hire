@@ -25,6 +25,13 @@ class Dashboard extends Component
         $this->user = Auth::user();
         $this->employee = Employee::where('user_id', $this->user->id)->first();
         
+        // Initialize collections
+        $this->latestAttendance = collect();
+        $this->latestAppliedVacations = collect();
+        $this->upcomingInterviews = collect();
+        $this->latestApplicants = collect();
+        $this->pendingVacationRequests = collect();
+        
         $this->loadUserData();
         
         if ($this->user->is_admin || $this->user->is_hr) {

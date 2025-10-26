@@ -197,7 +197,7 @@
                         </ul>
                     </li>
 
-                    @if (!$user->permit_tibian)
+                    @if (!auth()->user()->permit_tibian)
                         <li class="">
                             <a href="javascript:void(0)" class="navItem">
                                 <span class="flex items-center">
@@ -347,7 +347,7 @@
 
                         </ul>
                     </li>
-                    @if (!$user->permit_tibian)
+                    @if (!auth()->user()->permit_tibian)
                         <li class="">
                             <a href="javascript:void(0)" class="navItem">
                                 <span class="flex items-center">

@@ -118,6 +118,13 @@ class AppliedVacation extends Model
         return $query;
     }
 
+    public function scopeByTypeName($query, $typeName)
+    {
+        return $query->whereHas('vacationBenefit', function ($q) use ($typeName) {
+            $q->where('name', $typeName);
+        });
+    }
+
     ///relations
     public function employee()
     {

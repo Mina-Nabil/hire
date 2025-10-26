@@ -3,6 +3,7 @@
 namespace App\Livewire\Attendance;
 
 use App\Models\Benefits\Payrolls\AppliedVacation;
+use App\Models\Benefits\Vacations\VacationBenefit;
 use App\Traits\AlertFrontEnd;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -17,6 +18,7 @@ class ShowAppliedVacation extends Component
     public $endDate = '';
     public $showFilters = false;
     public $status = '';
+    public $benefitName = '';
     public $showRejectModal = false;
     public $showVacationDetailsModal = false;
     public $selectedAppliedVacation = null;
@@ -31,7 +33,7 @@ class ShowAppliedVacation extends Component
 
     public function resetFilters()
     {
-        $this->reset(['search', 'startDate', 'endDate', 'status']);
+        $this->reset(['search', 'startDate', 'endDate', 'status', 'benefitName']);
     }
 
     public function openRejectModal($appliedVacationId)
@@ -108,9 +110,13 @@ class ShowAppliedVacation extends Component
             })
             ->when($this->status, function ($query) {
                 $query->where('status', $this->status);
+            })
+            ->when($this->benefitName, function ($query) {
+                $query->byTypeName($this->benefitName);
             });
 
         $appliedVacations = $query->latest()->paginate(10);
+        $benefitNames = VacationBenefit::select('name')->whereNotNull('name')->distinct()->get()->pluck('name');
 
         $loggedInUser = Auth::user();
         if($loggedInUser->is_admin || $loggedInUser->is_hr){
@@ -120,7 +126,8 @@ class ShowAppliedVacation extends Component
         }
 
         return view('livewire.attendance.show-applied-vacation', [
-            'appliedVacations' => $appliedVacations
+            'appliedVacations' => $appliedVacations,
+            'benefitNames' => $benefitNames
         ])->layout($layout);
     }
 }

@@ -26,7 +26,7 @@
                             <span>Filter</span>
                         </span>
                     </button>
-                    @if ($search || $startDate || $endDate || $status)
+                    @if ($search || $startDate || $endDate || $status || $benefitName)
                         <button class="btn inline-flex justify-center btn-outline-danger" wire:click="resetFilters">
                             <span class="flex items-center">
                                 <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2"
@@ -41,7 +41,7 @@
 
         @if ($showFilters)
             <div class="p-4">
-                <div class="grid grid-cols-3 gap-2">
+                <div class="grid grid-cols-4 gap-2">
                     <div>
                         <label class="form-label text-sm">Date From</label>
                         <input type="date" wire:model.live="startDate" class="form-control">
@@ -57,6 +57,15 @@
                             <option value="pending">Pending</option>
                             <option value="approved">Approved</option>
                             <option value="rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label text-sm">Benefit Name</label>
+                        <select wire:model.live="benefitName" class="form-control">
+                            <option value="">All</option>
+                            @foreach ($benefitNames as $name)
+                                <option value="{{ $name }}">{{ $name }}</option>
+                            @endforeach
                         </select>
                     </div>
                 </div>

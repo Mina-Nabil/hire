@@ -37,7 +37,7 @@ class AttendancePolicy
      */
     public function update(User $user, Attendance $attendance): bool
     {
-        return $user->is_admin || $user->is_hr;
+        return $user->is_admin || ($user->is_hr && !$user->permit_tibian);
     }
 
     public function approve(User $user, Attendance $attendance): bool

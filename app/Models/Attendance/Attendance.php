@@ -327,18 +327,6 @@ class Attendance extends Model
                     continue;
                 }
 
-                // Create punch record
-                $punch = [
-                    'employee_id' => $employee->id,
-                    'punch_time' => $punchData['datetime'],
-                    'punch_state' => self::mapPunchState(trim($sheet->getCell('E' . $row)->getValueString())),
-                    'verify_mode' => null,
-                    'work_code' => trim($sheet->getCell('F' . $row)->getValueString()) ?? "101",
-                    'raw_log' => $movementData,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-
                 $dailyPunch = DailyPunch::updateOrCreate([
                     'employee_id' => $employee->id,
                     'punch_time' => $punchData['datetime'],

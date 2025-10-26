@@ -16,88 +16,7 @@
 
     <h2 class="font-bold text-2xl mb-6">Dashboard</h2>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        {{-- Latest Attendance Card --}}
-        @if($employee && $latestAttendance->count() > 0)
-        <div class="card">
-            <div class="card-header py-3">
-                <h5 class="font-medium m-0">
-                    <i class="fas fa-clock mr-2"></i>
-                    Latest Attendance Records
-                </h5>
-            </div>
-            <div class="card-body mt-2">
-                <div class="divide-y">
-                    @foreach($latestAttendance as $attendance)
-                    <div class="p-4">
-                        <div class="flex justify-between items-center">
-                            <div class="flex-1">
-                                <div class="flex items-center space-x-3 mb-2">
-                                    <p class="font-medium">{{ $attendance->date->format('M d, Y') }}</p>
-                                    @if($attendance->is_approved)
-                                        <span class="badge bg-success text-white">Approved</span>
-                                    @elseif($attendance->is_approved === false)
-                                        <span class="badge bg-danger text-white">Rejected</span>
-                                    @else
-                                        <span class="badge bg-warning text-white">Pending</span>
-                                    @endif
-                                </div>
-                                <div class="text-sm text-slate-500">
-                                    <span>{{ $attendance->start_time }}</span>
-                                    @if($attendance->end_time)
-                                        <span> - {{ $attendance->end_time }}</span>
-                                    @endif
-                                    <span> · {{ $attendance->hours }} hrs</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-        @endif
-
-        {{-- Latest Applied Vacations Card --}}
-        @if($employee && $latestAppliedVacations->count() > 0)
-        <div class="card">
-            <div class="card-header py-3">
-                <h5 class="font-medium m-0">
-                    <i class="fas fa-calendar-alt mr-2"></i>
-                    Latest Applied Vacations
-                </h5>
-            </div>
-            <div class="card-body mt-2">
-                <div class="divide-y">
-                    @foreach($latestAppliedVacations as $vacation)
-                    <div class="p-4">
-                        <div class="flex justify-between items-center">
-                            <div class="flex-1">
-                                <div class="flex items-center space-x-3 mb-2">
-                                    <p class="font-medium">{{ $vacation->vacationBenefit->name ?? 'N/A' }}</p>
-                                    @if($vacation->status === 'approved')
-                                        <span class="badge bg-success text-white">Approved</span>
-                                    @elseif($vacation->status === 'rejected')
-                                        <span class="badge bg-danger text-white">Rejected</span>
-                                    @else
-                                        <span class="badge bg-warning text-white">Pending</span>
-                                    @endif
-                                </div>
-                                <div class="text-sm text-slate-500">
-                                    <span>{{ $vacation->vacationDays->count() }} days</span>
-                                    <span> · Applied {{ $vacation->created_at->format('M d, Y') }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-        @endif
-    </div>
-
-    {{-- Admin/HR Only Cards --}}
+    {{-- Admin/HR Only Data Section --}}
     @if($user->is_admin || $user->is_hr)
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         {{-- Upcoming Interviews Card --}}
@@ -286,7 +205,177 @@
             </div>
         </div>
     </div>
+
+    {{-- My Data Section (for Admin/HR as well) --}}
+    @if($employee)
+        <div class="mt-8">
+            <h3 class="font-bold text-xl mb-4">My Data</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                {{-- Latest Attendance Card --}}
+                @if($latestAttendance->count() > 0)
+                <div class="card">
+                    <div class="card-header py-3">
+                        <h5 class="font-medium m-0">
+                            <i class="fas fa-clock mr-2"></i>
+                            My Latest Attendance Records
+                        </h5>
+                    </div>
+                    <div class="card-body mt-2">
+                        <div class="divide-y">
+                            @foreach($latestAttendance as $attendance)
+                            <div class="p-4">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex-1">
+                                        <div class="flex items-center space-x-3 mb-2">
+                                            <p class="font-medium">{{ $attendance->date->format('M d, Y') }}</p>
+                                            @if($attendance->is_approved)
+                                                <span class="badge bg-success text-white">Approved</span>
+                                            @elseif($attendance->is_approved === false)
+                                                <span class="badge bg-danger text-white">Rejected</span>
+                                            @else
+                                                <span class="badge bg-warning text-white">Pending</span>
+                                            @endif
+                                        </div>
+                                        <div class="text-sm text-slate-500">
+                                            <span>{{ $attendance->start_time }}</span>
+                                            @if($attendance->end_time)
+                                                <span> - {{ $attendance->end_time }}</span>
+                                            @endif
+                                            <span> · {{ $attendance->hours }} hrs</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+                @endif
+
+                {{-- Latest Applied Vacations Card --}}
+                @if($latestAppliedVacations->count() > 0)
+                <div class="card">
+                    <div class="card-header py-3">
+                        <h5 class="font-medium m-0">
+                            <i class="fas fa-calendar-alt mr-2"></i>
+                            My Latest Applied Vacations
+                        </h5>
+                    </div>
+                    <div class="card-body mt-2">
+                        <div class="divide-y">
+                            @foreach($latestAppliedVacations as $vacation)
+                            <div class="p-4">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex-1">
+                                        <div class="flex items-center space-x-3 mb-2">
+                                            <p class="font-medium">{{ $vacation->vacationBenefit->name ?? 'N/A' }}</p>
+                                            @if($vacation->status === 'approved')
+                                                <span class="badge bg-success text-white">Approved</span>
+                                            @elseif($vacation->status === 'rejected')
+                                                <span class="badge bg-danger text-white">Rejected</span>
+                                            @else
+                                                <span class="badge bg-warning text-white">Pending</span>
+                                            @endif
+                                        </div>
+                                        <div class="text-sm text-slate-500">
+                                            <span>{{ $vacation->vacationDays->count() }} days</span>
+                                            <span> · Applied {{ $vacation->created_at->format('M d, Y') }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+                @endif
+            </div>
+        </div>
     @endif
+    @endif
+
+    {{-- Regular Employee Data (for non-admin/hr) --}}
+    @if(!$user->is_admin && !$user->is_hr)
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        {{-- Latest Attendance Card --}}
+        @if($employee && $latestAttendance->count() > 0)
+        <div class="card">
+            <div class="card-header py-3">
+                <h5 class="font-medium m-0">
+                    <i class="fas fa-clock mr-2"></i>
+                    Latest Attendance Records
+                </h5>
+            </div>
+            <div class="card-body mt-2">
+                <div class="divide-y">
+                    @foreach($latestAttendance as $attendance)
+                    <div class="p-4">
+                        <div class="flex justify-between items-center">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-3 mb-2">
+                                    <p class="font-medium">{{ $attendance->date->format('M d, Y') }}</p>
+                                    @if($attendance->is_approved)
+                                        <span class="badge bg-success text-white">Approved</span>
+                                    @elseif($attendance->is_approved === false)
+                                        <span class="badge bg-danger text-white">Rejected</span>
+                                    @else
+                                        <span class="badge bg-warning text-white">Pending</span>
+                                    @endif
+                                </div>
+                                <div class="text-sm text-slate-500">
+                                    <span>{{ $attendance->start_time }}</span>
+                                    @if($attendance->end_time)
+                                        <span> - {{ $attendance->end_time }}</span>
+                                    @endif
+                                    <span> · {{ $attendance->hours }} hrs</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+        @endif
+
+        {{-- Latest Applied Vacations Card --}}
+        @if($employee && $latestAppliedVacations->count() > 0)
+        <div class="card">
+            <div class="card-header py-3">
+                <h5 class="font-medium m-0">
+                    <i class="fas fa-calendar-alt mr-2"></i>
+                    Latest Applied Vacations
+                </h5>
+            </div>
+            <div class="card-body mt-2">
+                <div class="divide-y">
+                    @foreach($latestAppliedVacations as $vacation)
+                    <div class="p-4">
+                        <div class="flex justify-between items-center">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-3 mb-2">
+                                    <p class="font-medium">{{ $vacation->vacationBenefit->name ?? 'N/A' }}</p>
+                                    @if($vacation->status === 'approved')
+                                        <span class="badge bg-success text-white">Approved</span>
+                                    @elseif($vacation->status === 'rejected')
+                                        <span class="badge bg-danger text-white">Rejected</span>
+                                    @else
+                                        <span class="badge bg-warning text-white">Pending</span>
+                                    @endif
+                                </div>
+                                <div class="text-sm text-slate-500">
+                                    <span>{{ $vacation->vacationDays->count() }} days</span>
+                                    <span> · Applied {{ $vacation->created_at->format('M d, Y') }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+        @endif
+    </div>
     @endif
 
     {{-- Empty State Messages --}}

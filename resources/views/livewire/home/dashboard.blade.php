@@ -112,31 +112,36 @@
             <div class="card-body mt-2">
                 <div class="divide-y">
                     @foreach($upcomingInterviews as $interview)
-                    <div class="p-4">
-                        <div class="flex justify-between items-start">
-                            <div class="flex-1">
-                                <div class="flex items-center space-x-2 mb-2">
-                                    <p class="font-medium">{{ $interview->application->applicant->first_name }} {{ $interview->application->applicant->last_name }}</p>
-                                    @if($interview->status === 'scheduled')
-                                        <span class="badge bg-success text-white">Scheduled</span>
-                                    @else
-                                        <span class="badge bg-warning text-white">Pending</span>
-                                    @endif
+                    <a href="{{ route('recruitment.applicants.show', $interview->application->applicant->id) }}" class="block hover:bg-slate-50 transition-colors">
+                        <div class="p-4 cursor-pointer">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-2 mb-2">
+                                        <p class="font-medium">{{ $interview->application->applicant->first_name }} {{ $interview->application->applicant->last_name }}</p>
+                                        @if($interview->status === 'scheduled')
+                                            <span class="badge bg-success text-white">Scheduled</span>
+                                        @else
+                                            <span class="badge bg-warning text-white">Pending</span>
+                                        @endif
+                                    </div>
+                                    <p class="text-slate-600 text-sm mb-1">{{ $interview->application->vacancy->title ?? 'N/A' }}</p>
+                                    <p class="text-slate-500 text-sm">
+                                        {{ $interview->date->format('M d, Y H:i') }}
+                                        @if($interview->type === 'in_person')
+                                            <span class="badge bg-primary text-white ml-2">In Person</span>
+                                        @elseif($interview->type === 'online')
+                                            <span class="badge bg-info text-white ml-2">Online</span>
+                                        @else
+                                            <span class="badge bg-secondary text-white ml-2">Phone</span>
+                                        @endif
+                                    </p>
                                 </div>
-                                <p class="text-slate-600 text-sm mb-1">{{ $interview->application->vacancy->title ?? 'N/A' }}</p>
-                                <p class="text-slate-500 text-sm">
-                                    {{ $interview->date->format('M d, Y H:i') }}
-                                    @if($interview->type === 'in_person')
-                                        <span class="badge bg-primary text-white ml-2">In Person</span>
-                                    @elseif($interview->type === 'online')
-                                        <span class="badge bg-info text-white ml-2">Online</span>
-                                    @else
-                                        <span class="badge bg-secondary text-white ml-2">Phone</span>
-                                    @endif
-                                </p>
+                                <div class="text-slate-400">
+                                    <i class="fas fa-chevron-right"></i>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                     @endforeach
                 </div>
             </div>

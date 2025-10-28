@@ -246,7 +246,11 @@ class ShowAttendance extends Component
                 $this->alertError('You are not authorized to delete this attendance record.');
                 return;
             }
-            $attendance = Attendance::findOrFail($attendanceId);
+            $attendance = Attendance::firstWhere('id', $attendanceId);
+            if (!$attendance) {
+                $this->alertError('Attendance record not found.');
+                return;
+            }
             
             $attendance->delete();
             

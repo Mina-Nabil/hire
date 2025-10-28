@@ -382,7 +382,9 @@
 
             @can('delete', \App\Models\Attendance\Attendance::class)
                 <x-secondary-button
-                    wire:click="deleteAttendance({{ $editingTimesAttendanceId }})">Delete</x-secondary-button>
+                    wire:click="$dispatch('showConfirmation', { message: 'Are you sure you want to delete the attendance record for?', color: 'danger', callback: 'deleteAttendance', params: [{{ $editingTimesAttendanceId }}] })">
+                    Delete
+                </x-secondary-button>
             @endcan
 
             <x-primary-button wire:click.prevent="saveAttendanceTimes" loadingFunction="saveAttendanceTimes">Save

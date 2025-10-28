@@ -45,6 +45,8 @@ class ShowAttendance extends Component
     public $editTimesAttendanceDate = '';
     public $editTimesCurrentHours = '';
 
+    protected $listeners = ['deleteAttendance'];
+
     public function mount()
     {
         // Check if the current user is a manager or HR
@@ -238,6 +240,7 @@ class ShowAttendance extends Component
     public function deleteAttendance($attendanceId)
     {
         try {
+            /** @var User $user */
             $user = Auth::user();
             if (!$user->can('delete', Attendance::class)) {
                 $this->alertError('You are not authorized to delete this attendance record.');

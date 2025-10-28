@@ -52,8 +52,8 @@ class AttendancePolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Attendance $attendance): bool
+    public function delete(User $user, Attendance $attendance=null): bool
     {
-        return $user->is_admin || ($user->is_hr && !$user->permit_tibian);
+        return $user->is_admin ;
     }
 }

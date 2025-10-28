@@ -8,6 +8,7 @@ use App\Traits\AlertFrontEnd;
 use App\Exceptions\AppException;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Layout;
@@ -231,6 +232,27 @@ class ShowAttendance extends Component
             $this->alertError($e->getMessage());
         } catch (\Exception $e) {
             $this->alertError('Failed to update attendance times: ' . $e->getMessage());
+        }
+    }
+
+    public function deleteAttendance($attendanceId)
+    {
+        try {
+            $user = Auth::user();
+            if (!$user->can('delete', Attendance::class)) {
+                $this->alertError('You are not authorized to delete this attendance record.');
+                return;
+            }
+            $attendance = Attendance::findOrFail($attendanceId);
+            
+            $attendance->delete();
+            
+            $this->alertSuccess('Attendance record deleted successfully!');
+            $this->closeEditTimesModal();
+        } catch (AppException $e) {
+            $this->alertError($e->getMessage());
+        } catch (\Exception $e) {
+            $this->alertError('Failed to delete attendance: ' . $e->getMessage());
         }
     }
 

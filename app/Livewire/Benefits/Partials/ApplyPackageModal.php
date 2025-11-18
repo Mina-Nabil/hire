@@ -153,7 +153,7 @@ class ApplyPackageModal extends Component
                 'end_date' => $detail->end_date,
                 'package_detail_id' => $detail->id,
                 'name' => $detail->name,
-                'amount' => $detail->amount_min,
+                'amount' => $detail->amount_max,
                 'amount_min' => $detail->amount_min,
                 'amount_max' => $detail->amount_max,
                 'type' => $detail->type,

@@ -4566,12 +4566,12 @@ class Employee extends Model
             return 360 / (60); // 6 hours penalty
         }
 
-        if ($lateMinutes <= 420) { // Up to 7 hours
+        if ($lateMinutes < 480) { // Up to 8 hours
             return 480 / (60); // 8 hours penalty (full day)
         }
 
-        // For more than 7 hours late, treat as full day absence
-        return 480 / (60); // 8 hours penalty (full day)
+        // For more than 8 hours late, treat as full day absence
+        return 960 / (60); // 16 hours penalty (2 full days)
     }
 
     /**

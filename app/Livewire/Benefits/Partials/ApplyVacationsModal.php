@@ -116,7 +116,7 @@ class ApplyVacationsModal extends Component
                 'inc_rate' => $detail->inc_rate_min,
                 'inc_rate_min' => $detail->inc_rate_min,
                 'inc_rate_max' => $detail->inc_rate_max,
-                'max_balance' => $detail->max_balance_min,
+                'max_balance' => $detail->max_balance_max,
                 'max_balance_min' => $detail->max_balance_min,
                 'max_balance_max' => $detail->max_balance_max,
                 'hour_price' => $detail->hour_price_min,

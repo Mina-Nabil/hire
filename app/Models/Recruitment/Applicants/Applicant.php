@@ -282,6 +282,7 @@ class Applicant extends Model
     ): Applicant {
         try {
             return DB::transaction(function () use ($areaId, $firstName, $lastName, $email, $phone, $socialNumber, $additionalData) {
+                $applicant = null;
                 if ($socialNumber) {
                     $applicant = self::updateOrCreate([
                         'social_number' => $socialNumber,

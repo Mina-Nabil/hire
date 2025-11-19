@@ -147,7 +147,9 @@
                                             <td class="table-td">{{ $interview->next_step }}</td>
                                             <td class="table-td">
                                                 @foreach ($interview->interviewers as $interviewer)
-                                                    {{ $interviewer->username }} @if (!$loop->last) , @endif
+                                                    {{ $interviewer->username }} @if (!$loop->last)
+                                                        ,
+                                                    @endif
                                                 @endforeach
                                             </td>
                                             <td class="table-td">
@@ -198,12 +200,13 @@
                                                             </a>
                                                         </li>
                                                         @if ($interview->status == 'completed')
-                                                        <li>
-                                                            <a class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300 last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize rtl:space-x-reverse"
-                                                                wire:click="addNextInterview({{ $interview->id }})">
-                                                                <i class="fas fa-sync-alt mr-2"></i> Add Next Interview
-                                                            </a>
-                                                        </li>
+                                                            <li>
+                                                                <a class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300 last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize rtl:space-x-reverse"
+                                                                    wire:click="addNextInterview({{ $interview->id }})">
+                                                                    <i class="fas fa-sync-alt mr-2"></i> Add Next
+                                                                    Interview
+                                                                </a>
+                                                            </li>
                                                         @endif
                                                         <li>
                                                             <a class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300 last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize rtl:space-x-reverse"
@@ -213,8 +216,7 @@
                                                         </li>
                                                         <li>
                                                             <a class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300 last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize rtl:space-x-reverse"
-                                                                wire:click="showApplicant({{ $interview->application->applicant_id }})"
-                                                                >
+                                                                wire:click="showApplicant({{ $interview->application->applicant_id }})">
                                                                 <i class="fas fa-eye mr-2"></i> Show Applicant
                                                             </a>
                                                         </li>
@@ -225,6 +227,23 @@
                                                                 <i class="fas fa-times mr-2"></i> Cancel Interview
                                                             </a>
                                                         </li>
+                                                        @if ($interview->status == 'pending')
+                                                            <li>
+                                                                <a class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300 last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize rtl:space-x-reverse"
+                                                                    wire:click="setAsNoShow({{ $interview->id }})">
+                                                                    <i class="fas fa-user-times mr-2"></i> Set as No
+                                                                    Show
+                                                                </a>
+                                                            </li>
+                                                        @elseif ($interview->status == 'no_show')
+                                                            <li>
+                                                                <a class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300 last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize rtl:space-x-reverse"
+                                                                    wire:click="resetInterviewStatus({{ $interview->id }})">
+                                                                    <i class="fas fa-user-times mr-2"></i> Reset
+                                                                    Interview Status
+                                                                </a>
+                                                            </li>
+                                                        @endif
                                                     </ul>
                                                 </div>
                                             </td>
@@ -281,7 +300,9 @@
                                             <td class="table-td">{{ $interview->next_step }}</td>
                                             <td class="table-td">
                                                 @foreach ($interview->interviewers as $interviewer)
-                                                    {{ $interviewer->username }} @if (!$loop->last) , @endif
+                                                    {{ $interviewer->username }} @if (!$loop->last)
+                                                        ,
+                                                    @endif
                                                 @endforeach
                                             </td>
                                             <td class="table-td">
@@ -332,12 +353,13 @@
                                                             </a>
                                                         </li>
                                                         @if ($interview->status == 'completed')
-                                                        <li>
-                                                            <a class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300 last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize rtl:space-x-reverse"
-                                                                wire:click="addFinalInterview({{ $interview->id }})">
-                                                                <i class="fas fa-sync-alt mr-2"></i> Add Final Interview
-                                                            </a>
-                                                        </li>
+                                                            <li>
+                                                                <a class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300 last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize rtl:space-x-reverse"
+                                                                    wire:click="addFinalInterview({{ $interview->id }})">
+                                                                    <i class="fas fa-sync-alt mr-2"></i> Add Final
+                                                                    Interview
+                                                                </a>
+                                                            </li>
                                                         @endif
                                                         <li>
                                                             <a class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300 last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize rtl:space-x-reverse"
@@ -347,8 +369,7 @@
                                                         </li>
                                                         <li>
                                                             <a class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300 last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize rtl:space-x-reverse"
-                                                                wire:click="showApplicant({{ $interview->application->applicant_id }})"
-                                                                >
+                                                                wire:click="showApplicant({{ $interview->application->applicant_id }})">
                                                                 <i class="fas fa-eye mr-2"></i> Show Applicant
                                                             </a>
                                                         </li>
@@ -360,19 +381,21 @@
                                                             </a>
                                                         </li>
                                                         @if ($interview->status == 'pending')
-                                                        <li>
-                                                            <a class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300 last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize rtl:space-x-reverse"
-                                                                wire:click="setAsNoShow({{ $interview->id }})">
-                                                                <i class="fas fa-user-times mr-2"></i> Set as No Show
-                                                            </a>
-                                                        </li>
+                                                            <li>
+                                                                <a class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300 last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize rtl:space-x-reverse"
+                                                                    wire:click="setAsNoShow({{ $interview->id }})">
+                                                                    <i class="fas fa-user-times mr-2"></i> Set as No
+                                                                    Show
+                                                                </a>
+                                                            </li>
                                                         @elseif ($interview->status == 'no_show')
-                                                        <li>
-                                                            <a class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300 last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize rtl:space-x-reverse"
-                                                                wire:click="resetInterviewStatus({{ $interview->id }})">
-                                                                <i class="fas fa-user-times mr-2"></i> Reset Interview Status
-                                                            </a>
-                                                        </li>
+                                                            <li>
+                                                                <a class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300 last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize rtl:space-x-reverse"
+                                                                    wire:click="resetInterviewStatus({{ $interview->id }})">
+                                                                    <i class="fas fa-user-times mr-2"></i> Reset
+                                                                    Interview Status
+                                                                </a>
+                                                            </li>
                                                         @endif
                                                     </ul>
                                                 </div>
@@ -430,7 +453,9 @@
                                             <td class="table-td">{{ $interview->next_step }}</td>
                                             <td class="table-td">
                                                 @foreach ($interview->interviewers as $interviewer)
-                                                    {{ $interviewer->username }} @if (!$loop->last) , @endif
+                                                    {{ $interviewer->username }} @if (!$loop->last)
+                                                        ,
+                                                    @endif
                                                 @endforeach
                                             </td>
                                             <td class="table-td">
@@ -481,12 +506,13 @@
                                                             </a>
                                                         </li>
                                                         @if ($interview->status == 'completed')
-                                                        <li>
-                                                            <a class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300 last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize rtl:space-x-reverse"
-                                                                wire:click="openNewOfferModal({{ $interview->application->applicant_id }})">
-                                                                <i class="fas fa-file-contract mr-2"></i> Make Offer
-                                                            </a>
-                                                        </li>
+                                                            <li>
+                                                                <a class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300 last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize rtl:space-x-reverse"
+                                                                    wire:click="openNewOfferModal({{ $interview->application->applicant_id }})">
+                                                                    <i class="fas fa-file-contract mr-2"></i> Make
+                                                                    Offer
+                                                                </a>
+                                                            </li>
                                                         @endif
                                                         <li>
                                                             <a class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300 last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize rtl:space-x-reverse"
@@ -496,8 +522,7 @@
                                                         </li>
                                                         <li>
                                                             <a class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300 last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize rtl:space-x-reverse"
-                                                                wire:click="showApplicant({{ $interview->application->applicant_id }})"
-                                                                >
+                                                                wire:click="showApplicant({{ $interview->application->applicant_id }})">
                                                                 <i class="fas fa-eye mr-2"></i> Show Applicant
                                                             </a>
                                                         </li>
@@ -508,6 +533,23 @@
                                                                 <i class="fas fa-times mr-2"></i> Cancel Interview
                                                             </a>
                                                         </li>
+                                                        @if ($interview->status == 'pending')
+                                                            <li>
+                                                                <a class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300 last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize rtl:space-x-reverse"
+                                                                    wire:click="setAsNoShow({{ $interview->id }})">
+                                                                    <i class="fas fa-user-times mr-2"></i> Set as No
+                                                                    Show
+                                                                </a>
+                                                            </li>
+                                                        @elseif ($interview->status == 'no_show')
+                                                            <li>
+                                                                <a class="hover:bg-slate-900 dark:hover:bg-slate-600 dark:hover:bg-opacity-70 hover:text-white w-full border-b border-b-gray-500 border-opacity-10 px-4 py-2 text-sm dark:text-slate-300 last:mb-0 cursor-pointer first:rounded-t last:rounded-b flex space-x-2 items-center capitalize rtl:space-x-reverse"
+                                                                    wire:click="resetInterviewStatus({{ $interview->id }})">
+                                                                    <i class="fas fa-user-times mr-2"></i> Reset
+                                                                    Interview Status
+                                                                </a>
+                                                            </li>
+                                                        @endif
                                                     </ul>
                                                 </div>
                                             </td>
@@ -560,11 +602,14 @@
                                         <tr>
                                             <td class="table-td">{{ $offer->application->applicant->full_name }}</td>
                                             <td class="table-td">{{ $offer->formatted_salary }}</td>
-                                            <td class="table-td">{{ $offer->offer_date ? $offer->offer_date->format('d M Y') : 'Not sent' }}
+                                            <td class="table-td">
+                                                {{ $offer->offer_date ? $offer->offer_date->format('d M Y') : 'Not sent' }}
                                             </td>
-                                            <td class="table-td">{{ $offer->proposed_start_date ? $offer->proposed_start_date->format('d M Y') : 'N/A' }}
+                                            <td class="table-td">
+                                                {{ $offer->proposed_start_date ? $offer->proposed_start_date->format('d M Y') : 'N/A' }}
                                             </td>
-                                            <td class="table-td">{{ $offer->expiry_date ? $offer->expiry_date->format('d M Y') : 'N/A' }}
+                                            <td class="table-td">
+                                                {{ $offer->expiry_date ? $offer->expiry_date->format('d M Y') : 'N/A' }}
                                             </td>
                                             <td class="table-td">
                                                 <span
@@ -578,7 +623,7 @@
                                                         wire:click="openEditOfferModal({{ $offer->id }})">
                                                         <i class="fas fa-eye"></i>
                                                     </button>
-                                              
+
                                                     <button type="button" class="btn btn-xs btn-outline-info"
                                                         wire:click="$dispatch('showConfirmation', {
                                                             title: 'Send Offer',

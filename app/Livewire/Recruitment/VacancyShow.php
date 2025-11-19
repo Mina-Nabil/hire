@@ -779,7 +779,7 @@ class VacancyShow extends Component
     public function setAsNoShow($interviewId)
     {
         $this->selectedInterview = Interview::find($interviewId);
-        $this->selectedInterview->setStatus(Interview::STATUS_NO_SHOW);
+        $this->selectedInterview->updateStatus(Interview::STATUS_NO_SHOW);
         $this->alert('success', 'Interview set as no show successfully');
         $this->refreshInterviews();
     }
@@ -787,7 +787,7 @@ class VacancyShow extends Component
     public function resetInterviewStatus($interviewId)
     {
         $this->selectedInterview = Interview::find($interviewId);
-        $this->selectedInterview->setStatus(Interview::STATUS_PENDING);
+        $this->selectedInterview->updateStatus(Interview::STATUS_PENDING);
         $this->alert('success', 'Interview status reset successfully');
         $this->refreshInterviews();
     }

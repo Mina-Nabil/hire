@@ -784,6 +784,14 @@ class VacancyShow extends Component
         $this->refreshInterviews();
     }
 
+    public function resetInterviewStatus($interviewId)
+    {
+        $this->selectedInterview = Interview::find($interviewId);
+        $this->selectedInterview->setStatus(Interview::STATUS_PENDING);
+        $this->alert('success', 'Interview status reset successfully');
+        $this->refreshInterviews();
+    }
+
 
     // Interview Management - Add Note
     public function openAddNoteModal($interviewId)

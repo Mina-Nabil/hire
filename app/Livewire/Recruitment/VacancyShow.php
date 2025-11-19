@@ -776,6 +776,14 @@ class VacancyShow extends Component
         }
     }
 
+    public function setAsNoShow($interviewId)
+    {
+        $this->selectedInterview = Interview::find($interviewId);
+        $this->selectedInterview->setStatus(Interview::STATUS_NO_SHOW);
+        $this->alert('success', 'Interview set as no show successfully');
+        $this->refreshInterviews();
+    }
+
 
     // Interview Management - Add Note
     public function openAddNoteModal($interviewId)

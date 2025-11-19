@@ -143,32 +143,37 @@ class ApplicantsCreateMin extends Component
     // Step 1: Personal Info
     public function validatePersonalInfo()
     {
-        $this->validate([
-            'areaId' => 'required|exists:areas,id',
-            'firstName' => 'required|string|max:255',
-            'lastName' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'socialNumber' => 'required',
-            'phone' => 'required|string|max:255',
-            'homePhone' => 'nullable|string|max:255',
-            'channelId' => 'nullable|exists:channels,id',
-            'cv' => 'nullable|file|mimes:pdf,doc,docx|max:4096',
-        ], [
-            'areaId.required' => 'The area is required',
-            'firstName.required' => 'The first name is required',
-            'lastName.required' => 'The last name is required',
-            'email.required' => 'The email is required',
-            'phone.required' => 'The phone is required',
-        ]);
-
         $user = Auth::user();
         if (!$user) {
             $this->validate([
+                'areaId' => 'required|exists:areas,id',
+                'firstName' => 'required|string|max:255',
+                'lastName' => 'required|string|max:255',
+                'email' => 'required|email|max:255',
+                'socialNumber' => 'required',
+                'phone' => 'required|string|max:255',
+                'homePhone' => 'nullable|string|max:255',
+                'channelId' => 'nullable|exists:channels,id',
                 'cv' => 'required|file|mimes:pdf,doc,docx|max:4096',
             ], [
+                'areaId.required' => 'The area is required',
+                'firstName.required' => 'The first name is required',
+                'lastName.required' => 'The last name is required',
+                'email.required' => 'The email is required',
+                'phone.required' => 'The phone is required',
                 'cv.required' => 'The CV is required',
                 'cv.mimes' => 'The CV must be a PDF, DOC or DOCX file',
                 'cv.max' => 'The CV must be less than 4MB',
+            ]);
+        } else {
+            $this->validate([
+                'areaId' => 'required|exists:areas,id',
+                'firstName' => 'required|string|max:255',
+                'lastName' => 'required|string|max:255',
+            ], [
+                'areaId.required' => 'The area is required',
+                'firstName.required' => 'The first name is required',
+                'lastName.required' => 'The last name is required',
             ]);
         }
     }

@@ -275,22 +275,32 @@ class Applicant extends Model
         int $areaId,
         string $firstName,
         string $lastName,
-        string $email,
-        string $phone,
-        string $socialNumber,
+        ?string $email = null,
+        ?string $phone = null,
+        ?string $socialNumber = null,
         array $additionalData = []
     ): Applicant {
         try {
             return DB::transaction(function () use ($areaId, $firstName, $lastName, $email, $phone, $socialNumber, $additionalData) {
-                return self::updateOrCreate([
-                    'social_number' => $socialNumber,
-                ], array_merge([
-                    'area_id' => $areaId,
-                    'first_name' => $firstName,
-                    'last_name' => $lastName,
-                    'phone' => $phone,
-                    'email' =>  $email
-                ], $additionalData));
+                if ($socialNumber) {
+                    $applicant = self::updateOrCreate([
+                        'social_number' => $socialNumber,
+                    ], array_merge([
+                        'area_id' => $areaId,
+                        'first_name' => $firstName,
+                        'last_name' => $lastName,
+                        'email' => $email,
+                        'phone' => $phone,
+                    ], $additionalData));
+                } else {
+                    $applicant = self::create(array_merge([
+                        'area_id' => $areaId,
+                        'first_name' => $firstName,
+                        'last_name' => $lastName,
+                        'email' => $email,
+                        'phone' => $phone,
+                    ], $additionalData));
+                }
                 AppLog::info('Applicant Created', 'Applicant. ' . $firstName . ' ' . $lastName . ' created successfully', loggable: $applicant);
             });
         } catch (Exception $e) {

@@ -55,6 +55,7 @@ class Interview extends Model
     const STATUS_REJECTED = 'rejected';
     const STATUS_ON_HOLD = 'on_hold';
     const STATUS_RESCHEDULED = 'rescheduled';
+    const STATUS_NO_SHOW = 'no_show';
 
     const INTERVIEW_STATUSES = [
         self::STATUS_PENDING,
@@ -64,6 +65,7 @@ class Interview extends Model
         self::STATUS_REJECTED,
         self::STATUS_ON_HOLD,
         self::STATUS_RESCHEDULED,
+        self::STATUS_NO_SHOW,
     ];
 
     const INTERVIEW_LEVEL_FIRST = 'first';
@@ -100,6 +102,7 @@ class Interview extends Model
             self::STATUS_CANCELLED => 'bg-danger-200',
             self::STATUS_REJECTED => 'bg-danger-200',
             self::STATUS_RESCHEDULED => 'bg-warning-200',
+            self::STATUS_NO_SHOW => 'bg-danger-200',
         };
     }
 

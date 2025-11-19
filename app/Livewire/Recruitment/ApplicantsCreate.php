@@ -220,7 +220,7 @@ class ApplicantsCreate extends Component
             'militaryStatus' => 'required|in:' . implode(',', Applicant::MILITARY_STATUS),
             'channelId' => 'nullable|exists:channels,id',
             'profileImage' => 'nullable|image|max:4096',
-            'cv' => 'nullable|file|mimes:pdf,doc,docx|max:4096',
+            'cv' => 'required|file|mimes:pdf,doc,docx|max:4096',
             'idCard' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:4096',
             'birthCertificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:4096',
             'collegeCertificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:4096',

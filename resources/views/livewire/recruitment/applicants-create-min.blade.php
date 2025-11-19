@@ -289,7 +289,7 @@
                         </div>
                     @endif
 
-                    <!-- Base Questions (if any) -->
+                    {{-- <!-- Base Questions (if any) -->
                     @if (count($allVacancyQuestions) > 0)
                         <div class="mb-6">
                             <h5 class="font-medium mb-4">{{ __('recruitment.application_questions') }}</h5>
@@ -374,7 +374,7 @@
                             @endforeach
                         </div>
                     @endif
-
+ --}}
 
 
 

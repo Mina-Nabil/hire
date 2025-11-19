@@ -263,7 +263,7 @@ class EmployeeConfiguration extends Component
     {
         $this->validate([
             'baseBenefit.name' => 'required|string',
-            'baseBenefit.amount' => 'required|numeric|min:0',
+            'baseBenefit.amount' => 'required|numeric',
             'baseBenefit.type' => 'required|string',
             'baseBenefit.receiver' => 'required|string',
             'baseBenefit.start_date' => 'required|date',

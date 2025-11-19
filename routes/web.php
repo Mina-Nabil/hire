@@ -74,6 +74,7 @@ Route::group(['middleware' => ['auth', 'type:admin|hr']], function () {
 
     Route::get('/recruitment/applicants', ApplicantsIndex::class)->name('recruitment.applicants');
     Route::get('/recruitment/applicants/create', ApplicantsCreate::class)->name('applicants.create');
+    Route::get('/recruitment/applicants/create-min', ApplicantsCreateMin::class)->name('applicants.create-min');
 
     Route::get('/recruitment/base-questions', BaseQuestionsIndex::class)->name('recruitment.base-questions');
     Route::get('/recruitment/applicants/success', ApplicantSuccess::class)->name('applicants.success');
@@ -110,7 +111,7 @@ Route::group(['middleware' => ['auth', 'type:admin|hr']], function () {
 Route::group(['middleware' => 'guest'], function () {
     Route::get('/login', Login::class)->name('login');
     Route::get('/recruitment/apply/{vacancyID}/{referralID?}', ApplicantsCreate::class)->name('applicants.guest.create');
-    Route::get('/recruitment/apply-min/{vacancyID}/{referralID?}', ApplicantsCreateMin::class)->name('applicants.guest.create-min');
+    Route::get('/recruitment/apply-min/{vacancyID?}/{referralID?}', ApplicantsCreateMin::class)->name('applicants.guest.create-min');
     Route::get('/thank-you', function () {
         return view('thank-you');
     })->name('thank-you');

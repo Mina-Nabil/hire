@@ -290,6 +290,10 @@
                         <ul class="sidebar-submenu">
                             @can('create', App\Models\Recruitment\Applicants\Applicant::class)
                                 <li>
+                                    <a class="{{ request()->routeIs('applicants.create-min') ? 'active' : '' }}"
+                                        href="{{ url('/recruitment/applicants/create-min') }}">New Applicant (Minimal)</a>
+                                </li>
+                                <li>
                                     <a class="{{ request()->routeIs('applicants.create') ? 'active' : '' }}"
                                         href="{{ url('/recruitment/applicants/create') }}">New Applicant</a>
                                 </li>

@@ -246,46 +246,73 @@
                 @if ($currentStep === 2)
                     <h4 class="text-xl font-medium mb-5">{{ __('recruitment.vacancy_application_details') }}</h4>
 
-
-                    <!-- Vacancy Information -->
-
-                    <div class="flex justify-between">
-
-                        <div class="w-full p-4 bg-slate-50 rounded-md mb-6">
-                            <h5 class="font-medium mb-2">{{ __('recruitment.vacancy_details') }}:</h5>
-                            <p><strong>{{ __('recruitment.position') }}:</strong>
-                                {{ $selectedVacancy?->position?->name }}</p>
-                            <p><strong>{{ __('recruitment.department') }}:</strong>
-                                {{ $selectedVacancy?->position?->department?->name }}</p>
-                            <p><strong>{{ __('recruitment.opening_date') }}:</strong>
-                                {{ $selectedVacancy?->created_at->format('d M Y') }}
-                            </p>
-                            <p><strong>{{ __('recruitment.closing_date') }}:</strong>
-                                {{ $selectedVacancy?->closing_date }}
-                            </p>
-                            <p><strong>{{ __('recruitment.status') }}:</strong> <span
-                                    class="badge {{ $selectedVacancy?->status === 'open' ? 'bg-success-500' : 'bg-danger-500' }}">{{ ucfirst($selectedVacancy?->status) }}</span>
-                            </p>
+                    @if ($selectedVacancy)
+                        <!-- Vacancy Information -->
+                        <div class="flex justify-between">
+                            <div class="w-full p-4 bg-slate-50 rounded-md mb-6">
+                                <h5 class="font-medium mb-2">{{ __('recruitment.vacancy_details') }}:</h5>
+                                <p><strong>{{ __('recruitment.position') }}:</strong>
+                                    {{ $selectedVacancy->position?->name }}</p>
+                                <p><strong>{{ __('recruitment.department') }}:</strong>
+                                    {{ $selectedVacancy->position?->department?->name }}</p>
+                                <p><strong>{{ __('recruitment.opening_date') }}:</strong>
+                                    {{ $selectedVacancy->created_at->format('d M Y') }}
+                                </p>
+                                <p><strong>{{ __('recruitment.closing_date') }}:</strong>
+                                    {{ $selectedVacancy->closing_date }}
+                                </p>
+                                <p><strong>{{ __('recruitment.status') }}:</strong> <span
+                                        class="badge {{ $selectedVacancy->status === 'open' ? 'bg-success-500' : 'bg-danger-500' }}">{{ ucfirst($selectedVacancy->status) }}</span>
+                                </p>
+                            </div>
+                            @if ($canEditVacancy)
+                                <div class="flex items-center p-4 bg-slate-50 rounded-md mb-6">
+                                    <button type="button" wire:click="clearSelectedVacancy" class="text-danger-500">
+                                        <iconify-icon icon="heroicons:trash"></iconify-icon>
+                                    </button>
+                                </div>
+                            @endif
                         </div>
 
-                    </div>
+                        <!-- Pick Preferred Interview Slot -->
+                        @if ($selectedVacancy->vacancy_slots && $selectedVacancy->vacancy_slots->count() > 0)
+                            <div class="mb-6">
+                                <h5 class="font-medium mb-4">{{ __('recruitment.preferred_interview_slot') }}</h5>
 
-                    <!-- Pick Preferred Interview Slot -->
-                    @if ($selectedVacancy->vacancy_slots->count() > 0)
-                        <div class="mb-6">
-                            <h5 class="font-medium mb-4">{{ __('recruitment.preferred_interview_slot') }}</h5>
+                                <x-select wire:model="slotId">
+                                    <option value="">{{ __('recruitment.all_slots_ok') }}</option>
+                                    @foreach ($selectedVacancy->vacancy_slots as $slot)
+                                        <option value="{{ $slot->id }}">
+                                            {{ $slot->date->format('d M Y') }} -
+                                            {{ $slot->start_time->format('H:i') }} to
+                                            {{ $slot->end_time->format('H:i') }}
+                                        </option>
+                                    @endforeach
+                                </x-select>
 
-                            <x-select wire:model="slotId">
-                                <option value="">{{ __('recruitment.all_slots_ok') }}</option>
-                                @foreach ($selectedVacancy->vacancy_slots as $slot)
-                                    <option value="{{ $slot->id }}">
-                                        {{ $slot->date->format('d M Y') }} -
-                                        {{ $slot->start_time->format('H:i') }} to
-                                        {{ $slot->end_time->format('H:i') }}
+                            </div>
+                        @endif
+                    @else
+                        <!-- Vacancy Selection -->
+                        <div class="form-group mb-4">
+                            <label class="form-label">{{ __('recruitment.select_vacancy') }} <span
+                                    class="text-danger-500">*</span></label>
+                            <select wire:model.live="vacancyId"
+                                class="form-control @error('vacancyId') !border-danger-500 @enderror"
+                                @if ($locale === 'ar') dir="rtl" @endif>
+                                <option value="">{{ __('recruitment.select_vacancy') }}</option>
+                                @foreach ($vacancies as $vacancy)
+                                    <option value="{{ $vacancy->id }}">{{ $vacancy->title }}
+                                        ({{ $vacancy->position->name }})
                                     </option>
                                 @endforeach
-                            </x-select>
-
+                            </select>
+                            @error('vacancyId')
+                                <bdi>
+                                    <span
+                                        class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                </bdi>
+                            @enderror
                         </div>
                     @endif
 

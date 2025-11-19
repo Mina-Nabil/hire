@@ -64,27 +64,38 @@ class ApplicantsCreateMin extends Component
     public $coverLetter = null;
     public $referredById = null;
     public $slotId = null;
+    public $canEditVacancy = false;
 
-    public function mount($vacancyID, $referralID = null)
+    public function mount($vacancyID = null, $referralID = null)
     {
         // Set the locale from session or default to English
         $this->locale = Session::get('locale', 'en');
         App::setLocale($this->locale);
 
-        try {
-            $vacancyID = decrypt($vacancyID);
-        } catch (Exception $e) {
-            abort(404);
-        }
+        if ($vacancyID) {
+            try {
+                $vacancyID = decrypt($vacancyID);
+            } catch (Exception $e) {
+                abort(404);
+            }
 
-        $this->vacancyId = $vacancyID;
-        $this->selectedVacancy = Vacancy::findOrFail($vacancyID);
-        $this->updatedVacancyId($vacancyID);
+            $this->vacancyId = $vacancyID;
+            $this->selectedVacancy = Vacancy::findOrFail($vacancyID);
+            $this->updatedVacancyId($vacancyID);
+        }
 
         if ($referralID) {
             $referralID = decrypt($referralID);
             $this->referredById = $referralID;
             $this->selectedReferral = Employee::findOrFail($referralID);
+        }
+
+        if (!$this->selectedVacancy) {
+            $user = Auth::user();
+            if ($user) {
+                $this->authorize('viewAny', Vacancy::class);
+            }
+            $this->canEditVacancy = true;
         }
 
         // $this->areas = Area::all();
@@ -205,6 +216,7 @@ class ApplicantsCreateMin extends Component
     public function clearSelectedVacancy()
     {
         $this->selectedVacancy = null;
+        $this->vacancyId = null;
         // $this->allVacancyQuestions = [];
         // $this->questionAnswers = [];
     }

@@ -302,6 +302,7 @@ class Applicant extends Model
                     ], $additionalData));
                 }
                 AppLog::info('Applicant Created', 'Applicant. ' . $firstName . ' ' . $lastName . ' created successfully', loggable: $applicant);
+                return $applicant;
             });
         } catch (Exception $e) {
             report($e);

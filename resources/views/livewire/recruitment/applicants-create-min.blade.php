@@ -279,7 +279,7 @@
                             <div class="mb-6">
                                 <h5 class="font-medium mb-4">{{ __('recruitment.preferred_interview_slot') }}</h5>
 
-                                <x-select wire:model="slotId">
+                                <x-select wire:model="slotId" class="@error('slotId') !border-danger-500 @enderror">
                                     <option value="">{{ __('recruitment.all_slots_ok') }}</option>
                                     @foreach ($selectedVacancy->vacancy_slots as $slot)
                                         <option value="{{ $slot->id }}">
@@ -288,6 +288,12 @@
                                             {{ $slot->end_time->format('H:i') }}
                                         </option>
                                     @endforeach
+                                    @error('slotId')
+                                    <bdi>
+                                        <span
+                                            class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                                    </bdi>
+                                @enderror
                                 </x-select>
 
                             </div>

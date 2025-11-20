@@ -103,6 +103,7 @@ class Interview extends Model
             self::STATUS_REJECTED => 'bg-danger-200',
             self::STATUS_RESCHEDULED => 'bg-warning-200',
             self::STATUS_NO_SHOW => 'bg-danger-200',
+            default => 'bg-gray-200',
         };
     }
 

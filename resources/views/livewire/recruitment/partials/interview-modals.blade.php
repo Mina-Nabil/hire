@@ -619,8 +619,8 @@
                             <div class="space-y-4">
                                 @foreach ($selectedApplication->answers as $answer)
                                     <div class="border-b pb-3">
-                                        <p class="font-medium">{{ $answer->answerable->question }}</p>
-                                        <p class="mt-1 text-gray-600">{{ $answer->answer }}</p>
+                                        <p class="font-medium">{{ $answer->answerable?->question }}</p>
+                                        <p class="mt-1 text-gray-600">{{ $answer?->answer }}</p>
                                     </div>
                                 @endforeach
                             </div>

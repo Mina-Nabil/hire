@@ -170,10 +170,12 @@ class ApplicantsCreateMin extends Component
                 'areaId' => 'required|exists:areas,id',
                 'firstName' => 'required|string|max:255',
                 'lastName' => 'required|string|max:255',
+                'phone' => 'required|max:255',
             ], [
                 'areaId.required' => 'The area is required',
                 'firstName.required' => 'The first name is required',
                 'lastName.required' => 'The last name is required',
+                'phone.required' => 'The phone is required',
             ]);
         }
     }

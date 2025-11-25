@@ -1101,7 +1101,7 @@ class ApplicantShow extends Component
             'editMainInfo.gender' => 'nullable|in:Male,Female',
             'editMainInfo.marital_status' => 'nullable|in:Single,Married,Divorced,Widowed',
             'editMainInfo.military_status' => 'nullable|in:Exempted,Drafted,Completed',
-            'cvResume' => 'nullable|file|mimes:pdf|max:10048',
+            'cvResume' => 'nullable|mimes:pdf|max:10048',
         ], [
             'editMainInfo.first_name.required' => 'First name is required',
             'editMainInfo.last_name.required' => 'Last name is required',

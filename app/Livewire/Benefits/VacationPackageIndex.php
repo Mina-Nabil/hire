@@ -5,6 +5,7 @@ namespace App\Livewire\Benefits;
 use App\Exceptions\AppException;
 use App\Models\Benefits\Configurations\VacationPackage;
 use App\Models\Benefits\Vacations\VacationDetail;
+use App\Models\Personel\Employee;
 use App\Traits\AlertFrontEnd;
 use Exception;
 use Livewire\Component;
@@ -36,6 +37,7 @@ class VacationPackageIndex extends Component
 
     public function showCreateModal()
     {
+        $this->reset(['name', 'desc', 'vacationDetails', 'editingPackageId', 'isEditing']);
         $this->showAddModal = true;
     }
 
@@ -152,6 +154,35 @@ class VacationPackageIndex extends Component
             $this->alertSuccess('Package deleted successfully!');
         } catch (Exception $e) {
             $this->alertError('Failed to delete package: ' . $e->getMessage());
+        }
+    }
+
+    public function applyPackageToAllActiveEmployees($packageId)
+    {
+        try {
+            $package = VacationPackage::findOrFail($packageId);
+            $result = Employee::applyVacationPackageToAllActiveEmployees($package);
+            
+            $message = "Successfully applied vacation package to {$result['success_count']} out of {$result['total_count']} active employees.";
+            
+            if (!empty($result['errors'])) {
+                $errorCount = count($result['errors']);
+                $message .= " {$errorCount} employee(s) had errors.";
+                
+                if ($errorCount <= 5) {
+                    $message .= " Errors: " . implode(', ', array_column($result['errors'], 'error'));
+                }
+            }
+            
+            if ($result['success_count'] > 0) {
+                $this->alertSuccess($message);
+            } else {
+                $this->alertError('Failed to apply package to any employees. ' . ($result['errors'][0]['error'] ?? 'Unknown error'));
+            }
+        } catch (AppException $e) {
+            $this->alertError($e->getMessage());
+        } catch (Exception $e) {
+            $this->alertError('Failed to apply package to employees: ' . $e->getMessage());
         }
     }
 

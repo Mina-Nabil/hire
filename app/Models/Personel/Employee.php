@@ -310,6 +310,75 @@ class Employee extends Model
     }
 
     /**
+     * Apply vacation package to all active employees
+     * Active employees are those with status active and no termination_date/release_date/absent_date in the current year
+     * 
+     * @param VacationPackage $vacationPackage
+     * @return array Returns array with 'success_count' and 'errors' keys
+     */
+    public static function applyVacationPackageToAllActiveEmployees(VacationPackage $vacationPackage)
+    {
+        /** @var User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser || !$loggedInUser->can('create', VacationPackage::class)) {
+            throw new AppException('Unauthorized');
+        }
+
+        // Get current year start date (January 1st of current year)
+        $currentYearStart = Carbon::now()->startOfYear()->format('Y-m-d');
+
+        // Get all current employees (active status, no termination/release/absent dates in current year)
+        $activeEmployees = self::current($currentYearStart)->get();
+
+        $successCount = 0;
+        $errors = [];
+
+        // Load vacation details for the package
+        $vacationDetails = $vacationPackage->vacationDetails;
+
+        if ($vacationDetails->isEmpty()) {
+            throw new AppException('Vacation package has no vacation details');
+        }
+
+        foreach ($activeEmployees as $employee) {
+            try {
+                // Prepare vacation benefits array using max_balance_max from VacationDetail
+                $vacationBenefits = $vacationDetails->map(function ($detail) {
+                    return [
+                        'vacation_detail_id' => $detail->id,
+                        'name' => $detail->name,
+                        'start_date' => now()->format('Y-m-d'),
+                        'inc_rate' => $detail->inc_rate_max, // Use max value
+                        'max_balance' => $detail->max_balance_max, // Use max_balance_max as requested
+                        'hour_price' => $detail->hour_price_max, // Use max value
+                        'automatic_add_to_balance' => false,
+                    ];
+                })->toArray();
+
+                // Apply vacation package without deleting old configuration
+                $employee->applyVacationPackage($vacationPackage, $vacationBenefits, false);
+                $successCount++;
+            } catch (Exception $e) {
+                report($e);
+                $errors[] = [
+                    'employee_id' => $employee->id,
+                    'employee_name' => $employee->name,
+                    'error' => $e->getMessage(),
+                ];
+                AppLog::error('Error applying vacation package to employee', $e->getMessage(), loggable: $employee);
+            }
+        }
+
+        AppLog::info('Vacation Package Applied to All Active Employees', "Package: {$vacationPackage->name}, Success: $successCount, Errors: " . count($errors));
+
+        return [
+            'success_count' => $successCount,
+            'total_count' => $activeEmployees->count(),
+            'errors' => $errors,
+        ];
+    }
+
+    /**
      * Apply for benefit package
      * @param array $working_days
      * ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday']

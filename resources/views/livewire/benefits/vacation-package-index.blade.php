@@ -28,11 +28,23 @@
                                         <td class="table-td">
                                             <div class="flex space-x-3 rtl:space-x-reverse">
                                                 <button class="action-btn btn-edit"
-                                                    wire:click="showEditModal({{ $package->id }})">
+                                                    wire:click="showEditModal({{ $package->id }})"
+                                                    title="Edit Package">
                                                     <iconify-icon icon="heroicons-outline:pencil-alt"></iconify-icon>
                                                 </button>
+                                                <button class="action-btn btn-primary"
+                                                    wire:click="$dispatch('showConfirmation', { 
+                                                        message: 'This will apply the vacation package &quot;{{ $package->name }}&quot; to all active employees. Active employees are those with status active and no termination_date, release_date, or absent_date set in the current year. Each employee will receive vacation benefits with maximum balance values from the package. Existing vacation benefits will be preserved (not deleted). Continue?', 
+                                                        color: 'primary', 
+                                                        callback: 'applyPackageToAllActiveEmployees', 
+                                                        params: {{ $package->id }}
+                                                    })"
+                                                    title="Apply to All Active Employees">
+                                                    <iconify-icon icon="heroicons-outline:user-group"></iconify-icon>
+                                                </button>
                                                 <button class="action-btn btn-delete"
-                                                    wire:click="deletePackage({{ $package->id }})">
+                                                    wire:click="deletePackage({{ $package->id }})"
+                                                    title="Delete Package">
                                                     <iconify-icon icon="heroicons-outline:trash"></iconify-icon>
                                                 </button>
                                             </div>

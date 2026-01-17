@@ -22,6 +22,8 @@ class VacationPackageIndex extends Component
     public $vacationDetailTypes;
     public $showAddModal = false;
 
+    public $listeners = ['applyPackageToAllActiveEmployees'];
+
 
     public function loadPackages()
     {

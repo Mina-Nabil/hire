@@ -35,7 +35,7 @@
                                                 <button class="action-btn btn-primary"
                                                     wire:click="$dispatch('showConfirmation', { 
                                                         message: 'This will apply the vacation package &quot;{{ $package->name }}&quot; to all active employees. Active employees are those with status active and no termination_date, release_date, or absent_date set in the current year. Each employee will receive vacation benefits with maximum balance values from the package. Existing vacation benefits will be preserved (not deleted). Continue?', 
-                                                        color: 'primary', 
+                                                         color: 'primary', 
                                                         callback: 'applyPackageToAllActiveEmployees', 
                                                         params: {{ $package->id }}
                                                     })"

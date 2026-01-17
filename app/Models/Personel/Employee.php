@@ -261,7 +261,7 @@ class Employee extends Model
      * ]
      * @return void
      */
-    public function applyVacationPackage(VacationPackage $vacationPackage, $vacation_benefits, bool $delete_old_conf = true)
+    public function applyVacationPackage(VacationPackage $vacationPackage, $vacation_benefits, bool $delete_old_conf = true, $start_date_today = false)
     {
         foreach ($vacation_benefits as &$applied_vacation_benefit) {
             $vacation_benefit = VacationDetail::find($applied_vacation_benefit['vacation_detail_id']);
@@ -285,11 +285,11 @@ class Employee extends Model
         }
 
         try {
-            DB::transaction(function () use ($vacation_benefits, $vacationPackage, $delete_old_conf) {
+            DB::transaction(function () use ($vacation_benefits, $vacationPackage, $delete_old_conf, $start_date_today) {
                 if ($delete_old_conf) {
                     $this->vacationBenefits()->delete();
                 } else {
-                    $start_date = $this->benefitConfiguration->start_date ? Carbon::parse($this->benefitConfiguration->start_date) : Carbon::parse($this->vacationBenefits()->first()->start_date);
+                    $start_date = $start_date_today ? Carbon::now() : ($this->benefitConfiguration->start_date ? Carbon::parse($this->benefitConfiguration->start_date) : Carbon::parse($this->vacationBenefits()->first()->start_date));
                     $this->vacationBenefits()->update([
                         'end_date' => $start_date->subDay()->format('Y-m-d'),
                     ]);
@@ -356,7 +356,7 @@ class Employee extends Model
                 })->toArray();
 
                 // Apply vacation package without deleting old configuration
-                $employee->applyVacationPackage($vacationPackage, $vacationBenefits, false);
+                $employee->applyVacationPackage($vacationPackage, $vacationBenefits, false, true);
                 $successCount++;
             } catch (Exception $e) {
                 report($e);

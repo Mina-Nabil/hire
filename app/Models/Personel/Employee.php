@@ -350,7 +350,9 @@ class Employee extends Model
                         'start_date' => now()->format('Y-m-d'),
                         'inc_rate' => $detail->inc_rate_max, // Use max value
                         'max_balance' => $detail->max_balance_max, // Use max_balance_max as requested
+                        'current_balance' => $detail->max_balance_max,
                         'hour_price' => $detail->hour_price_max, // Use max value
+                        'apply_deadline' => $detail->apply_deadline,
                         'automatic_add_to_balance' => false,
                     ];
                 })->toArray();

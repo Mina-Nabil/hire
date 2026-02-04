@@ -251,8 +251,8 @@
                         <div class="flex justify-between">
                             <div class="w-full p-4 bg-slate-50 rounded-md mb-6">
                                 <h5 class="font-medium mb-2">{{ __('recruitment.vacancy_details') }}:</h5>
-                                <p><strong>{{ __('recruitment.position') }}:</strong>
-                                    {{ $selectedVacancy->position?->name }}</p>
+                                {{-- <p><strong>{{ __('recruitment.position') }}:</strong>
+                                    {{ $selectedVacancy->position?->name }}</p> --}}
                                 <p><strong>{{ __('recruitment.department') }}:</strong>
                                     {{ $selectedVacancy->position?->department?->name }}</p>
                                 <p><strong>{{ __('recruitment.opening_date') }}:</strong>

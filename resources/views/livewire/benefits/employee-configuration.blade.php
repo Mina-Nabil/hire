@@ -322,6 +322,13 @@
                                                 @endforeach
                                             </div>
                                         </div>
+
+                                        <div class="row mb-3">
+                                            <div class="col-md-5 font-weight-bold">Start Date:</div>
+                                            <div class="col-md-7">
+                                                {{ $employee->benefitConfiguration->start_date ? $employee->benefitConfiguration->start_date->format('d/m/Y') : '-' }}
+                                            </div>
+                                        </div>
                                     @else
                                         <div class="alert alert-warning">
                                             No benefit configuration found for this employee.

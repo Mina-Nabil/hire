@@ -326,7 +326,7 @@
                                         <div class="row mb-3">
                                             <div class="col-md-5 font-weight-bold">Start Date:</div>
                                             <div class="col-md-7">
-                                                {{ $employee->benefitConfiguration->start_date ? $employee->benefitConfiguration->start_date->format('d/m/Y') : '-' }}
+                                                {{ $employee->benefitConfiguration->start_date ?? '-' }}
                                             </div>
                                         </div>
                                     @else

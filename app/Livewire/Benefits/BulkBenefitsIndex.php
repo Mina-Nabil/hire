@@ -170,6 +170,8 @@ class BulkBenefitsIndex extends Component
                 if (isset($firstDetail['end_date'])) {
                     $employeeData['packageEndDate'] = Carbon::parse($firstDetail['end_date'])->format('Y-m-d');
                 }
+            } else {
+                $employeeData['packageStartDate'] = $employee->benefitConfiguration->start_date;
             }
         } else if ($employee->position && $employee->position->salaryGrade) {
             // Load default from position

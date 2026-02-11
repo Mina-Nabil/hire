@@ -461,7 +461,7 @@ class CreatePayroll extends Component
 
             if ($payroll) {
                 $this->alertSuccess('Payroll created successfully.');
-                $this->reset();
+                return redirect()->route('payrolls.show', $payroll->id);
             } else {
                 $this->alertError('Failed to create payroll. Please try again.');
             }

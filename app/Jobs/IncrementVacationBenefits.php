@@ -17,7 +17,7 @@ class IncrementVacationBenefits implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(private $forceType = null)
+    public function __construct(private $forceType = null, private $benefitName = null)
     {
         //
     }
@@ -28,7 +28,11 @@ class IncrementVacationBenefits implements ShouldQueue
     public function handle(): void
     {
         $now = Carbon::now();
-        $vacationBenefits = VacationBenefit::current($now)->get();
+        $vacationBenefits = VacationBenefit::current($now)->when($this->benefitName, function ($query) {
+            $query->whereHas('vacationDetail', function ($q) {
+                $q->where('vacation_benefits.name', $this->benefitName);
+            });
+        })->get();
 
         Log::info("Incrementing vacation benefits for {$now->toDateString()}");
         Log::info("Force type: {$this->forceType}");

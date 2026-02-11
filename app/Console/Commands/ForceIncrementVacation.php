@@ -12,7 +12,7 @@ class ForceIncrementVacation extends Command
      *
      * @var string
      */
-    protected $signature = 'app:force-increment-vacation {type}';
+    protected $signature = 'app:force-increment-vacation {type} {benefitName?}';
 
     /**
      * The console command description.
@@ -27,6 +27,7 @@ class ForceIncrementVacation extends Command
     public function handle()
     {
         $type = $this->argument('type');
-        IncrementVacationBenefits::dispatch($type);
+        $benefitName = $this->argument('benefitName');
+        IncrementVacationBenefits::dispatch($type, $benefitName);
     }
 }

@@ -454,7 +454,7 @@ class CreatePayroll extends Component
      */
     public function submitPayroll()
     {
-        $this->ensureArrays();
+        // $this->ensureArrays();
 
         try {
             // Prepare employee data for the payroll

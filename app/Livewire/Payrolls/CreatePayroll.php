@@ -447,6 +447,8 @@ class CreatePayroll extends Component
 
         $this->payrollData = $departmentGroups;
         $this->payrollData['_totals'] = $totals;
+
+        $this->submitPayroll();
     }
 
     /**
@@ -623,7 +625,7 @@ class CreatePayroll extends Component
 
             if ($payroll) {
                 $this->alertSuccess('Payroll created successfully.');
-                $this->reset();
+                return redirect()->route('payrolls.index');
             } else {
                 $this->alertError('Failed to create payroll. Please try again.');
             }

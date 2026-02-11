@@ -317,7 +317,7 @@
                                                     $query,
                                                 ) use ($department) {
                                                     $query->where('department_id', $department->id);
-                                                })->currentBetween(Carbon::parse($this->startDate), Carbon::parse($this->endDate))->count();
+                                                })->currentBetween(\Carbon\Carbon::parse($this->startDate), \Carbon\Carbon::parse($this->endDate))->count();
                                             @endphp
                                             <span
                                                 class="text-xs bg-primary-500 text-white rounded-full px-2 py-1">{{ $count }}</span>
@@ -353,7 +353,7 @@
                                             function ($query) {
                                                 $query->whereIn('department_id', $this->selectedDepartments);
                                             },
-                                        )->currentBetween(Carbon::parse($this->startDate), Carbon::parse($this->endDate))->get();
+                                        )->currentBetween(\Carbon\Carbon::parse($this->startDate), \Carbon\Carbon::parse($this->endDate))->get();
                                     @endphp
 
                                     @forelse($departmentEmployees as $employee)

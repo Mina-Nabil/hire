@@ -159,7 +159,7 @@ class CreatePayroll extends Component
         $employees = Employee::whereHas('position', function ($query) use ($departmentIds) {
             $query->whereIn('department_id', $departmentIds);
         })
-            ->current(Carbon::parse($this->startDate), Carbon::parse($this->endDate))
+            ->currentBetween(Carbon::parse($this->startDate), Carbon::parse($this->endDate))
             ->get();
 
         $this->selectedEmployees = $employees->pluck('id')->toArray();
@@ -177,7 +177,7 @@ class CreatePayroll extends Component
         $employees = Employee::whereHas('position', function ($query) use ($departmentId) {
             $query->where('department_id', $departmentId);
         })
-            ->current(Carbon::parse($this->startDate), Carbon::parse($this->endDate))
+            ->currentBetween(Carbon::parse($this->startDate), Carbon::parse($this->endDate))
             ->get();
 
         $this->selectedEmployees = $employees->pluck('id')->toArray();
@@ -245,7 +245,7 @@ class CreatePayroll extends Component
         $this->payrollData = [];
 
         $employees = Employee::with(['position', 'position.department', 'benefitConfiguration'])
-            ->current(Carbon::parse($this->startDate), Carbon::parse($this->endDate))
+            ->currentBetween(Carbon::parse($this->startDate), Carbon::parse($this->endDate))
             ->whereIn('id', $this->selectedEmployees)
             ->get()
             ->sortBy('position.department.name');
@@ -447,6 +447,8 @@ class CreatePayroll extends Component
 
         $this->payrollData = $departmentGroups;
         $this->payrollData['_totals'] = $totals;
+
+        $this->submitPayroll();
 
     }
 

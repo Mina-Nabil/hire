@@ -245,7 +245,6 @@ class CreatePayroll extends Component
         $this->payrollData = [];
 
         $employees = Employee::with(['position', 'position.department', 'benefitConfiguration'])
-            ->currentBetween(Carbon::parse($this->startDate), Carbon::parse($this->endDate))
             ->whereIn('id', $this->selectedEmployees)
             ->get()
             ->sortBy('position.department.name');

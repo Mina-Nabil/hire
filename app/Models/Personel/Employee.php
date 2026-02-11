@@ -1544,6 +1544,22 @@ class Employee extends Model
         });
     }
 
+    public function scopeCurrentAfter($query, $start_date = null)
+    {
+        $start_date = $start_date ?? now()->format('Y-m-d');
+        return $query->where(function ($q) use ($start_date) {
+            $q->statusActive()
+                ->where('employment_date', '<=', $start_date)
+                ->where(function ($q) use ($start_date) {
+                    $q->whereNull('termination_date')->orWhere('termination_date', '>=', $start_date);
+                })->where(function ($q) use ($start_date) {
+                    $q->whereNull('release_date')->orWhere('release_date', '>=', $start_date);
+                })->where(function ($q) use ($start_date) {
+                    $q->whereNull('absent_date')->orWhere('absent_date', '>=', $start_date);
+                });
+        });
+    }
+
     public function scopeLeft($query, $start_date = null)
     {
         $start_date = $start_date ?? now()->format('Y-m-d');

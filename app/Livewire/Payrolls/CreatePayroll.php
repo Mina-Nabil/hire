@@ -32,7 +32,7 @@ class CreatePayroll extends Component
     public $startDate;
     public $endDate;
     public $payrollMonth;
-    protected $payrollData = [];
+    public $payrollData = [];
 
     // Properties for adjustment modal
     public $showAdjustmentModal = false;
@@ -454,6 +454,7 @@ class CreatePayroll extends Component
      */
     public function submitPayroll()
     {
+        $this->ensureArrays();
 
         try {
             // Prepare employee data for the payroll
@@ -641,8 +642,7 @@ class CreatePayroll extends Component
     public function render()
     {
         return view('livewire.payrolls.create-payroll', [
-            'loadedDepartments' => $this->departments,
-            'payrollData' => $this->payrollData,
+            'loadedDepartments' => $this->departments
         ]);
     }
 }

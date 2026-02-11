@@ -159,7 +159,7 @@ class CreatePayroll extends Component
         $employees = Employee::whereHas('position', function ($query) use ($departmentIds) {
             $query->whereIn('department_id', $departmentIds);
         })
-            ->currentBetween(Carbon::parse($this->startDate), Carbon::parse($this->endDate))
+            ->current(Carbon::parse($this->startDate), Carbon::parse($this->endDate))
             ->get();
 
         $this->selectedEmployees = $employees->pluck('id')->toArray();
@@ -177,7 +177,7 @@ class CreatePayroll extends Component
         $employees = Employee::whereHas('position', function ($query) use ($departmentId) {
             $query->where('department_id', $departmentId);
         })
-            ->currentBetween(Carbon::parse($this->startDate), Carbon::parse($this->endDate))
+            ->current(Carbon::parse($this->startDate), Carbon::parse($this->endDate))
             ->get();
 
         $this->selectedEmployees = $employees->pluck('id')->toArray();
@@ -245,7 +245,7 @@ class CreatePayroll extends Component
         $this->payrollData = [];
 
         $employees = Employee::with(['position', 'position.department', 'benefitConfiguration'])
-            ->currentBetween(Carbon::parse($this->startDate), Carbon::parse($this->endDate))
+            ->current(Carbon::parse($this->startDate), Carbon::parse($this->endDate))
             ->whereIn('id', $this->selectedEmployees)
             ->get()
             ->sortBy('position.department.name');
@@ -271,9 +271,6 @@ class CreatePayroll extends Component
         ];
 
         foreach ($employees as $employee) {
-            if($employee->id == 22) {
-                continue;
-            }
             $departmentName = $employee->position?->department?->name ?? 'No Department';
             $departmentId = $employee->position?->department?->id ?? 0;
 

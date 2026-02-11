@@ -271,6 +271,9 @@ class CreatePayroll extends Component
         ];
 
         foreach ($employees as $employee) {
+            if($employee->id == 22) {
+                continue;
+            }
             $departmentName = $employee->position?->department?->name ?? 'No Department';
             $departmentId = $employee->position?->department?->id ?? 0;
 
@@ -468,10 +471,6 @@ class CreatePayroll extends Component
 
                 foreach ($departmentData['employees'] as $employeeData) {
                     $employee = Employee::find($employeeData['id']);
-
-                    if($employeeData['id'] == 22) {
-                        dd($employeeData);
-                    }
 
                     if (!$employee) {
                         continue;

@@ -1544,12 +1544,11 @@ class Employee extends Model
         });
     }
 
-    public function scopeCurrentAfter($query, $start_date = null)
+    public function scopeCurrentBetween($query, $start_date, $end_date)
     {
-        $start_date = $start_date ?? now()->format('Y-m-d');
-        return $query->where(function ($q) use ($start_date) {
+        return $query->where(function ($q) use ($start_date, $end_date) {
             $q->statusActive()
-                ->where('employment_date', '<=', $start_date)
+                ->where('employment_date', '<', $end_date)
                 ->where(function ($q) use ($start_date) {
                     $q->whereNull('termination_date')->orWhere('termination_date', '>=', $start_date);
                 })->where(function ($q) use ($start_date) {

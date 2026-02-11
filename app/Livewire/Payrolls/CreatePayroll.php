@@ -159,7 +159,7 @@ class CreatePayroll extends Component
         $employees = Employee::whereHas('position', function ($query) use ($departmentIds) {
             $query->whereIn('department_id', $departmentIds);
         })
-            ->current(Carbon::parse($this->startDate), Carbon::parse($this->endDate))
+            ->currentBetween(Carbon::parse($this->startDate), Carbon::parse($this->endDate))
             ->get();
 
         $this->selectedEmployees = $employees->pluck('id')->toArray();

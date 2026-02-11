@@ -448,7 +448,6 @@ class CreatePayroll extends Component
         $this->payrollData = $departmentGroups;
         $this->payrollData['_totals'] = $totals;
 
-        return $this->submitPayroll();
     }
 
     /**

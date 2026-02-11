@@ -29,9 +29,7 @@ class IncrementVacationBenefits implements ShouldQueue
     {
         $now = Carbon::now();
         $vacationBenefits = VacationBenefit::current($now)->when($this->benefitName, function ($query) {
-            $query->whereHas('vacationDetail', function ($q) {
-                $q->where('vacation_benefits.name', $this->benefitName);
-            });
+            $query->where('name', $this->benefitName);
         })->get();
 
         Log::info("Incrementing vacation benefits for {$now->toDateString()}");

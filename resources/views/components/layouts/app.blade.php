@@ -224,6 +224,10 @@
                                         <a class="{{ request()->routeIs('benefits.bulk-vacation') ? 'active' : '' }}"
                                             href="{{ url('/benefits/bulk-vacation') }}">Bulk Vacation</a>
                                     </li>
+                                    <li>
+                                        <a class="{{ request()->routeIs('employees.reports.applied-benefits') ? 'active' : '' }}"
+                                            href="{{ route('employees.reports.applied-benefits') }}">Applied Benefits Report</a>
+                                    </li>
                                 @endcan
                                 @can('viewAny', App\Models\Benefits\Configurations\SalaryGrade::class)
                                     <li>

@@ -30,6 +30,7 @@ use App\Livewire\Employee\EmployeeIndex;
 use App\Livewire\Employee\EmployeeShow;
 use App\Livewire\Employee\EmployeeCreate;
 use App\Livewire\Employee\MissingDocReport;
+use App\Livewire\Employee\AppliedBenefitsReport;
 use App\Livewire\Recruitment\ApplicantShow;
 use App\Livewire\Recruitment\ChannelIndex;
 use App\Livewire\Recruitment\ApplicantsIndex;
@@ -91,6 +92,7 @@ Route::group(['middleware' => ['auth', 'type:admin|hr']], function () {
     Route::get('/employees/import', App\Livewire\Employee\ImportEmployees::class)->name('employees.import');
     Route::get('/employees/dashboard', EmployeeDashboard::class)->name('employees.dashboard');
     Route::get('/employees/reports/missing-documents', MissingDocReport::class)->name('employees.reports.missing-documents');
+    Route::get('/employees/reports/applied-benefits', AppliedBenefitsReport::class)->name('employees.reports.applied-benefits');
     Route::get('/employees/{id}', EmployeeShow::class)->name('employees.show');
 
 

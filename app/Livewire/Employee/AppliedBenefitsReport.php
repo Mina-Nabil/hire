@@ -84,7 +84,9 @@ class AppliedBenefitsReport extends Component
             ->where('applied_vacations.status', AppliedVacation::STATUS_APPROVED)
             ->whereIn('applied_vacations.employee_id', $activeEmployeeIds)
             ->whereBetween('vacation_days.vacation_date', [$from->format('Y-m-d'), $to->format('Y-m-d')])
-            ->groupBy('employees.id', 'employees.name', 'vacation_name')
+            ->groupBy('employees.id', 'employees.name', DB::raw('COALESCE(applied_vacations.name, vacation_benefits.name)'))
+            ->orderBy('employees.name')
+            ->orderBy(DB::raw('COALESCE(applied_vacations.name, vacation_benefits.name)'))
             ->get();
 
         return $rows->map(function ($row) {

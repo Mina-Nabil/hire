@@ -72,10 +72,11 @@ class AppliedBenefitsReport extends Component
 
         // Query: approved applied vacations with vacation_days in range
         // Group by employee_id + vacation name, sum hours from vacation_days
+        // When is_mission is true, display as "Mission" (different from null vacation name)
         $rows = AppliedVacation::query()
             ->select([
                 'employees.name as employee_name',
-                DB::raw('COALESCE(applied_vacations.name, vacation_benefits.name) as vacation_name'),
+                DB::raw('CASE WHEN applied_vacations.is_mission = 1 THEN "Mission" ELSE COALESCE(applied_vacations.name, vacation_benefits.name) END as vacation_name'),
                 DB::raw('SUM(vacation_days.hours) as total_hours'),
             ])
             ->join('employees', 'applied_vacations.employee_id', '=', 'employees.id')
@@ -84,9 +85,9 @@ class AppliedBenefitsReport extends Component
             ->where('applied_vacations.status', AppliedVacation::STATUS_APPROVED)
             ->whereIn('applied_vacations.employee_id', $activeEmployeeIds)
             ->whereBetween('vacation_days.vacation_date', [$from->format('Y-m-d'), $to->format('Y-m-d')])
-            ->groupBy('employees.id', 'employees.name', DB::raw('COALESCE(applied_vacations.name, vacation_benefits.name)'))
+            ->groupBy('employees.id', 'employees.name', DB::raw('CASE WHEN applied_vacations.is_mission = 1 THEN "Mission" ELSE COALESCE(applied_vacations.name, vacation_benefits.name) END'))
             ->orderBy('employees.name')
-            ->orderBy(DB::raw('COALESCE(applied_vacations.name, vacation_benefits.name)'))
+            ->orderBy(DB::raw('CASE WHEN applied_vacations.is_mission = 1 THEN "Mission" ELSE COALESCE(applied_vacations.name, vacation_benefits.name) END'))
             ->get();
 
         return $rows->map(function ($row) {

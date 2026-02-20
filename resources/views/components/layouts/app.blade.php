@@ -225,6 +225,10 @@
                                             href="{{ url('/benefits/bulk-vacation') }}">Bulk Vacation</a>
                                     </li>
                                     <li>
+                                        <a class="{{ request()->routeIs('benefits.add-bulk-missions') ? 'active' : '' }}"
+                                            href="{{ route('benefits.add-bulk-missions') }}">Add Bulk Missions</a>
+                                    </li>
+                                    <li>
                                         <a class="{{ request()->routeIs('employees.reports.applied-benefits') ? 'active' : '' }}"
                                             href="{{ route('employees.reports.applied-benefits') }}">Applied Benefits Report</a>
                                     </li>

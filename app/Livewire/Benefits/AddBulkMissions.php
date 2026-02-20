@@ -37,6 +37,11 @@ class AddBulkMissions extends Component
 
     public function mount(): void
     {
+        $user = Auth::user();
+        if (!$user?->is_admin) {
+            abort(403, 'Only administrators can access this page.');
+        }
+
         $this->startDate = Carbon::now()->format('Y-m-d');
         $this->endDate = Carbon::now()->format('Y-m-d');
     }

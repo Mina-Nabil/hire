@@ -424,7 +424,7 @@ class PayrollShow extends Component
         $newNetAmount = $payrollEmployee->net_after_penalty + $payrollEmployee->extra_payments + $payrollEmployee->overtime_amount + $this->adjustmentAmount;
         $payrollEmployee->net_after_deductions = $newNetAmount;
         $payrollEmployee->paid = $newNetAmount; // Update paid amount as well
-        $payrollEmployee->tax_amount = Payroll::calculateTaxAmount($newNetAmount);
+        $payrollEmployee->tax_amount = Payroll::calculateTaxAmount($newNetAmount, $payrollEmployee->employee_id, $this->payroll->id);
         $payrollEmployee->after_tax_salary = $newNetAmount - $payrollEmployee->tax_amount;
 
         $payrollEmployee->save();

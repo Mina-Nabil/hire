@@ -272,7 +272,7 @@ class Payroll extends Model
                 }
 
                 $netAmountBeforeTax = ($employeeData['net_after_deductions'] ?? 0);
-                $taxAmount = $employee->benefitConfiguration->is_taxable ? self::calculateTaxAmount($netAmountBeforeTax) : 0;
+                $taxAmount = $employee->benefitConfiguration->is_taxable ? self::calculateTaxAmount($netAmountBeforeTax, $employee->id) : 0;
                 $netAmountAfterTax = $netAmountBeforeTax + ($employeeData['employee_base_benefits'] ?? 0) - $taxAmount - ($employeeData['employee_medical'] ?? 0) + ($employeeData['extra_payments'] ?? 0);
 
                 // Create payroll_employee record with fields that exist in the database schema
@@ -402,10 +402,24 @@ class Payroll extends Model
         return $payroll;
     }
 
-    public static function calculateTaxAmount($netAfterDeductions) : float
+    public static function calculateTaxAmount($netAfterDeductions, $employeeId, $currentPayrollId = null) : float
     {
+        $prevSalaries = PayrollEmployee::where('employee_id', $employeeId)
+        ->when($currentPayrollId, function ($query) use ($currentPayrollId) {
+            $query->where('payroll_id', '<', $currentPayrollId);
+        })
+        ->sum('net_after_deductions');
+
+        $prevSalariesCount = PayrollEmployee::where('employee_id', $employeeId)
+        ->when($currentPayrollId, function ($query) use ($currentPayrollId) {
+            $query->where('payroll_id', '<', $currentPayrollId);
+        })
+        ->count();
+
+        $currentNetAverage = $prevSalaries + $netAfterDeductions / $prevSalariesCount + 1;
+
         // Calculate annual taxable income: (12 * monthly_net_salary) - yearly_allowance
-        $annualTaxableIncome = (12 * $netAfterDeductions);
+        $annualTaxableIncome = (12 * $currentNetAverage);
         
         // If taxable income is 0 or negative, no tax
         if ($annualTaxableIncome <= 0) {

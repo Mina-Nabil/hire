@@ -304,13 +304,13 @@ class CreatePayroll extends Component
             // Calculate the percentage of the gross salary based on the included days
             if ($employeeStartDate->isAfter($this->startDate) && $employeeTerminationDate && $employeeTerminationDate->isBefore($this->endDate)) {
                 $includedDays = $employeeTerminationDate->diffInDays($this->employeeStartDate);
-                $grossPercentage = (min($includedDays, 30) / 30) * 100;
+                $grossPercentage = (min($includedDays + 1, 30) / 30) * 100;
             } else if ($employeeTerminationDate && $employeeTerminationDate->isAfter($this->startDate) && $employeeTerminationDate->isBefore($this->endDate)) {
                 $includedDays = $employeeTerminationDate->diffInDays($this->startDate);
-                $grossPercentage = (min($includedDays, 30) / 30) * 100;
+                $grossPercentage = (min($includedDays + 1, 30) / 30) * 100;
             } else if ($employeeStartDate->isAfter($this->startDate) && $employeeStartDate->isBefore($this->endDate)) {
                 $includedDays = $employeeStartDate->diffInDays($this->endDate);
-                $grossPercentage = (min($includedDays, 30) / 30) * 100;
+                $grossPercentage = (min($includedDays + 1, 30) / 30) * 100;
             }
 
             $grossSalary = ($employee->benefitConfiguration?->gross_salary ?? 0) * $grossPercentage / 100;

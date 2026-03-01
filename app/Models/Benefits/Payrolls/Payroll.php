@@ -416,7 +416,7 @@ class Payroll extends Model
         })
         ->count();
 
-        $currentNetAverage = $prevSalaries + $netAfterDeductions / $prevSalariesCount + 1;
+        $currentNetAverage = ($prevSalaries + $netAfterDeductions) / ($prevSalariesCount + 1);
 
         // Calculate annual taxable income: (12 * monthly_net_salary) - yearly_allowance
         $annualTaxableIncome = (12 * $currentNetAverage);

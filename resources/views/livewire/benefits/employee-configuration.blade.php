@@ -213,12 +213,29 @@
                                                     <div class="flex justify-between items-center">
                                                         <h6 class="font-medium text-slate-900">{{ $benefit->name }}
                                                         </h6>
-                                                        @if ($benefit->end_date)
-                                                            <span class="badge bg-danger">Ended:
-                                                                {{ $benefit->end_date->format('d/m/Y') }}</span>
-                                                        @else
-                                                            <span class="badge bg-success">Active</span>
-                                                        @endif
+                                                        <div class="flex items-center gap-2">
+                                                            @if (!$benefit->package_detail_id)
+                                                                <button type="button"
+                                                                    wire:click="editCustomBaseBenefit({{ $benefit->id }})"
+                                                                    class="btn btn-sm btn-soft-primary"
+                                                                    title="Edit benefit">
+                                                                    <iconify-icon icon="mdi:pencil"></iconify-icon>
+                                                                </button>
+                                                                <button type="button"
+                                                                    wire:click="deleteCustomBaseBenefit({{ $benefit->id }})"
+                                                                    wire:confirm="Are you sure you want to delete this benefit?"
+                                                                    class="btn btn-sm btn-danger"
+                                                                    title="Delete benefit">
+                                                                    <iconify-icon icon="mdi:delete"></iconify-icon>
+                                                                </button>
+                                                            @endif
+                                                            @if ($benefit->end_date)
+                                                                <span class="badge bg-danger">Ended:
+                                                                    {{ $benefit->end_date->format('d/m/Y') }}</span>
+                                                            @else
+                                                                <span class="badge bg-success">Active</span>
+                                                            @endif
+                                                        </div>
                                                     </div>
                                                     <div class="grid grid-cols-2 gap-1 mt-2 text-sm">
                                                         <div class="flex items-center">
@@ -982,6 +999,71 @@
                             <x-secondary-button wire:click="closeAddCustomBaseBenefitModal">Cancel</x-secondary-button>
                             <x-primary-button wire:click.prevent="saveCustomBaseBenefit"
                                 loadingFunction="saveCustomBaseBenefit">
+                                Save
+                            </x-primary-button>
+                        </div>
+                    </x-slot>
+                </x-modal>
+            @endif
+        </div>
+
+        <!-- Edit Custom Base Benefit Modal -->
+        <div>
+            @if ($showEditCustomBaseBenefitModal)
+                <x-modal wire:model="showEditCustomBaseBenefitModal">
+                    <x-slot name="title">Edit Custom Base Benefit</x-slot>
+
+                    <div class="space-y-6">
+                        @if ($errors->any())
+                            <div class="alert alert-warning mb-4">
+                                <div class="flex items-center">
+                                    <i class="fas fa-info-circle mr-2"></i>
+                                    <div>
+                                        <p class="font-medium">Please fix the following errors:</p>
+                                        <ul>
+                                            @foreach ($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
+                        <div class="grid grid-cols-1 gap-4">
+                            <x-select wire:model="baseBenefit.receiver" label="Paid to*"
+                                errorMessage="{{ $errors->first('baseBenefit.receiver') }}">
+                                <option value="" disabled selected>-- Select Receiver --</option>
+                                @foreach ($benefitReceivers as $receiver)
+                                    <option value="{{ $receiver }}">{{ $receiver }}</option>
+                                @endforeach
+                            </x-select>
+
+                            <x-text-input label="Name*" type="text" wire:model="baseBenefit.name"
+                                errorMessage="{{ $errors->first('baseBenefit.name') }}" />
+
+                            <x-text-input label="Amount*" type="number" step="0.01"
+                                wire:model="baseBenefit.amount"
+                                errorMessage="{{ $errors->first('baseBenefit.amount') }}" />
+
+                            <x-select wire:model="baseBenefit.type" label="Increment Type*"
+                                errorMessage="{{ $errors->first('baseBenefit.type') }}">
+                                <option value="" disabled selected>-- Select Type --</option>
+                                @foreach ($benefitIncrementTypes as $type)
+                                    <option value="{{ $type }}">{{ $type }}</option>
+                                @endforeach
+                            </x-select>
+
+                            <x-text-input label="Start Date*" type="date" wire:model="baseBenefit.start_date"
+                                errorMessage="{{ $errors->first('baseBenefit.start_date') }}" />
+                        </div>
+                    </div>
+
+                    <x-slot name="footer">
+                        <div class="mt-4 flex justify-end gap-3">
+                            <x-secondary-button wire:click="closeEditCustomBaseBenefitModal">Cancel</x-secondary-button>
+                            <x-primary-button wire:click.prevent="saveCustomBaseBenefitEdit"
+                                loadingFunction="saveCustomBaseBenefitEdit">
                                 Save
                             </x-primary-button>
                         </div>

@@ -62,6 +62,10 @@ class EmployeeConfiguration extends Component
         'start_date' => '',
     ];
 
+    // Edit Custom Base Benefit Modal
+    public $showEditCustomBaseBenefitModal = false;
+    public $editingBaseBenefit = null;
+
     // Custom Vacation Benefit Modal
     public $showAddCustomVacationBenefitModal = false;
     public $vacationBenefit = [
@@ -288,6 +292,85 @@ class EmployeeConfiguration extends Component
             $this->alertSuccess('Custom base benefit added successfully.');
         } catch (Exception $e) {
             $this->alertError('Error: ' . $e->getMessage());
+        }
+    }
+
+    public function editCustomBaseBenefit($baseBenefitId)
+    {
+        try {
+            $benefit = BaseBenefit::where('employee_id', $this->employee->id)->findOrFail($baseBenefitId);
+            if ($benefit->package_detail_id) {
+                $this->alertError('Package benefits cannot be edited here.');
+                return;
+            }
+            $this->editingBaseBenefit = $benefit;
+            $this->baseBenefit = [
+                'name' => $benefit->name,
+                'amount' => $benefit->amount,
+                'type' => $benefit->type,
+                'receiver' => $benefit->receiver ?? 'employee',
+                'start_date' => $benefit->start_date->format('Y-m-d'),
+            ];
+            $this->showEditCustomBaseBenefitModal = true;
+        } catch (Exception $e) {
+            $this->alertError('Error loading benefit. Please try again.');
+        }
+    }
+
+    public function closeEditCustomBaseBenefitModal()
+    {
+        $this->showEditCustomBaseBenefitModal = false;
+        $this->editingBaseBenefit = null;
+        $this->resetBaseBenefitForm();
+    }
+
+    public function saveCustomBaseBenefitEdit()
+    {
+        $this->validate([
+            'baseBenefit.name' => 'required|string',
+            'baseBenefit.amount' => 'required|numeric',
+            'baseBenefit.type' => 'required|string',
+            'baseBenefit.receiver' => 'required|string',
+            'baseBenefit.start_date' => 'required|date',
+        ], [
+            'baseBenefit.name.required' => 'The name is required.',
+            'baseBenefit.amount.required' => 'The amount is required.',
+            'baseBenefit.type.required' => 'The type is required.',
+            'baseBenefit.receiver.required' => 'The receiver is required.',
+            'baseBenefit.start_date.required' => 'The start date is required.',
+        ]);
+
+        try {
+            $this->editingBaseBenefit->updateCustomBenefit(
+                $this->baseBenefit['name'],
+                $this->baseBenefit['amount'],
+                $this->baseBenefit['type'],
+                $this->baseBenefit['receiver'],
+                Carbon::parse($this->baseBenefit['start_date'])
+            );
+            $this->closeEditCustomBaseBenefitModal();
+            $this->alertSuccess('Custom base benefit updated successfully.');
+        } catch (AppException $e) {
+            $this->alertError($e->getMessage());
+        } catch (Exception $e) {
+            $this->alertError('Error: ' . $e->getMessage());
+        }
+    }
+
+    public function deleteCustomBaseBenefit($baseBenefitId)
+    {
+        try {
+            $benefit = BaseBenefit::where('employee_id', $this->employee->id)->findOrFail($baseBenefitId);
+            if ($benefit->package_detail_id) {
+                $this->alertError('Package benefits cannot be deleted here.');
+                return;
+            }
+            $benefit->deleteBenefit();
+            $this->alertSuccess('Custom base benefit deleted successfully.');
+        } catch (AppException $e) {
+            $this->alertError($e->getMessage());
+        } catch (Exception $e) {
+            $this->alertError('Error deleting benefit. Please try again.');
         }
     }
 

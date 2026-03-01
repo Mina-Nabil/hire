@@ -111,6 +111,38 @@ class BaseBenefit extends Model
         }
     }
 
+    /**
+     * Update a custom base benefit (only for benefits without package_detail_id).
+     */
+    public function updateCustomBenefit(string $name, float $amount, string $type, string $receiver, Carbon $start_date)
+    {
+        /** @var \App\Models\Users\User $loggedInUser */
+        $loggedInUser = Auth::user();
+        if (!$loggedInUser->can('updateEmployeeBenefits', $this->employee)) {
+            throw new AppException('You dont have permission to update base benefit');
+        }
+
+        if ($this->package_detail_id) {
+            throw new AppException('Cannot edit package benefits here. Use the standard update for package benefits.');
+        }
+
+
+        try {
+            $this->update([
+                'name' => $name,
+                'amount' => $amount,
+                'type' => $type,
+                'receiver' => $receiver,
+                'start_date' => $start_date,
+            ]);
+            AppLog::info('Custom Benefit Updated', "Name: $name", loggable: $this);
+        } catch (Exception $e) {
+            report($e);
+            AppLog::error('Error updating custom benefit', $e->getMessage(), loggable: $this);
+            throw new AppException('Failed to update benefit');
+        }
+    }
+
     public function deactiveBenefit()
     {
         /** @var User $loggedInUser */

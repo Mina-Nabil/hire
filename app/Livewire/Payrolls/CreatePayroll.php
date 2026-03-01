@@ -322,10 +322,10 @@ class CreatePayroll extends Component
             $employeeMedical = $employee->activeMedicalBenefits(Carbon::parse($this->startDate), Carbon::parse($this->endDate))->sum('amount');
             $totalMedical = $employeeMedical;
             $employeeDeductions = $employeeInsurance;
-            $netIncome = $otherAmount + $insuranceAmount;
-            $dayPrice = $netIncome / 30;
             $employeeBaseBenefits = $employee->getEmployeeBaseBenefitsCalculation(Carbon::parse($this->startDate), Carbon::parse($this->endDate));
             $otherBaseBenefits = $employee->getOtherBaseBenefitsCalculation(Carbon::parse($this->startDate), Carbon::parse($this->endDate));
+            $netIncome = $otherAmount + $insuranceAmount + $employeeBaseBenefits;
+            $dayPrice = $netIncome / 30;
 
 
             // Get daily working hours from employee benefit configuration
@@ -437,7 +437,7 @@ class CreatePayroll extends Component
                 'adj_amount' => $adjAmount,
                 'adj_desc' => $adjDesc,
                 'net_after_deductions' => $netAfterDeductions,
-                'employee_base_benefits' => $employeeBaseBenefits,
+                'employee_base_benefits' => 0,
                 'other_base_benefits' => $otherBaseBenefits,
                 'benefits' => $benefits,
                 'potential_overtime_data' => $potentialOvertimeData, // Store potential overtime data for later creation

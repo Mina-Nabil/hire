@@ -404,16 +404,19 @@ class Payroll extends Model
 
     public static function calculateTaxAmount($netAfterDeductions, $employeeId, $currentPayrollId = null) : float
     {
+        $payroll = Payroll::find($currentPayrollId);
         $prevSalaries = PayrollEmployee::where('employee_id', $employeeId)
         ->when($currentPayrollId, function ($query) use ($currentPayrollId) {
             $query->where('payroll_id', '<', $currentPayrollId);
         })
+        ->whereYear('start_date', $payroll->start_date->year)
         ->sum('net_after_deductions');
 
         $prevSalariesCount = PayrollEmployee::where('employee_id', $employeeId)
         ->when($currentPayrollId, function ($query) use ($currentPayrollId) {
             $query->where('payroll_id', '<', $currentPayrollId);
         })
+        ->whereYear('start_date', $payroll->start_date->year)
         ->count();
 
         $currentNetAverage = ($prevSalaries + $netAfterDeductions) / ($prevSalariesCount + 1);

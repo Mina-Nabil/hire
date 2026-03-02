@@ -71,7 +71,7 @@ class Payroll extends Model
     const TAX_BRACKET_9 = 900000;  // 25% from 800,001 to 900,000
     const TAX_BRACKET_10 = 1200000; // 25% from 900,001 to 1,200,000
     // 27.5% above 1,200,000
-    
+
     const TAX_YEARLY_ALLOWANCE = 15000;
 
     /**
@@ -272,7 +272,7 @@ class Payroll extends Model
                 }
 
                 $netAmountBeforeTax = ($employeeData['net_after_deductions'] ?? 0);
-                $taxAmount = $employee->benefitConfiguration->is_taxable ? self::calculateTaxAmount($netAmountBeforeTax, $employee->id) : 0;
+                $taxAmount = $employee->benefitConfiguration->is_taxable ? self::calculateTaxAmount($netAmountBeforeTax, $employee->id, $endDate) : 0;
                 $netAmountAfterTax = $netAmountBeforeTax + ($employeeData['employee_base_benefits'] ?? 0) - $taxAmount - ($employeeData['employee_medical'] ?? 0) + ($employeeData['extra_payments'] ?? 0);
 
                 // Create payroll_employee record with fields that exist in the database schema
@@ -402,41 +402,35 @@ class Payroll extends Model
         return $payroll;
     }
 
-    public static function calculateTaxAmount($netAfterDeductions, $employeeId, $currentPayrollId = null) : float
+    public static function calculateTaxAmount($netAfterDeductions, $employeeId, $startDate): float
     {
-        $payroll = Payroll::find($currentPayrollId);
-        $year = $payroll?->start_date->year ?? now()->year;
         $prevSalaries = PayrollEmployee::where('employee_id', $employeeId)
-        ->when($currentPayrollId, function ($query) use ($currentPayrollId) {
-            $query->where('payroll_id', '<', $currentPayrollId);
-        })
-        ->join('payrolls', 'payroll_employees.payroll_id', '=', 'payrolls.id')
-        ->whereYear('start_date', $year)
-        ->sum('net_after_deductions');
+            ->join('payrolls', 'payroll_employees.payroll_id', '=', 'payrolls.id')
+            ->whereYear('start_date', $startDate->year)
+            ->whereMonth('start_date', '<', $startDate->month)
+            ->sum('net_after_deductions');
 
         $prevSalariesCount = PayrollEmployee::where('employee_id', $employeeId)
-        ->when($currentPayrollId, function ($query) use ($currentPayrollId) {
-            $query->where('payroll_id', '<', $currentPayrollId);
-        })
-        ->join('payrolls', 'payroll_employees.payroll_id', '=', 'payrolls.id')
-        ->whereYear('start_date', $year)
-        ->count();
+            ->join('payrolls', 'payroll_employees.payroll_id', '=', 'payrolls.id')
+            ->whereYear('start_date', $startDate->year)
+            ->whereMonth('start_date', '<', $startDate->month)
+            ->count();
 
         $currentNetAverage = ($prevSalaries + $netAfterDeductions) / ($prevSalariesCount + 1);
 
         // Calculate annual taxable income: (12 * monthly_net_salary) - yearly_allowance
         $annualTaxableIncome = (12 * $currentNetAverage);
-        
+
         // If taxable income is 0 or negative, no tax
         if ($annualTaxableIncome <= 0) {
             return 0;
         }
-        
+
         $tax = 0;
-        
+
         // Progressive tax calculation based on the Excel formula
         // IF(C17≤60000,0,IF(C17≤75000,(C17×10%)−6000,IF(C17≤90000,(C17×15%)−9750,IF(C17≤220000,(C17×20%)−14250,IF(C17≤420000,(C17×22.5%)−19750,IF(C17≤620000,(C17×25%)−30250,IF(C17≤720000,(C17×25%)−26250,IF(C17≤820000,(C17×25%)−23500,IF(C17≤920000,(C17×25%)−20000,IF(C17≤1220000,(C17×25%)−15000,(C17×27.5%)−35500))))))))))
-        
+
         if ($annualTaxableIncome <= 60000) {
             $tax = 0;
         } elseif ($annualTaxableIncome <= 75000) {
@@ -463,7 +457,7 @@ class Payroll extends Model
 
         // Ensure tax is never negative
         $tax = max(0, $tax);
-        
+
         // Return the monthly tax amount (divide annual tax by 12)
         return $tax / 12;
     }
@@ -497,32 +491,32 @@ class Payroll extends Model
     {
         // Create new spreadsheet
         $spreadsheet = new Spreadsheet();
-        
+
         // Remove default worksheet
         $spreadsheet->removeSheetByIndex(0);
-        
+
         // 1. Create Payroll Summary Sheet
         $this->createPayrollSummarySheet($spreadsheet);
-        
+
         // 2. Create Employee Overview Sheet
         $this->createEmployeeOverviewSheet($spreadsheet);
-        
+
         // 3. Create individual employee sheets
         $this->createEmployeeDetailSheets($spreadsheet);
-        
+
         // Set the first sheet as active
         $spreadsheet->setActiveSheetIndex(0);
-        
+
         // Create writer
         $writer = new Xlsx($spreadsheet);
-        
+
         // Save the file
         $filename = storage_path('payroll_export_' . $this->id . '_' . date('Y-m-d_H-i-s') . '.xlsx');
         $writer->save($filename);
-        
+
         return response()->download($filename)->deleteFileAfterSend(true);
     }
-    
+
     /**
      * Create the payroll summary sheet
      */
@@ -530,7 +524,7 @@ class Payroll extends Model
     {
         $summarySheet = $spreadsheet->createSheet();
         $summarySheet->setTitle('Payroll Summary');
-        
+
         // Header styling
         $headerStyle = [
             'font' => [
@@ -547,30 +541,30 @@ class Payroll extends Model
                 'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER
             ]
         ];
-        
+
         // Title
         $summarySheet->setCellValue('A1', 'Payroll Summary Report');
         $summarySheet->mergeCells('A1:B1');
         $summarySheet->getStyle('A1:B1')->applyFromArray($headerStyle);
-        
+
         // Basic Information
         $summarySheet->setCellValue('A3', 'Period:');
         $summarySheet->setCellValue('B3', $this->start_date->format('M d, Y') . ' - ' . $this->end_date->format('M d, Y'));
-        
+
         $summarySheet->setCellValue('A4', 'Status:');
         $summarySheet->setCellValue('B4', ucfirst($this->status));
-        
+
         $summarySheet->setCellValue('A5', 'Created By:');
         $summarySheet->setCellValue('B5', $this->creator->name ?? 'N/A');
-        
+
         $summarySheet->setCellValue('A6', 'Created At:');
         $summarySheet->setCellValue('B6', $this->created_at->format('M d, Y H:i'));
-        
+
         // Financial Summary
         $summarySheet->setCellValue('A8', 'Financial Summary');
         $summarySheet->mergeCells('A8:B8');
         $summarySheet->getStyle('A8:B8')->applyFromArray($headerStyle);
-        
+
         $row = 10;
         $financialData = [
             'Total Employees' => $this->total_employees,
@@ -582,19 +576,19 @@ class Payroll extends Model
             'Tax Amount' => number_format($this->total_tax_amount, 2),
             'Overtime Amount' => number_format($this->total_overtime_amount, 2),
         ];
-        
+
         foreach ($financialData as $label => $value) {
             $summarySheet->setCellValue('A' . $row, $label . ':');
             $summarySheet->setCellValue('B' . $row, $value);
             $row++;
         }
-        
+
         // Auto-size columns
         foreach (range('A', 'B') as $column) {
             $summarySheet->getColumnDimension($column)->setAutoSize(true);
         }
     }
-    
+
     /**
      * Create the employee overview sheet
      */
@@ -602,12 +596,12 @@ class Payroll extends Model
     {
         $overviewSheet = $spreadsheet->createSheet();
         $overviewSheet->setTitle('Employee Overview');
-        
+
         // Headers
         $headers = [
             'A1' => 'Employee Name',
             'B1' => 'Position',
-            'C1' => 'Department', 
+            'C1' => 'Department',
             'D1' => 'Gross Salary',
             'E1' => 'Social Insurance Salary',
             'F1' => 'Other Amount',
@@ -622,11 +616,11 @@ class Payroll extends Model
             'O1' => 'Tax Amount',
             'P1' => 'Net After Tax'
         ];
-        
+
         foreach ($headers as $cell => $header) {
             $overviewSheet->setCellValue($cell, $header);
         }
-        
+
         // Style headers
         $headerStyle = [
             'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
@@ -636,13 +630,13 @@ class Payroll extends Model
             ],
             'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER]
         ];
-        
+
         $overviewSheet->getStyle('A1:P1')->applyFromArray($headerStyle);
-        
+
         // Data rows
         $row = 2;
         $payrollEmployees = $this->payrollEmployees()->with('employee')->get();
-        
+
         foreach ($payrollEmployees as $payrollEmployee) {
             $overviewSheet->setCellValue('A' . $row, $payrollEmployee->employee->name ?? 'N/A');
             $overviewSheet->setCellValue('B' . $row, $payrollEmployee->position);
@@ -662,7 +656,7 @@ class Payroll extends Model
             $overviewSheet->setCellValue('P' . $row, number_format($payrollEmployee->after_tax_salary, 2));
             $row++;
         }
-        
+
         // Add totals row
         $totalRow = $row;
         $overviewSheet->setCellValue('A' . $totalRow, 'TOTALS');
@@ -678,7 +672,7 @@ class Payroll extends Model
         $overviewSheet->setCellValue('N' . $totalRow, number_format($payrollEmployees->sum('net_after_deductions'), 2));
         $overviewSheet->setCellValue('O' . $totalRow, number_format($payrollEmployees->sum('tax_amount'), 2));
         $overviewSheet->setCellValue('P' . $totalRow, number_format($payrollEmployees->sum('after_tax_salary'), 2));
-        
+
         // Style totals row
         $totalStyle = [
             'font' => ['bold' => true],
@@ -688,33 +682,33 @@ class Payroll extends Model
             ]
         ];
         $overviewSheet->getStyle('A' . $totalRow . ':P' . $totalRow)->applyFromArray($totalStyle);
-        
+
         // Auto-size columns
         foreach (range('A', 'P') as $column) {
             $overviewSheet->getColumnDimension($column)->setAutoSize(true);
         }
     }
-    
+
     /**
      * Create individual employee detail sheets
      */
     private function createEmployeeDetailSheets($spreadsheet)
     {
         $payrollEmployees = $this->payrollEmployees()->with('employee')->get();
-        
+
         foreach ($payrollEmployees as $payrollEmployee) {
             $employee = $payrollEmployee->employee;
             if (!$employee) continue;
-            
+
             // Create sheet for employee
             $employeeSheet = $spreadsheet->createSheet();
             $safeSheetName = substr(preg_replace('/[^A-Za-z0-9 ]/', '', $employee->name), 0, 31);
             $employeeSheet->setTitle($safeSheetName);
-            
+
             // Employee info header
             $employeeSheet->setCellValue('A1', 'Employee Details: ' . $employee->name);
             $employeeSheet->mergeCells('A1:F1');
-            
+
             $headerStyle = [
                 'font' => ['bold' => true, 'size' => 14, 'color' => ['rgb' => 'FFFFFF']],
                 'fill' => [
@@ -724,7 +718,7 @@ class Payroll extends Model
                 'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER]
             ];
             $employeeSheet->getStyle('A1:F1')->applyFromArray($headerStyle);
-            
+
             // Employee summary
             $employeeSheet->setCellValue('A3', 'Position:');
             $employeeSheet->setCellValue('B3', $payrollEmployee->position);
@@ -734,22 +728,22 @@ class Payroll extends Model
             $employeeSheet->setCellValue('B5', number_format($payrollEmployee->gross_salary, 2));
             $employeeSheet->setCellValue('A6', 'Net After Tax:');
             $employeeSheet->setCellValue('B6', number_format($payrollEmployee->after_tax_salary, 2));
-            
+
             // Attendance Records
             $employeeSheet->setCellValue('A8', 'Attendance Records');
             $employeeSheet->mergeCells('A8:F8');
             $employeeSheet->getStyle('A8:F8')->applyFromArray($headerStyle);
-            
+
             // Attendance headers
             $attendanceHeaders = [
                 'A10' => 'Day',
-                'B10' => 'Date', 
+                'B10' => 'Date',
                 'C10' => 'Check In',
                 'D10' => 'Check Out',
                 'E10' => 'Total Hours',
                 'F10' => 'Status'
             ];
-            
+
             foreach ($attendanceHeaders as $cell => $header) {
                 $employeeSheet->setCellValue($cell, $header);
             }
@@ -760,13 +754,13 @@ class Payroll extends Model
                     'startColor' => ['rgb' => 'E0E0E0']
                 ]
             ]);
-            
+
             // Get attendance records for this payroll period
             $attendanceRecords = $employee->attendances()
                 ->whereBetween('date', [$this->start_date, $this->end_date])
                 ->orderBy('date')
                 ->get();
-            
+
             $row = 11;
             foreach ($attendanceRecords as $attendance) {
                 $date = \Carbon\Carbon::parse($attendance->date);
@@ -774,31 +768,31 @@ class Payroll extends Model
                 $employeeSheet->setCellValue('B' . $row, $date->format('d/m/Y'));
                 $employeeSheet->setCellValue('C' . $row, $attendance->start_time ? \Carbon\Carbon::parse($attendance->start_time)->format('H:i A') : 'N/A');
                 $employeeSheet->setCellValue('D' . $row, $attendance->end_time ? \Carbon\Carbon::parse($attendance->end_time)->format('H:i A') : 'N/A');
-                
+
                 $hoursText = $attendance->hours ? $attendance->hours . 'h' : 'N/A';
                 if ($attendance->penalized_hours > 0) {
-                    $penaltyText = $attendance->penalized_hours > 1.0 
-                        ? number_format($attendance->penalized_hours, 0) . 'h' 
+                    $penaltyText = $attendance->penalized_hours > 1.0
+                        ? number_format($attendance->penalized_hours, 0) . 'h'
                         : number_format($attendance->penalized_hours * 60, 2) . 'min';
                     $hoursText .= ' -(' . $penaltyText . ')';
                 }
                 $employeeSheet->setCellValue('E' . $row, $hoursText);
-                
+
                 $status = 'Present';
                 if ($attendance->status === 'absent') $status = 'Absent';
                 elseif ($attendance->status === 'late') $status = 'Late';
                 elseif (!$attendance->is_approved) $status = 'Pending';
-                
+
                 $employeeSheet->setCellValue('F' . $row, $status);
                 $row++;
             }
-            
+
             // Missing Days section
             $missingDaysStartRow = $row + 2;
             $employeeSheet->setCellValue('A' . $missingDaysStartRow, 'Missing Days');
             $employeeSheet->mergeCells('A' . $missingDaysStartRow . ':B' . $missingDaysStartRow);
             $employeeSheet->getStyle('A' . $missingDaysStartRow . ':B' . $missingDaysStartRow)->applyFromArray($headerStyle);
-            
+
             // Missing days headers
             $missingDaysHeaderRow = $missingDaysStartRow + 2;
             $employeeSheet->setCellValue('A' . $missingDaysHeaderRow, 'Missed Day');
@@ -810,20 +804,20 @@ class Payroll extends Model
                     'startColor' => ['rgb' => 'E0E0E0']
                 ]
             ]);
-            
+
             // Get missing days for this payroll period
             $missingDays = $employee->missingDays()
                 ->whereBetween('date', [$this->start_date, $this->end_date])
                 ->orderBy('date')
                 ->get();
-            
+
             $missingRow = $missingDaysHeaderRow + 1;
             foreach ($missingDays as $missingDay) {
                 $employeeSheet->setCellValue('A' . $missingRow, \Carbon\Carbon::parse($missingDay->date)->format('d M Y'));
                 $employeeSheet->setCellValue('B' . $missingRow, $missingDay->hours);
                 $missingRow++;
             }
-            
+
             // Auto-size columns
             foreach (range('A', 'F') as $column) {
                 $employeeSheet->getColumnDimension($column)->setAutoSize(true);

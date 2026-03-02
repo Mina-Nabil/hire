@@ -410,6 +410,7 @@ class Payroll extends Model
         ->when($currentPayrollId, function ($query) use ($currentPayrollId) {
             $query->where('payroll_id', '<', $currentPayrollId);
         })
+        ->join('payrolls', 'payroll_employees.payroll_id', '=', 'payrolls.id')
         ->whereYear('start_date', $year)
         ->sum('net_after_deductions');
 
@@ -417,6 +418,7 @@ class Payroll extends Model
         ->when($currentPayrollId, function ($query) use ($currentPayrollId) {
             $query->where('payroll_id', '<', $currentPayrollId);
         })
+        ->join('payrolls', 'payroll_employees.payroll_id', '=', 'payrolls.id')
         ->whereYear('start_date', $year)
         ->count();
 

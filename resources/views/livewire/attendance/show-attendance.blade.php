@@ -268,8 +268,12 @@
                                                 {{ $penaltyLabel }}
                                             </span>
                                             @if ($attendance->expected_penalty_hours)
+                                                @php
+                                                    $totalMinutes = (int) round($attendance->expected_penalty_hours * 60);
+                                                    $penaltyHhMm = floor($totalMinutes / 60) . ':' . str_pad($totalMinutes % 60, 2, '0', STR_PAD_LEFT);
+                                                @endphp
                                                 <span class="block text-xs text-slate-500">
-                                                    {{ number_format($attendance->expected_penalty_hours, 2) }} hrs
+                                                    {{ $penaltyHhMm }} hrs
                                                 </span>
                                             @endif
                                             @if ($attendance->expected_penalty_amount)

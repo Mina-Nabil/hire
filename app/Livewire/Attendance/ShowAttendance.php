@@ -36,6 +36,13 @@ class ShowAttendance extends Component
     public $isHr = false;
     public $isAdmin = false;
 
+    // Modal for adding new attendance
+    public $showAddAttendanceModal = false;
+    public $newEmployeeId = null;
+    public $newDate = '';
+    public $newStartTime = '';
+    public $newEndTime = '';
+
     // Modal for attendance times editing
     public $showEditTimesModal = false;
     public $editingTimesAttendanceId = null;
@@ -65,6 +72,58 @@ class ShowAttendance extends Component
     public function resetFilters()
     {
         $this->reset(['search', 'startDate', 'endDate', 'isApproved']);
+    }
+
+    public function openAddAttendanceModal()
+    {
+        $this->showAddAttendanceModal = true;
+    }
+
+    public function closeAddAttendanceModal()
+    {
+        $this->showAddAttendanceModal = false;
+        $this->reset(['newEmployeeId', 'newDate', 'newStartTime', 'newEndTime']);
+    }
+
+    public function addAttendance()
+    {
+        $this->validate([
+            'newEmployeeId' => 'required|exists:employees,id',
+            'newDate' => 'required|date',
+            'newStartTime' => 'required|date_format:H:i',
+            'newEndTime' => 'nullable|date_format:H:i|after:newStartTime',
+        ]);
+
+        try {
+            if ($this->newEndTime) {
+                $startTime = Carbon::parse($this->newStartTime);
+                $endTime = Carbon::parse($this->newEndTime);
+                $hours = abs(round($endTime->diffInHours($startTime), 2));
+            } else {
+                $employee = Employee::with('benefitConfiguration')->find($this->newEmployeeId);
+                $benefitConfig = $employee?->benefitConfiguration;
+                $hours = $benefitConfig ? $benefitConfig->daily_working_hours : 8;
+            }
+
+            Attendance::saveAttendance([[
+                'employee_id' => $this->newEmployeeId,
+                'date' => $this->newDate,
+                'start_time' => $this->newStartTime,
+                'end_time' => $this->newEndTime ?: null,
+                'hours' => $hours,
+                'extra_hours' => null,
+                'is_extra_hours_approved' => null,
+                'creator_id' => Auth::id(),
+                'is_approved' => null,
+            ]]);
+
+            $this->alertSuccess('Attendance record added successfully!');
+            $this->closeAddAttendanceModal();
+        } catch (AppException $e) {
+            $this->alertError($e->getMessage());
+        } catch (\Exception $e) {
+            $this->alertError('Failed to add attendance: ' . $e->getMessage());
+        }
     }
 
     public function approveExtraHours($attendanceId)
@@ -291,6 +350,21 @@ class ShowAttendance extends Component
 
         $attendances = $query->paginate(50);
 
+        // Get employees for add attendance modal
+        $user = Auth::user();
+        if ($user->is_admin || $user->is_hr) {
+            $employees = Employee::orderBy('name')->get(['id', 'name']);
+        } else {
+            $userEmployee = Employee::where('user_id', $user->id)->first();
+            if ($userEmployee && $userEmployee->is_manager) {
+                $employees = Employee::whereHas('benefitConfiguration', function ($q) use ($userEmployee) {
+                    $q->where('manager_id', $userEmployee->id);
+                })->orWhere('id', $userEmployee->id)->orderBy('name')->get(['id', 'name']);
+            } else {
+                $employees = collect();
+            }
+        }
+
         // Determine which layout to use based on user role
         $user = Auth::user();
         $layout = 'components.layouts.app'; // Default layout
@@ -312,6 +386,7 @@ class ShowAttendance extends Component
 
         return view('livewire.attendance.show-attendance', [
             'attendances' => $attendances,
+            'employees' => $employees,
             'isManager' => $this->isManager,
             'isHr' => $this->isHr,
             'isAdmin' => $this->isAdmin,

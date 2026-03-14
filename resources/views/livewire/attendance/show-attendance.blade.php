@@ -37,6 +37,16 @@
                             <span>Filters</span>
                         </span>
                     </button>
+                    @if ($isHr || $isAdmin || $isManager)
+                        <button type="button" class="btn btn-sm btn-primary ltr:ml-2 rtl:mr-2"
+                            wire:click="openAddAttendanceModal">
+                            <span class="flex items-center">
+                                <iconify-icon class="text-xl ltr:mr-2 rtl:ml-2 text-sm"
+                                    icon="heroicons-outline:plus"></iconify-icon>
+                                <span>Add Attendance</span>
+                            </span>
+                        </button>
+                    @endif
                 </div>
             </div>
         </header>
@@ -271,6 +281,73 @@
             {{ $attendances->links('vendor.livewire.simple-bootstrap') }}
         </div>
     </div>
+
+    <!-- Add Attendance Modal -->
+    <x-modal wire:model="showAddAttendanceModal">
+        <x-slot name="title">Add Attendance Record</x-slot>
+
+        <div class="p-6 space-y-4">
+            <div class="from-group">
+                <label class="form-label">Employee <span class="text-danger-500">*</span></label>
+                <select class="form-control @error('newEmployeeId') !border-danger-500 @enderror"
+                    wire:model="newEmployeeId">
+                    <option value="">Select Employee</option>
+                    @foreach ($employees as $employee)
+                        <option value="{{ $employee->id }}">{{ $employee->name }}</option>
+                    @endforeach
+                </select>
+                @error('newEmployeeId')
+                    <span class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <div class="from-group">
+                <label class="form-label">Date <span class="text-danger-500">*</span></label>
+                <input type="date" class="form-control @error('newDate') !border-danger-500 @enderror"
+                    wire:model="newDate">
+                @error('newDate')
+                    <span class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="from-group">
+                    <label class="form-label">Start Time <span class="text-danger-500">*</span></label>
+                    <input type="time" class="form-control @error('newStartTime') !border-danger-500 @enderror"
+                        wire:model="newStartTime">
+                    @error('newStartTime')
+                        <span class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="from-group">
+                    <label class="form-label">End Time</label>
+                    <input type="time" class="form-control @error('newEndTime') !border-danger-500 @enderror"
+                        wire:model="newEndTime">
+                    @error('newEndTime')
+                        <span class="font-Inter text-sm text-danger-500 pt-2 inline-block">{{ $message }}</span>
+                    @enderror
+                </div>
+            </div>
+
+            <div class="bg-slate-50 dark:bg-slate-700 p-3 rounded-md">
+                <div class="flex items-start">
+                    <iconify-icon class="text-lg text-warning-500 mr-2 mt-0.5"
+                        icon="heroicons-outline:exclamation-circle"></iconify-icon>
+                    <p class="text-sm text-slate-600 dark:text-slate-300">
+                        If end time is not provided, hours will be calculated from the employee's daily working
+                        hours. The record will be pending manager approval.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <x-slot name="footer">
+            <x-secondary-button wire:click="closeAddAttendanceModal">Cancel</x-secondary-button>
+            <x-primary-button wire:click.prevent="addAttendance" loadingFunction="addAttendance">Add
+                Attendance</x-primary-button>
+        </x-slot>
+    </x-modal>
 
     <!-- Extra Hours Edit Modal -->
     <x-modal wire:model="showExtraHoursModal">

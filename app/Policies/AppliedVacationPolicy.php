@@ -37,7 +37,9 @@ class AppliedVacationPolicy
     public function approve(User $user, AppliedVacation $appliedVacation): bool
     {
         return $appliedVacation->status !== AppliedVacation::STATUS_APPROVED &&
-            ($user->is_admin || ($user->is_hr && !$user->permit_tibian) || ($user->employee_id === $appliedVacation->employee->manager_id && $appliedVacation->status === AppliedVacation::STATUS_PENDING));
+            ($user->is_admin || ($user->is_hr && !$user->permit_tibian));
+        // return $appliedVacation->status !== AppliedVacation::STATUS_APPROVED &&
+        //     ($user->is_admin || ($user->is_hr && !$user->permit_tibian) || ($user->employee_id === $appliedVacation->employee->manager_id && $appliedVacation->status === AppliedVacation::STATUS_PENDING));
     }
 
     /**

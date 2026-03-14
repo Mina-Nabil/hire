@@ -842,16 +842,12 @@ class Attendance extends Model
             if ($busArrival) {
                 $allowedStartMax = Carbon::parse($date . ' ' . $busArrival->time);
                 if ($attendanceStart->gt($allowedStartMax)) {
-                    $lateHours = $employee->calculateLateArrivalPenalty(
-                        (int) $attendanceStart->diffInMinutes($allowedStartMax, true)
-                    );
+                    $lateHours = round($attendanceStart->diffInMinutes($allowedStartMax, true) / 60, 2);
                 }
                 if ($attendanceEnd && $config->working_day_end_min) {
                     $allowedEndMin = Carbon::parse($date . ' ' . $config->working_day_end_min);
                     if ($attendanceEnd->lt($allowedEndMin)) {
-                        $earlyHours = $employee->calculateEarlyDeparturePenalty(
-                            (int) $allowedEndMin->diffInMinutes($attendanceEnd, true)
-                        );
+                        $earlyHours = round($allowedEndMin->diffInMinutes($attendanceEnd, true) / 60, 2);
                     }
                 }
             }
@@ -859,9 +855,7 @@ class Attendance extends Model
             if ($config->working_day_start_max) {
                 $allowedStartMax = Carbon::parse($date . ' ' . $config->working_day_start_max);
                 if ($attendanceStart->gt($allowedStartMax)) {
-                    $lateHours = $employee->calculateLateArrivalPenalty(
-                        (int) $attendanceStart->diffInMinutes($allowedStartMax, true)
-                    );
+                    $lateHours = round($attendanceStart->diffInMinutes($allowedStartMax, true) / 60, 2);
                 }
             }
         } else {
@@ -869,11 +863,9 @@ class Attendance extends Model
             if (!$config->working_day_start_max || !$config->working_day_end_min) {
                 // No time constraints: penalise if total hours worked < daily_working_hours
                 if ($attendanceEnd) {
-                    $workedHours = $attendanceStart->diffInHours($attendanceEnd, true);
+                    $workedHours = round($attendanceStart->diffInHours($attendanceEnd, true), 2);
                     if ($workedHours < $config->daily_working_hours) {
-                        $lateHours = $employee->calculateLateArrivalPenalty(
-                            (int)(($config->daily_working_hours - $workedHours) * 60)
-                        );
+                        $lateHours = round($config->daily_working_hours - $workedHours, 2);
                     }
                 }
             } else {
@@ -885,15 +877,11 @@ class Attendance extends Model
                 }
 
                 if ($attendanceStart->gt($allowedStartMax)) {
-                    $lateHours = $employee->calculateLateArrivalPenalty(
-                        (int) $attendanceStart->diffInMinutes($allowedStartMax, true)
-                    );
+                    $lateHours = round($attendanceStart->diffInMinutes($allowedStartMax, true) / 60, 2);
                 }
 
                 if ($attendanceEnd && $attendanceEnd->lt($allowedEndMin)) {
-                    $earlyHours = $employee->calculateEarlyDeparturePenalty(
-                        (int) $allowedEndMin->diffInMinutes($attendanceEnd, true)
-                    );
+                    $earlyHours = round($allowedEndMin->diffInMinutes($attendanceEnd, true) / 60, 2);
                 }
             }
         }

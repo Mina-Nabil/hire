@@ -375,6 +375,25 @@ class ShowAttendance extends Component
         }
     }
 
+    public function recalculatePenalty($attendanceId)
+    {
+        if (!$this->isHr && !$this->isAdmin && !$this->isManager) {
+            $this->alertError('You are not authorized to recalculate penalties.');
+            return;
+        }
+
+        try {
+            $attendance = Attendance::with('employee')->findOrFail($attendanceId);
+            $attendance->calculateExpectedPenalty();
+            $attendance->saveQuietly();
+            $this->alertSuccess('Penalty recalculated successfully!');
+        } catch (AppException $e) {
+            $this->alertError($e->getMessage());
+        } catch (\Exception $e) {
+            $this->alertError('Failed to recalculate penalty: ' . $e->getMessage());
+        }
+    }
+
     public function render()
     {
         $query = Attendance::query()

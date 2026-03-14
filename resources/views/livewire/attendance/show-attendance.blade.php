@@ -289,6 +289,12 @@
                                                     <iconify-icon icon="heroicons:clock"></iconify-icon>
                                                 </button>
                                             @endcan
+                                            @if ($isHr || $isAdmin || $isManager)
+                                                <button wire:click="recalculatePenalty({{ $attendance->id }})"
+                                                    class="action-btn" type="button" title="Recalculate Expected Penalty">
+                                                    <iconify-icon icon="heroicons:arrow-path"></iconify-icon>
+                                                </button>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>

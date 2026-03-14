@@ -9,6 +9,7 @@ use App\Models\Payrolls\PenaltyDay;
 use App\Models\Personel\Employee;
 use App\Models\Users\AppLog;
 use App\Models\Users\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -402,24 +403,24 @@ class Payroll extends Model
         return $payroll;
     }
 
-    public static function calculateTaxAmount($netAfterDeductions, $employeeId, $startDate): float
+    public static function calculateTaxAmount($netAfterDeductions, $employeeId, $referenceDate): float
     {
-        $prevSalaries = PayrollEmployee::where('employee_id', $employeeId)
-            ->join('payrolls', 'payroll_employees.payroll_id', '=', 'payrolls.id')
-            ->whereYear('start_date', $startDate->year)
-            ->whereMonth('start_date', '<', $startDate->month)
-            ->sum('net_after_deductions');
+        $referenceDate = Carbon::parse($referenceDate);
 
-        $prevSalariesCount = PayrollEmployee::where('employee_id', $employeeId)
+        $result = PayrollEmployee::where('employee_id', $employeeId)
             ->join('payrolls', 'payroll_employees.payroll_id', '=', 'payrolls.id')
-            ->whereYear('start_date', $startDate->year)
-            ->whereMonth('start_date', '<', $startDate->month)
-            ->count();
+            ->whereYear('start_date', $referenceDate->year)
+            ->whereMonth('start_date', '<', $referenceDate->month)
+            ->selectRaw('SUM(net_after_deductions) as total, COUNT(*) as count')
+            ->first();
+
+        $prevSalaries = $result->total ?? 0;
+        $prevSalariesCount = $result->count ?? 0;
 
         $currentNetAverage = ($prevSalaries + $netAfterDeductions) / ($prevSalariesCount + 1);
 
         // Calculate annual taxable income: (12 * monthly_net_salary) - yearly_allowance
-        $annualTaxableIncome = (12 * $currentNetAverage);
+        $annualTaxableIncome = (12 * $currentNetAverage) - self::TAX_YEARLY_ALLOWANCE;
 
         // If taxable income is 0 or negative, no tax
         if ($annualTaxableIncome <= 0) {

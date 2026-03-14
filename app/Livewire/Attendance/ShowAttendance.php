@@ -23,6 +23,7 @@ class ShowAttendance extends Component
     public $startDate = '';
     public $endDate = '';
     public $isApproved = '';
+    public $hasPenalty = '';
     public $showFilters = false;
     
     // Modal for extra hours editing
@@ -71,7 +72,59 @@ class ShowAttendance extends Component
 
     public function resetFilters()
     {
-        $this->reset(['search', 'startDate', 'endDate', 'isApproved']);
+        $this->reset(['search', 'startDate', 'endDate', 'isApproved', 'hasPenalty']);
+    }
+
+    public function openAddAttendanceModal()
+    {
+        $this->showAddAttendanceModal = true;
+    }
+
+    public function closeAddAttendanceModal()
+    {
+        $this->showAddAttendanceModal = false;
+        $this->reset(['newEmployeeId', 'newDate', 'newStartTime', 'newEndTime']);
+    }
+
+    public function addAttendance()
+    {
+        $this->validate([
+            'newEmployeeId' => 'required|exists:employees,id',
+            'newDate' => 'required|date',
+            'newStartTime' => 'required|date_format:H:i',
+            'newEndTime' => 'nullable|date_format:H:i|after:newStartTime',
+        ]);
+
+        try {
+            if ($this->newEndTime) {
+                $startTime = Carbon::parse($this->newStartTime);
+                $endTime = Carbon::parse($this->newEndTime);
+                $hours = abs(round($endTime->diffInHours($startTime), 2));
+            } else {
+                $employee = Employee::with('benefitConfiguration')->find($this->newEmployeeId);
+                $benefitConfig = $employee?->benefitConfiguration;
+                $hours = $benefitConfig ? $benefitConfig->daily_working_hours : 8;
+            }
+
+            Attendance::saveAttendance([[
+                'employee_id' => $this->newEmployeeId,
+                'date' => $this->newDate,
+                'start_time' => $this->newStartTime,
+                'end_time' => $this->newEndTime ?: null,
+                'hours' => $hours,
+                'extra_hours' => null,
+                'is_extra_hours_approved' => null,
+                'creator_id' => Auth::id(),
+                'is_approved' => null,
+            ]]);
+
+            $this->alertSuccess('Attendance record added successfully!');
+            $this->closeAddAttendanceModal();
+        } catch (AppException $e) {
+            $this->alertError($e->getMessage());
+        } catch (\Exception $e) {
+            $this->alertError('Failed to add attendance: ' . $e->getMessage());
+        }
     }
 
     public function openAddAttendanceModal()
@@ -345,6 +398,13 @@ class ShowAttendance extends Component
                     $query->where('is_approved', false);
                 } elseif ($this->isApproved === 'pending') {
                     $query->whereNull('is_approved');
+                }
+            })
+            ->when($this->hasPenalty !== '', function ($query) {
+                if ($this->hasPenalty === 'yes') {
+                    $query->whereNotNull('expected_penalty_type');
+                } elseif ($this->hasPenalty === 'no') {
+                    $query->whereNull('expected_penalty_type');
                 }
             });
 

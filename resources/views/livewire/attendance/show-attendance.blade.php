@@ -53,7 +53,7 @@
 
         @if ($showFilters)
             <div class="p-4">
-                <div class="grid grid-cols-3 gap-2">
+                <div class="grid grid-cols-4 gap-2">
                     <div>
                         <label class="form-label text-sm">Date From</label>
                         <input type="date" wire:model.live="startDate" class="form-control">
@@ -69,6 +69,14 @@
                             <option value="approved">Approved</option>
                             <option value="rejected">Rejected</option>
                             <option value="pending">Pending</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label text-sm">Penalty</label>
+                        <select wire:model.live="hasPenalty" class="form-control">
+                            <option value="">All</option>
+                            <option value="yes">With Penalty</option>
+                            <option value="no">Without Penalty</option>
                         </select>
                     </div>
                 </div>
@@ -88,6 +96,7 @@
                                 <th scope="col" class="table-th">End Time</th>
                                 <th scope="col" class="table-th">Hours</th>
                                 <th scope="col" class="table-th">Extra Hours</th>
+                                <th scope="col" class="table-th">Expected Penalty</th>
                                 <th scope="col" class="table-th">Actions</th>
                             </tr>
                         </thead>
@@ -242,6 +251,35 @@
                                                 @endif
                                             @endif
                                         </div>
+                                    </td>
+                                    <td class="table-td">
+                                        @if ($attendance->expected_penalty_type)
+                                            @php
+                                                $penaltyLabels = [
+                                                    'missing_start_or_end_time' => 'Missing Time',
+                                                    'missing_start_and_end_time' => 'Missing Times',
+                                                    'late_arrival' => 'Late Arrival',
+                                                    'early_departure' => 'Early Departure',
+                                                    'early_and_late_penalty' => 'Late & Early',
+                                                ];
+                                                $penaltyLabel = $penaltyLabels[$attendance->expected_penalty_type] ?? $attendance->expected_penalty_type;
+                                            @endphp
+                                            <span class="inline-block px-2 py-0.5 rounded text-xs bg-danger-500 bg-opacity-20 text-danger-600 dark:text-danger-400 mb-1">
+                                                {{ $penaltyLabel }}
+                                            </span>
+                                            @if ($attendance->expected_penalty_hours)
+                                                <span class="block text-xs text-slate-500">
+                                                    {{ number_format($attendance->expected_penalty_hours, 2) }} hrs
+                                                </span>
+                                            @endif
+                                            @if ($attendance->expected_penalty_amount)
+                                                <span class="block text-xs text-danger-500">
+                                                    {{ number_format($attendance->expected_penalty_amount, 2) }} EGP
+                                                </span>
+                                            @endif
+                                        @else
+                                            <span class="text-xs text-slate-400">—</span>
+                                        @endif
                                     </td>
                                     <td class="table-td">
                                         <div class="flex items-center gap-2">

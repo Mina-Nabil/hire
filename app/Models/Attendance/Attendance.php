@@ -4,7 +4,9 @@ namespace App\Models\Attendance;
 
 use App\Exceptions\AppException;
 use App\Jobs\ProcessDailyAttendanceJob;
+use App\Models\Attendance\BusArrival;
 use App\Models\Attendance\DailyPunch;
+use App\Models\Payrolls\PenaltyDay;
 use App\Models\Attendance\PublicHoliday;
 use App\Models\Benefits\Configurations\BenefitConfiguration;
 use App\Models\Benefits\Payrolls\AppliedVacation;
@@ -37,9 +39,13 @@ class Attendance extends Model
         'is_extra_hours_approved',
         'is_approved',
         'payroll_id',
+        'expected_penalty_type',
+        'expected_penalty_hours',
+        'expected_penalty_amount',
     ];
 
     const MORPH_NAME = 'attendance';
+    const EXPECTED_PENALTY_TYPE_EARLY_AND_LATE = 'early_and_late_penalty';
 
     protected static function booted()
     {
@@ -504,6 +510,10 @@ class Attendance extends Model
                         );
                         $attendanceRecord->generateOvertime();
 
+                        // Calculate expected penalty and persist it
+                        $attendanceRecord->calculateExpectedPenalty();
+                        $attendanceRecord->saveQuietly();
+
                         // Check if employee worked on a day they shouldn't have and add vacation balance
                         $attendanceRecord->checkExtraAttendanceAndAddVacationBalance();
                     }
@@ -763,6 +773,10 @@ class Attendance extends Model
                 // Regenerate overtime if needed
                 $this->generateOvertime();
 
+                // Recalculate expected penalty with the new times
+                $this->calculateExpectedPenalty();
+                $this->saveQuietly();
+
                 AppLog::info('Attendance Times Edited', "Employee: {$this->employee->name}, Date: {$this->date}, Old Start: $oldStartTime, New Start: $start_time, Old End: $oldEndTime, New End: $end_time, Old Hours: $oldHours, New Hours: {$this->hours}", loggable: $this);
             });
         } catch (Exception $e) {
@@ -773,8 +787,141 @@ class Attendance extends Model
     }
 
     /**
+     * Calculate and set the expected penalty for this attendance record based on
+     * the employee's benefit configuration. Ignores vacation offsets — this is a
+     * raw estimate before payroll processing.
+     *
+     * @return void
+     */
+    public function calculateExpectedPenalty(): void
+    {
+        $employee = $this->employee()->with('benefitConfiguration')->first();
+        $config = $employee?->benefitConfiguration;
+
+        if (!$employee || !$config) {
+            $this->expected_penalty_type = null;
+            $this->expected_penalty_hours = null;
+            $this->expected_penalty_amount = null;
+            return;
+        }
+
+        $date = is_string($this->date) ? $this->date : Carbon::parse($this->date)->format('Y-m-d');
+
+        // Both times missing
+        if (!$this->start_time && !$this->end_time) {
+            $this->expected_penalty_type = PenaltyDay::PENALTY_TYPE_MISSING_START_AND_END_TIME;
+            $this->expected_penalty_hours = $config->daily_working_hours;
+            $this->expected_penalty_amount = round($this->expected_penalty_hours * $employee->calculateHourlyRate(), 2);
+            return;
+        }
+
+        // Exactly one of start/end missing (not applicable for in-only)
+        if (
+            $config->attendance_calculation !== BenefitConfiguration::ATTENDANCE_CALCULATION_IN_ONLY &&
+            ((!$this->start_time && $this->end_time) || ($this->start_time && !$this->end_time))
+        ) {
+            $this->expected_penalty_type = PenaltyDay::PENALTY_TYPE_MISSING_START_OR_END_TIME;
+            $this->expected_penalty_hours = $config->daily_working_hours;
+            $this->expected_penalty_amount = round($this->expected_penalty_hours * $employee->calculateHourlyRate(), 2);
+            return;
+        }
+
+        // Both times present — calculate late arrival and/or early departure
+        $attendanceStart = Carbon::parse($date . ' ' . $this->start_time);
+        $attendanceEnd = $this->end_time ? Carbon::parse($date . ' ' . $this->end_time) : null;
+
+        if ($attendanceEnd && $attendanceEnd->lt($attendanceStart)) {
+            $attendanceEnd->addDay();
+        }
+
+        $lateHours = 0.0;
+        $earlyHours = 0.0;
+
+        if ($config->attendance_calculation === BenefitConfiguration::ATTENDANCE_CALCULATION_BUS) {
+            $busArrival = BusArrival::where('date', $date)->first();
+            if ($busArrival) {
+                $allowedStartMax = Carbon::parse($date . ' ' . $busArrival->time);
+                if ($attendanceStart->gt($allowedStartMax)) {
+                    $lateHours = $employee->calculateLateArrivalPenalty(
+                        (int) $attendanceStart->diffInMinutes($allowedStartMax, true)
+                    );
+                }
+                if ($attendanceEnd && $config->working_day_end_min) {
+                    $allowedEndMin = Carbon::parse($date . ' ' . $config->working_day_end_min);
+                    if ($attendanceEnd->lt($allowedEndMin)) {
+                        $earlyHours = $employee->calculateEarlyDeparturePenalty(
+                            (int) $allowedEndMin->diffInMinutes($attendanceEnd, true)
+                        );
+                    }
+                }
+            }
+        } elseif ($config->attendance_calculation === BenefitConfiguration::ATTENDANCE_CALCULATION_IN_ONLY) {
+            if ($config->working_day_start_max) {
+                $allowedStartMax = Carbon::parse($date . ' ' . $config->working_day_start_max);
+                if ($attendanceStart->gt($allowedStartMax)) {
+                    $lateHours = $employee->calculateLateArrivalPenalty(
+                        (int) $attendanceStart->diffInMinutes($allowedStartMax, true)
+                    );
+                }
+            }
+        } else {
+            // fixed / flexible / semi-flexible
+            if (!$config->working_day_start_max || !$config->working_day_end_min) {
+                // No time constraints: penalise if total hours worked < daily_working_hours
+                if ($attendanceEnd) {
+                    $workedHours = $attendanceStart->diffInHours($attendanceEnd, true);
+                    if ($workedHours < $config->daily_working_hours) {
+                        $lateHours = $employee->calculateLateArrivalPenalty(
+                            (int)(($config->daily_working_hours - $workedHours) * 60)
+                        );
+                    }
+                }
+            } else {
+                $allowedStartMax = Carbon::parse($date . ' ' . $config->working_day_start_max);
+                $allowedEndMin = Carbon::parse($date . ' ' . $config->working_day_end_min);
+
+                if ($allowedEndMin->lt($allowedStartMax)) {
+                    $allowedEndMin->addDay();
+                }
+
+                if ($attendanceStart->gt($allowedStartMax)) {
+                    $lateHours = $employee->calculateLateArrivalPenalty(
+                        (int) $attendanceStart->diffInMinutes($allowedStartMax, true)
+                    );
+                }
+
+                if ($attendanceEnd && $attendanceEnd->lt($allowedEndMin)) {
+                    $earlyHours = $employee->calculateEarlyDeparturePenalty(
+                        (int) $allowedEndMin->diffInMinutes($attendanceEnd, true)
+                    );
+                }
+            }
+        }
+
+        $hourlyRate = $employee->calculateHourlyRate();
+
+        if ($lateHours > 0 && $earlyHours > 0) {
+            $this->expected_penalty_type = self::EXPECTED_PENALTY_TYPE_EARLY_AND_LATE;
+            $this->expected_penalty_hours = $lateHours + $earlyHours;
+            $this->expected_penalty_amount = round($this->expected_penalty_hours * $hourlyRate, 2);
+        } elseif ($lateHours > 0) {
+            $this->expected_penalty_type = PenaltyDay::PENALTY_TYPE_LATE_ARRIVAL;
+            $this->expected_penalty_hours = $lateHours;
+            $this->expected_penalty_amount = round($lateHours * $hourlyRate, 2);
+        } elseif ($earlyHours > 0) {
+            $this->expected_penalty_type = PenaltyDay::PENALTY_TYPE_EARLY_DEPARTURE;
+            $this->expected_penalty_hours = $earlyHours;
+            $this->expected_penalty_amount = round($earlyHours * $hourlyRate, 2);
+        } else {
+            $this->expected_penalty_type = null;
+            $this->expected_penalty_hours = null;
+            $this->expected_penalty_amount = null;
+        }
+    }
+
+    /**
      * Check if employee worked on a day they shouldn't have and add vacation balance if applicable
-     * 
+     *
      * @return void
      * @throws AppException
      */

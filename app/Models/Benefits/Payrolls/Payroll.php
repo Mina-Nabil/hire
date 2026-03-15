@@ -273,7 +273,7 @@ class Payroll extends Model
                 }
 
                 $netAmountBeforeTax = ($employeeData['net_after_deductions'] ?? 0);
-                $taxAmount = $employee->benefitConfiguration->is_taxable ? self::calculateTaxAmount($netAmountBeforeTax, $employee->id, $endDate) : 0;
+                $taxAmount = $employee->benefitConfiguration?->is_taxable ? self::calculateTaxAmount($netAmountBeforeTax, $employee->id, $endDate) : 0;
                 $netAmountAfterTax = $netAmountBeforeTax + ($employeeData['employee_base_benefits'] ?? 0) - $taxAmount - ($employeeData['employee_medical'] ?? 0) + ($employeeData['extra_payments'] ?? 0);
 
                 // Create payroll_employee record with fields that exist in the database schema

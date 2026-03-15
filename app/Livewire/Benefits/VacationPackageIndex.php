@@ -106,7 +106,7 @@ class VacationPackageIndex extends Component
             'vacationDetails.*.max_balance_max' => 'required|numeric|min:0',
             'vacationDetails.*.hour_price_min' => 'required|numeric|min:0',
             'vacationDetails.*.hour_price_max' => 'required|numeric|min:0',
-            'vacationDetails.*.apply_deadline' => 'nullable|integer|min:0',
+            'vacationDetails.*.apply_deadline' => 'nullable|integer',
         ], [
             'vacationDetails.*.name.required' => 'Name#:position is required',
             'vacationDetails.*.type.required' => 'Type#:position is required',

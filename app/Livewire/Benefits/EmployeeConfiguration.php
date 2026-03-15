@@ -410,7 +410,7 @@ class EmployeeConfiguration extends Component
             'vacationBenefit.max_balance' => 'required|numeric|min:0',
             'vacationBenefit.type' => 'required|string',
             'vacationBenefit.start_date' => 'required|date',
-            'vacationBenefit.apply_deadline' => 'nullable|integer|min:0',
+            'vacationBenefit.apply_deadline' => 'nullable|integer',
         ], [
             'vacationBenefit.name.required' => 'The name is required.',
             'vacationBenefit.inc_rate.required' => 'The inc rate is required.',

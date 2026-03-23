@@ -46,6 +46,7 @@ class EmployeeConfiguration extends Component
     public $release_date;
     public $absent_date;
     public $release_note;
+    public $id_number;
 
     public $benefitIncrementTypes = BaseBenefit::TYPE_LIST;
     public $vacationBenefitTypes = VacationDetail::TYPE_LIST;
@@ -810,6 +811,8 @@ class EmployeeConfiguration extends Component
         $this->termination_date = $this->employee->termination_date ? Carbon::parse($this->employee->termination_date)->format('Y-m-d') : null;
         $this->release_date = $this->employee->release_date ? Carbon::parse($this->employee->release_date)->format('Y-m-d') : null;
         $this->absent_date = $this->employee->absent_date ? Carbon::parse($this->employee->absent_date)->format('Y-m-d') : null;
+        $this->release_note = $this->employee->release_note;
+        $this->id_number = $this->employee->id_number;
         $this->editBaseInfoModal = true;
     }
 

@@ -9,7 +9,7 @@ class ForceIncrementVacation extends Command
 {
     /**
      * The name and signature of the console command.
-     *
+     * e.g. php artisan app:force-increment-vacation monthly Excuse
      * @var string
      */
     protected $signature = 'app:force-increment-vacation {type} {benefitName?}';

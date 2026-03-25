@@ -682,7 +682,7 @@
 
                                 @if (isset($payrollRecords))
                                     <div class="mt-6">
-                                        {{ $payrollRecords->links() }}
+                                        {{ $payrollRecords->links('vendor.livewire.simple-bootstrap') }}
                                     </div>
                                 @endif
                             </div>

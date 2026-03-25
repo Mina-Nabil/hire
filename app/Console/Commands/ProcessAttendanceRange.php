@@ -10,6 +10,7 @@ class ProcessAttendanceRange extends Command
 {
     /**
      * The name and signature of the console command.
+     * E.g. php artisan attendance:process-range 2026-03-01 --end-date=2026-03-31
      *
      * @var string
      */

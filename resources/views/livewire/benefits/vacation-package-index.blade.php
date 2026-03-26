@@ -140,10 +140,19 @@
                                     <x-text-input type="number" step="0.01" class="w-20"
                                         label="Hour Price Maximum"
                                         wire:model.defer="vacationDetails.{{ $i }}.hour_price_max" />
-                                    <x-text-input type="number" class="w-20"
-                                        label="Apply Deadline (days after leave)"
-                                        wire:model.defer="vacationDetails.{{ $i }}.apply_deadline"
+                                    <div class="flex flex-col gap-1">
+                                        <x-text-input type="number" class="w-20"
+                                            label="Apply Deadline (days after leave)"
+                                            wire:model.defer="vacationDetails.{{ $i }}.apply_deadline"
+                                            :disabled="!empty($detail['apply_deadline_na'])"
                                         />
+                                        <label class="flex items-center gap-1 text-xs text-gray-500 cursor-pointer">
+                                            <input type="checkbox"
+                                                wire:model.defer="vacationDetails.{{ $i }}.apply_deadline_na"
+                                            />
+                                            Not applicable
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                             <div class="flex flex-col items-center">

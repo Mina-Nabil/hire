@@ -69,6 +69,7 @@ class EmployeeConfiguration extends Component
 
     // Custom Vacation Benefit Modal
     public $showAddCustomVacationBenefitModal = false;
+    public $vacationBenefitDeadlineNA = false;
     public $vacationBenefit = [
         'name' => '',
         'inc_rate' => 0,
@@ -397,8 +398,15 @@ class EmployeeConfiguration extends Component
             'max_balance' => 0,
             'type' => '',
             'start_date' => now()->format('Y-m-d'),
-            'apply_deadline' => 0,
+            'apply_deadline' => null,
         ];
+        $this->vacationBenefitDeadlineNA = false;
+    }
+
+    public function toggleVacationBenefitDeadlineNA()
+    {
+        $this->vacationBenefitDeadlineNA = !$this->vacationBenefitDeadlineNA;
+        $this->vacationBenefit['apply_deadline'] = $this->vacationBenefitDeadlineNA ? null : 0;
     }
 
     public function saveCustomVacationBenefit()

@@ -67,7 +67,7 @@ class VacationBenefit extends Model
     public function applyDeadline(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => $this->vacationDetail?->apply_deadline ?? ($value ?? 0),
+            get: fn($value) => $this->vacationDetail ? $this->vacationDetail->apply_deadline : $value,
             set: fn($value) => $value,
         );
     }

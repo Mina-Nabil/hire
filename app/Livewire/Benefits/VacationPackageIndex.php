@@ -64,6 +64,7 @@ class VacationPackageIndex extends Component
                 'hour_price_min' => $detail->hour_price_min,
                 'hour_price_max' => $detail->hour_price_max,
                 'apply_deadline' => $detail->apply_deadline,
+                'apply_deadline_na' => $detail->apply_deadline === null,
             ];
         })->toArray();
 
@@ -82,6 +83,7 @@ class VacationPackageIndex extends Component
             'hour_price_min' => '',
             'hour_price_max' => '',
             'apply_deadline' => '',
+            'apply_deadline_na' => false,
         ];
     }
 
@@ -94,6 +96,12 @@ class VacationPackageIndex extends Component
 
     public function savePackage()
     {
+        foreach ($this->vacationDetails as $i => $detail) {
+            if (!empty($detail['apply_deadline_na'])) {
+                $this->vacationDetails[$i]['apply_deadline'] = null;
+            }
+        }
+
         $this->validate([
             'name' => 'required|string|max:255',
             'desc' => 'nullable|string',
@@ -107,6 +115,7 @@ class VacationPackageIndex extends Component
             'vacationDetails.*.hour_price_min' => 'required|numeric|min:0',
             'vacationDetails.*.hour_price_max' => 'required|numeric|min:0',
             'vacationDetails.*.apply_deadline' => 'nullable|integer',
+            'vacationDetails.*.apply_deadline_na' => 'boolean',
         ], [
             'vacationDetails.*.name.required' => 'Name#:position is required',
             'vacationDetails.*.type.required' => 'Type#:position is required',

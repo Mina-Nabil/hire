@@ -396,7 +396,7 @@
                                                         </div>
                                                         <div class="flex items-center">
                                                             <span class="text-slate-500 mr-2">Apply Deadline:</span>
-                                                            <span>{{ $vacation->apply_deadline . ' days' }}</span>
+                                                            <span>{{ $vacation->apply_deadline !== null ? $vacation->apply_deadline . ' days' : 'Not applicable' }}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1124,9 +1124,19 @@
                                 wire:model="vacationBenefit.max_balance"
                                 errorMessage="{{ $errors->first('vacationBenefit.max_balance') }}" />
 
-                            <x-text-input label="Apply Deadline (days after leave)" type="number"
-                                wire:model="vacationBenefit.apply_deadline"
-                                errorMessage="{{ $errors->first('vacationBenefit.apply_deadline') }}" />
+                            <div class="flex flex-col gap-1">
+                                <x-text-input label="Apply Deadline (days after leave)" type="number"
+                                    wire:model="vacationBenefit.apply_deadline"
+                                    :disabled="$vacationBenefitDeadlineNA"
+                                    errorMessage="{{ $errors->first('vacationBenefit.apply_deadline') }}" />
+                                <label class="flex items-center gap-1 text-xs text-gray-500 cursor-pointer">
+                                    <input type="checkbox"
+                                        wire:click="toggleVacationBenefitDeadlineNA"
+                                        @checked($vacationBenefitDeadlineNA)
+                                    />
+                                    Not applicable
+                                </label>
+                            </div>
 
                             <x-text-input label="Start Date*" type="date" wire:model="vacationBenefit.start_date"
                                 errorMessage="{{ $errors->first('vacationBenefit.start_date') }}" />

@@ -4479,7 +4479,7 @@ class Employee extends Model
         if ($penaltiesGenerated == 0) {
             $effectiveWorkingHours = $effectiveStart->diffInHours($effectiveEnd, true);
             $workingDiff = $this->benefitConfiguration->daily_working_hours - $effectiveWorkingHours - $vacationHours - $vacationHoursForDay;
-            if ($workingDiff > 0) {
+            if ($vacationHoursForDay < 8 && $workingDiff > 0) {
                 $penaltyHours += $workingDiff;
                 if ($vacationHours > 0) {
                     $vacationHoursForDay += $workingDiff;
@@ -4489,7 +4489,6 @@ class Employee extends Model
                 $actualPenaltyHours = $this->calculateLateArrivalPenalty($workingDiff * 60);
 
                 if ($actualPenaltyHours) {
-                    Log::info('actualPenaltyHours', ['actualPenaltyHours' => $actualPenaltyHours, 'id' => $this->id, 'date' => $date, 'hours' => $actualPenaltyHours, 'type' => PenaltyDay::PENALTY_TYPE_LATE_ARRIVAL, 'employee_id' => $this->id]);
                     $penaltyDays[] = [
                         'date' => $attendanceStart->format('Y-m-d'),
                         'hours' => $actualPenaltyHours,

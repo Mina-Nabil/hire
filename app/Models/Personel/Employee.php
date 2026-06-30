@@ -4378,7 +4378,6 @@ class Employee extends Model
                     $vacationHours = 0;
                     $actualPenaltyHours = $this->calculateLateArrivalPenalty(($this->benefitConfiguration->daily_working_hours - $workingHours) * 60);
                     if ($actualPenaltyHours) {
-                        Log::info('actualPenaltyHours', ['actualPenaltyHours' => $actualPenaltyHours, 'id' => $this->id, 'date' => $date, 'hours' => $actualPenaltyHours, 'type' => PenaltyDay::PENALTY_TYPE_LATE_ARRIVAL, 'employee_id' => $this->id]);
                         $penaltyDays[] = [
                             'date' => $date,
                             'hours' => $actualPenaltyHours,
@@ -4427,6 +4426,7 @@ class Employee extends Model
                 $vacationHours = 0;
                 $actualPenaltyHours = $this->calculateLateArrivalPenalty($penaltyHours * 60);
                 if ($actualPenaltyHours) {
+                    Log::info('actualPenaltyHours2', ['actualPenaltyHours' => $actualPenaltyHours, 'id' => $this->id, 'date' => $date, 'hours' => $actualPenaltyHours, 'type' => PenaltyDay::PENALTY_TYPE_LATE_ARRIVAL, 'employee_id' => $this->id]);
                     $penaltyDays[] = [
                         'date' => $attendanceStart->format('Y-m-d'),
                         'hours' => $actualPenaltyHours,
@@ -4489,6 +4489,7 @@ class Employee extends Model
                 $actualPenaltyHours = $this->calculateLateArrivalPenalty($workingDiff * 60);
 
                 if ($actualPenaltyHours) {
+                    Log::info('actualPenaltyHours', ['actualPenaltyHours' => $actualPenaltyHours, 'id' => $this->id, 'date' => $date, 'hours' => $actualPenaltyHours, 'type' => PenaltyDay::PENALTY_TYPE_LATE_ARRIVAL, 'employee_id' => $this->id]);
                     $penaltyDays[] = [
                         'date' => $attendanceStart->format('Y-m-d'),
                         'hours' => $actualPenaltyHours,

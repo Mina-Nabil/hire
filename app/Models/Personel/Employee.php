@@ -4596,14 +4596,6 @@ class Employee extends Model
                 $vacationHoursForDay += $vacationHours;
                 $vacationHours = 0;
                 $actualPenaltyHours = $this->calculateLateArrivalPenalty($attendanceStart->diffInMinutes($allowedStartMax, true));
-                Log::info('actualPenaltyHours', [
-                    'actualPenaltyHours' => $actualPenaltyHours,
-                    'id' => $this->id,
-                    'attendanceStart' => $attendanceStart,
-                    'allowedStartMax' => $allowedStartMax,
-                    'penaltyHours' => $penaltyHours,
-                    'vacationHours' => $vacationHours
-                ]);
                 if ($actualPenaltyHours) {
                     $penaltyHoursForDay += $penaltyHours;
                     $penaltyDays[] = [

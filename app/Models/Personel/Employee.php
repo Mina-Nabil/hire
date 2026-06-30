@@ -5095,9 +5095,6 @@ class Employee extends Model
         $totalPenaltyHours = $penaltyData['total_penalty_hours'];
         $totalVacationHours = $penaltyData['total_vacation_hours'];
         $penaltyDays = $penaltyData['penalty_days'];
-        if ($this->id == 1) {
-            Log::info('total penalty hours', ['totalPenaltyHours' => $totalPenaltyHours]);
-        }
 
         if ($totalPenaltyHours <= 0) {
             return [

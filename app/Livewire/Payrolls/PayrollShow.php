@@ -468,7 +468,7 @@ class PayrollShow extends Component
                             ->orWhere('department', 'like', '%' . $this->search . '%');
                     });
                 })
-                ->orderBy($this->sortField, $this->sortDirection)
+                // ->orderBy($this->sortField, $this->sortDirection)
                 ->paginate($this->perPage);
 
             // Calculate totals for all employees (not just paginated ones)

@@ -4378,12 +4378,6 @@ class Employee extends Model
                     $vacationHours = 0;
                     $actualPenaltyHours = $this->calculateLateArrivalPenalty(($this->benefitConfiguration->daily_working_hours - $workingHours) * 60);
                     if ($actualPenaltyHours) {
-                        Log::info('penaltyHours', ['penaltyHours' => $penaltyHours]);
-                        Log::info('vacationHours', ['vacationHours' => $vacationHours]);
-                        Log::info('workingHours', ['workingHours' => $workingHours]);
-                        Log::info('this->benefitConfiguration->daily_working_hours', ['this->benefitConfiguration->daily_working_hours' => $this->benefitConfiguration->daily_working_hours]);
-                        Log::info('date', ['date' => $date]);
-                        Log::info('this->id', ['this->id' => $this->id]);
                         $penaltyDays[] = [
                             'date' => $date,
                             'hours' => $actualPenaltyHours,
@@ -4456,13 +4450,6 @@ class Employee extends Model
             $earlyDeparture = $allowedEndMin->diffInHours($attendanceEnd, true);
             $penaltyHours += $earlyDeparture;
             if ($vacationHours < 8 && $penaltyHours > $vacationHours) {
-                if ($this->id == 16) {
-                    Log::info('attendanceEnd', ['attendanceEnd' => $attendanceEnd]);
-                    Log::info('allowedEndMin', ['allowedEndMin' => $allowedEndMin]);
-                    Log::info('penaltyHours', ['penaltyHours' => $penaltyHours]);
-                    Log::info('vacationHours', ['vacationHours' => $vacationHours]);
-                    Log::info('earlyDeparture', ['earlyDeparture' => $earlyDeparture]);
-                }
                 $penaltyHours = ($penaltyHours - $vacationHours);
                 $vacationHoursForDay += min(8, $vacationHours);
                 $penaltyHoursForDay += $penaltyHours;
@@ -4609,6 +4596,13 @@ class Employee extends Model
                 $vacationHours = 0;
                 $actualPenaltyHours = $this->calculateLateArrivalPenalty($attendanceStart->diffInMinutes($allowedStartMax, true));
                 Log::info('actualPenaltyHours', ['actualPenaltyHours' => $actualPenaltyHours]);
+                if($this->id == 9){
+                    Log::info('attendanceStart', ['attendanceStart' => $attendanceStart]);
+                    Log::info('allowedStartMax', ['allowedStartMax' => $allowedStartMax]);
+                    Log::info('penaltyHours', ['penaltyHours' => $penaltyHours]);
+                    Log::info('vacationHours', ['vacationHours' => $vacationHours]);
+                    Log::info('actualPenaltyHours', ['actualPenaltyHours' => $actualPenaltyHours]);
+                }
                 if ($actualPenaltyHours) {
                     $penaltyHoursForDay += $penaltyHours;
                     $penaltyDays[] = [

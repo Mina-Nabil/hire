@@ -4372,6 +4372,14 @@ class Employee extends Model
             if ($workingHours < $this->benefitConfiguration->daily_working_hours) {
                 $penaltyHours = $this->benefitConfiguration->daily_working_hours - $workingHours;
                 if ($vacationHours < 8 && $penaltyHours > $vacationHours) {
+                    if($this->id == 9){
+                        Log::info('penaltyHours', ['penaltyHours' => $penaltyHours]);
+                        Log::info('vacationHours', ['vacationHours' => $vacationHours]);
+                        Log::info('workingHours', ['workingHours' => $workingHours]);
+                        Log::info('this->benefitConfiguration->daily_working_hours', ['this->benefitConfiguration->daily_working_hours' => $this->benefitConfiguration->daily_working_hours]);
+                        Log::info('date', ['date' => $date]);
+                        Log::info('this->id', ['this->id' => $this->id]);
+                    }
                     $penaltyHours = ($penaltyHours - $vacationHours);
                     $vacationHoursForDay += $vacationHours;
                     $penaltyHoursForDay += $penaltyHours;

@@ -635,7 +635,7 @@ class Employee extends Model
             throw new AppException('You dont have permission to apply for vacation or mission');
         }
 
-        if($vacationBenefit && $vacationBenefit->employee_id != $this->id){
+        if ($vacationBenefit && $vacationBenefit->employee_id != $this->id) {
             throw new AppException('You cannot apply for vacation for another employee');
         }
 
@@ -3972,7 +3972,7 @@ class Employee extends Model
         $startDate = $startDate instanceof Carbon ? $startDate : Carbon::parse($startDate);
         $endDate = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
 
-        if($this->employment_date->isAfter($startDate)) {
+        if ($this->employment_date->isAfter($startDate)) {
             $startDate = $this->employment_date->clone();
         }
 
@@ -4372,20 +4372,18 @@ class Employee extends Model
             if ($workingHours < $this->benefitConfiguration->daily_working_hours) {
                 $penaltyHours = $this->benefitConfiguration->daily_working_hours - $workingHours;
                 if ($vacationHours < 8 && $penaltyHours > $vacationHours) {
-                    if($this->id == 9){
-                        Log::info('penaltyHours', ['penaltyHours' => $penaltyHours]);
-                        Log::info('vacationHours', ['vacationHours' => $vacationHours]);
-                        Log::info('workingHours', ['workingHours' => $workingHours]);
-                        Log::info('this->benefitConfiguration->daily_working_hours', ['this->benefitConfiguration->daily_working_hours' => $this->benefitConfiguration->daily_working_hours]);
-                        Log::info('date', ['date' => $date]);
-                        Log::info('this->id', ['this->id' => $this->id]);
-                    }
                     $penaltyHours = ($penaltyHours - $vacationHours);
                     $vacationHoursForDay += $vacationHours;
                     $penaltyHoursForDay += $penaltyHours;
                     $vacationHours = 0;
                     $actualPenaltyHours = $this->calculateLateArrivalPenalty(($this->benefitConfiguration->daily_working_hours - $workingHours) * 60);
                     if ($actualPenaltyHours) {
+                        Log::info('penaltyHours', ['penaltyHours' => $penaltyHours]);
+                        Log::info('vacationHours', ['vacationHours' => $vacationHours]);
+                        Log::info('workingHours', ['workingHours' => $workingHours]);
+                        Log::info('this->benefitConfiguration->daily_working_hours', ['this->benefitConfiguration->daily_working_hours' => $this->benefitConfiguration->daily_working_hours]);
+                        Log::info('date', ['date' => $date]);
+                        Log::info('this->id', ['this->id' => $this->id]);
                         $penaltyDays[] = [
                             'date' => $date,
                             'hours' => $actualPenaltyHours,

@@ -1435,7 +1435,7 @@ class ApplicantShow extends Component
     public function rescheduleInterview()
     {
         $this->validate([
-            'newInterviewDate' => 'required|date|after_or_equal:today',
+            'newInterviewDate' => 'required|date',
             'newInterviewTime' => 'required',
             'newInterviewType' => 'required|in:' . implode(',', Interview::INTERVIEW_TYPES),
             'newInterviewLocation' => 'nullable|string|max:255',

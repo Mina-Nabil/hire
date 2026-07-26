@@ -70,6 +70,7 @@ class Employee extends Model
     const DOC_STATUS_NEAR_EXPIRY = 'near_expiry';
     const DOC_STATUS_EXPIRED = 'expired';
     const DOC_STATUS_MISSING = 'missing';
+    const DOC_STATUS_NOT_REQUIRED = 'not_required';
 
     // Default days threshold for near expiry warning (30 days)
     const NEAR_EXPIRY_DAYS = 30;
@@ -627,7 +628,7 @@ class Employee extends Model
      * ]
      * @return void
      */
-    public function applyForVacation(?VacationBenefit $vacationBenefit = null, float $hours_count, array $days = [], bool $is_approved = false, bool $is_mission = false)
+    public function applyForVacation(?VacationBenefit $vacationBenefit = null, float $hours_count, array $days = [], bool $is_approved = false, bool $is_mission = false, ?string $reason = null)
     {
         /** @var User $loggedInUser */
         $loggedInUser = Auth::user();
@@ -648,12 +649,16 @@ class Employee extends Model
             }
             $vacationBenefit->load('vacationDetail');
             $applyDeadline = $vacationBenefit->apply_deadline;
+            // Apply deadline is the number of days after a leave day within which
+            // the employee is still allowed to apply. Once that many days have
+            // passed since the leave day, the application is no longer accepted.
             if ($applyDeadline !== null) {
-                $deadlineDate = Carbon::now()->addDays($applyDeadline)->setTime(23, 59, 59);
                 if (!$loggedInUser->can('applyLateForAny', AppliedVacation::class) && !$loggedInUser->can('applyForVacationLate', $this)) {
+                    $now = Carbon::now();
                     foreach ($days as $day) {
                         $dayDate = Carbon::parse($day['vacation_date']);
-                        if ($dayDate->isBefore($deadlineDate)) {
+                        $deadlineDate = $dayDate->copy()->addDays($applyDeadline)->setTime(23, 59, 59);
+                        if ($now->isAfter($deadlineDate)) {
                             throw new AppException('You cannot apply for vacation after the apply deadline');
                         }
                     }
@@ -663,13 +668,14 @@ class Employee extends Model
 
 
         try {
-            DB::transaction(function () use ($hours_count, $days, $currentBalance, $vacationBenefit, $is_approved, $loggedInUser, $is_mission) {
+            DB::transaction(function () use ($hours_count, $days, $currentBalance, $vacationBenefit, $is_approved, $loggedInUser, $is_mission, $reason) {
                 $appliedVacation = $this->appliedVacations()->create([
                     'vacation_benefit_id' => $is_mission ? null : $vacationBenefit?->id,
                     'hours' => $hours_count,
                     'new_balance' => $currentBalance - $hours_count,
                     'name' => $is_mission ? 'Mission' : $vacationBenefit?->name,
                     'is_mission' => $is_mission,
+                    'reason' => $reason,
                     'status' => $is_approved ? AppliedVacation::STATUS_APPROVED : AppliedVacation::STATUS_PENDING,
                 ]);
                 // dd($days);
@@ -1610,11 +1616,16 @@ class Employee extends Model
                 ->when($docManagers->contains('doc_type', 'birthCertificate'), fn($q) => $q->orWhereDoesntHave('birthCertificate'))
                 // 3. Employment Contract
                 ->when($docManagers->contains('doc_type', 'employeeContract'), fn($q) => $q->orWhereDoesntHave('contracts'))
-                // 4. Army Service Paper - only for males with appropriate military status
+                // 4. Army Service Paper - only required for male employees who have
+                // completed or been exempted from military service
                 ->when($docManagers->contains('doc_type', 'armyServicePaper'), fn($q) => $q->orWhere(function ($query) {
                     $query
                         ->whereHas('info', function ($q) {
-                            $q->where('gender', 'male')->whereNotIn('military_status', ['exempt', 'completed']);
+                            $q->where('gender', Applicant::GENDER_MALE)
+                                ->whereIn('military_status', [
+                                    Applicant::MILITARY_STATUS_EXEMPTED,
+                                    Applicant::MILITARY_STATUS_COMPLETED,
+                                ]);
                         })
                         ->whereDoesntHave('armyServicePaper');
                 }))
@@ -1863,8 +1874,9 @@ class Employee extends Model
             $missingDocs[] = 'Employment Contract';
         }
 
-        // 4. Army Service Paper
-        if ($docManagers->contains('doc_type', 'armyServicePaper') && $this->gender === Applicant::GENDER_MALE && ($this->info && in_array($this->info->military_status, [Applicant::MILITARY_STATUS_EXEMPTED, Applicant::MILITARY_STATUS_COMPLETED])) && !$this->armyServicePaper) {
+        // 4. Army Service Paper - only required for male employees who have
+        // completed or been exempted from military service
+        if ($docManagers->contains('doc_type', 'armyServicePaper') && $this->isArmyServicePaperRequired() && !$this->armyServicePaper) {
             $missingDocs[] = 'Army Service Paper';
         }
 
@@ -3308,8 +3320,33 @@ class Employee extends Model
      * @param int $nearExpiryDays Days threshold for near expiry warning
      * @return string Document status
      */
+    /**
+     * Determine whether an Army Service Paper is required for this employee.
+     * Only male employees who have completed or been exempted from military
+     * service are expected to have one. Anyone else (females, or males who are
+     * still drafted / have no military status recorded) does not need it.
+     */
+    public function isArmyServicePaperRequired(): bool
+    {
+        return $this->gender === Applicant::GENDER_MALE
+            && $this->info
+            && in_array($this->info->military_status, [
+                Applicant::MILITARY_STATUS_EXEMPTED,
+                Applicant::MILITARY_STATUS_COMPLETED,
+            ]);
+    }
+
     public function checkArmyServicePaperStatus($nearExpiryDays = self::NEAR_EXPIRY_DAYS)
     {
+        // Army Service Paper is only required for male employees who have
+        // completed or been exempted from military service
+        if (!$this->isArmyServicePaperRequired()) {
+            return [
+                'status' => self::DOC_STATUS_NOT_REQUIRED,
+                'details' => 'Army service paper is not required',
+            ];
+        }
+
         $status = $this->checkDocumentStatus($this->armyServicePaper, $nearExpiryDays);
 
         return [
@@ -3789,6 +3826,14 @@ class Employee extends Model
             $this->status = $status;
             $this->save();
             AppLog::info('Employee Status Updated', 'Employee status updated for employee: ' . $this->name . ' to ' . ucfirst(str_replace('_', ' ', $status)), loggable: $this);
+
+            // When an employee resigns, remove them from their position so it
+            // becomes vacant and available to be filled again.
+            if ($status === self::STATUS_RESIGNED && $this->position) {
+                $this->position()->update(['employee_id' => null]);
+                AppLog::info('Employee Removed From Position', 'Employee ' . $this->name . ' removed from their position after resignation', loggable: $this);
+            }
+
             return true;
         } catch (Exception $e) {
             report($e);

@@ -21,8 +21,11 @@ class ShowAppliedVacation extends Component
     public $benefitName = '';
     public $showRejectModal = false;
     public $showVacationDetailsModal = false;
+    public $showEditModal = false;
     public $selectedAppliedVacation = null;
     public $rejectNote = '';
+    public $editDays = [];
+    public $editReason = '';
 
     protected $listeners = ['approveVacation'];
 
@@ -88,6 +91,74 @@ class ShowAppliedVacation extends Component
     public function confirmReject()
     {
         $this->reject($this->selectedAppliedVacation->id, $this->rejectNote);
+    }
+
+    public function openEditModal($appliedVacationId)
+    {
+        $appliedVacation = AppliedVacation::with(['vacationDays', 'vacationBenefit'])->findOrFail($appliedVacationId);
+
+        if (!Auth::user()->can('edit', $appliedVacation)) {
+            $this->alertError('You cannot edit this request');
+            return;
+        }
+
+        $this->selectedAppliedVacation = $appliedVacation;
+        $this->editReason = $appliedVacation->reason;
+        $this->editDays = $appliedVacation->vacationDays
+            ->map(fn($day) => [
+                'vacation_date' => \Carbon\Carbon::parse($day->vacation_date)->format('Y-m-d'),
+                'hours' => (float) $day->hours,
+            ])->toArray();
+        $this->resetValidation();
+        $this->showEditModal = true;
+    }
+
+    public function closeEditModal()
+    {
+        $this->showEditModal = false;
+        $this->selectedAppliedVacation = null;
+        $this->editDays = [];
+        $this->editReason = '';
+    }
+
+    public function addEditDay()
+    {
+        $this->editDays[] = ['vacation_date' => '', 'hours' => 8];
+    }
+
+    public function removeEditDay($index)
+    {
+        unset($this->editDays[$index]);
+        $this->editDays = array_values($this->editDays);
+    }
+
+    public function getEditTotalHoursProperty()
+    {
+        return collect($this->editDays)->sum('hours');
+    }
+
+    public function saveEdit()
+    {
+        $this->validate([
+            'editDays' => 'required|array|min:1',
+            'editDays.*.vacation_date' => 'required|date',
+            'editDays.*.hours' => 'required|numeric|min:1|max:24',
+            'editReason' => 'nullable|string|max:255',
+        ]);
+
+        try {
+            $appliedVacation = AppliedVacation::findOrFail($this->selectedAppliedVacation->id);
+            $days = collect($this->editDays)->map(fn($day) => [
+                'vacation_date' => $day['vacation_date'],
+                'hours' => (float) $day['hours'],
+            ])->toArray();
+
+            $appliedVacation->updateRequest($days, $this->editReason);
+            $this->alertSuccess('Vacation request updated successfully');
+            $this->closeEditModal();
+        } catch (\Exception $e) {
+            $this->alertError($e->getMessage());
+        }
     }
 
     public function render()

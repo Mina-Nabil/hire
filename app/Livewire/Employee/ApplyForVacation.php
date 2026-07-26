@@ -217,7 +217,7 @@ class ApplyForVacation extends Component
                 }
             }
 
-            $this->employee->applyForVacation($this->isMission ? null : $vacationBenefit, $this->totalHours, $this->days, false, $this->isMission);
+            $this->employee->applyForVacation($this->isMission ? null : $vacationBenefit, $this->totalHours, $this->days, false, $this->isMission, $this->description);
 
             $this->showConfirmModal = false;
             if ($this->isMission) {

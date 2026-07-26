@@ -156,6 +156,54 @@ class Applicant extends Model
         return $this->army_certificate_url ? Storage::disk('s3')->url($this->army_certificate_url) : null;
     }
 
+    /**
+     * Get the job title (vacancy position) from the most recent application
+     */
+    public function getJobTitleAttribute(): ?string
+    {
+        return $this->applications
+            ->sortByDesc('created_at')
+            ->first()?->vacancy?->position?->name;
+    }
+
+    /**
+     * Get a readable summary of the most recent education record
+     */
+    public function getLatestEducationAttribute(): ?string
+    {
+        $education = $this->educations->sortByDesc('end_date')->first();
+
+        if (!$education) {
+            return null;
+        }
+
+        return trim(collect([$education->degree, $education->field_of_study])
+            ->filter()
+            ->implode(' - ')) ?: $education->school_name;
+    }
+
+    /**
+     * Get the most recent interview for this applicant
+     */
+    public function getLatestInterviewAttribute(): ?Interview
+    {
+        return $this->interviews->sortByDesc('date')->first();
+    }
+
+    /**
+     * Get the result of the most recent interview (from its latest feedback)
+     */
+    public function getInterviewResultAttribute(): ?string
+    {
+        $interview = $this->latest_interview;
+
+        if (!$interview) {
+            return null;
+        }
+
+        return $interview->feedbacks->sortByDesc('created_at')->first()?->result;
+    }
+
     ///relations
     /**
      * Get the area that the applicant belongs to
@@ -752,6 +800,89 @@ class Applicant extends Model
     public function scopeWithMaritalStatus($query, $status)
     {
         return $query->where('marital_status', $status);
+    }
+
+    /**
+     * Scope to filter applicants by name
+     */
+    public function scopeWithName($query, $name)
+    {
+        foreach (explode(' ', $name) as $text) {
+            $query->where(function ($q) use ($text) {
+                $q->where('first_name', 'like', "%{$text}%")
+                    ->orWhere('middle_name', 'like', "%{$text}%")
+                    ->orWhere('last_name', 'like', "%{$text}%");
+            });
+        }
+        return $query;
+    }
+
+    /**
+     * Scope to filter applicants by job title (vacancy position name)
+     */
+    public function scopeWithJobTitle($query, $title)
+    {
+        return $query->whereHas('applications.vacancy.position', function ($q) use ($title) {
+            $q->where('name', 'like', "%{$title}%");
+        });
+    }
+
+    /**
+     * Scope to filter applicants by phone number
+     */
+    public function scopeWithPhone($query, $phone)
+    {
+        return $query->where('phone', 'like', "%{$phone}%");
+    }
+
+    /**
+     * Scope to filter applicants by gender
+     */
+    public function scopeWithGender($query, $gender)
+    {
+        return $query->where('gender', $gender);
+    }
+
+    /**
+     * Scope to filter applicants by education (degree, field of study or school)
+     */
+    public function scopeWithEducation($query, $education)
+    {
+        return $query->whereHas('educations', function ($q) use ($education) {
+            $q->where('degree', 'like', "%{$education}%")
+                ->orWhere('field_of_study', 'like', "%{$education}%")
+                ->orWhere('school_name', 'like', "%{$education}%");
+        });
+    }
+
+    /**
+     * Scope to filter applicants with an interview on or after a given date
+     */
+    public function scopeInterviewFrom($query, $date)
+    {
+        return $query->whereHas('interviews', function ($q) use ($date) {
+            $q->whereDate('interviews.date', '>=', $date);
+        });
+    }
+
+    /**
+     * Scope to filter applicants with an interview on or before a given date
+     */
+    public function scopeInterviewTo($query, $date)
+    {
+        return $query->whereHas('interviews', function ($q) use ($date) {
+            $q->whereDate('interviews.date', '<=', $date);
+        });
+    }
+
+    /**
+     * Scope to filter applicants by their interview result (feedback)
+     */
+    public function scopeWithInterviewResult($query, $result)
+    {
+        return $query->whereHas('interviews.feedbacks', function ($q) use ($result) {
+            $q->where('result', $result);
+        });
     }
 
     /**

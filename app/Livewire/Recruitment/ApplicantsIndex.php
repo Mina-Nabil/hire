@@ -5,6 +5,7 @@ namespace App\Livewire\Recruitment;
 use App\Models\Base\Area;
 use App\Models\Base\City;
 use App\Models\Recruitment\Applicants\Applicant;
+use App\Models\Recruitment\Interviews\InterviewFeedback;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -16,19 +17,25 @@ class ApplicantsIndex extends Component
     public $search = '';
     public $startDate = null;
     public $endDate = null;
-    public $militaryStatus = null;
-    public $maritalStatus = null;
     public $cityId = null;
     public $areaId = null;
     public $minAge = null;
     public $maxAge = null;
+    public $name = null;
+    public $jobTitle = null;
+    public $phone = null;
+    public $gender = null;
+    public $education = null;
+    public $interviewFrom = null;
+    public $interviewTo = null;
+    public $interviewResult = null;
     public $showFilters = false;
 
     // Data for Filters
     public $areas = [];
     public $cities = [];
-    public $militaryStatusOptions = [];
-    public $maritalStatusOptions = [];
+    public $genderOptions = [];
+    public $interviewResultOptions = [];
 
     public function toggleFilters()
     {
@@ -44,8 +51,8 @@ class ApplicantsIndex extends Component
     {
         $this->cities = City::all();
         // $this->areas = Area::all();
-        $this->militaryStatusOptions = Applicant::MILITARY_STATUS;
-        $this->maritalStatusOptions = Applicant::MARITAL_STATUS;
+        $this->genderOptions = Applicant::GENDER;
+        $this->interviewResultOptions = InterviewFeedback::RESULTS;
     }
 
     public function updatedCityId()
@@ -72,12 +79,6 @@ class ApplicantsIndex extends Component
             ->when($this->endDate, function ($query) {
                 $query->createdTo($this->endDate);
             })
-            ->when($this->militaryStatus, function ($query) {
-                $query->withMilitaryStatus($this->militaryStatus);
-            })
-            ->when($this->maritalStatus, function ($query) {
-                $query->withMaritalStatus($this->maritalStatus);
-            })
             ->when($this->areaId, function ($query) {
                 $query->fromArea($this->areaId);
             })
@@ -90,7 +91,35 @@ class ApplicantsIndex extends Component
             ->when($this->maxAge, function ($query) {
                 $query->youngerThan($this->maxAge);
             })
-            ->with(['area', 'applications'])
+            ->when($this->name, function ($query) {
+                $query->withName($this->name);
+            })
+            ->when($this->jobTitle, function ($query) {
+                $query->withJobTitle($this->jobTitle);
+            })
+            ->when($this->phone, function ($query) {
+                $query->withPhone($this->phone);
+            })
+            ->when($this->gender, function ($query) {
+                $query->withGender($this->gender);
+            })
+            ->when($this->education, function ($query) {
+                $query->withEducation($this->education);
+            })
+            ->when($this->interviewFrom, function ($query) {
+                $query->interviewFrom($this->interviewFrom);
+            })
+            ->when($this->interviewTo, function ($query) {
+                $query->interviewTo($this->interviewTo);
+            })
+            ->when($this->interviewResult, function ($query) {
+                $query->withInterviewResult($this->interviewResult);
+            })
+            ->with([
+                'applications.vacancy.position',
+                'educations',
+                'interviews.feedbacks',
+            ])
             ->simplePaginate(30);
 
         return view('livewire.recruitment.applicants-index', [
@@ -104,12 +133,18 @@ class ApplicantsIndex extends Component
             'search',
             'startDate',
             'endDate',
-            'militaryStatus',
-            'maritalStatus',
             'cityId',
             'areaId',
             'minAge',
-            'maxAge'
+            'maxAge',
+            'name',
+            'jobTitle',
+            'phone',
+            'gender',
+            'education',
+            'interviewFrom',
+            'interviewTo',
+            'interviewResult',
         ]);
     }
 
@@ -128,16 +163,6 @@ class ApplicantsIndex extends Component
         $this->resetPage();
     }
 
-    public function updatingMilitaryStatus()
-    {
-        $this->resetPage();
-    }
-
-    public function updatingMaritalStatus()
-    {
-        $this->resetPage();
-    }
-
     public function updatingAreaId()
     {
         $this->resetPage();
@@ -149,6 +174,46 @@ class ApplicantsIndex extends Component
     }
 
     public function updatingMaxAge()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingName()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingJobTitle()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingPhone()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingGender()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingEducation()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingInterviewFrom()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingInterviewTo()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingInterviewResult()
     {
         $this->resetPage();
     }

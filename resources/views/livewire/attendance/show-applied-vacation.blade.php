@@ -176,6 +176,12 @@
                                                 class="action-btn text-info-500" title="View Details">
                                                 <iconify-icon icon="heroicons:information-circle"></iconify-icon>
                                             </button>
+                                            @can('edit', $appliedVacation)
+                                                <button wire:click="openEditModal({{ $appliedVacation->id }})"
+                                                    class="action-btn text-warning-500" title="Edit">
+                                                    <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                                                </button>
+                                            @endcan
                                             @can('approve', $appliedVacation)
                                                 <button
                                                     wire:click="$dispatch('showConfirmation',{message:'Are you sure you want to approve this vacation?',color:'success',callback:'approveVacation',params:{{ $appliedVacation->id }}})"
@@ -253,6 +259,78 @@
                 <x-secondary-button wire:click="closeRejectModal">Cancel</x-secondary-button>
                 <x-primary-button wire:click.prevent="confirmReject" loadingFunction="confirmReject">Reject
                     Vacation</x-primary-button>
+            </x-slot>
+        </x-modal>
+    @endif
+
+    @if ($showEditModal)
+        <x-modal wire:model="showEditModal">
+            <x-slot name="title">Edit Vacation Request</x-slot>
+            <!-- Modal body -->
+            <div class="p-6 space-y-4">
+                @if ($selectedAppliedVacation)
+                    <div class="alert alert-info">
+                        <p class="font-medium">Editing request for:</p>
+                        <p>{{ $selectedAppliedVacation->employee ? $selectedAppliedVacation->employee->name : 'N/A' }}
+                            -
+                            {{ $selectedAppliedVacation->vacationBenefit ? $selectedAppliedVacation->vacationBenefit->name : 'Mission' }}
+                        </p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Days</label>
+                        <div class="space-y-2">
+                            @foreach ($editDays as $index => $day)
+                                <div class="flex items-end gap-2">
+                                    <div class="flex-1">
+                                        <label class="text-xs text-slate-500">Date</label>
+                                        <input type="date" class="form-control"
+                                            wire:model="editDays.{{ $index }}.vacation_date">
+                                        @error('editDays.' . $index . '.vacation_date')
+                                            <span class="text-xs text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="w-28">
+                                        <label class="text-xs text-slate-500">Hours</label>
+                                        <input type="number" min="1" max="24" step="0.5" class="form-control"
+                                            wire:model="editDays.{{ $index }}.hours">
+                                        @error('editDays.' . $index . '.hours')
+                                            <span class="text-xs text-danger-500">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <button type="button" wire:click="removeEditDay({{ $index }})"
+                                        class="action-btn text-danger-500 mb-2" title="Remove day">
+                                        <iconify-icon icon="heroicons:trash"></iconify-icon>
+                                    </button>
+                                </div>
+                            @endforeach
+                        </div>
+                        @error('editDays')
+                            <span class="text-xs text-danger-500">{{ $message }}</span>
+                        @enderror
+                        <button type="button" wire:click="addEditDay"
+                            class="btn btn-sm btn-outline-primary mt-2">+ Add Day</button>
+                    </div>
+
+                    <div class="text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Total Hours: {{ $this->editTotalHours }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editReason" class="form-label">Reason for Vacation (Optional)</label>
+                        <textarea id="editReason" rows="3" class="form-control" wire:model="editReason"
+                            placeholder="Reason for vacation..."></textarea>
+                        @error('editReason')
+                            <span class="text-xs text-danger-500">{{ $message }}</span>
+                        @enderror
+                    </div>
+                @endif
+            </div>
+            <!-- Modal footer -->
+            <x-slot name="footer">
+                <x-secondary-button wire:click="closeEditModal">Cancel</x-secondary-button>
+                <x-primary-button wire:click.prevent="saveEdit" loadingFunction="saveEdit">Save
+                    Changes</x-primary-button>
             </x-slot>
         </x-modal>
     @endif
@@ -354,6 +432,17 @@
                                         {{ $selectedAppliedVacation->approvedBy->name }}
                                     @else
                                         <span class="text-slate-400">Not approved yet</span>
+                                    @endif
+                                </p>
+                            </div>
+                            <div class="col-span-2">
+                                <label class="text-sm font-medium text-slate-600 dark:text-slate-300">Reason for
+                                    Vacation</label>
+                                <p class="mt-1 text-slate-900 dark:text-white whitespace-pre-wrap">
+                                    @if ($selectedAppliedVacation->reason && trim($selectedAppliedVacation->reason) !== '')
+                                        {{ $selectedAppliedVacation->reason }}
+                                    @else
+                                        <span class="text-slate-400">No reason provided</span>
                                     @endif
                                 </p>
                             </div>

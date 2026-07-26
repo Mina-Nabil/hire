@@ -57,26 +57,72 @@
                     </div>
                 </div>
 
-                <!-- Military Status -->
+                <!-- Name / Phone -->
                 <div class="mb-4">
                     <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <label class="form-label">Military Status</label>
-                            <select wire:model.live="militaryStatus" class="form-control">
+                            <label class="form-label text-sm">Name</label>
+                            <input type="text" wire:model.live.debounce.400ms="name" class="form-control"
+                                placeholder="Name">
+                        </div>
+                        <div>
+                            <label class="form-label text-sm">Phone Number</label>
+                            <input type="text" wire:model.live.debounce.400ms="phone" class="form-control"
+                                placeholder="Phone Number">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Job Title / Gender -->
+                <div class="mb-4">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="form-label text-sm">Job Title</label>
+                            <input type="text" wire:model.live.debounce.400ms="jobTitle" class="form-control"
+                                placeholder="Job Title">
+                        </div>
+                        <div>
+                            <label class="form-label">Gender</label>
+                            <select wire:model.live="gender" class="form-control">
                                 <option value="">All</option>
-                                @foreach ($militaryStatusOptions as $status)
-                                    <option value="{{ $status }}">{{ $status }}</option>
+                                @foreach ($genderOptions as $option)
+                                    <option value="{{ $option }}">{{ $option }}</option>
                                 @endforeach
                             </select>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Education / Interview Result -->
+                <div class="mb-4">
+                    <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <label class="form-label">Marital Status</label>
-                            <select wire:model.live="maritalStatus" class="form-control">
+                            <label class="form-label text-sm">Education</label>
+                            <input type="text" wire:model.live.debounce.400ms="education" class="form-control"
+                                placeholder="Degree, field or school">
+                        </div>
+                        <div>
+                            <label class="form-label">Interview Result</label>
+                            <select wire:model.live="interviewResult" class="form-control">
                                 <option value="">All</option>
-                                @foreach ($maritalStatusOptions as $status)
-                                    <option value="{{ $status }}">{{ $status }}</option>
+                                @foreach ($interviewResultOptions as $result)
+                                    <option value="{{ $result }}">{{ $result }}</option>
                                 @endforeach
                             </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interview Date Range -->
+                <div class="mb-4">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="form-label text-sm">Interview From</label>
+                            <input type="date" wire:model.live="interviewFrom" class="form-control">
+                        </div>
+                        <div>
+                            <label class="form-label text-sm">Interview To</label>
+                            <input type="date" wire:model.live="interviewTo" class="form-control">
                         </div>
                     </div>
                 </div>
@@ -136,13 +182,12 @@
                         <thead class="border-t border-slate-100 dark:border-slate-800 bg-slate-200 dark:bg-slate-700">
                             <tr>
                                 <th scope="col" class="table-th">Full Name</th>
+                                <th scope="col" class="table-th">Job Title</th>
                                 <th scope="col" class="table-th">Phone</th>
-                                <th scope="col" class="table-th">Email</th>
-                                <th scope="col" class="table-th">Area</th>
-                                <th scope="col" class="table-th">Marital Status</th>
-                                <th scope="col" class="table-th">Military Status</th>
-                                <th scope="col" class="table-th">Applications</th>
-                                <th scope="col" class="table-th">Interviews</th>
+                                <th scope="col" class="table-th">Gender</th>
+                                <th scope="col" class="table-th">Education</th>
+                                <th scope="col" class="table-th">Interview Date</th>
+                                <th scope="col" class="table-th">Interview Result</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
@@ -169,26 +214,14 @@
                                             @endif
                                         </div>
                                     </td>
+                                    <td class="table-td">{{ $applicant->job_title ?? '-' }}</td>
                                     <td class="table-td">{{ $applicant->phone }}</td>
-                                    <td class="table-td">{{ $applicant->email }}</td>
+                                    <td class="table-td">{{ $applicant->gender ?? '-' }}</td>
+                                    <td class="table-td">{{ $applicant->latest_education ?? '-' }}</td>
                                     <td class="table-td">
-                                        {{ $applicant->area ? $applicant->area->city->name . ' - ' . $applicant->area->name : '-' }}
+                                        {{ $applicant->latest_interview ? $applicant->latest_interview->date->format('d M Y') : '-' }}
                                     </td>
-                                    <td class="table-td">{{ $applicant->marital_status ?? '-' }}</td>
-                                    <td class="table-td">{{ $applicant->military_status ?? '-' }}</td>
-                                    <td class="table-td">
-                                        <div class="flex space-x-3 rtl:space-x-reverse">
-                                            <span class="text-success-500 text-xl leading-[0]">
-                                                {{ $applicant->applications->count() }}
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <td class="table-td">
-                                        <div class="flex space-x-3 rtl:space-x-reverse">
-                                            <span class="text-success-500 text-xl leading-[0]">
-                                                {{ $applicant->interviews->count() }}
-                                            </span>
-                                        </div>
+                                    <td class="table-td">{{ $applicant->interview_result ?? '-' }}</td>
                                 </tr>
                             @endforeach
                         </tbody>

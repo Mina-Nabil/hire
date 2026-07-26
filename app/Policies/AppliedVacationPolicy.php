@@ -47,4 +47,18 @@ class AppliedVacationPolicy
     {
         return $appliedVacation->status !== AppliedVacation::STATUS_REJECTED && ($user->is_admin || ($user->is_hr && !$user->permit_tibian) || (($user->employee_id === $appliedVacation->employee->manager_id || $user->employee_id === $appliedVacation->employee->id) && $appliedVacation->status === AppliedVacation::STATUS_PENDING));
     }
+
+    /**
+     * Determine whether the user can edit the applied vacation.
+     * Only pending requests can be edited, by the owning employee, their
+     * manager, or an admin / hr user.
+     */
+    public function edit(User $user, AppliedVacation $appliedVacation): bool
+    {
+        return $appliedVacation->status === AppliedVacation::STATUS_PENDING
+            && ($user->is_admin
+                || ($user->is_hr && !$user->permit_tibian)
+                || $user->employee_id === $appliedVacation->employee_id
+                || $user->employee_id === $appliedVacation->employee->manager_id);
+    }
 }

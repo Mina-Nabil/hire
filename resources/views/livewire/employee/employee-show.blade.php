@@ -973,12 +973,25 @@
                             ID Card Information
                         </h4>
 
-                        @can('setDocs', [$employee, 'idCard'])
-                            <button type="button" class="text-slate-900 dark:text-white"
-                                wire:click="openEditIdCardModal">
-                                <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
-                            </button>
-                        @endcan
+                        <div class="flex items-center gap-3">
+                            @can('setDocs', [$employee, 'idCard'])
+                                <button type="button" class="text-slate-900 dark:text-white"
+                                    wire:click="openEditIdCardModal">
+                                    <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
+                                </button>
+                            @endcan
+                            @can('deleteDocs', $employee)
+                                @if ($employee->idCard)
+                                    <button type="button" class="text-danger-500"
+                                        wire:click="removeDocument('idCard')"
+                                        wire:confirm="Are you sure you want to remove this document?"
+                                        title="Remove Document">
+                                        <iconify-icon icon="mingcute:delete-2-line" width="25"
+                                            height="25"></iconify-icon>
+                                    </button>
+                                @endif
+                            @endcan
+                        </div>
                     </div>
                     <div class="card-body p-6">
                         @if ($employee->idCard)
@@ -1072,12 +1085,25 @@
                             Birth Certificate Information
                         </h4>
 
-                        @can('setDocs', [$employee, 'birthCertificate'])
-                            <button type="button" class="text-slate-900 dark:text-white"
-                                wire:click="openEditBirthCertificateModal">
-                                <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
-                            </button>
-                        @endcan
+                        <div class="flex items-center gap-3">
+                            @can('setDocs', [$employee, 'birthCertificate'])
+                                <button type="button" class="text-slate-900 dark:text-white"
+                                    wire:click="openEditBirthCertificateModal">
+                                    <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
+                                </button>
+                            @endcan
+                            @can('deleteDocs', $employee)
+                                @if ($employee->birthCertificate)
+                                    <button type="button" class="text-danger-500"
+                                        wire:click="removeDocument('birthCertificate')"
+                                        wire:confirm="Are you sure you want to remove this document?"
+                                        title="Remove Document">
+                                        <iconify-icon icon="mingcute:delete-2-line" width="25"
+                                            height="25"></iconify-icon>
+                                    </button>
+                                @endif
+                            @endcan
+                        </div>
                     </div>
                     <div class="card-body p-6">
                         @if ($employee->birthCertificate)
@@ -1168,12 +1194,25 @@
                             Army Service Paper Information
                         </h4>
 
-                        @can('setDocs', [$employee, 'armyServicePaper'])
-                            <button type="button" class="text-slate-900 dark:text-white"
-                                wire:click="openEditArmyServicePaperModal">
-                                <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
-                            </button>
-                        @endcan
+                        <div class="flex items-center gap-3">
+                            @can('setDocs', [$employee, 'armyServicePaper'])
+                                <button type="button" class="text-slate-900 dark:text-white"
+                                    wire:click="openEditArmyServicePaperModal">
+                                    <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
+                                </button>
+                            @endcan
+                            @can('deleteDocs', $employee)
+                                @if ($employee->armyServicePaper)
+                                    <button type="button" class="text-danger-500"
+                                        wire:click="removeDocument('armyServicePaper')"
+                                        wire:confirm="Are you sure you want to remove this document?"
+                                        title="Remove Document">
+                                        <iconify-icon icon="mingcute:delete-2-line" width="25"
+                                            height="25"></iconify-icon>
+                                    </button>
+                                @endif
+                            @endcan
+                        </div>
                     </div>
                     <div class="card-body p-6">
                         @if ($employee->armyServicePaper)
@@ -1274,12 +1313,25 @@
                             Driver License Information
                         </h4>
 
-                        @can('setDocs', [$employee, 'driverLicense'])
-                            <button type="button" class="text-slate-900 dark:text-white"
-                                wire:click="openEditDriverLicenseModal">
-                                <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
-                            </button>
-                        @endcan
+                        <div class="flex items-center gap-3">
+                            @can('setDocs', [$employee, 'driverLicense'])
+                                <button type="button" class="text-slate-900 dark:text-white"
+                                    wire:click="openEditDriverLicenseModal">
+                                    <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
+                                </button>
+                            @endcan
+                            @can('deleteDocs', $employee)
+                                @if ($employee->driverLicense)
+                                    <button type="button" class="text-danger-500"
+                                        wire:click="removeDocument('driverLicense')"
+                                        wire:confirm="Are you sure you want to remove this document?"
+                                        title="Remove Document">
+                                        <iconify-icon icon="mingcute:delete-2-line" width="25"
+                                            height="25"></iconify-icon>
+                                    </button>
+                                @endif
+                            @endcan
+                        </div>
                     </div>
                     <div class="card-body p-6">
                         @if ($employee->driverLicense)
@@ -1977,12 +2029,25 @@
                             Employee S1 Doc Information
                         </h4>
 
-                        @can('setDocs', [$employee, 'employeeS1Doc'])
-                            <button type="button" class="text-slate-900 dark:text-white"
-                                wire:click="openEditEmployeeS1DocModal">
-                                <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
-                            </button>
-                        @endcan
+                        <div class="flex items-center gap-3">
+                            @can('setDocs', [$employee, 'employeeS1Doc'])
+                                <button type="button" class="text-slate-900 dark:text-white"
+                                    wire:click="openEditEmployeeS1DocModal">
+                                    <iconify-icon icon="mingcute:edit-line" width="25" height="25"></iconify-icon>
+                                </button>
+                            @endcan
+                            @can('deleteDocs', $employee)
+                                @if ($employee->employeeS1Doc)
+                                    <button type="button" class="text-danger-500"
+                                        wire:click="removeDocument('employeeS1Doc')"
+                                        wire:confirm="Are you sure you want to remove this document?"
+                                        title="Remove Document">
+                                        <iconify-icon icon="mingcute:delete-2-line" width="25"
+                                            height="25"></iconify-icon>
+                                    </button>
+                                @endif
+                            @endcan
+                        </div>
                     </div>
                     <div class="card-body p-6">
                         @if ($employee->employeeS1Doc)
@@ -2207,11 +2272,22 @@
                             Medical Record Information
                         </h4>
 
-                        @can('setDocs', [$employee, 'medicalRecord'])
-                            <button wire:click="openEditMedicalRecordModal" class="action-btn" type="button">
-                                <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
-                            </button>
-                        @endcan
+                        <div class="flex items-center gap-2">
+                            @can('setDocs', [$employee, 'medicalRecord'])
+                                <button wire:click="openEditMedicalRecordModal" class="action-btn" type="button">
+                                    <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                                </button>
+                            @endcan
+                            @can('deleteDocs', $employee)
+                                @if ($employee->medicalRecord)
+                                    <button wire:click="removeDocument('medicalRecord')"
+                                        wire:confirm="Are you sure you want to remove this document?"
+                                        class="action-btn text-danger-500" type="button" title="Remove Document">
+                                        <iconify-icon icon="heroicons:trash"></iconify-icon>
+                                    </button>
+                                @endif
+                            @endcan
+                        </div>
                     </div>
                     <div class="card-body p-6">
                         @if ($employee->medicalRecord)
@@ -2344,11 +2420,23 @@
                             External Medical Record
                         </h4>
 
-                        @can('setDocs', [$employee, 'externalMedicalRecord'])
-                            <button wire:click="openEditExternalMedicalRecordModal" class="action-btn" type="button">
-                                <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
-                            </button>
-                        @endcan
+                        <div class="flex items-center gap-2">
+                            @can('setDocs', [$employee, 'externalMedicalRecord'])
+                                <button wire:click="openEditExternalMedicalRecordModal" class="action-btn"
+                                    type="button">
+                                    <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                                </button>
+                            @endcan
+                            @can('deleteDocs', $employee)
+                                @if ($employee->externalMedicalRecord)
+                                    <button wire:click="removeDocument('externalMedicalRecord')"
+                                        wire:confirm="Are you sure you want to remove this document?"
+                                        class="action-btn text-danger-500" type="button" title="Remove Document">
+                                        <iconify-icon icon="heroicons:trash"></iconify-icon>
+                                    </button>
+                                @endif
+                            @endcan
+                        </div>
                     </div>
 
                     @if ($employee->externalMedicalRecord)
@@ -2449,11 +2537,22 @@
                             Practice Card
                         </h4>
 
-                        @can('setDocs', [$employee, 'practiceCard'])
-                            <button wire:click="openEditPracticeCardModal" class="action-btn" type="button">
-                                <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
-                            </button>
-                        @endcan
+                        <div class="flex items-center gap-2">
+                            @can('setDocs', [$employee, 'practiceCard'])
+                                <button wire:click="openEditPracticeCardModal" class="action-btn" type="button">
+                                    <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                                </button>
+                            @endcan
+                            @can('deleteDocs', $employee)
+                                @if ($employee->practiceCard)
+                                    <button wire:click="removeDocument('practiceCard')"
+                                        wire:confirm="Are you sure you want to remove this document?"
+                                        class="action-btn text-danger-500" type="button" title="Remove Document">
+                                        <iconify-icon icon="heroicons:trash"></iconify-icon>
+                                    </button>
+                                @endif
+                            @endcan
+                        </div>
                     </div>
 
                     @if ($employee->practiceCard)
@@ -2545,11 +2644,23 @@
                             Skills Qualification
                         </h4>
 
-                        @can('setDocs', [$employee, 'skillsQualification'])
-                            <button wire:click="openEditSkillsQualificationModal" class="action-btn" type="button">
-                                <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
-                            </button>
-                        @endcan
+                        <div class="flex items-center gap-2">
+                            @can('setDocs', [$employee, 'skillsQualification'])
+                                <button wire:click="openEditSkillsQualificationModal" class="action-btn"
+                                    type="button">
+                                    <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                                </button>
+                            @endcan
+                            @can('deleteDocs', $employee)
+                                @if ($employee->skillsQualifications)
+                                    <button wire:click="removeDocument('skillsQualifications')"
+                                        wire:confirm="Are you sure you want to remove this document?"
+                                        class="action-btn text-danger-500" type="button" title="Remove Document">
+                                        <iconify-icon icon="heroicons:trash"></iconify-icon>
+                                    </button>
+                                @endif
+                            @endcan
+                        </div>
                     </div>
 
                     @if ($employee->skillsQualifications)
@@ -2644,11 +2755,22 @@
                             Syndicate Card
                         </h4>
 
-                        @can('setDocs', [$employee, 'syndicateCard'])
-                            <button wire:click="openEditSyndicateCardModal" class="action-btn" type="button">
-                                <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
-                            </button>
-                        @endcan
+                        <div class="flex items-center gap-2">
+                            @can('setDocs', [$employee, 'syndicateCard'])
+                                <button wire:click="openEditSyndicateCardModal" class="action-btn" type="button">
+                                    <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                                </button>
+                            @endcan
+                            @can('deleteDocs', $employee)
+                                @if ($employee->syndicateCard)
+                                    <button wire:click="removeDocument('syndicateCard')"
+                                        wire:confirm="Are you sure you want to remove this document?"
+                                        class="action-btn text-danger-500" type="button" title="Remove Document">
+                                        <iconify-icon icon="heroicons:trash"></iconify-icon>
+                                    </button>
+                                @endif
+                            @endcan
+                        </div>
                     </div>
 
                     @if ($employee->syndicateCard)
@@ -2740,11 +2862,22 @@
                             Labour Document
                         </h4>
 
-                        @can('setDocs', [$employee, 'labourDocument'])
-                            <button wire:click="openEditLabourDocumentModal" class="action-btn" type="button">
-                                <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
-                            </button>
-                        @endcan
+                        <div class="flex items-center gap-2">
+                            @can('setDocs', [$employee, 'labourDocument'])
+                                <button wire:click="openEditLabourDocumentModal" class="action-btn" type="button">
+                                    <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                                </button>
+                            @endcan
+                            @can('deleteDocs', $employee)
+                                @if ($employee->labourDocument)
+                                    <button wire:click="removeDocument('labourDocument')"
+                                        wire:confirm="Are you sure you want to remove this document?"
+                                        class="action-btn text-danger-500" type="button" title="Remove Document">
+                                        <iconify-icon icon="heroicons:trash"></iconify-icon>
+                                    </button>
+                                @endif
+                            @endcan
+                        </div>
                     </div>
 
                     @if ($employee->labourDocument)
@@ -2849,11 +2982,23 @@
                             College Certificate
                         </h4>
 
-                        @can('setDocs', [$employee, 'collegeCertificate'])
-                            <button wire:click="openEditCollegeCertificateModal" class="action-btn" type="button">
-                                <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
-                            </button>
-                        @endcan
+                        <div class="flex items-center gap-2">
+                            @can('setDocs', [$employee, 'collegeCertificate'])
+                                <button wire:click="openEditCollegeCertificateModal" class="action-btn"
+                                    type="button">
+                                    <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                                </button>
+                            @endcan
+                            @can('deleteDocs', $employee)
+                                @if ($employee->collegeCertificate)
+                                    <button wire:click="removeDocument('collegeCertificate')"
+                                        wire:confirm="Are you sure you want to remove this document?"
+                                        class="action-btn text-danger-500" type="button" title="Remove Document">
+                                        <iconify-icon icon="heroicons:trash"></iconify-icon>
+                                    </button>
+                                @endif
+                            @endcan
+                        </div>
                     </div>
 
                     @if ($employee->collegeCertificate)
@@ -2948,11 +3093,22 @@
                             Social Print
                         </h4>
 
-                        @can('setDocs', [$employee, 'socialPrint'])
-                            <button wire:click="openEditSocialPrintModal" class="action-btn" type="button">
-                                <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
-                            </button>
-                        @endcan
+                        <div class="flex items-center gap-2">
+                            @can('setDocs', [$employee, 'socialPrint'])
+                                <button wire:click="openEditSocialPrintModal" class="action-btn" type="button">
+                                    <iconify-icon icon="heroicons:pencil-square"></iconify-icon>
+                                </button>
+                            @endcan
+                            @can('deleteDocs', $employee)
+                                @if ($employee->socialPrint)
+                                    <button wire:click="removeDocument('socialPrint')"
+                                        wire:confirm="Are you sure you want to remove this document?"
+                                        class="action-btn text-danger-500" type="button" title="Remove Document">
+                                        <iconify-icon icon="heroicons:trash"></iconify-icon>
+                                    </button>
+                                @endif
+                            @endcan
+                        </div>
                     </div>
 
                     @if ($employee->socialPrint)

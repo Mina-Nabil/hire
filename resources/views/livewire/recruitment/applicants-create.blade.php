@@ -613,8 +613,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <!-- Training Name -->
                                 <div class="form-group">
-                                    <label class="form-label">{{ __('recruitment.training_name') }} <span
-                                            class="text-danger-500">*</span></label>
+                                    <label class="form-label">{{ __('recruitment.training_name') }}</label>
                                     <input type="text" wire:model="trainings.{{ $index }}.name"
                                         @if ($locale === 'ar') dir="rtl" @endif
                                         class="form-control @error('trainings.' . $index . '.name') !border-danger-500 @enderror">
@@ -628,8 +627,7 @@
 
                                 <!-- Sponsor -->
                                 <div class="form-group">
-                                    <label class="form-label">{{ __('recruitment.sponsor') }} <span
-                                            class="text-danger-500">*</span></label>
+                                    <label class="form-label">{{ __('recruitment.sponsor') }}</label>
                                     <input type="text" wire:model="trainings.{{ $index }}.sponsor"
                                         @if ($locale === 'ar') dir="rtl" @endif
                                         class="form-control @error('trainings.' . $index . '.sponsor') !border-danger-500 @enderror">
@@ -643,8 +641,7 @@
 
                                 <!-- Duration -->
                                 <div class="form-group">
-                                    <label class="form-label">{{ __('recruitment.duration') }} <span
-                                            class="text-danger-500">*</span></label>
+                                    <label class="form-label">{{ __('recruitment.duration') }}</label>
                                     <input type="text" wire:model="trainings.{{ $index }}.duration"
                                         @if ($locale === 'ar') dir="rtl" @endif
                                         class="form-control @error('trainings.' . $index . '.duration') !border-danger-500 @enderror">
@@ -658,8 +655,7 @@
 
                                 <!-- Start Date -->
                                 <div class="form-group">
-                                    <label class="form-label">{{ __('recruitment.start_date') }} <span
-                                            class="text-danger-500">*</span></label>
+                                    <label class="form-label">{{ __('recruitment.start_date') }}</label>
                                     <input type="date" wire:model="trainings.{{ $index }}.start_date"
                                         @if ($locale === 'ar') dir="rtl" @endif
                                         class="form-control @error('trainings.' . $index . '.start_date') !border-danger-500 @enderror">

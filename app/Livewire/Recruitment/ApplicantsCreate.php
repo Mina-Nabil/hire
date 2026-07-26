@@ -305,15 +305,10 @@ class ApplicantsCreate extends Component
         foreach ($this->trainings as $index => $training) {
             if (!empty($training['name'])) {
                 $this->validate([
-                    "trainings.{$index}.name" => 'required|string|max:255',
-                    "trainings.{$index}.sponsor" => 'required|string|max:255',
-                    "trainings.{$index}.duration" => 'required|string|max:255',
-                    "trainings.{$index}.start_date" => 'required|date',
-                ], [
-                    "trainings.{$index}.name.required" => 'The training name is required',
-                    "trainings.{$index}.sponsor.required" => 'The training sponsor is required',
-                    "trainings.{$index}.duration.required" => 'The training duration is required',
-                    "trainings.{$index}.start_date.required" => 'The training start date is required',
+                    "trainings.{$index}.name" => 'nullable|string|max:255',
+                    "trainings.{$index}.sponsor" => 'nullable|string|max:255',
+                    "trainings.{$index}.duration" => 'nullable|string|max:255',
+                    "trainings.{$index}.start_date" => 'nullable|date',
                 ]);
             }
         }

@@ -27,10 +27,6 @@
                             <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
                             <p class="text-gray-600">We'll contact you shortly</p>
                         </div>
-                        <div class="flex items-start space-x-3">
-                            <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                            <p class="text-gray-600">Check your email for updates</p>
-                        </div>
                     </div>
                 </div>
 

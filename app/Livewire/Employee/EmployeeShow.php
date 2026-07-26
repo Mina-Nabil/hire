@@ -309,6 +309,92 @@ class EmployeeShow extends Component
         $this->social_print_types = \App\Models\Personel\Docs\SocialPrint::TYPES;
     }
 
+    /**
+     * The single (hasOne) document relations that admin / hr can remove.
+     */
+    private array $removableDocuments = [
+        'idCard',
+        'birthCertificate',
+        'armyServicePaper',
+        'driverLicense',
+        'medicalRecord',
+        'externalMedicalRecord',
+        'practiceCard',
+        'skillsQualifications',
+        'syndicateCard',
+        'labourDocument',
+        'collegeCertificate',
+        'socialPrint',
+        'employeeS1Doc',
+    ];
+
+    /**
+     * Reload the employee together with all document relations used by the view.
+     */
+    private function reloadEmployee(): void
+    {
+        $this->employee = Employee::with([
+            'info',
+            'idCard',
+            'birthCertificate',
+            'armyServicePaper',
+            'employeeS1Doc',
+            'employeeS2Doc',
+            'employeeS6Doc',
+            'policeRecords',
+            'hrLetters',
+            'driverLicense',
+            'medicalRecord',
+            'externalMedicalRecord',
+            'practiceCard',
+            'skillsQualifications',
+            'syndicateCard',
+            'labourDocument',
+            'collegeCertificate',
+            'socialPrint',
+        ])->findOrFail($this->employee->id);
+    }
+
+    /**
+     * Remove an uploaded single document (admin / hr only).
+     */
+    public function removeDocument($relation)
+    {
+        if (!in_array($relation, $this->removableDocuments, true)) {
+            $this->alertError('Invalid document type');
+            return;
+        }
+
+        if (!Auth::user()->can('deleteDocs', $this->employee)) {
+            $this->alertError('You are not authorized to remove this document');
+            return;
+        }
+
+        try {
+            $document = $this->employee->{$relation};
+            if (!$document) {
+                $this->alertError('No document found to remove');
+                return;
+            }
+
+            // Best-effort removal of the stored file from S3
+            $rawPath = $document->getRawOriginal('file_path');
+            if ($rawPath) {
+                $filePath = str_replace('storage/', '', $rawPath);
+                if (Storage::disk('s3')->exists($filePath)) {
+                    Storage::disk('s3')->delete($filePath);
+                }
+            }
+
+            $document->delete();
+
+            $this->reloadEmployee();
+            $this->alertSuccess('Document removed successfully');
+        } catch (\Exception $e) {
+            $this->alertError('Error removing document: ' . $e->getMessage());
+        }
+    }
+
     public function openEditIdCardModal()
     {
         $this->resetValidation();

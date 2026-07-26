@@ -29,6 +29,7 @@ class AppliedVacation extends Model
         'hours',
         'new_balance',
         'note',
+        'reason',
         'is_mission',
         'approved_by_id',
     ];
@@ -83,6 +84,66 @@ class AppliedVacation extends Model
             report($e);
             AppLog::error('Error rejecting vacation', $e->getMessage(), loggable: $this);
             throw new AppException('Error rejecting vacation');
+        }
+    }
+
+    /**
+     * Update a pending vacation request (days, hours and reason).
+     * Adjusts the linked vacation benefit balance to reflect the change.
+     *
+     * @param array $days Array of ['vacation_date' => 'Y-m-d', 'hours' => int]
+     * @param string|null $reason
+     * @return void
+     */
+    public function updateRequest(array $days, ?string $reason = null)
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        if (!$user->can('edit', $this)) {
+            throw new AppException('You dont have permission to edit this request');
+        }
+
+        if ($this->status !== self::STATUS_PENDING) {
+            throw new AppException('Only pending requests can be edited');
+        }
+
+        if (empty($days)) {
+            throw new AppException('You must add at least one day for the request');
+        }
+
+        $newHours = collect($days)->sum('hours');
+
+        try {
+            DB::transaction(function () use ($days, $reason, $newHours) {
+                // Adjust the vacation balance for non-mission requests: restore the
+                // hours previously deducted, then deduct the new amount.
+                if (!$this->is_mission && $this->vacationBenefit) {
+                    $restoredBalance = $this->vacationBenefit->current_balance + $this->hours;
+                    if ($restoredBalance < $newHours) {
+                        throw new AppException('You dont have enough vacation days');
+                    }
+                    $this->vacationBenefit->update([
+                        'current_balance' => $restoredBalance - $newHours,
+                    ]);
+                    $this->new_balance = $restoredBalance - $newHours;
+                }
+
+                $this->hours = $newHours;
+                $this->reason = $reason;
+                $this->save();
+
+                // Replace the vacation days
+                $this->vacationDays()->delete();
+                $this->vacationDays()->createMany($days);
+
+                AppLog::info('Vacation Request Updated', 'Vacation request updated for employee: ' . $this->employee->name, loggable: $this);
+            });
+        } catch (AppException $e) {
+            throw $e;
+        } catch (Exception $e) {
+            report($e);
+            AppLog::error('Error updating vacation request', $e->getMessage(), loggable: $this);
+            throw new AppException('Error updating vacation request');
         }
     }
 

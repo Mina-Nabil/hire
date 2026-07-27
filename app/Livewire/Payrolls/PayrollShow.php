@@ -366,12 +366,15 @@ class PayrollShow extends Component
         $overtimeAmount = $this->selectedPenaltyEmployee->overtime_amount;
         $adjAmount = $this->selectedPenaltyEmployee->adj_amount;
 
-        $netAfterDeductions = $netAfterPenalty + $extraPayments + $overtimeAmount + $adjAmount;
+        // Extra payments are excluded from net_after_deductions (the tax base,
+        // which is also averaged across months by calculateTaxAmount) and added
+        // back into the take-home amount (paid) so they remain after-tax.
+        $netAfterDeductions = $netAfterPenalty + $overtimeAmount + $adjAmount;
 
         $this->selectedPenaltyEmployee->update([
             'net_after_penalty' => $netAfterPenalty,
             'net_after_deductions' => $netAfterDeductions,
-            'paid' => $netAfterDeductions
+            'paid' => $netAfterDeductions + $extraPayments
         ]);
 
         // Update payroll total
@@ -420,12 +423,14 @@ class PayrollShow extends Component
         $payrollEmployee->adj_amount = $this->adjustmentAmount;
         $payrollEmployee->adj_desc = $this->adjustmentDescription;
 
-        // Recalculate net after deductions
-        $newNetAmount = $payrollEmployee->net_after_penalty + $payrollEmployee->extra_payments + $payrollEmployee->overtime_amount + $this->adjustmentAmount;
-        $payrollEmployee->net_after_deductions = $newNetAmount;
-        $payrollEmployee->paid = $newNetAmount; // Update paid amount as well
-        $payrollEmployee->tax_amount = Payroll::calculateTaxAmount($newNetAmount, $payrollEmployee->employee_id, $this->payroll->end_date);
-        $payrollEmployee->after_tax_salary = $newNetAmount - $payrollEmployee->tax_amount;
+        // Recalculate net after deductions. Extra payments are excluded from the
+        // tax base (net_after_deductions) and added back after tax, so they are
+        // paid to the employee but never taxed.
+        $taxBase = $payrollEmployee->net_after_penalty + $payrollEmployee->overtime_amount + $this->adjustmentAmount;
+        $payrollEmployee->net_after_deductions = $taxBase;
+        $payrollEmployee->paid = $taxBase + $payrollEmployee->extra_payments; // Update paid amount as well
+        $payrollEmployee->tax_amount = Payroll::calculateTaxAmount($taxBase, $payrollEmployee->employee_id, $this->payroll->end_date);
+        $payrollEmployee->after_tax_salary = $taxBase - $payrollEmployee->tax_amount + $payrollEmployee->extra_payments;
 
         $payrollEmployee->save();
 

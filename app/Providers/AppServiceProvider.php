@@ -22,6 +22,7 @@ use App\Models\Benefits\Extras\Purchase;
 use App\Models\Benefits\Payrolls\AppliedVacation;
 use App\Models\Benefits\Payrolls\BenefitPayment;
 use App\Models\Benefits\Payrolls\ExtraPayment;
+use App\Models\Benefits\Payrolls\PeriodicExtraPayment;
 use App\Models\Benefits\Payrolls\Payroll;
 use App\Models\Benefits\Payrolls\PayrollEmployee;
 use App\Models\Benefits\Vacations\GainedVacation;
@@ -149,6 +150,7 @@ class AppServiceProvider extends ServiceProvider
             PackageDetail::MORPH_NAME => PackageDetail::class,
             BenefitPayment::MORPH_NAME => BenefitPayment::class,
             ExtraPayment::MORPH_NAME => ExtraPayment::class,
+            PeriodicExtraPayment::MORPH_NAME => PeriodicExtraPayment::class,
             Location::MORPH_NAME => Location::class,
             VacationPackage::MORPH_NAME => VacationPackage::class,
             Attendance::MORPH_NAME => Attendance::class,

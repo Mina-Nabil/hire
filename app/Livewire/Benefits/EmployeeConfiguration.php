@@ -13,6 +13,7 @@ use App\Models\Benefits\Vacations\GainedVacation;
 use App\Models\Benefits\Extras\Loan;
 use App\Models\Benefits\Extras\Purchase;
 use App\Models\Benefits\Payrolls\ExtraPayment;
+use App\Models\Benefits\Payrolls\PeriodicExtraPayment;
 use App\Models\Benefits\Vacations\VacationDetail;
 use App\Traits\AlertFrontEnd;
 use Livewire\Component;
@@ -106,9 +107,10 @@ class EmployeeConfiguration extends Component
         'amount' => 0,
         'due_date' => '',
         'desc' => '',
+        'frequency' => '', // '' = one-time, otherwise 'monthly' | 'quarterly'
     ];
 
-    public $listeners = ['refreshConfiguration', 'deleteExtraPayment'];
+    public $listeners = ['refreshConfiguration', 'deleteExtraPayment', 'deactivatePeriodicExtraPayment'];
 
     public function refreshConfiguration()
     {
@@ -206,6 +208,10 @@ class EmployeeConfiguration extends Component
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
+        $periodicExtraPayments = PeriodicExtraPayment::where('employee_id', $this->employee->id)
+            ->orderBy('created_at', 'desc')
+            ->paginate(10, ['*'], 'periodicExtraPaymentsPage');
+
         $payrollRecords = PayrollEmployee::where('employee_id', $this->employee->id)
             ->orderBy('created_at', 'desc')
             ->paginate(10);
@@ -234,6 +240,7 @@ class EmployeeConfiguration extends Component
             'employeeVacations' => $employeeVacations,
             'employeePayments' => $employeePayments,
             'extraPayments' => $extraPayments,
+            'periodicExtraPayments' => $periodicExtraPayments,
             'payrollRecords' => $payrollRecords,
             'loans' => $loans,
             'purchases' => $purchases,
@@ -625,6 +632,7 @@ class EmployeeConfiguration extends Component
             'amount' => 0,
             'due_date' => now()->format('Y-m-d'),
             'desc' => '',
+            'frequency' => '',
         ];
     }
 
@@ -634,14 +642,17 @@ class EmployeeConfiguration extends Component
             'extraPayment.amount' => 'required|numeric',
             'extraPayment.due_date' => 'required|date',
             'extraPayment.desc' => 'required|string',
+            'extraPayment.frequency' => 'nullable|in:' . implode(',', PeriodicExtraPayment::FREQUENCIES),
         ], [
             'extraPayment.amount.required' => 'The amount is required.',
             'extraPayment.due_date.required' => 'The due date is required.',
             'extraPayment.desc.required' => 'The description is required.',
         ]);
 
+        $frequency = $this->extraPayment['frequency'];
+
         try {
-            ExtraPayment::createExtraPayment(
+            $payment = ExtraPayment::createExtraPayment(
                 $this->employee,
                 $this->extraPayment['name'],
                 $this->extraPayment['amount'],
@@ -649,8 +660,26 @@ class EmployeeConfiguration extends Component
                 $this->extraPayment['desc']
             );
 
+            if ($frequency) {
+                // The first occurrence is the payment just created (on the user's
+                // chosen date). The template is anchored to that date; the next
+                // occurrence is +1 month (monthly) or +3 months (quarterly).
+                $template = PeriodicExtraPayment::createPeriodicExtraPayment(
+                    $this->employee,
+                    $this->extraPayment['name'],
+                    $this->extraPayment['amount'],
+                    $frequency,
+                    $this->extraPayment['due_date'],
+                    $this->extraPayment['desc']
+                );
+                $payment->payable()->associate($template);
+                $payment->save();
+            }
+
             $this->closeAddExtraPaymentModal();
-            $this->alertSuccess('Extra payment added successfully.');
+            $this->alertSuccess($frequency
+                ? ucfirst($frequency) . ' extra payment added successfully.'
+                : 'Extra payment added successfully.');
         } catch (AppException $e) {
             $this->alertError($e->getMessage());
         } catch (Exception $e) {
@@ -701,6 +730,21 @@ class EmployeeConfiguration extends Component
         } catch (Exception $e) {
             report($e);
             $this->alertError('Error deleting extra payment. Please try again.');
+        }
+    }
+
+    // --------- Periodic Extra Payment Stop Function ---------
+    public function deactivatePeriodicExtraPayment($periodicExtraPaymentId)
+    {
+        try {
+            $template = PeriodicExtraPayment::findOrFail($periodicExtraPaymentId);
+            $template->deactivate();
+            $this->alertSuccess('Periodic extra payment stopped. Already-generated payments are kept.');
+        } catch (AppException $e) {
+            $this->alertError($e->getMessage());
+        } catch (Exception $e) {
+            report($e);
+            $this->alertError('Error stopping periodic extra payment. Please try again.');
         }
     }
 

@@ -571,6 +571,78 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-6 mt-5">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="card-title">Periodic Extra Payments</h4>
+                            </div>
+                            <div class="card-body px-6 pb-6">
+                                @if ($periodicExtraPayments->count() > 0)
+                                    <div class="overflow-x-auto -mx-6">
+                                        <div class="inline-block min-w-full align-middle">
+                                            <div class="overflow-hidden">
+                                                <table
+                                                    class="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
+                                                    <thead class="bg-slate-200 dark:bg-slate-700">
+                                                        <tr>
+                                                            <th scope="col" class="table-th">Amount</th>
+                                                            <th scope="col" class="table-th">Frequency</th>
+                                                            <th scope="col" class="table-th">Description</th>
+                                                            <th scope="col" class="table-th">Status</th>
+                                                            <th scope="col" class="table-th">Last Generated</th>
+                                                            <th scope="col" class="table-th">Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody
+                                                        class="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
+                                                        @foreach ($periodicExtraPayments as $periodic)
+                                                            <tr>
+                                                                <td class="table-td">{{ $periodic->amount }}</td>
+                                                                <td class="table-td">{{ ucfirst($periodic->frequency) }}</td>
+                                                                <td class="table-td">{{ $periodic->desc ?? '-' }}</td>
+                                                                <td class="table-td">
+                                                                    @if ($periodic->is_active)
+                                                                        <span class="badge bg-success">Active</span>
+                                                                    @else
+                                                                        <span class="badge bg-secondary">Stopped</span>
+                                                                    @endif
+                                                                </td>
+                                                                <td class="table-td">
+                                                                    {{ $periodic->last_generated_at ? \Carbon\Carbon::parse($periodic->last_generated_at)->format('Y-m-d') : '-' }}
+                                                                </td>
+                                                                <td class="table-td">
+                                                                    <div class="flex space-x-2">
+                                                                        @can('deleteExtraPayment', $employee)
+                                                                            @if ($periodic->is_active)
+                                                                                <button
+                                                                                    wire:click="$dispatch('showConfirmation',{message:'Stop this periodic extra payment? Already-generated payments are kept.',color:'danger',callback:'deactivatePeriodicExtraPayment',params:{{ $periodic->id }}})"
+                                                                                    class="btn btn-sm btn-danger"
+                                                                                    title="Stop Periodic Extra Payment">
+                                                                                    <iconify-icon
+                                                                                        icon="mdi:stop-circle-outline"></iconify-icon>
+                                                                                </button>
+                                                                            @endif
+                                                                        @endcan
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                                <div class="mt-6">
+                                                    {{ $periodicExtraPayments->links('vendor.livewire.simple-bootstrap') }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @else
+                                    <div class="alert alert-info mt-5">
+                                        No periodic extra payments found for this employee.
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1368,6 +1440,13 @@
                                 class="@error('extraPayment.desc') !border-danger-500 @enderror"
                                 wire:model="extraPayment.desc"
                                 errorMessage="{{ $errors->first('extraPayment.desc') }}" />
+
+                            <x-select label="Recurring" wire:model="extraPayment.frequency"
+                                errorMessage="{{ $errors->first('extraPayment.frequency') }}">
+                                <option value="">No (one-time payment)</option>
+                                <option value="monthly">Monthly (every 1 month from this date)</option>
+                                <option value="quarterly">Quarterly (every 3 months from this date)</option>
+                            </x-select>
                         </div>
                     </div>
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\GeneratePeriodicExtraPayments;
 use App\Jobs\IncrementVacationBenefits;
 use App\Jobs\ProcessDailyAttendanceJob;
 use Illuminate\Foundation\Inspiring;
@@ -24,6 +25,13 @@ Schedule::job(new IncrementVacationBenefits())
     ->description('Increment vacation benefits')
     ->withoutOverlapping() // Prevent multiple instances from running simultaneously
     ->appendOutputTo(storage_path('logs/increment-vacation-benefits.log'));
+
+Schedule::job(new GeneratePeriodicExtraPayments())
+    ->daily()
+    ->at('03:00') // Runs daily; each template generates when its next occurrence is due
+    ->description('Generate periodic (monthly/quarterly) extra payments when due')
+    ->withoutOverlapping() // Prevent multiple instances from running simultaneously
+    ->appendOutputTo(storage_path('logs/generate-periodic-extra-payments.log'));
 
 // Add a command to manually trigger the attendance processing for a specific date
 Artisan::command('attendance:process {date?}', function (string $date = null) {

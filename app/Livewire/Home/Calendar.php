@@ -188,19 +188,31 @@ class Calendar extends Component
     {
         $events = [];
 
-        foreach (Interview::userData()->get() as $t) {
+        // Only load a bounded window, with relations eager loaded, to keep memory and query count low
+        $from = Carbon::now()->subMonth()->startOfDay();
+        $to = Carbon::now()->addMonths(2)->endOfDay();
+
+        $interviews = Interview::userData()
+            ->whereBetween('interviews.date', [$from, $to])
+            ->with('application.applicant:id,first_name,last_name')
+            ->get();
+
+        foreach ($interviews as $t) {
+            $applicant = $t->application?->applicant;
+            if (!$applicant) continue;
+
             $events[] =  [
                 'id'        => "interview" . $t->id,
-                'title'     => "Interview: " . $t->application->applicant->first_name . " " . $t->application->applicant->last_name,
+                'title'     => "Interview: " . $applicant->first_name . " " . $applicant->last_name,
                 'backgroundColor' => '#75d193', //green
                 'allDay'    => false,
                 'start'     => (new Carbon($t->date))->toIso8601String(),
                 'end'       => (new Carbon($t->date))->addHours(1)->toIso8601String(),
-                'url'       => url('/recruitment/applicants/' . $t->application->applicant->id)
+                'url'       => url('/recruitment/applicants/' . $applicant->id)
             ];
         }
 
-        foreach (CalendarEvent::userData()->with('event_users')->get() as $t) {
+        foreach (CalendarEvent::userData($from, $to)->with('event_users.user:id,username')->get() as $t) {
             $events[] =  [
                 'id'        => "event" . $t->id,
                 'title'     => "$t->title with " . $t->event_users_names,
@@ -213,7 +225,8 @@ class Calendar extends Component
         }
 
         $USER_TAGS = CalendarEventUser::TAGS;
-        $USERS = User::all();
+        // The user picker only exists in the "Create Event" modal
+        $USERS = $this->newEventSection ? User::select('id', 'username')->get() : collect();
 
         $loggedInUser = Auth::user();
         if($loggedInUser->type == 'employee') {

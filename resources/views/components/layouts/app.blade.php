@@ -466,15 +466,15 @@
                             <div class="items-center space-x-4 rtl:space-x-reverse horizental-box">
                                 <a href="{{ url('/') }}">
                                     <span class="xl:inline-block hidden">
-                                        <img src="{{ asset('admin/assets/images/logo/logo.svg') }}"
+                                        <img src="{{ asset('images/logo/logo.svg') }}"
                                             class="black_logo " alt="logo">
-                                        <img src="{{ asset('admin/assets/images/logo/logo.svg') }}assets/images/logo/logo-white.svg"
+                                        <img src="{{ asset('images/logo/logo-white.svg') }}"
                                             class="white_logo" alt="logo">
                                     </span>
                                     <span class="xl:hidden inline-block">
-                                        <img src="{{ asset('admin/assets/images/logo/logo-c.svg') }}"
+                                        <img src="{{ asset('images/logo/logo-c.svg') }}"
                                             class="black_logo " alt="logo">
-                                        <img src="{{ asset('admin/assets/images/logo/logo-c-white.svg') }}"
+                                        <img src="{{ asset('images/logo/logo-c-white.svg') }}"
                                             class="white_logo " alt="logo">
                                     </span>
                                 </a>

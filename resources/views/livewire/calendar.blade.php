@@ -158,6 +158,7 @@
                         </div>
                     </div>
                 </div>
+            </div>
         @endif
 
         @if ($eventID)
@@ -284,16 +285,14 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
         @endif
-
-
-
     </div>
 
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
-            console.log(@json($events))
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 headerToolbar: {

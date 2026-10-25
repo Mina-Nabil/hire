@@ -387,7 +387,7 @@
                             <!-- Vacancy Slots Section -->
                             <div class="mt-6">
                                 <h4 class="text-lg font-medium mb-3">Interview Slots</h4>
-                                @foreach ($slots as $index => $slot)
+                                @foreach ($vacancySlots as $index => $slot)
                                     <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded mb-4">
                                         <div class="flex justify-between items-center mb-3">
                                             <h5 class="text-base font-medium">Slot {{ $index + 1 }}</h5>
@@ -400,17 +400,17 @@
                                             <div class="from-group">
                                                 <label class="form-label">Date</label>
                                                 <input type="date" class="form-control"
-                                                    wire:model="slots.{{ $index }}.date">
+                                                    wire:model="vacancySlots.{{ $index }}.date">
                                             </div>
                                             <div class="from-group">
                                                 <label class="form-label">Start Time</label>
                                                 <input type="time" class="form-control"
-                                                    wire:model="slots.{{ $index }}.start_time">
+                                                    wire:model="vacancySlots.{{ $index }}.start_time">
                                             </div>
                                             <div class="from-group">
                                                 <label class="form-label">End Time</label>
                                                 <input type="time" class="form-control"
-                                                    wire:model="slots.{{ $index }}.end_time">
+                                                    wire:model="vacancySlots.{{ $index }}.end_time">
                                             </div>
                                         </div>
                                     </div>
@@ -703,7 +703,7 @@
                             <!-- Vacancy Slots Section -->
                             <div class="mt-6">
                                 <h4 class="text-lg font-medium mb-3">Interview Slots</h4>
-                                @foreach ($slots as $index => $slot)
+                                @foreach ($vacancySlots as $index => $slot)
                                     <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded mb-4">
                                         <div class="flex justify-between items-center mb-3">
                                             <h5 class="text-base font-medium">Slot {{ $index + 1 }}</h5>
@@ -716,17 +716,17 @@
                                             <div class="from-group">
                                                 <label class="form-label">Date</label>
                                                 <input type="date" class="form-control"
-                                                    wire:model="slots.{{ $index }}.date">
+                                                    wire:model="vacancySlots.{{ $index }}.date">
                                             </div>
                                             <div class="from-group">
                                                 <label class="form-label">Start Time</label>
                                                 <input type="time" class="form-control"
-                                                    wire:model="slots.{{ $index }}.start_time">
+                                                    wire:model="vacancySlots.{{ $index }}.start_time">
                                             </div>
                                             <div class="from-group">
                                                 <label class="form-label">End Time</label>
                                                 <input type="time" class="form-control"
-                                                    wire:model="slots.{{ $index }}.end_time">
+                                                    wire:model="vacancySlots.{{ $index }}.end_time">
                                             </div>
                                         </div>
                                     </div>
@@ -919,12 +919,12 @@
                             @endif
 
                             <!-- Vacancy Slots Section -->
-                            @if (count($slots) > 0)
+                            @if (count($vacancySlots) > 0)
                                 <div class="bg-slate-50 dark:bg-slate-800 p-4 rounded">
                                     <h4 class="text-lg font-medium mb-4">Interview Slots</h4>
 
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        @foreach ($slots as $index => $slot)
+                                        @foreach ($vacancySlots as $index => $slot)
                                             <div class="border p-3 rounded-md dark:border-slate-600">
                                                 <p class="font-medium">Slot {{ $index + 1 }}</p>
                                                 <div class="mt-2 space-y-1">

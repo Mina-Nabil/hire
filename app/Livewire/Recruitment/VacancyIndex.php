@@ -51,7 +51,7 @@ class VacancyIndex extends Component
     public $questionTypes = [];
 
     // Slots section
-    public $slots = [];
+    public $vacancySlots = [];
 
     // Confirmation modal
     public $deleteConfirmationModal = false;
@@ -131,7 +131,7 @@ class VacancyIndex extends Component
 
             // Process slots
             $slotsData = [];
-            foreach ($this->slots as $slot) {
+            foreach ($this->vacancySlots as $slot) {
                 if (!empty($slot['date']) && !empty($slot['start_time']) && !empty($slot['end_time'])) {
                     $slotsData[] = [
                         'date' => $slot['date'],
@@ -194,9 +194,9 @@ class VacancyIndex extends Component
         }
 
         // Load slots
-        $this->slots = [];
+        $this->vacancySlots = [];
         foreach ($vacancy->vacancy_slots as $slot) {
-            $this->slots[] = [
+            $this->vacancySlots[] = [
                 'id' => $slot->id,
                 'date' => $slot->date->format('Y-m-d'),
                 'start_time' => $slot->start_time->format('H:i'),
@@ -205,7 +205,7 @@ class VacancyIndex extends Component
         }
 
         // If no slots, add an empty one
-        if (empty($this->slots)) {
+        if (empty($this->vacancySlots)) {
             $this->addSlot();
         }
 
@@ -245,9 +245,9 @@ class VacancyIndex extends Component
         }
 
         // Load slots
-        $this->slots = [];
+        $this->vacancySlots = [];
         foreach ($vacancy->vacancy_slots as $slot) {
-            $this->slots[] = [
+            $this->vacancySlots[] = [
                 'id' => $slot->id,
                 'date' => $slot->date->format('Y-m-d'),
                 'start_time' => $slot->start_time->format('H:i'),
@@ -328,7 +328,7 @@ class VacancyIndex extends Component
 
             // Process slots
             $slotsData = [];
-            foreach ($this->slots as $slot) {
+            foreach ($this->vacancySlots as $slot) {
                 if (!empty($slot['date']) && !empty($slot['start_time']) && !empty($slot['end_time'])) {
                     $slotData = [
                         'date' => $slot['date'],
@@ -409,7 +409,7 @@ class VacancyIndex extends Component
     // Slot functions
     public function addSlot()
     {
-        $this->slots[] = [
+        $this->vacancySlots[] = [
             'date' => Carbon::now()->format('Y-m-d'),
             'start_time' => '09:00',
             'end_time' => '17:00',
@@ -418,11 +418,11 @@ class VacancyIndex extends Component
 
     public function removeSlot($index)
     {
-        if (isset($this->slots[$index])) {
-            array_splice($this->slots, $index, 1);
+        if (isset($this->vacancySlots[$index])) {
+            array_splice($this->vacancySlots, $index, 1);
         }
 
-        if (count($this->slots) == 0) {
+        if (count($this->vacancySlots) == 0) {
             $this->addSlot();
         }
     }
@@ -432,10 +432,10 @@ class VacancyIndex extends Component
     {
         if ($name === 'closingDate') {
             $this->closingDate = $value;
-        } else if (strpos($name, 'slots.') === 0 && strpos($name, '.date') !== false) {
+        } else if (strpos($name, 'vacancySlots.') === 0 && strpos($name, '.date') !== false) {
             $parts = explode('.', $name);
             $index = $parts[1];
-            $this->slots[$index]['date'] = $value;
+            $this->vacancySlots[$index]['date'] = $value;
         }
     }
 
@@ -472,7 +472,7 @@ class VacancyIndex extends Component
         $this->arabicJobBenefits = null;
         $this->jobSalary = null;
         $this->questions = [];
-        $this->slots = [];
+        $this->vacancySlots = [];
     }
 
     public function updatedPositionId($value)

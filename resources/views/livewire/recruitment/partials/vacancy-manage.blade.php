@@ -142,7 +142,7 @@
             <!-- Time Slots Section -->
             <div class="mt-8">
                 <h4 class="text-lg font-medium mb-3">Time Slots</h4>
-                @foreach ($slots as $index => $slot)
+                @foreach ($vacancySlots as $index => $slot)
                     <div class="border rounded-md p-4 mb-4">
                         <div class="flex justify-between mb-2">
                             <h5 class="font-medium">Slot {{ $index + 1 }}</h5>
@@ -152,16 +152,16 @@
                         </div>
 
                         <div class="grid grid-cols-3 gap-4">
-                            <x-text-input label="Date" type="date" wire:model="slots.{{ $index }}.date"
-                                errorMessage="{{ $errors->first('slots.' . $index . '.date') }}" />
+                            <x-text-input label="Date" type="date" wire:model="vacancySlots.{{ $index }}.date"
+                                errorMessage="{{ $errors->first('vacancySlots.' . $index . '.date') }}" />
 
                             <x-text-input label="Start Time" type="time"
-                                wire:model="slots.{{ $index }}.start_time"
-                                errorMessage="{{ $errors->first('slots.' . $index . '.start_time') }}" />
+                                wire:model="vacancySlots.{{ $index }}.start_time"
+                                errorMessage="{{ $errors->first('vacancySlots.' . $index . '.start_time') }}" />
 
                             <x-text-input label="End Time" type="time"
-                                wire:model="slots.{{ $index }}.end_time"
-                                errorMessage="{{ $errors->first('slots.' . $index . '.end_time') }}" />
+                                wire:model="vacancySlots.{{ $index }}.end_time"
+                                errorMessage="{{ $errors->first('vacancySlots.' . $index . '.end_time') }}" />
                         </div>
                     </div>
                 @endforeach

@@ -4,6 +4,7 @@ namespace App\Livewire\Attendance;
 
 use App\Exceptions\AppException;
 use App\Models\Attendance\Attendance;
+use App\Rules\ExcelFile;
 use App\Traits\AlertFrontEnd;
 use Exception;
 use Livewire\Component;
@@ -22,9 +23,12 @@ class AddSheet extends Component
     public $uploadedAttendance = [];
     public $zktecoResults = [];
 
-    protected $rules = [
-        'file' => 'required|file|mimes:xlsx,xls|max:20480', // 20MB Max
-    ];
+    protected function rules(): array
+    {
+        return [
+            'file' => ['required', 'file', new ExcelFile, 'max:20480'],
+        ];
+    }
 
     public function openFileUpload()
     {

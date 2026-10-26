@@ -3,6 +3,7 @@
 namespace App\Livewire\Base;
 
 use App\Jobs\StartMigrationJob;
+use App\Rules\ExcelFile;
 use App\Services\MigrationService;
 use App\Traits\AlertFrontEnd;
 use Exception;
@@ -47,7 +48,7 @@ class ImportData extends Component
     public function uploadSheet()
     {
         $this->validate([
-            'file' => 'required|file|mimes:xlsx,xls',
+            'file' => ['required', 'file', new ExcelFile],
         ]);
         try {
             MigrationService::migrateFromStartupfile(

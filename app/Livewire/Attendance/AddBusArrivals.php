@@ -4,6 +4,7 @@ namespace App\Livewire\Attendance;
 
 use App\Exceptions\AppException;
 use App\Models\Attendance\BusArrival;
+use App\Rules\ExcelFile;
 use App\Traits\AlertFrontEnd;
 use Exception;
 use Livewire\Component;
@@ -20,9 +21,12 @@ class AddBusArrivals extends Component
 
     public $uploadedBusArrivals = [];
 
-    protected $rules = [
-        'file' => 'required|file|mimes:xlsx,xls|max:20480', // 20MB Max
-    ];
+    protected function rules(): array
+    {
+        return [
+            'file' => ['required', 'file', new ExcelFile, 'max:20480'],
+        ];
+    }
 
     public function openFileUpload()
     {

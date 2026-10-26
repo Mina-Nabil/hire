@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Employee;
 
+use App\Rules\ExcelFile;
 use App\Services\MigrationService;
 use App\Traits\AlertFrontEnd;
 use Livewire\Component;
@@ -16,9 +17,12 @@ class ImportEmployees extends Component
     public $employeeData = [];
     public $activeTab = 'new_employees';
 
-    protected $rules = [
-        'file' => 'required|mimes:xlsx,xls|max:10240', // 10MB max
-    ];
+    protected function rules(): array
+    {
+        return [
+            'file' => ['required', 'file', new ExcelFile, 'max:10240'],
+        ];
+    }
 
     public function render()
     {
